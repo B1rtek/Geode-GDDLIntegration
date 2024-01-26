@@ -30,7 +30,8 @@ class $modify(MenuLayer) {
 	 * has to match exactly - `bool onMoreGames` 
 	 * would not place a hook!
 	 */
-	static void onMoreGames(CCObject*) {
-		FLAlertLayer::create("Geode", "Hello from my custom mod!", "OK")->show(); 
+
+	void onMoreGames(CCObject*) {
+		FLAlertLayer::create("Geode", "B1rtek mod activated!", "OK")->show();
 	} 
 };
