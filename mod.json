@@ -1,9 +1,10 @@
 {
 	"geode": "2.0.0",
-	"version": "v1.0.0",
+	"version": "v1.0.0-alpha.1",
 	"gd": "2.204",
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
 	"developer": "B1rtek",
-	"description": "Displays GDDL tiers under demons"
+	"description": "Displays GDDL tiers under demons",
+	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration"
 }
