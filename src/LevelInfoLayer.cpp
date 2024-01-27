@@ -14,7 +14,8 @@ class $modify(LevelInfoLayer) {
         if (starsLabel && isDemon) {
             auto tierLabel = CCLabelBMFont::create("Tier ??", "bigFont.fnt");
             tierLabel->setID("gddl-rating"_spr);
-            float labelShift = starsLabel->getContentSize().height / 2.0f;
+            float labelShiftRows = m_level->m_coins > 0 ? 2.0f : 1.0f;
+            float labelShift = starsLabel->getContentSize().height * 0.9f / (2.0f / labelShiftRows); // I'm really trying to make it perfect
             tierLabel->setPosition({starsLabel->getPositionX(), starsLabel->getPositionY() - labelShift}); //160x185
             tierLabel->setAnchorPoint({0.5f, 0.5f});
             tierLabel->setScale(0.4f);
