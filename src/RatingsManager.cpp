@@ -51,17 +51,6 @@ GDDLRating RatingsManager::parseJson(std::string response) {
     return GDDLRating(levelData);
 }
 
-std::string RatingsManager::requestRating(int id) {
-    // it's a simple request so I don't think that async is needed here
-    // hi it's me from the future - this is actually quite noticeable, I need to redo this lmao
-    std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
-    auto res = web::fetch(requestURL);
-    if (!res) {
-        return "";
-    }
-    return res.value();
-}
-
 cocos2d::ccColor3B RatingsManager::convertToColor(int hexColor) {
     int r = (hexColor >> (8*2)) & 0xff;
     int g = (hexColor >> (8*1)) & 0xff;
@@ -70,13 +59,12 @@ cocos2d::ccColor3B RatingsManager::convertToColor(int hexColor) {
 }
 
 int RatingsManager::getDemonTier(int id) {
-    if (!demonMap.contains(id)) {
-        std::string response = requestRating(id);
-        if (response.empty()) return -1;
-        GDDLRating rating = parseJson(response);
-        demonMap[id] = rating;
-    }
-    return demonMap[id].roundedRating;
+    return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating;
+}
+
+std::string RatingsManager::getRequestUrl(int id) {
+    std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
+    return requestURL;
 }
 
 cocos2d::ccColor3B RatingsManager::getTierColor(int tier) {
@@ -85,4 +73,11 @@ cocos2d::ccColor3B RatingsManager::getTierColor(int tier) {
     }
     int hexColor = tierColors[tier];
     return convertToColor(hexColor);
+}
+
+bool RatingsManager::addRatingFromResponse(int id, std::string response) {
+    if (response.empty()) return false;
+    GDDLRating rating = parseJson(response);
+    demonMap[id] = rating;
+    return true;
 }

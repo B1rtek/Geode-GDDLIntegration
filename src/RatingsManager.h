@@ -13,14 +13,16 @@ class RatingsManager {
 
     static GDDLRating parseJson(std::string response);
 
-    static std::string requestRating(int id);
-
     static cocos2d::ccColor3B convertToColor(int hexColor);
 
 public:
     static int getDemonTier(int id);
 
+    static std::string getRequestUrl(int id);
+
     static cocos2d::ccColor3B getTierColor(int tier);
+
+    static bool addRatingFromResponse(int id, std::string response);
 };
 
 
