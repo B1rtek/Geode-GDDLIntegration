@@ -28,6 +28,7 @@ class $modify(LevelInfoLayer) {
             }
             std::string tierLabelText = "Tier " + tierString;
             tierLabel->setString(tierLabelText.c_str());
+            tierLabel->setColor(RatingsManager::getTierColor(tier));
         }
 
         return true;
