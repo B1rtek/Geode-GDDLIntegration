@@ -9,6 +9,8 @@ class GDDLRating {
 public:
     explicit GDDLRating(json levelData);
 
+    GDDLRating() = default;
+
     float rating;
     int roundedRating;
     float enjoyment;

@@ -5,8 +5,10 @@
 using namespace geode::prelude;
 using json = nlohmann::json;
 
+std::map<int, GDDLRating> RatingsManager::demonMap;
+
 GDDLRating RatingsManager::parseJson(std::string response) {
-    json levelData = response;
+    json levelData = json::parse(response);
     return GDDLRating(levelData);
 }
 
