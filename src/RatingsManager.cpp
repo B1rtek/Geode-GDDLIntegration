@@ -6,6 +6,15 @@ using namespace geode::prelude;
 using json = nlohmann::json;
 
 std::map<int, GDDLRating> RatingsManager::demonMap;
+std::vector<int> RatingsManager::tierColors = {
+    0x000000,
+    0x420696,
+    0x420696,
+    0x420696,
+    0x420696,
+    0x420696,
+    0x420696
+};
 
 GDDLRating RatingsManager::parseJson(std::string response) {
     json levelData = json::parse(response);
@@ -23,6 +32,13 @@ std::string RatingsManager::requestRating(int id) {
     return res.value();
 }
 
+cocos2d::ccColor3B RatingsManager::convertToColor(int hexColor) {
+    int r = (hexColor >> (8*0)) & 0xff;
+    int g = (hexColor >> (8*1)) & 0xff;
+    int b = (hexColor >> (8*2)) & 0xff;
+    return cocos2d::ccColor3B(r, g, b);
+}
+
 int RatingsManager::getDemonTier(int id) {
     if (!demonMap.contains(id)) {
         std::string response = requestRating(id);
@@ -31,4 +47,12 @@ int RatingsManager::getDemonTier(int id) {
         demonMap[id] = rating;
     }
     return demonMap[id].roundedRating;
+}
+
+cocos2d::ccColor3B RatingsManager::getTierColor(int tier) {
+    if(tier > tierColors.size() || tier < 0) {
+        return cocos2d::ccColor3B(255, 255, 255);
+    }
+    int hexColor = tierColors[tier];
+    return convertToColor(hexColor);
 }
