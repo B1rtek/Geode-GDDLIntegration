@@ -10,8 +10,10 @@ project(GDDLIntegration VERSION 1.0.0)
 # to recursively add all source files 
 # under src/ 
 file(GLOB SOURCES
-	src/*.cpp
+	src/*.cpp src/*.h
 )
+
+include_directories(extlibs)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
