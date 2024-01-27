@@ -6,5 +6,10 @@
 	"name": "GDDL Integration",
 	"developer": "B1rtek",
 	"description": "Displays GDDL tiers under demons",
-	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration"
+	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration",
+	"resources": {
+		"sprites": [
+			"resources/tier.png"
+		]
+	}
 }
