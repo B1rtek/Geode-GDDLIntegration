@@ -14,6 +14,7 @@ GDDLRating RatingsManager::parseJson(std::string response) {
 
 std::string RatingsManager::requestRating(int id) {
     // it's a simple request so I don't think that async is needed here
+    // hi it's me from the future - this is actually quite noticeable, I need to redo this lmao
     std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
     auto res = web::fetch(requestURL);
     if (!res) {
