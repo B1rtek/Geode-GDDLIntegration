@@ -17,7 +17,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (starsLabel && isDemon) {
             gddlTierUpdated = false;
             auto tierLabel = CCLabelBMFont::create("Tier ??", "bigFont.fnt");
-            CC_SAFE_RETAIN(tierLabel);
             tierLabel->setID("gddl-rating"_spr);
             float labelShiftRows = m_level->m_coins > 0 ? 2.0f : 1.0f;
             float labelShift = starsLabel->getContentSize().height * 0.9f / (2.0f / labelShiftRows); // I'm really trying to make it perfect
@@ -73,6 +72,5 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         auto tierLabel = typeinfo_cast<CCLabelBMFont*>(getChildByID("gddl-rating"_spr));
         tierLabel->setString(tierLabelText.c_str());
         tierLabel->setColor(RatingsManager::getTierColor(tier));
-        CC_SAFE_RELEASE(tierLabel);
     }
 };
