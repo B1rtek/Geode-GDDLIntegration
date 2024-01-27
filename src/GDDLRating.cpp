@@ -7,4 +7,6 @@ GDDLRating::GDDLRating(json levelData) {
     this->ratingCount = levelData["RatingCount"];
     this->enjoymentCount = levelData["EnjoymentCount"];
     this->submissionCount = levelData["SubmissionCount"];
+
+    this->roundedRating = round(this->rating);
 }

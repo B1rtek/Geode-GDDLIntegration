@@ -10,6 +10,7 @@ public:
     explicit GDDLRating(json levelData);
 
     float rating;
+    int roundedRating;
     float enjoyment;
     double deviation;
     int ratingCount;
