@@ -3,6 +3,7 @@
 #include <Geode/utils/web.hpp>
 
 #include "RatingsManager.h"
+#include "Utils.h"
 
 using namespace geode::prelude;
 
@@ -16,19 +17,25 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon) {
             gddlTierUpdated = false;
-            auto tierLabel = CCLabelBMFont::create("Tier ??", "bigFont.fnt");
-            tierLabel->setID("gddl-rating"_spr);
-            float labelShiftRows = m_level->m_coins > 0 ? 2.0f : 1.0f;
-            float labelShift = starsLabel->getContentSize().height * 0.9f / (2.0f / labelShiftRows); // I'm really trying to make it perfect
-            tierLabel->setPosition({starsLabel->getPositionX(), starsLabel->getPositionY() - labelShift}); //160x185
-            tierLabel->setAnchorPoint({0.5f, 0.5f});
-            tierLabel->setScale(0.4f);
-            addChild(tierLabel);
+
+            auto diffPosition = m_difficultySprite->getPosition();
+            auto diffSize = m_difficultySprite->getContentSize();
+
+            auto menu = CCMenu::create();
+            menu->setPosition({diffPosition.x - 50 - diffSize.width/2, diffPosition.y - diffSize.height/2});
+            menu->setContentSize({50, 50});
+            menu->setID("rating-menu"_spr);
+            addChild(menu);
+
+            auto button = CCMenuItemSpriteExtra::create(getDefaultSprite(), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+            button->setPosition({25, 25});
+            button->setID("rating"_spr);
+            menu->addChild(button);
 
             int levelID = m_level->m_levelID;
             int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
-                setTierInformation(tier);
+                updateButton(tier);
                 gddlTierUpdated = true;
             }
         }
@@ -55,22 +62,59 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if(RatingsManager::addRatingFromResponse(levelID, response)) {
                     tier = RatingsManager::getDemonTier(levelID);
                 }
-                setTierInformation(tier);
+                updateButton(tier);
             })
             .expect([this](std::string const& error) {
-                setTierInformation(-1);
+                updateButton(-1);
             });
         }
     }
 
-    void setTierInformation(int tier) {
-        std::string tierString = ":(";
-        if (tier != -1) {
-            tierString = std::to_string(tier);
+    void updateButton(int tier) {
+        auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
+        if (!menu) return;
+        auto tierButton = typeinfo_cast<CCMenuItemSpriteExtra*>(menu->getChildByID("rating"_spr));
+        if (!tierButton) return;
+        tierButton->removeAllChildren();
+
+        auto tierSprite = getSpriteFromTier(tier);
+        if (tierSprite) {
+            tierButton->addChild(tierSprite);
+        } else {
+            tierButton->addChild(getDefaultSprite());
         }
-        std::string tierLabelText = "Tier " + tierString;
-        auto tierLabel = typeinfo_cast<CCLabelBMFont*>(getChildByID("gddl-rating"_spr));
-        tierLabel->setString(tierLabelText.c_str());
-        tierLabel->setColor(RatingsManager::getTierColor(tier));
+    }
+
+    CCSprite *getTierSpriteFromName(const char *name) {
+        auto textureName = Mod::get()->expandSpriteName(name);
+        auto sprite = CCSprite::create(textureName);
+        if (!sprite) return getDefaultSprite();
+
+        sprite->setScale(0.275f);
+        sprite->setAnchorPoint({0, 0});
+
+        return sprite;
+    }
+
+    CCSprite *getSpriteFromTier(int tier) {
+        if (tier == -1) return getDefaultSprite();
+        return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
+    }
+
+    CCSprite *getDefaultSprite() {
+        return getTierSpriteFromName("tier_unrated.png");
+    }
+
+    void onGDDLInfo(CCObject *sender) {
+        auto rating = RatingsManager::getRating(m_level->m_levelID);
+        if (!rating) return;
+        auto info = rating.value();
+
+        std::string tier = info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2);
+        std::string enjoyment = info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2);
+        std::string submissionCount = info.submissionCount == -1 ? "N/A" : std::to_string(info.submissionCount);
+
+        auto layer = FLAlertLayer::create("GDDL Information", "Tier: " + tier + "\nEnjoyment: " + enjoyment + "\nTotal submissions: " + submissionCount, "Close");
+        layer->show();
     }
 };

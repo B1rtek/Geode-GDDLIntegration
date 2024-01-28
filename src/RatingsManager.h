@@ -17,6 +17,7 @@ class RatingsManager {
 
 public:
     static int getDemonTier(int id);
+    static std::optional<GDDLRating> getRating(int id);
 
     static std::string getRequestUrl(int id);
 

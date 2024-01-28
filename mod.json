@@ -1,6 +1,6 @@
 {
 	"geode": "2.0.0",
-	"version": "v1.0.0-beta.1",
+	"version": "v1.0.0-beta.2",
 	"gd": "2.204",
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
@@ -9,7 +9,8 @@
 	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration",
 	"resources": {
 		"sprites": [
-			"resources/tier.png"
+			"resources/tier.png",
+			"resources/tiers/*.png"
 		]
 	}
 }
