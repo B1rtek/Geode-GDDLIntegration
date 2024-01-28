@@ -12,16 +12,14 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1)) return false;
 
-        auto starsLabel = m_starsLabel;
+        auto difficultyLabel = m_difficultySprite;
         bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon) {
+        if (difficultyLabel && isDemon) {
             gddlTierUpdated = false;
             auto tierLabel = CCLabelBMFont::create("Tier ??", "bigFont.fnt");
             tierLabel->setID("gddl-rating"_spr);
-            float labelShiftRows = m_level->m_coins > 0 ? 2.0f : 1.0f;
-            float labelShift = starsLabel->getContentSize().height * 0.9f / (2.0f / labelShiftRows); // I'm really trying to make it perfect
-            tierLabel->setPosition({starsLabel->getPositionX(), starsLabel->getPositionY() - labelShift}); //160x185
-            tierLabel->setAnchorPoint({0.5f, 0.5f});
+            tierLabel->setPosition({difficultyLabel->getPositionX(), difficultyLabel->getPositionY() + difficultyLabel->getContentSize().height / 2.2f}); // 2.2 :D
+            tierLabel->setAnchorPoint({0.5f, 0}) ;
             tierLabel->setScale(0.4f);
             addChild(tierLabel);
 
