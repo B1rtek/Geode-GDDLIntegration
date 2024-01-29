@@ -1,17 +1,22 @@
 # <cr> GDDL Integration </c>
 
-Displays <cr>**GDDL tiers**</c> below demon ratings.
+Displays <cr>**GDDL tiers**</c> next to demon ratings.
 
-![Example](b1rtek.gddlintegration/tier.png)
+![Example (that'll show up once you download it)](b1rtek.gddlintegration/tier.png)
 
-If there's no rating yet, it'll display a sad face :(  
-If the rating doesn't load, <cb>refresh</c> the level page.
+If the rating doesn't load, <cb>refresh</c> the level page (It happens sometimes if you have the level saved already)
 
 ## Known issues
 
-- <cg>Usernames</c> sometimes turn into <cy>`-`</c> after a <cr>failed</c> request, this is just cosmetic though
+- <cg>Usernames</c> sometimes turn into <cy>`-`</c> after a <cr>failed</c> request, this is just cosmetic though (
+  apparently Rob's fault idk https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913375319)
 
-## Planned additions
-- Displaying details about the GDDL tier rating (through an <cb>*i*</c> button next to it or sth)
+If you encounter any other issues, contact me on Discord (<cb>@b1rtek</c>) or on Github
 
-If you encounter any other issues, contact me on Discord (<cb>@b1rtek</c>)
+## Special thanks
+
+<cb>*Code contributions:*</c> <cy>**Diversion**</c>
+<cg>*Feature suggestions:*</c> <cy>MasterGamerY, Weebifying</c>
+<cr>*Bug reporters:*</c> <cy>croozington, bllue</c>
+
+
