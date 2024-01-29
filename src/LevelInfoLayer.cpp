@@ -63,12 +63,13 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     tier = RatingsManager::getDemonTier(levelID);
                 }
                 updateButton(tier);
+                release();
             })
             .expect([this](std::string const& error) {
                 updateButton(-1);
+                release();
             });
         }
-        release();
     }
 
     void updateButton(int tier) {
