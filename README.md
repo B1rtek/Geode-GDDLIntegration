@@ -3,7 +3,7 @@
 Displays <cr>**GDDL tiers**</c> next to demon ratings as well as the reported <cb>enjoyment</c> ratings.  
 Click on the rating button (the red square) to see information about enjoyment and the amount of ratings.
 
-![Example (that'll show up once you download it)](b1rtek.gddlintegration/tier.png)
+![Example (that'll show up once you download it](resources/tier.png)
 
 If the rating doesn't load, <cb>refresh</c> the level page (It happens sometimes if you have the level saved already)
 
