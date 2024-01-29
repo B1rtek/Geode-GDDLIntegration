@@ -68,6 +68,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 updateButton(-1);
             });
         }
+        release();
     }
 
     void updateButton(int tier) {
