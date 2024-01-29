@@ -1,6 +1,7 @@
 # <cr> GDDL Integration </c>
 
-Displays <cr>**GDDL tiers**</c> next to demon ratings.
+Displays <cr>**GDDL tiers**</c> next to demon ratings as well as the reported <cb>enjoyment</c> ratings.  
+Click on the rating button (the red square) to see information about enjoyment and the amount of ratings.
 
 ![Example (that'll show up once you download it)](resources/tier.png)
 
