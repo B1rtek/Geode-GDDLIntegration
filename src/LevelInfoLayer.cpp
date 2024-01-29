@@ -22,7 +22,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             auto diffSize = m_difficultySprite->getContentSize();
 
             auto menu = CCMenu::create();
-            menu->setPosition({diffPosition.x - 50 - diffSize.width/2, diffPosition.y - diffSize.height/2});
+            menu->setPosition({diffPosition.x - 50 - diffSize.width/2, diffPosition.y - diffSize.height/3.2f});
             menu->setContentSize({50, 50});
             menu->setID("rating-menu"_spr);
             addChild(menu);
