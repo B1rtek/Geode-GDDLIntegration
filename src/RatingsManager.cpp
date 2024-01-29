@@ -62,6 +62,11 @@ int RatingsManager::getDemonTier(int id) {
     return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating;
 }
 
+std::optional<GDDLRating> RatingsManager::getRating(int id) {
+    if (!demonMap.contains(id)) return {};
+    return demonMap[id];
+}
+
 std::string RatingsManager::getRequestUrl(int id) {
     std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
     return requestURL;

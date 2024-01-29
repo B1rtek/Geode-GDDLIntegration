@@ -4,7 +4,6 @@ Displays <cr>**GDDL tiers**</c> below demon ratings.
 
 ![Example](resources/tier.png)
 
-If there's no rating yet, it'll display a sad face :(  
 If the rating doesn't load, <cb>refresh</c> the level page.
 
 ## Known issues
