@@ -16,7 +16,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         auto starsLabel = m_starsLabel;
         bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon) {
-            gddlTierUpdated = false;
+            m_fields->gddlTierUpdated = false;
 
             auto diffPosition = m_difficultySprite->getPosition();
             auto diffSize = m_difficultySprite->getContentSize();
@@ -36,7 +36,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
                 updateButton(tier);
-                gddlTierUpdated = true;
+                m_fields->gddlTierUpdated = true;
             }
         }
 
@@ -47,7 +47,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         LevelInfoLayer::updateLabelValues();
         auto starsLabel = m_starsLabel;
         bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (!starsLabel || !isDemon || gddlTierUpdated) return;
+        if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
         retain();
