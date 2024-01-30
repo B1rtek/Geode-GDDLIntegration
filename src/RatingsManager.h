@@ -22,6 +22,8 @@ public:
     static bool addRatingFromResponse(int id, std::string response);
 
     static void cacheRatings(const std::string &response);
+
+    static std::map<int, int> getTierStats();
 };
 
 
