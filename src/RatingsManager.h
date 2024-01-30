@@ -7,11 +7,18 @@
 
 #include "GDDLRating.h"
 
+using namespace geode::prelude;
+
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::map<int, int> ratingsCache;
+    inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
     static GDDLRating parseJson(std::string response);
+
+    static void populateFromSave();
+
+    static void cacheList();
 
 public:
     static int getDemonTier(int id);

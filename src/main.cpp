@@ -44,12 +44,6 @@ class $modify(MenuLayer) {
             .text()
             .then([](std::string const& response) {
                 RatingsManager::cacheRatings(response);
-                std::map<int, int> userTierStats = RatingsManager::getTierStats();
-                std::string statsString;
-                for(auto element:userTierStats) {
-                    statsString += std::to_string(element.first) + ": " + std::to_string(element.second) + ", ";
-                }
-                FLAlertLayer::create("GDDL Integration", statsString, "OK")->show();
             })
             .expect([](std::string const& error) {
                 FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
