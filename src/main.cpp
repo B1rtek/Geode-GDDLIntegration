@@ -35,24 +35,26 @@ class $modify(MenuLayer) {
      * would not place a hook!
      */
 
-    bool gameLaunch = true;
-
     bool init() {
         if (!MenuLayer::init()) return false;
 
-        if (m_fields->gameLaunch) {
-            m_fields->gameLaunch = false;
+        if (!RatingsManager::alreadyCached()) {
             web::AsyncWebRequest()
             .fetch("https://gdladder.com/api/theList")
             .text()
             .then([](std::string const& response) {
                 RatingsManager::cacheRatings(response);
+                std::map<int, int> userTierStats = RatingsManager::getTierStats();
+                std::string statsString;
+                for(auto element:userTierStats) {
+                    statsString += std::to_string(element.first) + ": " + std::to_string(element.second) + ", ";
+                }
+                FLAlertLayer::create("GDDL Integration", statsString, "OK")->show();
             })
             .expect([](std::string const& error) {
                 FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
             });
         }
-
         return true;
     }
 };

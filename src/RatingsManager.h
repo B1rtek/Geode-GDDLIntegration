@@ -24,6 +24,8 @@ public:
     static void cacheRatings(const std::string &response);
 
     static std::map<int, int> getTierStats();
+
+    static bool alreadyCached();
 };
 
 

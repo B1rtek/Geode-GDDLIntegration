@@ -45,17 +45,19 @@ void RatingsManager::cacheRatings(const std::string &response) {
 }
 
 std::map<int, int> RatingsManager::getTierStats() {
-    GameLevelManager* levelManager = GameLevelManager::sharedState();
-    cocos2d::CCArray* completedLevels = levelManager->getCompletedLevels(false);
+    GameLevelManager *levelManager = GameLevelManager::sharedState();
+    cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
     std::map<int, int> tierStats;
-    CCObject* obj;
-    CCARRAY_FOREACH(completedLevels,obj)
-    {
-        auto level = dynamic_cast<GJGameLevel*>(obj);
-        if(level->m_normalPercent == 100 && level->m_stars == 10) {
+    CCObject *obj;
+    CCARRAY_FOREACH(completedLevels, obj) {
+        auto level = dynamic_cast<GJGameLevel *>(obj);
+        if (level->m_normalPercent == 100 && level->m_stars == 10) {
             int cachedTier = ratingsCache[level->m_levelID];
             tierStats[cachedTier]++;
         }
     }
     return tierStats;
+}
+bool RatingsManager::alreadyCached() {
+    return !ratingsCache.empty();
 }
