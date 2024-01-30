@@ -38,7 +38,7 @@ void RatingsManager::cacheRatings(const std::string &response) {
     json ratingsData = json::parse(response);
     for (auto element: ratingsData) {
         const int id = element["ID"];
-        const float rating = element["Rating"].is_null() ? -1 : element["Rating"];
+        const float rating = element["Rating"].is_null() ? -1.0f : static_cast<float>(element["Rating"]);
         const int roundedRating = round(rating);
         ratingsCache[id] = roundedRating;
     }
