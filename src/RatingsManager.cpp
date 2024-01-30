@@ -6,6 +6,7 @@ using namespace geode::prelude;
 using json = nlohmann::json;
 
 std::map<int, GDDLRating> RatingsManager::demonMap;
+std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(std::string response) {
     json levelData = json::parse(response);
@@ -27,8 +28,18 @@ std::string RatingsManager::getRequestUrl(int id) {
 }
 
 bool RatingsManager::addRatingFromResponse(int id, std::string response) {
-    if (response.empty()) return false;
+    if (response.empty())
+        return false;
     GDDLRating rating = parseJson(response);
     demonMap[id] = rating;
     return true;
+}
+void RatingsManager::cacheRatings(const std::string &response) {
+    json ratingsData = json::parse(response);
+    for (auto element: ratingsData) {
+        const int id = element["ID"];
+        const float rating = element["Rating"].is_null() ? -1 : element["Rating"];
+        const int roundedRating = round(rating);
+        ratingsCache[id] = roundedRating;
+    }
 }
