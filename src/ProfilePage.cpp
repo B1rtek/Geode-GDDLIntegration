@@ -6,6 +6,9 @@ using namespace geode::prelude;
 class $modify(GDDLProfileMod, ProfilePage) {
     virtual TodoReturn loadPageFromUserInfo(GJUserScore* p0) {
         ProfilePage::loadPageFromUserInfo(p0);
+        if(p0->m_accountID != GJAccountManager::sharedState()->m_accountID) return;
+        if(m_mainLayer->getChildByIDRecursive("gddl-demon-buttons-container") != nullptr) return;
+        // get the existing nodes
         auto statsMenu = m_mainLayer->getChildByID("stats-menu");
         auto demonButton = m_mainLayer->getChildByIDRecursive("demons-icon");
         // create GDDL button
@@ -19,6 +22,8 @@ class $modify(GDDLProfileMod, ProfilePage) {
         this->m_buttons->addObject(gddlButton);
         // create CCNode layout for the demon and gddl buttons
         CCMenu* demonButtonsContainer = CCMenu::create();
+        demonButtonsContainer->setID("gddl-demon-buttons-container");
+        // remove the demon button from the original layout and put it in the new one
         statsMenu->removeChild(demonButton);
         demonButtonsContainer->addChild(demonButton);
         demonButtonsContainer->addChild(gddlButton);
@@ -26,6 +31,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         demonButtonsContainer->reorderChild(gddlButton, 3);
         demonButtonsContainer->setLayout(RowLayout::create()->setGap(3.0f));
         demonButtonsContainer->setContentSize({50.0f, 30.0f});
+        // magic that makes it look properly
         statsMenu->addChild(demonButtonsContainer);
         demonButtonsContainer->updateLayout();
         statsMenu->reorderChild(demonButtonsContainer, 1); // who cares it should be fine as long as it's over 0
