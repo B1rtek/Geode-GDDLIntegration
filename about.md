@@ -11,6 +11,7 @@ If the rating doesn't load, <cb>refresh</c> the level page (It happens sometimes
 
 - <cg>Usernames</c> sometimes turn into <cy>`-`</c> after a <cr>failed</c> request, this is just cosmetic though (
   [apparently Rob's fault](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913375319))
+- Refreshing your profile page might slightly break its layout (just exit and enter it again if that happens)
 
 If you encounter any other issues, contact me on Discord (<cb>@b1rtek</c>) or on Github
 
