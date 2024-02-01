@@ -13,5 +13,13 @@
 			"resources/split.png",
 			"resources/tiers/*.png"
 		]
+	},
+	"settings": {
+		"move-button-to-level-name": {
+			"name": "Move tier button to level name",
+			"description": "By default, the tier button is situated to the left of the demon face, if this is toggled on it'll be moved right to the level name",
+			"type": "bool",
+			"default": false
+		}
 	}
 }
