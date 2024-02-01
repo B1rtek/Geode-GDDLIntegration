@@ -10,6 +10,7 @@
 	"resources": {
 		"sprites": [
 			"resources/tier.png",
+			"resources/split.png",
 			"resources/tiers/*.png"
 		]
 	}
