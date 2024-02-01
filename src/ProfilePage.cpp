@@ -1,6 +1,8 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/ProfilePage.hpp>
 
+#include "GDDLDemonSplitLayer.h"
+
 using namespace geode::prelude;
 
 class $modify(GDDLProfileMod, ProfilePage) {
@@ -13,7 +15,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         std::string gddlButtonSpritePath = Mod::get()->expandSpriteName("tier_unrated.png");
         auto gddlButtonSprite = CCSprite::create(gddlButtonSpritePath.c_str());
         gddlButtonSprite->setScale(0.15f);
-        auto gddlButton = CCMenuItemSpriteExtra::create(gddlButtonSprite, this, menu_selector(GDDLProfileMod::test));
+        auto gddlButton = CCMenuItemSpriteExtra::create(gddlButtonSprite, this, menu_selector(GDDLProfileMod::onGDDLDemonSplit));
         gddlButton->setScale(0.5f);
         gddlButton->setContentSize({20.0f, 20.0f});
         gddlButton->setID("gddl-button");
@@ -26,7 +28,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         gddlButtonSprite->setPosition({gddlButtonSprite->getParent()->getContentSize().width/2, gddlButtonSprite->getParent()->getContentSize().height/2});
     }
 
-    void test(CCObject* sender) {
-        FLAlertLayer::create("did it work?", "yes", "very cool ig")->show();
+    void onGDDLDemonSplit(CCObject* sender) {
+        GDDLDemonSplitLayer::create()->show();
     }
 };
