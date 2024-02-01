@@ -10,10 +10,12 @@ class GDDLDemonSplitLayer : public FLAlertLayer {
 
     bool init();
     void onClose(cocos2d::CCObject* sender);
+    void onInfo(cocos2d::CCObject* sender);
 
     CCNode* createTierNode(int tier);
 public:
     static GDDLDemonSplitLayer* create();
+    void show();
 };
 
 

@@ -20,10 +20,23 @@ bool GDDLDemonSplitLayer::init() {
     m_buttonMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
     m_mainLayer->addChild(m_buttonMenu, 10);
     // title
+    auto titleContainer = CCMenu::create();
+    titleContainer->setLayout(RowLayout::create());
+    titleContainer->setContentSize({200.0f, 30.0f});
     auto title = CCLabelBMFont::create("GDDL Demon Split", "goldFont.fnt");
     title->setID("gddl-demon-split-title"_spr);
-    m_buttonMenu->addChild(title);
-    m_buttonMenu->reorderChild(title, 0);
+    titleContainer->addChild(title);
+    // the (i) button
+    auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    iButtonSprite->setScale(0.5f);
+    auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLDemonSplitLayer::onInfo));
+    iButton->setScale(0.4f);
+    iButton->setContentSize({10.0f, 10.0f});
+    titleContainer->addChild(iButton);
+    titleContainer->updateLayout();
+    m_buttonMenu->addChild(titleContainer);
+    m_buttonMenu->reorderChild(titleContainer, 0);
+
     // this is where the tiers go
     for (int row = 0; row < 5; row++) {
         auto rowNode = CCNode::create();
@@ -46,6 +59,8 @@ bool GDDLDemonSplitLayer::init() {
 
     m_buttonMenu->updateLayout();
     m_mainLayer->updateLayout();
+    // fix the iButton :tm: placement (is it clear already that I never did frontend)
+    iButton->setPosition({iButton->getPositionX(), 15.0f});
     return true;
 }
 
@@ -53,6 +68,11 @@ void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
+
+void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) {
+    FLAlertLayer::create("GDDL Demon Split", "Not accounting for <cb>official levels</c>, <co>gauntlet levels</c> and <cy>weekly demons</c>.", "OK")->show();
+}
+
 
 CCNode *GDDLDemonSplitLayer::createTierNode(int tier) {
     auto tierNode = CCNode::create();
@@ -89,3 +109,9 @@ GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {
         return nullptr;
     }
 }
+
+void GDDLDemonSplitLayer::show() {
+    FLAlertLayer::show();
+    cocos::handleTouchPriority(this);
+}
+
