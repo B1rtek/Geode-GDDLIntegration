@@ -22,8 +22,8 @@ If you encounter any other issues, contact me on Discord (<cb>@b1rtek</c>) or on
 
 ## Special thanks
 
-<cb>*Code contributions:*</c> <cy>**[Diversion](https://github.com/B1rtek/Geode-GDDLIntegration/pull/3)**</c>
-<cg>*Feature suggestions:*</c> <cy>[MasterGamerY](https://github.com/B1rtek/Geode-GDDLIntegration/issues/1), [Weebifying](https://github.com/B1rtek/Geode-GDDLIntegration/pull/2), [averiee_](https://github.com/B1rtek/Geode-GDDLIntegration/milestone/4), [thesuperjepphykiller](https://github.com/B1rtek/Geode-GDDLIntegration/issues/6)</c>
+<cb>*Code contributions:*</c> <cy>**[Diversion](https://github.com/B1rtek/Geode-GDDLIntegration/pull/3)**</c>  
+<cg>*Feature suggestions:*</c> <cy>[MasterGamerY](https://github.com/B1rtek/Geode-GDDLIntegration/issues/1), [Weebifying](https://github.com/B1rtek/Geode-GDDLIntegration/pull/2), [averiee_](https://github.com/B1rtek/Geode-GDDLIntegration/milestone/4), [TheSuperJepphyKiller](https://github.com/B1rtek/Geode-GDDLIntegration/issues/6)</c>  
 <cr>*Bug reporters:*</c> <cy>croozington, bllue, [Fleeym](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780380), [matcool](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780699), [Lexicon](https://github.com/B1rtek/Geode-GDDLIntegration/issues/7)</c>
 
 
