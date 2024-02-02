@@ -17,20 +17,25 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon) {
             m_fields->gddlTierUpdated = false;
+            bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
 
-            auto diffPosition = m_difficultySprite->getPosition();
-            auto diffSize = m_difficultySprite->getContentSize();
-
-            auto menu = CCMenu::create();
-            menu->setPosition({diffPosition.x - 50 - diffSize.width/2, diffPosition.y - diffSize.height/3.2f});
-            menu->setContentSize({50, 50});
-            menu->setID("rating-menu"_spr);
-            addChild(menu);
-
-            auto button = CCMenuItemSpriteExtra::create(getDefaultSprite(), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
-            button->setPosition({25, 25});
-            button->setID("rating"_spr);
-            menu->addChild(button);
+            CCPoint menuPosition, buttonPosition;
+            CCSize menuSize;
+            if(moveToLevelName) {
+                const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
+                const auto levelNamePosition = levelNameLabel->getPosition();
+                const auto levelNameSize = levelNameLabel->getContentSize();
+                menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width + 25.0f, levelNamePosition.y + levelNameSize.height/2};
+                menuSize = CCSize{50, 50};
+                buttonPosition = CCPoint{25, 25};
+            } else {
+                const auto diffPosition = m_difficultySprite->getPosition();
+                const auto diffSize = m_difficultySprite->getContentSize();
+                menuPosition = CCPoint{diffPosition.x - 50 - diffSize.width/2, diffPosition.y - diffSize.height/3.2f};
+                menuSize = CCSize{50, 50};
+                buttonPosition = CCPoint{25, 25};
+            }
+            placeGDDLButton(menuPosition, menuSize, buttonPosition);
 
             int levelID = m_level->m_levelID;
             int tier = RatingsManager::getDemonTier(levelID);
@@ -70,6 +75,19 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 release();
             });
         }
+    }
+
+    void placeGDDLButton(const CCPoint& menuPosition, const CCSize& menuSize, const CCPoint& buttonPosition) {
+        auto menu = CCMenu::create();
+        menu->setPosition(menuPosition);
+        menu->setContentSize(menuSize);
+        menu->setID("rating-menu"_spr);
+        addChild(menu);
+
+        auto button = CCMenuItemSpriteExtra::create(getDefaultSprite(), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        button->setPosition(buttonPosition);
+        button->setID("rating"_spr);
+        menu->addChild(button);
     }
 
     void updateButton(int tier) {
