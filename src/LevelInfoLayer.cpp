@@ -18,15 +18,20 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (starsLabel && isDemon) {
             m_fields->gddlTierUpdated = false;
             bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
+            int levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
 
             CCPoint menuPosition, buttonPosition;
             CCSize menuSize;
             float buttonScale = 1.0f;
-            if(moveToLevelName) {
+            if(moveToLevelName && levelNamePos != 0) {
                 const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                 const auto levelNamePosition = levelNameLabel->getPosition();
                 const auto levelNameSize = levelNameLabel->getContentSize();
-                menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width/2.5f, levelNamePosition.y - levelNameSize.height/2.25f};
+                if (levelNamePos > 0) { // right
+                    menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width/2.5f, levelNamePosition.y - levelNameSize.height/2.25f};
+                } else { // left
+                    menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width/1.75f, levelNamePosition.y - levelNameSize.height/2.25f};
+                }
                 menuSize = CCSize{25, 25};
                 buttonPosition = CCPoint{12.5f, 12.5f};
                 buttonScale = 0.5f;
