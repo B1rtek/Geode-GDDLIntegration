@@ -70,7 +70,14 @@ void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) {
-    FLAlertLayer::create("GDDL Demon Split", "Not accounting for <cb>official levels</c>, <co>gauntlet levels</c> and <cy>weekly demons</c>.", "OK")->show();
+    std::map<int, int> tierStats = RatingsManager::getTierStats();
+    int total = 0;
+    for (auto tierCountPair: tierStats) {
+        total += tierCountPair.second;
+    }
+    const int unrated = tierStats[-1];
+    const std::string message = "Not accounting for <cb>official levels</c>, <co>gauntlet levels</c> and <cy>weekly demons</c>.\n <cg>Total:</c> " + std::to_string(total) + ", of which with <cr>unknown</c> tier: " + std::to_string(unrated);
+    FLAlertLayer::create("GDDL Demon Split", message.c_str(), "OK")->show();
 }
 
 
