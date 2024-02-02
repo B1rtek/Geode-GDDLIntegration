@@ -142,7 +142,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         std::string enjoyment = info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2);
         std::string submissionCount = info.submissionCount == -1 ? "N/A" : std::to_string(info.submissionCount);
 
-        auto layer = FLAlertLayer::create("GDDL Information", "Tier: " + tier + "\nEnjoyment: " + enjoyment + "\nTotal submissions: " + submissionCount, "Close");
+        auto layer = FLAlertLayer::create("GDDL Information", "<cr>Tier:</c> " + tier + "\n<cg>Enjoyment:</c> " + enjoyment + "\n<cy>Total submissions:</c> " + submissionCount, "Close");
         layer->show();
     }
 };
