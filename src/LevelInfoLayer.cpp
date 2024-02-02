@@ -21,13 +21,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
             CCPoint menuPosition, buttonPosition;
             CCSize menuSize;
+            float buttonScale = 1.0f;
             if(moveToLevelName) {
                 const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                 const auto levelNamePosition = levelNameLabel->getPosition();
                 const auto levelNameSize = levelNameLabel->getContentSize();
-                menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width + 25.0f, levelNamePosition.y + levelNameSize.height/2};
-                menuSize = CCSize{50, 50};
-                buttonPosition = CCPoint{25, 25};
+                menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width/2.5f, levelNamePosition.y - levelNameSize.height/2.25f};
+                menuSize = CCSize{25, 25};
+                buttonPosition = CCPoint{12.5f, 12.5f};
+                buttonScale = 0.5f;
             } else {
                 const auto diffPosition = m_difficultySprite->getPosition();
                 const auto diffSize = m_difficultySprite->getContentSize();
@@ -35,7 +37,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 menuSize = CCSize{50, 50};
                 buttonPosition = CCPoint{25, 25};
             }
-            placeGDDLButton(menuPosition, menuSize, buttonPosition);
+            placeGDDLButton(menuPosition, menuSize, buttonPosition, buttonScale);
 
             int levelID = m_level->m_levelID;
             int tier = RatingsManager::getDemonTier(levelID);
@@ -77,10 +79,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         }
     }
 
-    void placeGDDLButton(const CCPoint& menuPosition, const CCSize& menuSize, const CCPoint& buttonPosition) {
+    void placeGDDLButton(const CCPoint& menuPosition, const CCSize& menuSize, const CCPoint& buttonPosition, float buttonScale = 1.0f) {
         auto menu = CCMenu::create();
         menu->setPosition(menuPosition);
         menu->setContentSize(menuSize);
+        menu->setScale(buttonScale);
         menu->setID("rating-menu"_spr);
         addChild(menu);
 
