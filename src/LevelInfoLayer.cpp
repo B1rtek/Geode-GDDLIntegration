@@ -30,7 +30,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (levelNamePos > 0) { // right
                     menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width/2.5f, levelNamePosition.y - levelNameSize.height/2.25f};
                 } else { // left
-                    menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width/1.75f, levelNamePosition.y - levelNameSize.height/2.25f};
+                    menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width/2.5f - 25.0f, levelNamePosition.y - levelNameSize.height/2.25f};
                 }
                 menuSize = CCSize{25, 25};
                 buttonPosition = CCPoint{12.5f, 12.5f};
