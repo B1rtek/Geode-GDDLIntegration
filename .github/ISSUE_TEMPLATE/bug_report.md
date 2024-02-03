@@ -21,3 +21,5 @@ Steps to reproduce the behavior:
 
 **Additional context**
 Add any other context about the problem here.
+
+[ ] I checked that I have the latest version of this mod
