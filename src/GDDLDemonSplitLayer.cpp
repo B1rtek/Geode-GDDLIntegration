@@ -76,13 +76,24 @@ void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) {
         total += tierCountPair.second;
     }
     const int unrated = tierStats[-1];
-    const std::string message = "Not accounting for <cb>official levels</c>, <co>gauntlet levels</c> and <cy>weekly demons</c>.\n <cg>Total:</c> " + std::to_string(total) + ", of which with <cr>unknown</c> tier: " + std::to_string(unrated);
+    const std::string message = "Not accounting for <cb>official levels</c>, <co>gauntlet levels</c> and <cy>weekly "
+                                "demons</c>.\n <cg>Total:</c> " +
+                                std::to_string(total) +
+                                ", of which with <cr>unknown</c> tier: " + std::to_string(unrated);
     FLAlertLayer::create("GDDL Demon Split", message.c_str(), "OK")->show();
 }
 
+void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) {
+    auto *senderNode = dynamic_cast<CCNode *>(sender);
+    const std::string tierStr = senderNode->getID();
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    GJSearchObject *searchObject = RatingsManager::searchForTier(tierNumber, true);
+    const auto listLayer = LevelBrowserLayer::create(searchObject);
+    cocos::switchToScene(listLayer);
+}
 
 CCNode *GDDLDemonSplitLayer::createTierNode(int tier) {
-    auto tierNode = CCNode::create();
+    auto tierNode = CCMenu::create();
     tierNode->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     tierNode->setContentSize({50.0f, 20.0f});
     // tier sprite
@@ -91,7 +102,10 @@ CCNode *GDDLDemonSplitLayer::createTierNode(int tier) {
     auto tierSprite = CCSprite::create(textureName);
     tierSprite->setScale(0.05f);
     tierSprite->setContentSize({20.0f, 20.0f});
-    tierNode->addChild(tierSprite);
+    auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLDemonSplitLayer::onTierSearch));
+    tierButton->setContentSize({20.0f, 20.0f});
+    tierButton->setID("button-tier-"+std::to_string(tier));
+    tierNode->addChild(tierButton);
     // tier count
     int count = RatingsManager::getTierStats()[tier];
     auto countLabel = CCLabelBMFont::create(std::to_string(count).c_str(), "chatFont.fnt");
@@ -100,7 +114,7 @@ CCNode *GDDLDemonSplitLayer::createTierNode(int tier) {
     tierNode->updateLayout();
     // sprite size fix
     tierSprite->setScale(0.15f);
-    tierSprite->setPosition({4.0f, 1.5f});
+    tierButton->setPosition({14.0f, 11.5f});
     if(count >= 1000) {
         countLabel->setScale(0.8f);
     }
