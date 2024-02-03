@@ -33,6 +33,8 @@ public:
     static std::map<int, int> getTierStats();
 
     static bool alreadyCached();
+
+    static GJSearchObject* searchForTier(int tier, bool completed);
 };
 
 
