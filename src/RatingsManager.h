@@ -49,7 +49,9 @@ public:
 
     static bool isSearchingForTier();
 
-    static GJSearchObject* getSearchPage(int page);
+    static GJSearchObject *getSearchPage(int page);
+
+    static void stopSearch();
 };
 
 
