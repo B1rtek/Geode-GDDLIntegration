@@ -57,6 +57,39 @@ void RatingsManager::cacheList() {
     settingsFile.close();
 }
 
+void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchType) {
+    std::set<int> allLevelsFromTier;
+    for (auto [id, cachedTier]: ratingsCache) {
+        if (cachedTier == tier) {
+            allLevelsFromTier.insert(id);
+        }
+    }
+    if(searchType != ANY) {
+        std::set<int> allCompletedTierLevels;
+        GameLevelManager *levelManager = GameLevelManager::sharedState();
+        const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
+        CCObject *obj;
+        CCARRAY_FOREACH(completedLevels, obj) {
+            const auto level = dynamic_cast<GJGameLevel *>(obj);
+            // ReSharper disable once CppTooWideScopeInitStatement
+            const bool levelCompleted = level->m_normalPercent == 100;
+            if (allLevelsFromTier.contains(level->m_levelID) && levelCompleted) {
+                allCompletedTierLevels.insert(level->m_levelID);
+            }
+        }
+        if(searchType == COMPLETED) {
+            searchResults = Utils::copySetToVector(allCompletedTierLevels);
+        } else { // searchType == UNCOMPLETED
+            for (auto level: allCompletedTierLevels) {
+                allLevelsFromTier.erase(level);
+            }
+            searchResults = Utils::copySetToVector(allCompletedTierLevels);
+        }
+    } else {
+        searchResults = Utils::copySetToVector(allLevelsFromTier);
+    }
+}
+
 int RatingsManager::getDemonTier(int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
 
 std::optional<GDDLRating> RatingsManager::getRating(int id) {
@@ -110,34 +143,9 @@ bool RatingsManager::alreadyCached() {
     populateFromSave();
     return !ratingsCache.empty();
 }
-GJSearchObject *RatingsManager::searchForTier(const int tier, const bool completed, const int page) {
-    std::string idList;
-    GameLevelManager *levelManager = GameLevelManager::sharedState();
-    const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
-    CCObject *obj;
-    int levelIndex = 0;
-    CCARRAY_FOREACH(completedLevels, obj) {
-        const auto level = dynamic_cast<GJGameLevel *>(obj);
-        const int levelTier = ratingsCache[level->m_levelID];
-        // ReSharper disable once CppTooWideScopeInitStatement
-        const bool levelCompleted = level->m_normalPercent == 100;
-        if (levelTier == tier && completed == levelCompleted) {
-            if (levelIndex >= (page - 1) * 10 && levelIndex < page * 10) {
-                idList += std::to_string(level->m_levelID) + ',';
-            } else if (levelIndex >= page * 10) {
-                break;
-            }
-            ++levelIndex;
-        }
-    }
-    idList.pop_back();
-    idList += "&gameVersion=22";
-    return GJSearchObject::create(SearchType::Type19, idList);
-}
 
 void RatingsManager::setupSearch(const int tier, const TierSearchType searchType) {
-    searchedTier = tier;
-    tierSearchType = searchType;
+    prepareSearchResults(tier, searchType);
     searchingForTier = true;
 }
 
@@ -145,8 +153,33 @@ bool RatingsManager::isSearchingForTier() {
     return searchingForTier;
 }
 
-GJSearchObject *RatingsManager::getSearchPage(const int page) {
-    return searchForTier(searchedTier, true, page);
+GJSearchObject *RatingsManager::getSearchPage(int page) {
+    if (page < 1) {
+        page = 1;
+    } else if (page > getSearchResultsPageCount()) {
+        page = getSearchResultsPageCount();
+    }
+    const int firstIndex = (page - 1) * 10;
+    const int lastIndex = std::min(firstIndex+10, static_cast<int>(searchResults.size()));
+    std::string requestString;
+    for (int i = firstIndex; i < lastIndex; i++) {
+        requestString += std::to_string(searchResults[i]) + ',';
+    }
+    if (!requestString.empty()) {
+        requestString.pop_back();
+    }
+    requestString += "&gameVersion=22";
+    return GJSearchObject::create(SearchType::Type19, requestString);
+}
+
+int RatingsManager::getSearchResultsPageCount() {
+    const int searchResultsCount = searchResults.size();
+    const int correction = searchResultsCount % 10 == 1 ? 0 : 1;
+    return searchResultsCount / 10 + correction;
+}
+
+int RatingsManager::getSearchResultsCount() {
+    return searchResults.size();
 }
 
 void RatingsManager::stopSearch() {

@@ -22,6 +22,7 @@ class RatingsManager {
     inline static int searchedTier = -1;
     inline static TierSearchType tierSearchType{};
     inline static bool searchingForTier = false;
+    inline static std::vector<int> searchResults{};
 
     static GDDLRating parseJson(std::string response);
 
@@ -29,8 +30,11 @@ class RatingsManager {
 
     static void cacheList();
 
+    static void prepareSearchResults(int tier, TierSearchType searchType);
+
 public:
     static int getDemonTier(int id);
+
     static std::optional<GDDLRating> getRating(int id);
 
     static std::string getRequestUrl(int id);
@@ -43,13 +47,15 @@ public:
 
     static bool alreadyCached();
 
-    static GJSearchObject* searchForTier(int tier, bool completed, int page);
-
     static void setupSearch(int tier, TierSearchType searchType);
 
     static bool isSearchingForTier();
 
     static GJSearchObject *getSearchPage(int page);
+
+    static int getSearchResultsPageCount();
+
+    static int getSearchResultsCount();
 
     static void stopSearch();
 };
