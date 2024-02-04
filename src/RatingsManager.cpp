@@ -110,21 +110,42 @@ bool RatingsManager::alreadyCached() {
     populateFromSave();
     return !ratingsCache.empty();
 }
-GJSearchObject *RatingsManager::searchForTier(const int tier, const bool completed) {
+GJSearchObject *RatingsManager::searchForTier(const int tier, const bool completed, const int page) {
     std::string idList;
     GameLevelManager *levelManager = GameLevelManager::sharedState();
     const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
     CCObject *obj;
+    int levelIndex = 0;
     CCARRAY_FOREACH(completedLevels, obj) {
         const auto level = dynamic_cast<GJGameLevel *>(obj);
         const int levelTier = ratingsCache[level->m_levelID];
         // ReSharper disable once CppTooWideScopeInitStatement
         const bool levelCompleted = level->m_normalPercent == 100;
-        if(levelTier == tier && completed == levelCompleted) {
-            idList += std::to_string(level->m_levelID) + ',';
+        if (levelTier == tier && completed == levelCompleted) {
+            if (levelIndex >= (page - 1) * 10 && levelIndex < page * 10) {
+                idList += std::to_string(level->m_levelID) + ',';
+                ++levelIndex;
+            } else if (levelIndex >= page * 10) {
+                break;
+            }
         }
     }
     idList.pop_back();
     idList += "&gameVersion=22";
     return GJSearchObject::create(SearchType::Type19, idList);
+}
+
+void RatingsManager::setupSearch(const int tier, const TierSearchType searchType) {
+    searchedTier = tier;
+    tierSearchType = searchType;
+}
+
+bool RatingsManager::isSearchingForTier() {
+    const bool oldVal = searchingForTier;
+    searchingForTier = false;
+    return oldVal;
+}
+
+GJSearchObject *RatingsManager::getSearchPage(const int page) {
+    return searchForTier(searchedTier, true, page);
 }
