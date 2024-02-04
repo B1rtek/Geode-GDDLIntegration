@@ -16,12 +16,14 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
 
     void onNextPage(CCObject* sender) {
         LevelBrowserLayer::onNextPage(sender);
+        if(!RatingsManager::isSearchingForTier() || m_searchObject->m_searchType != SearchType::Type19) return;
         m_fields->currentPage++;
         loadPage(RatingsManager::getSearchPage(m_fields->currentPage));
     }
 
     void onPrevPage(CCObject* sender) {
         LevelBrowserLayer::onNextPage(sender);
+        if(!RatingsManager::isSearchingForTier() || m_searchObject->m_searchType != SearchType::Type19) return;
         m_fields->currentPage = std::max(0, m_fields->currentPage-1);
         loadPage(RatingsManager::getSearchPage(m_fields->currentPage));
     }
