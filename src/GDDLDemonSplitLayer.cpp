@@ -88,7 +88,7 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) {
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
     RatingsManager::setupSearch(tierNumber, COMPLETED);
-    const auto listLayer = LevelBrowserLayer::create(nullptr);
+    const auto listLayer = LevelBrowserLayer::create(RatingsManager::getSearchPage(1));
     cocos::switchToScene(listLayer);
 }
 
