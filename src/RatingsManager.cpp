@@ -174,7 +174,7 @@ GJSearchObject *RatingsManager::getSearchPage(int page) {
 
 int RatingsManager::getSearchResultsPageCount() {
     const int searchResultsCount = searchResults.size();
-    const int correction = searchResultsCount % 10 == 1 ? 0 : 1;
+    const int correction = searchResultsCount % 10 == 0 ? 0 : 1;
     return searchResultsCount / 10 + correction;
 }
 
