@@ -9,6 +9,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     bool init();
     void onClose(CCObject* sender);
     void onInfo(CCObject* sender);
+    void onSearchOptionSelected(CCObject* sender);
     void onTierSearch(CCObject* sender);
     CCMenuItemSpriteExtra* createTierNode(int tier);
     CCMenu* createCheckboxNode(std::string idSuffix, std::string name);

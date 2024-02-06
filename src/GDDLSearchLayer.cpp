@@ -16,10 +16,23 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
     m_mainLayer->addChild(m_buttonMenu, 10);
     // title
-    auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
+    const auto titleContainer = CCMenu::create();
+    titleContainer->setLayout(RowLayout::create());
+    titleContainer->setContentSize({200.0f, 30.0f});
+    const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
     title->setID("gddl-demon-search-title"_spr);
-    m_buttonMenu->addChild(title);
-    m_buttonMenu->reorderChild(title, 0);
+    titleContainer->addChild(title);
+    titleContainer->reorderChild(title, 0);
+    // the (i) button
+    const auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    iButtonSprite->setScale(0.5f);
+    const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLSearchLayer::onInfo));
+    iButton->setScale(0.4f);
+    iButton->setContentSize({10.0f, 10.0f});
+    titleContainer->addChild(iButton);
+    titleContainer->updateLayout();
+    m_buttonMenu->addChild(titleContainer);
+    m_buttonMenu->reorderChild(titleContainer, 0);
     // tier buttons
     for (int row = 0; row < 5; row++) {
         const auto rowNode = CCMenu::create();
@@ -59,6 +72,8 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->reorderChild(okButton, 10);
     m_buttonMenu->updateLayout();
 
+    // fix the iButton :tm: placement
+    iButton->setPosition({iButton->getPositionX(), 15.0f});
     return true;
 }
 
@@ -70,6 +85,8 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
 void GDDLSearchLayer::onInfo(CCObject *sender) {
 
 }
+
+void GDDLSearchLayer::onSearchOptionSelected(CCObject *sender) {}
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     FLAlertLayer::create("GDDL Search", "Search clicked", "OK")->show();
