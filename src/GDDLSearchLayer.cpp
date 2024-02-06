@@ -83,10 +83,10 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onInfo(CCObject *sender) {
-
+    FLAlertLayer::create("GDDL Search", "Select the <cg>completed</c>/<cr>uncompleted</c> checkboxes and click a <co>button</c> to search for a corresponding <cy>tier</c>, click the <cp>?</c> button to search for levels that are <cb>not yet rated</c>", "OK")->show();
 }
 
-void GDDLSearchLayer::onSearchOptionSelected(CCObject *sender) {}
+void GDDLSearchLayer::onSearchOptionSelected(CCObject *sender) {} // do nothing lmao
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     FLAlertLayer::create("GDDL Search", "Search clicked", "OK")->show();
