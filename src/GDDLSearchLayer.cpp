@@ -1,4 +1,7 @@
 #include "GDDLSearchLayer.h"
+
+
+#include "RatingsManager.h"
 bool GDDLSearchLayer::init() {
     if(!FLAlertLayer::init(75)) return false;
 
@@ -89,7 +92,18 @@ void GDDLSearchLayer::onInfo(CCObject *sender) {
 void GDDLSearchLayer::onSearchOptionSelected(CCObject *sender) {} // do nothing lmao
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
-    FLAlertLayer::create("GDDL Search", "Search clicked", "OK")->show();
+    auto *senderNode = dynamic_cast<CCNode *>(sender);
+    const std::string tierStr = senderNode->getID();
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    const bool searchForCompleted = dynamic_cast<CCMenuItemToggler*>(m_buttonMenu->getChildByIDRecursive("toggler-completed"))->isToggled();
+    const bool searchForUncompleted = dynamic_cast<CCMenuItemToggler*>(m_buttonMenu->getChildByIDRecursive("toggler-uncompleted"))->isToggled();
+    TierSearchType searchType = ANY;
+    if (searchForCompleted != searchForUncompleted) {
+        searchType = searchForCompleted ? COMPLETED : UNCOMPLETED;
+    }
+    RatingsManager::setupSearch(tierNumber, searchType);
+    const auto listLayer = LevelBrowserLayer::create(RatingsManager::getSearchPage(1));
+    cocos::switchToScene(listLayer);
 }
 
 CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(int tier) {

@@ -83,7 +83,7 @@ void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchT
             for (auto level: allCompletedTierLevels) {
                 allLevelsFromTier.erase(level);
             }
-            searchResults = Utils::copySetToVector(allCompletedTierLevels);
+            searchResults = Utils::copySetToVector(allLevelsFromTier);
         }
     } else {
         searchResults = Utils::copySetToVector(allLevelsFromTier);
@@ -159,7 +159,7 @@ GJSearchObject *RatingsManager::getSearchPage(int page) {
     } else if (page > getSearchResultsPageCount()) {
         page = getSearchResultsPageCount();
     }
-    const int firstIndex = (page - 1) * 10;
+    const int firstIndex = std::max(0, (page - 1) * 10);
     const int lastIndex = std::min(firstIndex+10, static_cast<int>(searchResults.size()));
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
