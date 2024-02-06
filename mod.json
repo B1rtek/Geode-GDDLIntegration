@@ -1,6 +1,6 @@
 {
 	"geode": "2.0.0",
-	"version": "v1.0.4",
+	"version": "v1.0.5",
 	"gd": "2.204",
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
@@ -14,6 +14,10 @@
 			"importance": "required"
 		}
 	],
+	"issues": {
+		"info": "You can submit an <cr>bug report</c>/<cj>feature request</c> directly to the mod's repo here",
+		"url": "https://github.com/B1rtek/Geode-GDDLIntegration/issues/new/choose"
+	},
 	"resources": {
 		"sprites": [
 			"resources/tier.png",
