@@ -9,10 +9,20 @@
 
 using namespace geode::prelude;
 
+enum TierSearchType {
+    ANY,
+    UNCOMPLETED,
+    COMPLETED
+};
+
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::map<int, int> ratingsCache;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
+    inline static int searchedTier = -1;
+    inline static TierSearchType tierSearchType{};
+    inline static bool searchingForTier = false;
+    inline static std::vector<int> searchResults{};
 
     static GDDLRating parseJson(std::string response);
 
@@ -20,8 +30,11 @@ class RatingsManager {
 
     static void cacheList();
 
+    static void prepareSearchResults(int tier, TierSearchType searchType);
+
 public:
     static int getDemonTier(int id);
+
     static std::optional<GDDLRating> getRating(int id);
 
     static std::string getRequestUrl(int id);
@@ -33,6 +46,18 @@ public:
     static std::map<int, int> getTierStats();
 
     static bool alreadyCached();
+
+    static void setupSearch(int tier, TierSearchType searchType);
+
+    static bool isSearchingForTier();
+
+    static GJSearchObject *getSearchPage(int page);
+
+    static int getSearchResultsPageCount();
+
+    static int getSearchResultsCount();
+
+    static void stopSearch();
 };
 
 

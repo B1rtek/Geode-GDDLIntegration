@@ -38,6 +38,7 @@ class $modify(MenuLayer) {
     bool init() {
         if (!MenuLayer::init()) return false;
 
+        RatingsManager::stopSearch();
         if (!RatingsManager::alreadyCached()) {
             web::AsyncWebRequest()
             .fetch("https://gdladder.com/api/theList")
