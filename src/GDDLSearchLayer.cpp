@@ -3,12 +3,13 @@
 
 #include "RatingsManager.h"
 bool GDDLSearchLayer::init() {
-    if(!FLAlertLayer::init(75)) return false;
+    if (!FLAlertLayer::init(75))
+        return false;
 
-    CCPoint popupSize = {360.0f, 250.0f};
-    auto winSize = CCDirector::sharedDirector()->getWinSize();
+    const CCPoint popupSize = {360.0f, 250.0f};
+    const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // background
-    auto bg = CCScale9Sprite::create("GJ_square01.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create("GJ_square01.png", {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({ winSize.width / 2, winSize.height / 2 });
     bg->setID("gddl-demon-search-popup"_spr);
@@ -108,7 +109,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
 
 CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(int tier) {
     // tier sprite
-    std::string tierString = tier != -1 ? std::to_string(tier) : "unrated";
+    const std::string tierString = tier != -1 ? std::to_string(tier) : "unrated";
     const std::string tierSpriteName = "tier_" + tierString + ".png";
     const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
     const auto tierSprite = CCSprite::create(textureName);
@@ -120,8 +121,8 @@ CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(int tier) {
     return tierButton;
 }
 
-CCMenu *GDDLSearchLayer::createCheckboxNode(std::string idSuffix, std::string name) {
-    auto menu = CCMenu::create();
+CCMenu *GDDLSearchLayer::createCheckboxNode(const std::string &idSuffix, const std::string &name) {
+    const auto menu = CCMenu::create();
     menu->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     // checkbox
     const auto toggler = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(GDDLSearchLayer::onSearchOptionSelected), 0.8f);
