@@ -6,79 +6,100 @@ bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(75))
         return false;
 
-    const CCPoint popupSize = {360.0f, 250.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // background
     const auto bg = CCScale9Sprite::create("GJ_square01.png", {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
-    bg->setPosition({ winSize.width / 2, winSize.height / 2 });
+    bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-demon-search-popup"_spr);
     m_mainLayer->addChild(bg, -1);
     // menu with the main layout
     m_buttonMenu = CCMenu::create();
+    m_buttonMenu->setContentSize({winSize.width, winSize.height});
+    m_buttonMenu->setPosition({74.5f, 295.0f});
     m_buttonMenu->setID("gddl-demon-search-menu"_spr);
-    m_buttonMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
-    m_mainLayer->addChild(m_buttonMenu, 10);
+    m_mainLayer->addChild(m_buttonMenu, 0);
+    // close button
+    const auto closeButtonSprite = CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png");
+    const auto closeButton = CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLSearchLayer::onClose));
+    m_buttonMenu->addChild(closeButton, 1);
+    closeButton->setPosition({0.0f, 0.0f});
+    // info button
+    const auto infoButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    const auto infoButton = CCMenuItemSpriteExtra::create(infoButtonSprite, this, menu_selector(GDDLSearchLayer::onInfo));
+    m_buttonMenu->addChild(infoButton);
+    m_buttonMenu->reorderChild(infoButton, 1);
+    infoButton->setPosition({413.0f, -7.0f});
     // title
-    const auto titleContainer = CCMenu::create();
-    titleContainer->setLayout(RowLayout::create());
-    titleContainer->setContentSize({200.0f, 30.0f});
     const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
-    title->setID("gddl-demon-search-title"_spr);
-    titleContainer->addChild(title);
-    titleContainer->reorderChild(title, 0);
-    // the (i) button
-    const auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    iButtonSprite->setScale(0.5f);
-    const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLSearchLayer::onInfo));
-    iButton->setScale(0.4f);
-    iButton->setContentSize({10.0f, 10.0f});
-    titleContainer->addChild(iButton);
-    titleContainer->updateLayout();
-    m_buttonMenu->addChild(titleContainer);
-    m_buttonMenu->reorderChild(titleContainer, 0);
-    // tier buttons
-    for (int row = 0; row < 5; row++) {
-        const auto rowNode = CCMenu::create();
-        rowNode->setLayout(RowLayout::create()->setGap(5.0f));
-        rowNode->setContentSize({popupSize.x-10.0f, 20.0f});
-        for (int column = 0; column < 7; column++) {
-            const auto tierNode = createTierNode(row+1+column*5);
-            rowNode->addChild(tierNode);
-        }
-        rowNode->updateLayout();
-        m_buttonMenu->addChild(rowNode);
-        m_buttonMenu->reorderChild(rowNode, row+1);
-    }
-    // togglers - container
-    const auto rowNode = CCMenu::create();
-    rowNode->setLayout(RowLayout::create()->setGap(5.0f));
-    rowNode->setContentSize({popupSize.x-10.0f, 35.0f});
-    // unknown tier
-    const auto unknownButton = createTierNode(-1);
-    rowNode->addChild(unknownButton);
-    // togglers - checkboxes
-    const std::string ids[2] = {"completed", "uncompleted"};
-    const std::string labels[2] = {"Completed", "Uncompleted"};
-    for (int i=0; i<2; i++) {
-        const auto togglerNode = createCheckboxNode(ids[i], labels[i]);
-        rowNode->addChild(togglerNode);
-        rowNode->reorderChild(togglerNode, i);
-    }
-    rowNode->updateLayout();
-    m_buttonMenu->addChild(rowNode);
-    m_buttonMenu->reorderChild(rowNode, 9);
-    // ok button
-    const auto spr = ButtonSprite::create("OK");
-    const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLSearchLayer::onClose));
-    okButton->setID("gddl-demon-split-ok"_spr);
-    m_buttonMenu->addChild(okButton);
-    m_buttonMenu->reorderChild(okButton, 10);
-    m_buttonMenu->updateLayout();
-
-    // fix the iButton :tm: placement
-    iButton->setPosition({iButton->getPositionX(), 15.0f});
+    m_mainLayer->addChild(title, 1);
+    title->setPosition({284.5f, 287.0f});
+    title->setScale(0.7f);
+    loadPage();
+    // title
+    // const auto titleContainer = CCMenu::create();
+    // titleContainer->setLayout(RowLayout::create());
+    // titleContainer->setContentSize({200.0f, 30.0f});
+    // const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
+    // title->setID("gddl-demon-search-title"_spr);
+    // titleContainer->addChild(title);
+    // titleContainer->reorderChild(title, 0);
+    // // the (i) button
+    // const auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    // iButtonSprite->setScale(0.5f);
+    // const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLSearchLayer::onInfo));
+    // iButton->setScale(0.4f);
+    // iButton->setContentSize({10.0f, 10.0f});
+    // titleContainer->addChild(iButton);
+    // titleContainer->updateLayout();
+    // m_buttonMenu->addChild(titleContainer);
+    // m_buttonMenu->reorderChild(titleContainer, 0);
+    // // tier buttons
+    // for (int row = 0; row < 5; row++) {
+    //     const auto rowNode = CCMenu::create();
+    //     rowNode->setLayout(RowLayout::create()->setGap(5.0f));
+    //     rowNode->setContentSize({popupSize.x - 10.0f, 20.0f});
+    //     for (int column = 0; column < 7; column++) {
+    //         const auto tierNode = createTierNode(row + 1 + column * 5);
+    //         rowNode->addChild(tierNode);
+    //     }
+    //     rowNode->updateLayout();
+    //     m_buttonMenu->addChild(rowNode);
+    //     m_buttonMenu->reorderChild(rowNode, row + 1);
+    // }
+    // // togglers - container
+    // const auto rowNode = CCMenu::create();
+    // rowNode->setLayout(RowLayout::create()->setGap(5.0f));
+    // rowNode->setContentSize({popupSize.x - 10.0f, 35.0f});
+    // // unknown tier
+    // const auto unknownButton = createTierNode(-1);
+    // rowNode->addChild(unknownButton);
+    // // togglers - checkboxes
+    // const std::string ids[2] = {"completed", "uncompleted"};
+    // const std::string labels[2] = {"Completed", "Uncompleted"};
+    // for (int i = 0; i < 2; i++) {
+    //     const auto togglerNode = createCheckboxNode(ids[i], labels[i]);
+    //     rowNode->addChild(togglerNode);
+    //     rowNode->reorderChild(togglerNode, i);
+    // }
+    // rowNode->updateLayout();
+    // m_buttonMenu->addChild(rowNode);
+    // m_buttonMenu->reorderChild(rowNode, 9);
+    // // ok button
+    // const auto spr = ButtonSprite::create("OK");
+    // const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLSearchLayer::onClose));
+    // okButton->setID("gddl-demon-split-ok"_spr);
+    // m_buttonMenu->addChild(okButton);
+    // m_buttonMenu->reorderChild(okButton, 10);
+    // m_buttonMenu->updateLayout();
+    //
+    // // fix the iButton :tm: placement
+    // iButton->setPosition({iButton->getPositionX(), 15.0f});
     return true;
+}
+
+void GDDLSearchLayer::loadPage() {
+
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
@@ -154,4 +175,12 @@ GDDLSearchLayer *GDDLSearchLayer::create() {
 void GDDLSearchLayer::show() {
     FLAlertLayer::show();
     cocos::handleTouchPriority(this);
+}
+
+void GDDLSearchLayer::loadSettings() {
+
+}
+
+void GDDLSearchLayer::saveSettings() {
+
 }

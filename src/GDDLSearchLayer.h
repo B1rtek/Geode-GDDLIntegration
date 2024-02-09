@@ -60,7 +60,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     CCLabelBMFont *sortByLabel = nullptr;
     CCLabelBMFont *sortDirectionLabel = nullptr;
 
-    const CCPoint popupSize = {360.0f, 250.0f};
+    const CCPoint popupSize = {440.0f, 290.0f};
 
     bool init() override;
     void loadPage();
