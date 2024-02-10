@@ -99,7 +99,16 @@ bool GDDLSearchLayer::init() {
 }
 
 void GDDLSearchLayer::loadPage() {
-
+    createLabel(m_buttonMenu, "bigFont.fnt", "Name", 0.6f, {75.0f, -52.5f});
+    createTextInputNode(m_buttonMenu, nameTextfield, "bigFont.fnt", "", {80.0f, 25.0f}, {60.0f, -77.5f});
+    createCheckbox(m_buttonMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -77.5f}, menu_selector(GDDLSearchLayer::onToggleExactMatch));
+    createLabel(m_buttonMenu, "bigFont.fnt", "Creator", 0.6f, {75.0f, -112.5f});
+    createTextInputNode(m_buttonMenu, creatorTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -137.5f});
+    createLabel(m_buttonMenu, "bigFont.fnt", "Song name", 0.6f, {75.0f, -172.5f});
+    createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -197.5f});
+    createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 0.6f, {75.0f, -232.5f});
+    createTextInputNode(m_buttonMenu, difficultyTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -257.5f});
+    createLeftRightButtonsAround(difficultyTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft), menu_selector(GDDLSearchLayer::onInGameRatingRight));
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
@@ -116,9 +125,11 @@ void GDDLSearchLayer::onSearchOptionSelected(CCObject *sender) {} // do nothing 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
-    const bool searchForCompleted = dynamic_cast<CCMenuItemToggler*>(m_buttonMenu->getChildByIDRecursive("toggler-completed"))->isToggled();
-    const bool searchForUncompleted = dynamic_cast<CCMenuItemToggler*>(m_buttonMenu->getChildByIDRecursive("toggler-uncompleted"))->isToggled();
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size() - 10));
+    const bool searchForCompleted =
+            dynamic_cast<CCMenuItemToggler *>(m_buttonMenu->getChildByIDRecursive("toggler-completed"))->isToggled();
+    const bool searchForUncompleted =
+            dynamic_cast<CCMenuItemToggler *>(m_buttonMenu->getChildByIDRecursive("toggler-uncompleted"))->isToggled();
     TierSearchType searchType = ANY;
     if (searchForCompleted != searchForUncompleted) {
         searchType = searchForCompleted ? COMPLETED : UNCOMPLETED;
@@ -126,6 +137,60 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     RatingsManager::setupSearch(tierNumber, searchType);
     const auto listLayer = LevelBrowserLayer::create(RatingsManager::getSearchPage(1));
     cocos::switchToScene(listLayer);
+}
+
+void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string text, float scale, CCPoint position,
+                                  int zOrder) {
+    const auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
+    parent->addChild(label, zOrder);
+    label->setPosition(position);
+    label->setScale(scale);
+}
+void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
+                                          std::string placeholder, CCPoint bgSize, CCPoint position,
+                                          int zOrder) {
+    const auto bg = CCScale9Sprite::create("square02_small.png");
+    parent->addChild(bg, zOrder);
+    bg->setContentSize(bgSize);
+    bg->setScale(0.5f);
+    bg->setContentSize(bg->getContentSize() / 0.5f);
+    bg->setPosition(position);
+    bg->setOpacity(100);
+    textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
+    parent->addChild(textfield, zOrder + 1);
+    textfield->setPosition(position);
+    textfield->setMaxLabelLength(32);
+    textfield->setMaxLabelScale(0.7f);
+}
+void GDDLSearchLayer::createLeftRightButtonsAround(CCLayer *object, CCPoint size, SEL_MenuHandler leftCallback,
+                                                   SEL_MenuHandler rightCallback, int zOrder) {
+    // left
+    const CCPoint positionLeft = object->getPosition() - CCPoint(object->getContentSize().width / 2 + size.x / 2, 0.0f);
+    const auto leftButtonSprite = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
+    const auto leftButton = CCMenuItemSpriteExtra::create(leftButtonSprite, this, leftCallback);
+    object->getParent()->addChild(leftButton, zOrder);
+    leftButton->setPosition(positionLeft);
+    leftButton->setContentSize(size);
+    // right
+    const CCPoint positionRight =
+            positionLeft + CCPoint(object->getContentSize().width + leftButton->getContentSize().width + 0.5f,
+                                   0.0f); // why is this not symmetrical wtf
+    const auto rightButtonSprite = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
+    const auto rightButton = CCMenuItemSpriteExtra::create(rightButtonSprite, this, rightCallback);
+    object->getParent()->addChild(rightButton, zOrder);
+    rightButton->setPosition(positionRight);
+    rightButton->setContentSize(size);
+}
+
+void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset, float scale,
+                                     CCPoint position, SEL_MenuHandler callback, int zOrder) {
+    toggler = CCMenuItemToggler::createWithStandardSprites(this, callback, scale);
+    parent->addChild(toggler, zOrder);
+    toggler->setPosition(position);
+    const auto toggleLabel = CCLabelBMFont::create(label.c_str(), "bigFont.fnt");
+    parent->addChild(toggleLabel, zOrder);
+    toggleLabel->setPosition({toggler->getPositionX(), toggler->getPositionY()-labelOffset});
+    toggleLabel->setScale(0.3f);
 }
 
 CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(int tier) {
@@ -146,7 +211,8 @@ CCMenu *GDDLSearchLayer::createCheckboxNode(const std::string &idSuffix, const s
     const auto menu = CCMenu::create();
     menu->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     // checkbox
-    const auto toggler = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(GDDLSearchLayer::onSearchOptionSelected), 0.8f);
+    const auto toggler = CCMenuItemToggler::createWithStandardSprites(
+            this, menu_selector(GDDLSearchLayer::onSearchOptionSelected), 0.8f);
     toggler->setID("toggler-" + idSuffix);
     menu->addChild(toggler);
     menu->reorderChild(toggler, 0);
@@ -157,8 +223,18 @@ CCMenu *GDDLSearchLayer::createCheckboxNode(const std::string &idSuffix, const s
     menu->reorderChild(label, 1);
     menu->setContentSize({150.0f, 35.0f});
     menu->updateLayout();
-    label->setScale(110.0f/label->getContentSize().width);
+    label->setScale(110.0f / label->getContentSize().width);
     return menu;
+}
+
+void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) {}
+
+void GDDLSearchLayer::onInGameRatingLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "You touched the left button", "OK")->show();
+}
+
+void GDDLSearchLayer::onInGameRatingRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "You touched the left button", "OK")->show();
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
