@@ -69,7 +69,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onSearchOptionSelected(CCObject *sender); // will be removed
     void onTierSearch(CCObject *sender); // relink to a search button
     // utility
-    void createLabel(CCLayer* parent, std::string font, std::string text, float scale, CCPoint position, int zOrder = 1);
+    void createLabel(CCLayer* parent, std::string font, std::string text, int maxWidth, CCPoint position, int zOrder = 1);
     void createTextInputNode(CCLayer* parent, CCTextInputNode* &textfield, std::string font, std::string placeholder, CCPoint bgSize, CCPoint position, int zOrder = 1);
     void createLeftRightButtonsAround(CCLayer* object, CCPoint size, SEL_MenuHandler leftCallback, SEL_MenuHandler rightCallback, int zOrder = 1);
     void createCheckbox(CCLayer* parent, CCMenuItemToggler* &toggler, std::string label, float labelOffset, float scale, CCPoint position, SEL_MenuHandler callback, int zOrder = 1);

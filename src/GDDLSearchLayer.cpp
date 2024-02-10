@@ -99,16 +99,51 @@ bool GDDLSearchLayer::init() {
 }
 
 void GDDLSearchLayer::loadPage() {
-    createLabel(m_buttonMenu, "bigFont.fnt", "Name", 0.6f, {75.0f, -52.5f});
+    // column 1
+    // level name
+    createLabel(m_buttonMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -52.5f});
     createTextInputNode(m_buttonMenu, nameTextfield, "bigFont.fnt", "", {80.0f, 25.0f}, {60.0f, -77.5f});
     createCheckbox(m_buttonMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -77.5f}, menu_selector(GDDLSearchLayer::onToggleExactMatch));
-    createLabel(m_buttonMenu, "bigFont.fnt", "Creator", 0.6f, {75.0f, -112.5f});
+    // creator
+    createLabel(m_buttonMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -112.5f});
     createTextInputNode(m_buttonMenu, creatorTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -137.5f});
-    createLabel(m_buttonMenu, "bigFont.fnt", "Song name", 0.6f, {75.0f, -172.5f});
+    // song name
+    createLabel(m_buttonMenu, "bigFont.fnt", "Song name", 110.0f, {75.0f, -172.5f});
     createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -197.5f});
-    createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 0.6f, {75.0f, -232.5f});
+    // in-game difficulty
+    createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -232.5f});
     createTextInputNode(m_buttonMenu, difficultyTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -257.5f});
     createLeftRightButtonsAround(difficultyTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft), menu_selector(GDDLSearchLayer::onInGameRatingRight));
+
+    // column 2
+    // rating range
+    createLabel(m_buttonMenu, "bigFont.fnt", "Tiers", 110.0f, {220.0f, -52.5f});
+    createTextInputNode(m_buttonMenu, tierLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -77.5f});
+    createTextInputNode(m_buttonMenu, tierHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -77.5f});
+    createLeftRightButtonsAround(tierLowTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onTierLowLeft), menu_selector(GDDLSearchLayer::onTierLowRight));
+    createLeftRightButtonsAround(tierHighTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onTierHighLeft), menu_selector(GDDLSearchLayer::onTierHighRight));
+    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -77.5f});
+    // enjoyment range
+    createLabel(m_buttonMenu, "bigFont.fnt", "Enjoyment rating", 110.0f, {220.0f, -112.5f});
+    createTextInputNode(m_buttonMenu, enjoymentLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -137.5f});
+    createTextInputNode(m_buttonMenu, enjoymentHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -137.5f});
+    createLeftRightButtonsAround(enjoymentLowTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjoymentLowLeft), menu_selector(GDDLSearchLayer::onEnjoymentLowRight));
+    createLeftRightButtonsAround(enjoymentHighTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjoymentHighLeft), menu_selector(GDDLSearchLayer::onEnjoymentHighRight));
+    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -137.5f});
+    // submissions count
+    createLabel(m_buttonMenu, "bigFont.fnt", "Submissions count", 110.0f, {220.0f, -172.5f});
+    createTextInputNode(m_buttonMenu, submissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -197.5f});
+    createTextInputNode(m_buttonMenu, submissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -197.5f});
+    createLeftRightButtonsAround(submissionsCountLowTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onSubmissionCountLowLeft), menu_selector(GDDLSearchLayer::onSubmissionCountLowRight));
+    createLeftRightButtonsAround(submissionsCountHighTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onSubmissionCountHighLeft), menu_selector(GDDLSearchLayer::onSubmissionCountHighRight));
+    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -197.5f});
+    // enjoyment submissions count
+    createLabel(m_buttonMenu, "bigFont.fnt", "Enj. submissions count", 110.0f, {220.0f, -232.5f});
+    createTextInputNode(m_buttonMenu, submissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -257.5f});
+    createTextInputNode(m_buttonMenu, submissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -257.5f});
+    createLeftRightButtonsAround(submissionsCountLowTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowLeft), menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowRight));
+    createLeftRightButtonsAround(submissionsCountHighTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighLeft), menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighRight));
+    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -257.5f});
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
@@ -139,11 +174,12 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     cocos::switchToScene(listLayer);
 }
 
-void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string text, float scale, CCPoint position,
+void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
                                   int zOrder) {
     const auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
+    const float scale = 0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
     label->setScale(scale);
 }
 void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
@@ -235,6 +271,67 @@ void GDDLSearchLayer::onInGameRatingLeft(CCObject *sender) {
 
 void GDDLSearchLayer::onInGameRatingRight(CCObject *sender) {
     FLAlertLayer::create("GDDL", "You touched the left button", "OK")->show();
+}
+void GDDLSearchLayer::onTierLowLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low tier -", "OK")->show();
+}
+void GDDLSearchLayer::onTierLowRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low tier +", "OK")->show();
+}
+void GDDLSearchLayer::onTierHighLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High tier -", "OK")->show();
+}
+
+void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High tier +", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low enj -", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjoymentLowRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low enj +", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjoymentHighLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High enj -", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High enj +", "OK")->show();
+}
+
+void GDDLSearchLayer::onSubmissionCountLowLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low sub count -", "OK")->show();
+}
+
+void GDDLSearchLayer::onSubmissionCountLowRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low sub count +", "OK")->show();
+}
+
+void GDDLSearchLayer::onSubmissionCountHighLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High sub count -", "OK")->show();
+}
+
+void GDDLSearchLayer::onSubmissionCountHighRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High sub count +", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjSubmissionCountLowLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low enj sub count -", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjSubmissionCountLowRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Low enj sub count +", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjSubmissionCountHighLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High enj sub count -", "OK")->show();
+}
+
+void GDDLSearchLayer::onEnjSubmissionCountHighRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "High enj sub count +", "OK")->show();
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
