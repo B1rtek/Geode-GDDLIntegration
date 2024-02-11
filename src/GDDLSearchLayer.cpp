@@ -112,8 +112,8 @@ void GDDLSearchLayer::loadPage() {
     createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -197.5f});
     // in-game difficulty
     createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -232.5f});
-    createTextInputNode(m_buttonMenu, difficultyTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -257.5f});
-    createLeftRightButtonsAround(difficultyTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft), menu_selector(GDDLSearchLayer::onInGameRatingRight));
+    auto bg = createLabelForChoice(m_buttonMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -257.5f}, {110.0f, 25.0f});
+    createLeftRightButtonsAround(bg, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft), menu_selector(GDDLSearchLayer::onInGameRatingRight));
 
     // column 2
     // rating range
@@ -144,6 +144,22 @@ void GDDLSearchLayer::loadPage() {
     createLeftRightButtonsAround(submissionsCountLowTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowLeft), menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowRight));
     createLeftRightButtonsAround(submissionsCountHighTextfield, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighLeft), menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighRight));
     createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -257.5f});
+
+    // column 3
+    // tiers checkboxes
+    createCheckbox(m_buttonMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {305.0f, -77.5f}, menu_selector(GDDLSearchLayer::onToggleNoUnrated));
+    createCheckbox(m_buttonMenu, noRatedToggler, "No rated", 17.5f, 0.9f, {405.0f, -77.5f}, menu_selector(GDDLSearchLayer::onToggleNoRated));
+    // enjoyment rating checkboxes
+    createCheckbox(m_buttonMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {305.0f, -137.5f}, menu_selector(GDDLSearchLayer::onToggleNoUnratedEnj));
+    createCheckbox(m_buttonMenu, noRatedEnjToggler, "No rated enj.", 17.5f, 0.9f, {405.0f, -137.5f}, menu_selector(GDDLSearchLayer::onToggleNoRatedEnj));
+    // sort by
+    createLabel(m_buttonMenu, "bigFont.fnt", "Sort by", 110.0f, {355.0f, -172.5f});
+    bg = createLabelForChoice(m_buttonMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {355.0f, -197.5f}, {110.0f, 25.0f});
+    createLeftRightButtonsAround(bg, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onSortByLeft), menu_selector(GDDLSearchLayer::onSortByRight));
+    // sort direction
+    createLabel(m_buttonMenu, "bigFont.fnt", "Sort direction", 110.0f, {355.0f, -232.5f});
+    bg = createLabelForChoice(m_buttonMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {355.0f, -257.5f}, {110.0f, 25.0f});
+    createLeftRightButtonsAround(bg, {15.0f, 22.0f}, menu_selector(GDDLSearchLayer::onSortDirectionLeft), menu_selector(GDDLSearchLayer::onSortDirectionRight));
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
@@ -179,8 +195,27 @@ void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string
     const auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
-    const float scale = 0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
+    const float scale =
+            0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
     label->setScale(scale);
+}
+
+CCScale9Sprite* GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, std::string font, std::string placeholder,
+                                            int maxWidth, CCPoint position, CCPoint bgSize, int zOrder) {
+    label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
+    parent->addChild(label, zOrder);
+    label->setPosition(position);
+    const float scale =
+            0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
+    label->setScale(scale);
+    const auto bg = CCScale9Sprite::create("square02_small.png");
+    parent->addChild(bg, zOrder);
+    bg->setContentSize(bgSize);
+    bg->setScale(0.5f);
+    bg->setContentSize(bg->getContentSize() / 0.5f);
+    bg->setPosition(position);
+    bg->setOpacity(100);
+    return bg;
 }
 void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
                                           std::string placeholder, CCPoint bgSize, CCPoint position,
@@ -198,7 +233,7 @@ void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&tex
     textfield->setMaxLabelLength(32);
     textfield->setMaxLabelScale(0.7f);
 }
-void GDDLSearchLayer::createLeftRightButtonsAround(CCLayer *object, CCPoint size, SEL_MenuHandler leftCallback,
+void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
                                                    SEL_MenuHandler rightCallback, int zOrder) {
     // left
     const CCPoint positionLeft = object->getPosition() - CCPoint(object->getContentSize().width / 2 + size.x / 2, 0.0f);
@@ -332,6 +367,38 @@ void GDDLSearchLayer::onEnjSubmissionCountHighLeft(CCObject *sender) {
 
 void GDDLSearchLayer::onEnjSubmissionCountHighRight(CCObject *sender) {
     FLAlertLayer::create("GDDL", "High enj sub count +", "OK")->show();
+}
+
+void GDDLSearchLayer::onToggleNoUnrated(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "No unrated toggled", "OK")->show();
+}
+
+void GDDLSearchLayer::onToggleNoRated(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "No rated toggled", "OK")->show();
+}
+
+void GDDLSearchLayer::onToggleNoUnratedEnj(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "No unrated enj. toggled", "OK")->show();
+}
+
+void GDDLSearchLayer::onToggleNoRatedEnj(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "No rated enj. toggled", "OK")->show();
+}
+
+void GDDLSearchLayer::onSortByLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Sort by -", "OK")->show();
+}
+
+void GDDLSearchLayer::onSortByRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Sort by +", "OK")->show();
+}
+
+void GDDLSearchLayer::onSortDirectionLeft(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Sort direction -", "OK")->show();
+}
+
+void GDDLSearchLayer::onSortDirectionRight(CCObject *sender) {
+    FLAlertLayer::create("GDDL", "Sort direction +", "OK")->show();
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {

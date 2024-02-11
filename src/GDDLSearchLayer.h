@@ -44,7 +44,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     CCMenuItemToggler *nameExactMatchToggler = nullptr;
     CCTextInputNode *creatorTextfield = nullptr;
     CCTextInputNode *songTextfield = nullptr;
-    CCTextInputNode *difficultyTextfield = nullptr;
+    CCLabelBMFont *difficultyLabel = nullptr;
     CCTextInputNode *tierLowTextfield = nullptr;
     CCTextInputNode *tierHighTextfield = nullptr;
     CCTextInputNode *enjoymentLowTextfield = nullptr;
@@ -70,8 +70,9 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onTierSearch(CCObject *sender); // relink to a search button
     // utility
     void createLabel(CCLayer* parent, std::string font, std::string text, int maxWidth, CCPoint position, int zOrder = 1);
+    CCScale9Sprite* createLabelForChoice(CCLayer* parent, CCLabelBMFont *&label, std::string font, std::string text, int maxWidth, CCPoint position, CCPoint bgSize, int zOrder = 1);
     void createTextInputNode(CCLayer* parent, CCTextInputNode* &textfield, std::string font, std::string placeholder, CCPoint bgSize, CCPoint position, int zOrder = 1);
-    void createLeftRightButtonsAround(CCLayer* object, CCPoint size, SEL_MenuHandler leftCallback, SEL_MenuHandler rightCallback, int zOrder = 1);
+    void createLeftRightButtonsAround(CCNode* object, CCPoint size, SEL_MenuHandler leftCallback, SEL_MenuHandler rightCallback, int zOrder = 1);
     void createCheckbox(CCLayer* parent, CCMenuItemToggler* &toggler, std::string label, float labelOffset, float scale, CCPoint position, SEL_MenuHandler callback, int zOrder = 1);
     CCMenuItemSpriteExtra *createTierNode(int tier);
     CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name);
