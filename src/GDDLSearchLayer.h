@@ -67,7 +67,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onClose(CCObject *sender);
     void onInfo(CCObject *sender);
     void onSearchOptionSelected(CCObject *sender); // will be removed
-    void onTierSearch(CCObject *sender); // relink to a search button
+    void onTierSearch(CCObject *sender); // relink to a search button (future me: nvm remove this)
     // utility
     void createLabel(CCLayer* parent, std::string font, std::string text, int maxWidth, CCPoint position, int zOrder = 1);
     CCScale9Sprite* createLabelForChoice(CCLayer* parent, CCLabelBMFont *&label, std::string font, std::string text, int maxWidth, CCPoint position, CCPoint bgSize, int zOrder = 1);
@@ -104,6 +104,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onSortByRight(CCObject* sender);
     void onSortDirectionLeft(CCObject* sender);
     void onSortDirectionRight(CCObject* sender);
+    void onSearchClicked(CCObject* sender);
 
 public:
     static GDDLSearchLayer *create();
