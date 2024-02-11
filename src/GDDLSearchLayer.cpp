@@ -186,7 +186,7 @@ void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&tex
 void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
                                                    SEL_MenuHandler rightCallback, int zOrder) {
     // left
-    const CCPoint positionLeft = object->getPosition() - CCPoint(object->getContentSize().width * object->getScale() / 2 + size.x / 2 + 0.5f, 0.0f);
+    const CCPoint positionLeft = object->getPosition() - CCPoint(object->getContentSize().width * object->getScale() / 2 + size.x / 2 + 0.5f, -1.0f);
     const auto leftButtonSprite = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
     leftButtonSprite->setScale(0.8f);
     const auto leftButton = CCMenuItemSpriteExtra::create(leftButtonSprite, this, leftCallback);
