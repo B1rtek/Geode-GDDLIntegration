@@ -206,6 +206,10 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
+TodoReturn GDDLSearchLayer::keyBackClicked() {
+    saveValues();
+    FLAlertLayer::keyBackClicked();
+}
 
 void GDDLSearchLayer::onInfo(CCObject *sender) {
     std::string infoContent = "<co>Name - Ex. match</c> - will <cy>only</c> search for levels with <cy>exactly</c> matching names\n<co>Difficulty</c> - <cy>in-game</c> <cr>demon</c> difficulty\n<co>Enj./Submissions count</c> - the amount of <cj>enjoyment</c>/<cp>difficulty tier</c> submissions for a level\n<co>No unrated/No rated (Enj)</c> - <cy>only</c> search for levels <cg>with</c>(<cr>out</c>) a <cp>tier</c>/<cj>enjoyment</c> rating\n<cb>All</c> tier and submission ranges are <cy>inclusive</c> from <cy>both</c> sides";
@@ -307,7 +311,7 @@ float GDDLSearchLayer::calculateNewFloat(float currentValue, bool increase, floa
 }
 
 void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) {
-    exactName = dynamic_cast<CCMenuItemToggler*>(sender)->isToggled();
+    exactName = !dynamic_cast<CCMenuItemToggler*>(sender)->isOn();
 }
 
 void GDDLSearchLayer::onInGameRatingLeft(CCObject *sender) {
@@ -418,25 +422,25 @@ void GDDLSearchLayer::onEnjSubmissionCountHighRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onToggleNoUnrated(CCObject *sender) {
-    if(noUnratedToggler->isToggled()) {
+    if(!noUnratedToggler->isOn()) {
         noRatedToggler->toggle(false);
     }
 }
 
 void GDDLSearchLayer::onToggleNoRated(CCObject *sender) {
-    if(noRatedToggler->isToggled()) {
+    if(!noRatedToggler->isOn()) {
         noUnratedToggler->toggle(false);
     }
 }
 
 void GDDLSearchLayer::onToggleNoUnratedEnj(CCObject *sender) {
-    if(noUnratedEnjToggler->isToggled()) {
+    if(!noUnratedEnjToggler->isOn()) {
         noRatedEnjToggler->toggle(false);
     }
 }
 
 void GDDLSearchLayer::onToggleNoRatedEnj(CCObject *sender) {
-    if(noRatedEnjToggler->isToggled()) {
+    if(!noRatedEnjToggler->isOn()) {
         noUnratedEnjToggler->toggle(false);
     }
 }

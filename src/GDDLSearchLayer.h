@@ -7,7 +7,11 @@ using namespace geode::prelude;
 
 class GDDLSearchLayer : public FLAlertLayer {
     // endpoint args, ignoring chunk (always set to 10) and stddev args
-    // -1 defaults treated as null (not passed to the query)
+    // value limits
+    static constexpr int highestTier = 35;
+    static constexpr float highestEnjoyment = 10.0f;
+    static constexpr int maxSubmissions = 9999;
+    // 0 defaults treated as null (not passed to the query) (well, it depends)
     // page - parse as is, check for valid numbers of course
     inline static int page = 1;
     // name - use a url parser
@@ -28,7 +32,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     // enjoyment submission count limits
     inline static int enjLowCount = 0, enjHighCount = 0;
     // enjoyment rating limits
-    inline static float enjLow = 0, enjHigh = 0;
+    inline static float enjLow = 0, enjHigh = highestEnjoyment;
     // sort - displayed as sortBy, mapped to a value in the sort vector, default - ID
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {"ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
@@ -38,10 +42,6 @@ class GDDLSearchLayer : public FLAlertLayer {
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
     const inline static std::vector<std::string> sortDirection = {"asc", "desc"};
     // have fun remembering all of that lmao
-    // value limits
-    const int highestTier = 35;
-    const float highestEnjoyment = 10.0f;
-    const int maxSubmissions = 9999;
 
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
@@ -72,6 +72,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void loadValues();
     void saveValues();
     void onClose(CCObject *sender);
+    TodoReturn keyBackClicked() override;
     void onInfo(CCObject *sender);
     // utility
     void createLabel(CCLayer* parent, std::string font, std::string text, int maxWidth, CCPoint position, int zOrder = 1);
