@@ -13,10 +13,10 @@ class GDDLSearchLayer : public FLAlertLayer {
     // name - use a url parser
     inline static std::string name;
     // lowTier, highTier - parse as is, check for valid numbers
-    inline static int lowTier = -1, highTier = -1;
-    // difficulty - passed as a number from 0 to 4, shown as strings from the vector below
-    inline static int difficulty = -1;
-    const inline static std::vector<std::string> demonDifficulties = {"Easy", "Medium", "Hard", "Insane", "Extreme"};
+    inline static int lowTier = 0, highTier = 0;
+    // difficulty - passed as a number from 0 to 4, shown as strings from the vector below, 5 = any
+    inline static int difficulty = 5;
+    const inline static std::vector<std::string> demonDifficulties = {"Easy", "Medium", "Hard", "Insane", "Extreme", "Any"};
     // creator - use a url parser
     inline static std::string creator;
     // song - use a url parser
@@ -24,11 +24,11 @@ class GDDLSearchLayer : public FLAlertLayer {
     // bool switches
     inline static bool exactName = false, removeUnrated = false, removeUnratedEnj = false, removeRated = false, removeRatedEnj = false;
     // submission count limits
-    inline static int subLowCount = -1, subHighCount = -1;
+    inline static int subLowCount = 0, subHighCount = 0;
     // enjoyment submission count limits
-    inline static int enjLowCount = -1, enjHighCount = -1;
+    inline static int enjLowCount = 0, enjHighCount = 0;
     // enjoyment rating limits
-    inline static int enjLow = -1, enjHigh = -1;
+    inline static float enjLow = 0, enjHigh = 0;
     // sort - displayed as sortBy, mapped to a value in the sort vector, default - ID
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {"ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
@@ -38,6 +38,11 @@ class GDDLSearchLayer : public FLAlertLayer {
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
     const inline static std::vector<std::string> sortDirection = {"asc", "desc"};
     // have fun remembering all of that lmao
+    // value limits
+    const int highestTier = 35;
+    const float highestEnjoyment = 10.0f;
+    const int maxSubmissions = 9999;
+
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
     CCTextInputNode *nameTextfield = nullptr;
@@ -64,18 +69,18 @@ class GDDLSearchLayer : public FLAlertLayer {
 
     bool init() override;
     void loadPage();
+    void loadValues();
+    void saveValues();
     void onClose(CCObject *sender);
     void onInfo(CCObject *sender);
-    void onSearchOptionSelected(CCObject *sender); // will be removed
-    void onTierSearch(CCObject *sender); // relink to a search button (future me: nvm remove this)
     // utility
     void createLabel(CCLayer* parent, std::string font, std::string text, int maxWidth, CCPoint position, int zOrder = 1);
     CCScale9Sprite* createLabelForChoice(CCLayer* parent, CCLabelBMFont *&label, std::string font, std::string text, int maxWidth, CCPoint position, CCPoint bgSize, int zOrder = 1);
+    void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
     void createTextInputNode(CCLayer* parent, CCTextInputNode* &textfield, std::string font, std::string placeholder, CCPoint bgSize, CCPoint position, int zOrder = 1);
     void createLeftRightButtonsAround(CCNode* object, CCPoint size, SEL_MenuHandler leftCallback, SEL_MenuHandler rightCallback, int zOrder = 1);
     void createCheckbox(CCLayer* parent, CCMenuItemToggler* &toggler, std::string label, float labelOffset, float scale, CCPoint position, SEL_MenuHandler callback, int zOrder = 1);
-    CCMenuItemSpriteExtra *createTierNode(int tier);
-    CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name);
+    float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     // callbacks for all buttons that will be needed
     void onToggleExactMatch(CCObject* sender);
     void onInGameRatingLeft(CCObject* sender);
@@ -105,12 +110,21 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onSortDirectionLeft(CCObject* sender);
     void onSortDirectionRight(CCObject* sender);
     void onSearchClicked(CCObject* sender);
+    // setters so I don't have to repeat that spaghetti again
+    void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
+    void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
+    void setDifficultyLabel();
+    void setSortByLabel();
+    void setSortDirectionLabel();
+    // getters for the same thing
+    int getNumberTextfieldValue(CCTextInputNode *&textfield);
+    float getFloatTextfieldValue(CCTextInputNode *&textfield);
 
 public:
     static GDDLSearchLayer *create();
     void show() override;
-    static void loadSettings();
-    static void saveSettings();
+    static void loadSettings(); // called on game startup
+    static void saveSettings(); // called in menulayer after every modification of the search values
 };
 
 
