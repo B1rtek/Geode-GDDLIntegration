@@ -43,6 +43,12 @@ bool GDDLSearchLayer::init() {
     const auto searchButton = CCMenuItemSpriteExtra::create(searchButtonSprite, this, menu_selector(GDDLSearchLayer::onSearchClicked));
     m_buttonMenu->addChild(searchButton, 1);
     searchButton->setPosition({310.0f, -10.0f});
+    // reset button
+    const auto resetButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
+    resetButtonSprite->setScale(0.7f);
+    const auto resetButton = CCMenuItemSpriteExtra::create(resetButtonSprite, this, menu_selector(GDDLSearchLayer::onResetClicked));
+    m_buttonMenu->addChild(resetButton, 1);
+    resetButton->setPosition({340.0f, -10.0f});
     // interface
     loadPage();
     loadValues();
@@ -199,6 +205,32 @@ void GDDLSearchLayer::saveValues() {
     enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
     enjLow = getFloatTextfieldValue(enjoymentLowTextfield);
     enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
+}
+
+void GDDLSearchLayer::resetValues() {
+    page = 1;
+    nameTextfield->setString("");
+    setNumberWithDefZeroTextfield(0, tierLowTextfield);
+    setNumberWithDefZeroTextfield(0, tierHighTextfield);
+    difficulty = 5;
+    setDifficultyLabel();
+    creatorTextfield->setString("");
+    songTextfield->setString("");
+    nameExactMatchToggler->toggle(false);
+    noUnratedToggler->toggle(false);
+    noUnratedEnjToggler->toggle(false);
+    noRatedToggler->toggle(false);
+    noRatedEnjToggler->toggle(false);
+    setNumberWithDefZeroTextfield(0, submissionsCountLowTextfield);
+    setNumberWithDefZeroTextfield(0, submissionsCountHighTextfield);
+    setNumberWithDefZeroTextfield(0, enjSubmissionsCountLowTextfield);
+    setNumberWithDefZeroTextfield(0, enjSubmissionsCountHighTextfield);
+    setNumberFloatTextfield(0.0f, enjoymentLowTextfield);
+    setNumberFloatTextfield(highestEnjoyment, enjoymentHighTextfield);
+    sortDirectionIndex = 0;
+    setSortDirectionLabel();
+    sortOptionIndex = 0;
+    setSortByLabel();
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
@@ -472,6 +504,10 @@ void GDDLSearchLayer::onSortDirectionRight(CCObject *sender) {
 void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
     saveValues();
     FLAlertLayer::create("GDDL", "Search clicked", "OK")->show();
+}
+
+void GDDLSearchLayer::onResetClicked(CCObject *sender) {
+    resetValues();
 }
 
 void GDDLSearchLayer::setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {

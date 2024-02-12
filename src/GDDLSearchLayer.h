@@ -71,6 +71,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void loadPage();
     void loadValues();
     void saveValues();
+    void resetValues();
     void onClose(CCObject *sender);
     TodoReturn keyBackClicked() override;
     void onInfo(CCObject *sender);
@@ -111,6 +112,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onSortDirectionLeft(CCObject* sender);
     void onSortDirectionRight(CCObject* sender);
     void onSearchClicked(CCObject* sender);
+    void onResetClicked(CCObject* sender);
     // setters so I don't have to repeat that spaghetti again
     void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
