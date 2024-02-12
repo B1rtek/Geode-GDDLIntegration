@@ -13,10 +13,12 @@ bool GDDLSearchLayer::init() {
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-demon-search-popup"_spr);
     m_mainLayer->addChild(bg, -1);
+    float aspectRatioFixX = (569.0f - winSize.width) / 2;
+    float aspectRatioFixY = (320.0f - winSize.height) / 2;
     // menu with the main layout
     m_buttonMenu = CCMenu::create();
     m_buttonMenu->setContentSize({winSize.width, winSize.height});
-    m_buttonMenu->setPosition({64.5f, 295.0f});
+    m_buttonMenu->setPosition({64.5f - aspectRatioFixX, 295.0f - aspectRatioFixY});
     m_buttonMenu->setID("gddl-demon-search-menu"_spr);
     m_mainLayer->addChild(m_buttonMenu, 0);
     // close button
@@ -32,8 +34,8 @@ bool GDDLSearchLayer::init() {
     infoButton->setPosition({423.0f, -7.0f});
     // title
     const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
-    m_mainLayer->addChild(title, 1);
-    title->setPosition({285.5f, 287.0f});
+    m_buttonMenu->addChild(title, 1);
+    title->setPosition({220.0f, -10.0f});
     title->setScale(0.7f);
     // search button
     const auto searchButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn06_001.png");
