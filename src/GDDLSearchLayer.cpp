@@ -1,7 +1,9 @@
 #include "GDDLSearchLayer.h"
 
+#include <Geode/utils/web.hpp>
 
 #include "RatingsManager.h"
+
 bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(150))
         return false;
@@ -141,15 +143,17 @@ void GDDLSearchLayer::loadPage() {
 
     // column 3
     // tiers checkboxes
-    createCheckbox(m_buttonMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {330.0f, -62.5f},
+    createCheckbox(m_buttonMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {325.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoUnrated));
-    createCheckbox(m_buttonMenu, noRatedToggler, "No rated", 17.5f, 0.9f, {390.0f, -62.5f},
+    createCheckbox(m_buttonMenu, noRatedToggler, "No rated", -19.5f, 0.9f, {365.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoRated));
+    createCheckbox(m_buttonMenu, completedToggler, "Completed", 17.5f, 0.9f, {405.0f, -62.5f}, menu_selector(GDDLSearchLayer::onToggleCompleted));
     // enjoyment rating checkboxes
-    createCheckbox(m_buttonMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {330.0f, -122.5f},
+    createCheckbox(m_buttonMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {325.0f, -122.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoUnratedEnj));
-    createCheckbox(m_buttonMenu, noRatedEnjToggler, "No rated enj.", 17.5f, 0.9f, {390.0f, -122.5f},
+    createCheckbox(m_buttonMenu, noRatedEnjToggler, "No rated enj.", -19.5f, 0.9f, {365.0f, -122.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoRatedEnj));
+    createCheckbox(m_buttonMenu, uncompletedToggler, "Uncompleted", 17.5f, 0.9f, {405.0f, -122.5f}, menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
     createLabel(m_buttonMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
     bg = createLabelForChoice(m_buttonMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f},
@@ -177,6 +181,8 @@ void GDDLSearchLayer::loadValues() {
     noUnratedEnjToggler->toggle(removeUnratedEnj);
     noRatedToggler->toggle(removeRated);
     noRatedEnjToggler->toggle(removeRatedEnj);
+    completedToggler->toggle(completed);
+    uncompletedToggler->toggle(uncompleted);
     setNumberWithDefZeroTextfield(subLowCount, submissionsCountLowTextfield);
     setNumberWithDefZeroTextfield(subHighCount, submissionsCountHighTextfield);
     setNumberWithDefZeroTextfield(enjLowCount, enjSubmissionsCountLowTextfield);
@@ -199,6 +205,8 @@ void GDDLSearchLayer::saveValues() {
     removeUnratedEnj = noUnratedEnjToggler->isToggled();
     removeRated = noRatedToggler->isToggled();
     removeRatedEnj = noRatedEnjToggler->isToggled();
+    completed = completedToggler->isToggled();
+    uncompleted = uncompletedToggler->isToggled();
     subLowCount = getNumberTextfieldValue(submissionsCountLowTextfield);
     subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
     enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
@@ -221,6 +229,8 @@ void GDDLSearchLayer::resetValues() {
     noUnratedEnjToggler->toggle(false);
     noRatedToggler->toggle(false);
     noRatedEnjToggler->toggle(false);
+    completedToggler->toggle(true);
+    uncompletedToggler->toggle(true);
     setNumberWithDefZeroTextfield(0, submissionsCountLowTextfield);
     setNumberWithDefZeroTextfield(0, submissionsCountHighTextfield);
     setNumberWithDefZeroTextfield(0, enjSubmissionsCountLowTextfield);
@@ -244,8 +254,99 @@ TodoReturn GDDLSearchLayer::keyBackClicked() {
 }
 
 void GDDLSearchLayer::onInfo(CCObject *sender) {
-    std::string infoContent = "<co>Name - Ex. match</c> - will <cy>only</c> search for levels with <cy>exactly</c> matching names\n<co>Difficulty</c> - <cy>in-game</c> <cr>demon</c> difficulty\n<co>Enj./Submissions count</c> - the amount of <cj>enjoyment</c>/<cp>difficulty tier</c> submissions for a level\n<co>No unrated/No rated (Enj)</c> - <cy>only</c> search for levels <cg>with</c>(<cr>out</c>) a <cp>tier</c>/<cj>enjoyment</c> rating\n<cb>All</c> tier and submission ranges are <cy>inclusive</c> from <cy>both</c> sides";
+    std::string infoContent =
+            "<co>Name - Ex. match</c> - will <cy>only</c> search for levels with <cy>exactly</c> matching "
+            "names\n<co>Difficulty</c> - <cy>in-game</c> <cr>demon</c> difficulty\n<co>Enj./Submissions count</c> - "
+            "the amount of <cj>enjoyment</c>/<cp>difficulty tier</c> submissions for a level\n<co>No unrated/No rated "
+            "(Enj)</c> - <cy>only</c> search for levels <cg>with</c>(<cr>out</c>) a <cp>tier</c>/<cj>enjoyment</c> "
+            "rating\n<cb>All</c> tier and submission ranges are <cy>inclusive</c> from <cy>both</c> sides";
     FLAlertLayer::create("GDDL Search Help", infoContent, "OK")->show();
+}
+
+std::string GDDLSearchLayer::urlEncodeString(std::string toEncode) {
+    if (toEncode.find(' ') != std::string::npos) { // that's the only character that might need it
+        std::string encoded;
+        for (const auto character: toEncode) {
+            if (character == ' ') {
+                encoded += "%20";
+            } else {
+                encoded += character;
+            }
+        }
+        return encoded;
+    }
+    return toEncode;
+}
+
+std::string GDDLSearchLayer::addStringToRequest(const std::string &paramName, std::string value) {
+    if (value.empty()) {
+        return "";
+    }
+    return "&" + paramName + "=" + urlEncodeString(value);
+}
+
+std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, bool value) {
+    std::string strValue = "true";
+    if (!value) {
+        strValue = "false";
+    }
+    return "&" + paramName + "=" + strValue;
+}
+
+std::string GDDLSearchLayer::formSearchRequest() {
+    std::string request = searchEndpoint;
+    request += "?page=" + std::to_string(page) + "&chunk=10";
+    request += addStringToRequest("name", name);
+    request += addValueToRequest("lowTier", lowTier, 0);
+    request += addValueToRequest("highTier", highTier, 0);
+    request += addValueToRequest("difficulty", difficulty, 5);
+    request += addStringToRequest("creator", creator);
+    request += addStringToRequest("song", song);
+    request += addBoolToRequest("exactName", exactName);
+    request += addBoolToRequest("removeUnrated", removeUnrated);
+    request += addBoolToRequest("removeUnratedEnj", removeUnratedEnj);
+    request += addBoolToRequest("removeRated", removeRated);
+    request += addBoolToRequest("removeRatedEnj", removeRatedEnj);
+    request += addValueToRequest("subLowCount", subLowCount, 0);
+    request += addValueToRequest("subHighCount", subHighCount, 0);
+    request += addValueToRequest("enjLowCount", enjLowCount, 0);
+    request += addValueToRequest("enjHighCount", enjHighCount, 0);
+    request += addValueToRequest("enjLow", enjLow, 0.0f);
+    request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
+    request += addStringToRequest("sort", sort[sortOptionIndex]);
+    request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
+    return request;
+}
+
+/**
+ * example response:
+{
+  "total": 1,
+  "limit": 16,
+  "page": 1,
+  "levels": [
+    {
+      "LevelID": 30380566,
+      "Name": "Bausha Vortex",
+      "Rating": 28,
+      "Enjoyment": 8.285714285714286,
+      "Creator": "Pennutoh",
+      "Song": "~NK~ Fracture",
+      "Difficulty": "Extreme",
+      "InPack": 1
+    }
+  ]
+}
+ */
+std::vector<int> GDDLSearchLayer::parseResponse(std::string response) {
+    std::vector<int> results;
+    json responseJson = json::parse(response);
+    totalResults = responseJson["total"];
+    json levelList = responseJson["levels"];
+    for (auto element: levelList) {
+        results.push_back(element["LevelID"]);
+    }
+    return results;
 }
 
 void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
@@ -472,9 +573,17 @@ void GDDLSearchLayer::onToggleNoUnratedEnj(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onToggleNoRatedEnj(CCObject *sender) {
-    if(!noRatedEnjToggler->isOn()) {
+    if (!noRatedEnjToggler->isOn()) {
         noUnratedEnjToggler->toggle(false);
     }
+}
+
+void GDDLSearchLayer::onToggleCompleted(CCObject *sender) {
+    // do nothing
+}
+
+void GDDLSearchLayer::onToggleUncompleted(CCObject *sender) {
+    // do nothing
 }
 
 void GDDLSearchLayer::onSortByLeft(CCObject *sender) {
@@ -503,7 +612,7 @@ void GDDLSearchLayer::onSortDirectionRight(CCObject *sender) {
 
 void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
     saveValues();
-    FLAlertLayer::create("GDDL", "Search clicked", "OK")->show();
+    getSearchPage(1);
 }
 
 void GDDLSearchLayer::onResetClicked(CCObject *sender) {
@@ -574,5 +683,37 @@ void GDDLSearchLayer::loadSettings() {
 }
 
 void GDDLSearchLayer::saveSettings() {
+
+}
+
+GJSearchObject *GDDLSearchLayer::getSearchPage(int pageToGet) {
+    page = pageToGet;
+    std::string request = formSearchRequest();
+    web::AsyncWebRequest()
+            .fetch(request)
+            .text()
+            .then([](std::string const &response) {
+                std::vector<int> ids = parseResponse(response);
+
+            })
+            .expect([](std::string const &error) {
+                FLAlertLayer::create("GDDL Search",
+                                     "Search failed - either you're disconnected from the internet or the server did "
+                                     "something wrong...",
+                                     "OK")
+                        ->show();
+            });
+    return nullptr;
+}
+
+int GDDLSearchLayer::getSearchResultsPageCount() {
+    return 0;
+}
+
+int GDDLSearchLayer::getSearchResultsCount() {
+    return 0;
+}
+
+void GDDLSearchLayer::stopSearch() {
 
 }
