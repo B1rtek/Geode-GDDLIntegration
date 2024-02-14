@@ -4,6 +4,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "LevelBrowserLayer.cpp"
 
 bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(150))
@@ -419,9 +420,9 @@ std::pair<int, int> GDDLSearchLayer::getReadyRange(int requestedPage) {
     return {firstIndex, lastIndex};
 }
 
-void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, std::function<void(GJSearchObject *)> callback) {
-    if(callback != nullptr) { // search continues
-        callback(searchObject);
+void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject) {
+    if(callbackObject != nullptr) { // search continues
+        callbackObject->handleSearchObject(searchObject);
     } else { // new search
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         cocos::switchToScene(listLayer);
@@ -785,7 +786,7 @@ void GDDLSearchLayer::loadSettings() {}
 
 void GDDLSearchLayer::saveSettings() {}
 
-void GDDLSearchLayer::requestSearchPage(int requestedPage, std::function<void(GJSearchObject *)> callback) {
+void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer* callbackObject) {
     // check whether the cache already contains results for this query
     if (requestedPage < 1) {
         requestedPage = 1;
@@ -799,14 +800,14 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, std::function<void(GJ
     std::pair<int, int> readyRange = getReadyRange(requestedPage);
     if (readyRange.second - readyRange.first >= 10) { // we have the results yaaaay
         GJSearchObject* searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-        handleSearchObject(searchObject, callback);
+        handleSearchObject(searchObject, callbackObject);
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
     web::AsyncWebRequest()
             .fetch(request)
             .text()
-            .then([requestedPage, &callback](std::string const &response) {
+            .then([requestedPage, callbackObject](std::string const &response) {
                 // append results
                 appendFetchedResults(response);
                 // test if there's enough of them
@@ -820,7 +821,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, std::function<void(GJ
                 }
                 // and then call the callback
                 GJSearchObject* searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-                handleSearchObject(searchObject, callback);
+                handleSearchObject(searchObject, callbackObject);
             })
             .expect([](std::string const &error) {
                 FLAlertLayer::create("GDDL Search",
@@ -839,6 +840,4 @@ bool GDDLSearchLayer::isSearching() {
     return searching;
 }
 
-void GDDLSearchLayer::stopSearch() {
-    searching = false;
-}
+void GDDLSearchLayer::stopSearch() { searching = false; }

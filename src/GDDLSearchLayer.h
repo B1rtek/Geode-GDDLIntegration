@@ -3,6 +3,7 @@
 
 #include <Geode/Bindings.hpp>
 
+struct GDDLBrowserLayer;
 using namespace geode::prelude;
 
 enum LevelCompleteness {
@@ -108,7 +109,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     static GJSearchObject* makeASearchObjectFrom(int firstIndex, int lastIndex);
     static void appendFetchedResults(std::string response);
     static std::pair<int, int> getReadyRange(int requestedPage);
-    static void handleSearchObject(GJSearchObject* searchObject, std::function<void(GJSearchObject *)> callback);
+    static void handleSearchObject(GJSearchObject* searchObject, GDDLBrowserLayer* callbackObject);
     // utility
     void createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
                      int zOrder = 1);
@@ -169,7 +170,7 @@ public:
     void show() override;
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
-    static void requestSearchPage(int page, std::function<void(GJSearchObject*)> callback);
+    static void requestSearchPage(int page, GDDLBrowserLayer* callbackObject);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
     static bool isSearching();
