@@ -31,5 +31,14 @@ public:
         }
         return vec;
     }
+
+    template<typename T>
+    static std::set<T> copyVectorToSet(std::vector<T> vectorToCopy) {
+        std::set<T> set;
+        for (auto element: vectorToCopy) {
+            set.insert(element);
+        }
+        return set;
+    }
 };
 #endif // GDDL_UTILS_H

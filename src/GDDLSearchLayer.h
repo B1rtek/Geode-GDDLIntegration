@@ -57,7 +57,10 @@ class GDDLSearchLayer : public FLAlertLayer {
     // have fun remembering all of that lmao
 
     const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
-    inline static int totalResults = 0;
+    inline static int totalOnlineResults = 0;
+    inline static std::vector<int> cachedResults = {};
+    inline static int onlinePagesFetched = 0;
+    inline static bool searching = false;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
     CCTextInputNode *nameTextfield = nullptr;
@@ -92,6 +95,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onClose(CCObject *sender);
     TodoReturn keyBackClicked() override;
     void onInfo(CCObject *sender);
+    // request related
     static std::string urlEncodeString(std::string toEncode);
     static std::string addStringToRequest(const std::string &paramName, std::string value);
     static std::string addBoolToRequest(const std::string &paramName, bool value);
@@ -99,6 +103,12 @@ class GDDLSearchLayer : public FLAlertLayer {
     static std::string addValueToRequest(const std::string &paramName, T value, T defaultValue);
     static std::string formSearchRequest();
     static std::vector<int> parseResponse(std::string response);
+    static std::vector<int> filterResults(std::vector<int> ids, LevelCompleteness completionStatus);
+    static int getMaxPotentialPages();
+    static GJSearchObject* makeASearchObjectFrom(int firstIndex, int lastIndex);
+    static void appendFetchedResults(std::string response);
+    static std::pair<int, int> getReadyRange(int requestedPage);
+    static void handleSearchObject(GJSearchObject* searchObject, std::function<void(GJSearchObject *)> callback);
     // utility
     void createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
                      int zOrder = 1);
@@ -159,9 +169,10 @@ public:
     void show() override;
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
-    static GJSearchObject* getSearchPage(int page);
+    static void requestSearchPage(int page, std::function<void(GJSearchObject*)> callback);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
+    static bool isSearching();
     static void stopSearch();
 };
 
