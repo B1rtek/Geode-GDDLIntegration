@@ -322,6 +322,7 @@ void GDDLSearchLayer::restoreValues() {
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
     saveValues();
+    saveSettings();
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
@@ -768,11 +769,11 @@ void GDDLSearchLayer::onToggleNoRatedEnj(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onToggleCompleted(CCObject *sender) {
-    // do nothing
+     // do nothing
 }
 
 void GDDLSearchLayer::onToggleUncompleted(CCObject *sender) {
-    // do nothing
+     // do nothing
 }
 
 void GDDLSearchLayer::onSortByLeft(CCObject *sender) {
@@ -874,9 +875,57 @@ void GDDLSearchLayer::show() {
     cocos::handleTouchPriority(this);
 }
 
-void GDDLSearchLayer::loadSettings() {}
+void GDDLSearchLayer::loadSettings() {
+    // happens only on startup
+    if (!firstLoad) return;
+    firstLoad = false;
+    name = Mod::get()->getSavedValue<std::string>("search-name", "");
+    lowTier = Mod::get()->getSavedValue<int>("search-lowTier", 0);
+    highTier = Mod::get()->getSavedValue<int>("search-highTier", 0);
+    difficulty = Mod::get()->getSavedValue<int>("search-difficulty", 5);
+    creator = Mod::get()->getSavedValue<std::string>("search-creator", "");
+    song = Mod::get()->getSavedValue<std::string>("search-song", "");
+    exactName = Mod::get()->getSavedValue<bool>("search-exactName", false);
+    removeUnrated = Mod::get()->getSavedValue<bool>("search-removeUnrated", false);
+    removeUnratedEnj = Mod::get()->getSavedValue<bool>("search-removeUnratedEnj", false);
+    removeRated = Mod::get()->getSavedValue<bool>("search-removeRated", false);
+    removeRatedEnj = Mod::get()->getSavedValue<bool>("search-removeRatedEnj", false);
+    subLowCount = Mod::get()->getSavedValue<int>("search-subLowCount", 0);
+    subHighCount = Mod::get()->getSavedValue<int>("search-subHighCount", 0);
+    enjLowCount = Mod::get()->getSavedValue<int>("search-enjLowCount", 0);
+    enjHighCount = Mod::get()->getSavedValue<int>("search-enjHighCount", 0);
+    enjLow = Mod::get()->getSavedValue<float>("search-enjLow", 0);
+    enjHigh = Mod::get()->getSavedValue<float>("search-enjHigh", highestEnjoyment);
+    sortOptionIndex = Mod::get()->getSavedValue<int>("search-sortOptionIndex", 0);
+    sortDirectionIndex = Mod::get()->getSavedValue<int>("search-sortDirectionIndex", 0);
+    completed = Mod::get()->getSavedValue<bool>("search-completed", true);
+    uncompleted = Mod::get()->getSavedValue<bool>("search-uncompleted", true);
+}
 
-void GDDLSearchLayer::saveSettings() {}
+void GDDLSearchLayer::saveSettings() {
+    // save values
+    Mod::get()->setSavedValue("search-name", name);
+    Mod::get()->setSavedValue("search-lowTier", lowTier);
+    Mod::get()->setSavedValue("search-highTier", highTier);
+    Mod::get()->setSavedValue("search-difficulty", difficulty);
+    Mod::get()->setSavedValue("search-creator", creator);
+    Mod::get()->setSavedValue("search-song", song);
+    Mod::get()->setSavedValue("search-exactName", exactName);
+    Mod::get()->setSavedValue("search-removeUnrated", removeUnrated);
+    Mod::get()->setSavedValue("search-removeUnratedEnj", removeUnratedEnj);
+    Mod::get()->setSavedValue("search-removeRated", removeRated);
+    Mod::get()->setSavedValue("search-removeRatedEnj", removeRatedEnj);
+    Mod::get()->setSavedValue("search-subLowCount", subLowCount);
+    Mod::get()->setSavedValue("search-subHighCount", subHighCount);
+    Mod::get()->setSavedValue("search-enjLowCount", enjLowCount);
+    Mod::get()->setSavedValue("search-enjHighCount", enjHighCount);
+    Mod::get()->setSavedValue("search-enjLow", enjLow);
+    Mod::get()->setSavedValue("search-enjHigh", enjHigh);
+    Mod::get()->setSavedValue("search-sortOptionIndex", sortOptionIndex);
+    Mod::get()->setSavedValue("search-sortDirectionIndex", sortDirectionIndex);
+    Mod::get()->setSavedValue("search-completed", completed);
+    Mod::get()->setSavedValue("search-uncompleted", uncompleted);
+}
 
 void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject) {
     // check whether the cache already contains results for this query

@@ -39,8 +39,10 @@ class $modify(MenuLayer) {
     bool init() {
         if (!MenuLayer::init()) return false;
 
+        GDDLSearchLayer::loadSettings(); // will only work if this is the first time the MenuLayer was loaded
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
+        GDDLSearchLayer::saveSettings();
         if (!RatingsManager::alreadyCached()) {
             web::AsyncWebRequest()
             .fetch("https://gdladder.com/api/theList")

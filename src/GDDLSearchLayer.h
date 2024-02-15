@@ -55,7 +55,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static LevelCompleteness completeness = ANY1;
     inline static bool completed = true, uncompleted = true;
     // have fun remembering all of that lmao
-    inline static bool modified = false;
+    inline static bool firstLoad = true;
     // additional settings so the gddl demon split doesn't change the values
     inline static std::string savedName, savedCreator, savedSong;
     inline static int savedLowTier = -1, savedHighTier = 0, savedDifficulty = 5, savedSubLowCount = 0, savedSubHighCount = 0, savedEnjLowCount = 0, savedEnjHighCount = 0, savedSortOptionIndex = 0, savedSortDirectionIndex = 0;
