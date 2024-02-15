@@ -6,11 +6,7 @@
 struct GDDLBrowserLayer;
 using namespace geode::prelude;
 
-enum LevelCompleteness {
-    ANY1,
-    UNCOMPLETED1,
-    COMPLETED1
-};
+enum LevelCompleteness { ANY1, UNCOMPLETED1, COMPLETED1 };
 
 class GDDLSearchLayer : public FLAlertLayer {
     // endpoint args, ignoring chunk (always set to 10) and stddev args
@@ -25,10 +21,13 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static std::string name;
     // lowTier, highTier - parse as is, check for valid numbers
     inline static int lowTier = 0, highTier = 0;
-    // difficulty - passed as a number from 0 to 4, shown as strings from the vector below, 5 = any
+    // difficulty - passed as a number from 2 to 6, shown as strings from the vector below, 5 = any
+    // 1 is actually reserved for "Official" demons, but since they can't be displayed in a level browser, we can use it
+    // 0 is for nothing - just add 2 to the index and we're good
     inline static int difficulty = 5;
-    const inline static std::vector<std::string> demonDifficulties = {"Easy",   "Medium",  "Hard",
-                                                                      "Insane", "Extreme", "Any"};
+    const inline static std::vector<std::string> demonDifficulties = {
+            "Easy", "Medium", "Hard", "Insane", "Extreme", "Any"
+    };
     // creator - use a url parser
     inline static std::string creator;
     // song - use a url parser
@@ -103,20 +102,20 @@ class GDDLSearchLayer : public FLAlertLayer {
     template<typename T>
     static std::string addValueToRequest(const std::string &paramName, T value, T defaultValue);
     static std::string formSearchRequest();
-    static std::vector<int> parseResponse(const std::string& response);
+    static std::vector<int> parseResponse(const std::string &response);
     static std::vector<int> filterResults(std::vector<int> ids, LevelCompleteness completionStatus);
     static int getMaxPotentialPages();
     static int getOnlinePagesCount();
-    static GJSearchObject* makeASearchObjectFrom(int firstIndex, int lastIndex);
-    static void appendFetchedResults(const std::string& response);
+    static GJSearchObject *makeASearchObjectFrom(int firstIndex, int lastIndex);
+    static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
-    static void handleSearchObject(GJSearchObject* searchObject, GDDLBrowserLayer* callbackObject, int resultsCount);
+    static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     // utility
-    void createLabel(CCLayer *parent, const std::string &font, const std::string& text, int maxWidth, const CCPoint& position,
-                     int zOrder = 1);
-    CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string& font,
-                                         const std::string &text,
-                                         int maxWidth, CCPoint position, CCPoint bgSize, int zOrder = 1);
+    void createLabel(CCLayer *parent, const std::string &font, const std::string &text, int maxWidth,
+                     const CCPoint &position, int zOrder = 1);
+    CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
+                                         const std::string &text, int maxWidth, CCPoint position, CCPoint bgSize,
+                                         int zOrder = 1);
     void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
     void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font, std::string placeholder,
                              CCPoint bgSize, CCPoint position, int zOrder = 1);
@@ -172,10 +171,10 @@ public:
     void show() override;
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
-    static void requestSearchPage(int page, GDDLBrowserLayer* callbackObject);
+    static void requestSearchPage(int page, GDDLBrowserLayer *callbackObject);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
-    static GJSearchObject* getSearchObjectForPage(int requestedPage);
+    static GJSearchObject *getSearchObjectForPage(int requestedPage);
     static bool isSearching();
     static void stopSearch();
 };
