@@ -98,22 +98,24 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onInfo(CCObject *sender);
     // request related
     static std::string urlEncodeString(std::string toEncode);
-    static std::string addStringToRequest(const std::string &paramName, std::string value);
+    static std::string addStringToRequest(const std::string &paramName, const std::string &value);
     static std::string addBoolToRequest(const std::string &paramName, bool value);
     template<typename T>
     static std::string addValueToRequest(const std::string &paramName, T value, T defaultValue);
     static std::string formSearchRequest();
-    static std::vector<int> parseResponse(std::string response);
+    static std::vector<int> parseResponse(const std::string& response);
     static std::vector<int> filterResults(std::vector<int> ids, LevelCompleteness completionStatus);
     static int getMaxPotentialPages();
+    static int getOnlinePagesCount();
     static GJSearchObject* makeASearchObjectFrom(int firstIndex, int lastIndex);
-    static void appendFetchedResults(std::string response);
+    static void appendFetchedResults(const std::string& response);
     static std::pair<int, int> getReadyRange(int requestedPage);
-    static void handleSearchObject(GJSearchObject* searchObject, GDDLBrowserLayer* callbackObject);
+    static void handleSearchObject(GJSearchObject* searchObject, GDDLBrowserLayer* callbackObject, int resultsCount);
     // utility
-    void createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
+    void createLabel(CCLayer *parent, const std::string &font, const std::string& text, int maxWidth, const CCPoint& position,
                      int zOrder = 1);
-    CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, std::string font, std::string text,
+    CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string& font,
+                                         const std::string &text,
                                          int maxWidth, CCPoint position, CCPoint bgSize, int zOrder = 1);
     void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
     void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font, std::string placeholder,
@@ -173,6 +175,7 @@ public:
     static void requestSearchPage(int page, GDDLBrowserLayer* callbackObject);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
+    static GJSearchObject* getSearchObjectForPage(int requestedPage);
     static bool isSearching();
     static void stopSearch();
 };

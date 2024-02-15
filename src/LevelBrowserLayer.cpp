@@ -1,9 +1,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelBrowserLayer.hpp>
 
-
 #include "GDDLSearchLayer.h"
-#include "RatingsManager.h"
 
 class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
     int currentPage = 1;
@@ -12,15 +10,13 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         if (!GDDLSearchLayer::isSearching() || p0->m_searchType != SearchType::Type19) {
             return LevelBrowserLayer::init(p0);
         }
+        log::debug("{}", "GDDLBrowserLayer created");
         return LevelBrowserLayer::init(p0);
-    }
-
-    void epic420Function(int hi) {
-        ++hi;
     }
 
     void loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) {
         LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
+        log::debug("GDDLBrowserLayer::loadLevelsFinished() called, current page: {}", std::to_string(m_fields->currentPage));
         if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;
         m_leftArrow->setVisible(m_fields->currentPage > 1);
@@ -33,14 +29,16 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;
         m_fields->currentPage = std::min(m_fields->currentPage + 1, GDDLSearchLayer::getSearchResultsPageCount());
+        log::debug("GDDLBrowserLayer::onNextPage() called, requesting search page {}", std::to_string(m_fields->currentPage));
         GDDLSearchLayer::requestSearchPage(m_fields->currentPage, this);
     }
 
     void onPrevPage(CCObject * sender) {
         LevelBrowserLayer::onPrevPage(sender);
-        if (!RatingsManager::isSearchingForTier() || m_searchObject->m_searchType != SearchType::Type19)
+        if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;
         m_fields->currentPage = std::max(1, m_fields->currentPage - 1);
+        log::debug("GDDLBrowserLayer::onPrevPage() called, requesting search page {}", std::to_string(m_fields->currentPage));
         GDDLSearchLayer::requestSearchPage(m_fields->currentPage, this);
     }
 
@@ -62,7 +60,14 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         m_pageBtn->setVisible(false);
     }
 
-    void handleSearchObject(GJSearchObject * searchObject) {
+    void handleSearchObject(GJSearchObject * searchObject, int resultsCount) {
+        // check doesn't apply to the first page for REASONS
+        // DON'T GO TOO FAR OR ELSE
+        if (resultsCount <= 0 && m_fields->currentPage != 1) {
+            delete searchObject;
+            searchObject = GDDLSearchLayer::getSearchObjectForPage(--m_fields->currentPage);
+        }
+        // THIS IS NOT A JOKE
         loadPage(searchObject);
         setCorrectLabelsText();
     }

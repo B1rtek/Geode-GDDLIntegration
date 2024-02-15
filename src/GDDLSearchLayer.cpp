@@ -1,6 +1,7 @@
 #include "GDDLSearchLayer.h"
 
 #include <Geode/utils/web.hpp>
+#include <utility>
 
 #include "RatingsManager.h"
 #include "Utils.h"
@@ -223,6 +224,7 @@ void GDDLSearchLayer::saveValues() {
     enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
 }
 
+// ReSharper disable once CppDFAUnreachableFunctionCall
 void GDDLSearchLayer::resetValues() {
     page = 1;
     nameTextfield->setString("");
@@ -261,7 +263,7 @@ TodoReturn GDDLSearchLayer::keyBackClicked() {
     FLAlertLayer::keyBackClicked();
 }
 
-void GDDLSearchLayer::onInfo(CCObject *sender) {
+void GDDLSearchLayer::onInfo(CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     std::string infoContent =
             "<co>Name - Ex. match</c> - will <cy>only</c> search for levels with <cy>exactly</c> matching "
             "names\n<co>Difficulty</c> - <cy>in-game</c> <cr>demon</c> difficulty\n<co>Enj./Submissions count</c> - "
@@ -286,7 +288,7 @@ std::string GDDLSearchLayer::urlEncodeString(std::string toEncode) {
     return toEncode;
 }
 
-std::string GDDLSearchLayer::addStringToRequest(const std::string &paramName, std::string value) {
+std::string GDDLSearchLayer::addStringToRequest(const std::string &paramName, const std::string &value) {
     if (value.empty()) {
         return "";
     }
@@ -346,19 +348,24 @@ std::string GDDLSearchLayer::formSearchRequest() {
   ]
 }
  */
-std::vector<int> GDDLSearchLayer::parseResponse(std::string response) {
+
+std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
     json responseJson = json::parse(response);
-    totalOnlineResults = responseJson["total"];
+    int total = responseJson["total"];
+    totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
     json levelList = responseJson["levels"];
     for (auto element: levelList) {
-        results.push_back(element["LevelID"]);
+        int levelID = element["LevelID"];
+        if (levelID > 3) { // to avoid official demons
+            results.push_back(element["LevelID"]);
+        }
     }
     return results;
 }
 
 std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, LevelCompleteness completionStatus) {
-    std::set<int> setOfIds = Utils::copyVectorToSet(ids);
+    std::set<int> setOfIds = Utils::copyVectorToSet(std::move(ids));
     std::vector<int> filteredList;
     if (completionStatus != ANY1) {
         std::set<int> allCompleted;
@@ -388,14 +395,20 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, LevelCompl
 }
 
 int GDDLSearchLayer::getMaxPotentialPages() {
-    const int searchResultsCount = cachedResults.size();
-    const int correction = searchResultsCount % 10 == 0 ? 0 : 1;
-    return searchResultsCount / 10 + correction;
+    const int correction = totalOnlineResults % 10 == 0 ? 0 : 1;
+    return totalOnlineResults / 10 + correction;
+}
+
+int GDDLSearchLayer::getOnlinePagesCount() {
+    const int correction = totalOnlineResults % 50 == 0 ? 0 : 1;
+    return totalOnlineResults / 50 + correction;
 }
 
 GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, const int lastIndex) {
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
+        int id = cachedResults[i];
+        log::debug("Loop {} - adding level {}", std::to_string(i), std::to_string(id));
         requestString += std::to_string(cachedResults[i]) + ',';
     }
     if (!requestString.empty()) {
@@ -405,13 +418,26 @@ GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, con
     return GJSearchObject::create(SearchType::Type19, requestString);
 }
 
-void GDDLSearchLayer::appendFetchedResults(std::string response) {
+void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
     std::vector<int> parsedResponse = parseResponse(response);
+    log::debug("Before filtration: {}", std::to_string(parsedResponse.size()));
+    if (completed == uncompleted) {
+        completeness = ANY1;
+    } else {
+        if (completed) {
+            completeness = COMPLETED1;
+        } else {
+            completeness = UNCOMPLETED1;
+        }
+    }
     std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
+    log::debug("After filtration: {}", std::to_string(filteredResponse.size()));
     for (auto element: filteredResponse) {
         cachedResults.push_back(element);
     }
+    log::debug("Total cached: {}", std::to_string(cachedResults.size()));
     onlinePagesFetched++;
+    log::debug("Total pages fetched: {}", std::to_string(onlinePagesFetched));
 }
 
 std::pair<int, int> GDDLSearchLayer::getReadyRange(int requestedPage) {
@@ -420,25 +446,24 @@ std::pair<int, int> GDDLSearchLayer::getReadyRange(int requestedPage) {
     return {firstIndex, lastIndex};
 }
 
-void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject) {
+void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject, int resultsCount) {
     if(callbackObject != nullptr) { // search continues
-        callbackObject->handleSearchObject(searchObject);
+        callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         cocos::switchToScene(listLayer);
     }
 }
 
-void GDDLSearchLayer::createLabel(CCLayer *parent, std::string font, std::string text, int maxWidth, CCPoint position,
-                                  int zOrder) {
+void GDDLSearchLayer::createLabel(CCLayer *parent, const std::string &font, const std::string& text, const int maxWidth, const CCPoint& position, const int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
 }
 
-CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, std::string font,
-                                                      std::string placeholder, int maxWidth, CCPoint position,
+CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string& font,
+                                                      const std::string &placeholder, const int maxWidth, CCPoint position,
                                                       CCPoint bgSize, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
@@ -787,43 +812,58 @@ void GDDLSearchLayer::loadSettings() {}
 void GDDLSearchLayer::saveSettings() {}
 
 void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer* callbackObject) {
+    log::debug("Called requestSearchPage, requested page: {}, callbackObject: {}", std::to_string(requestedPage), std::to_string((int)std::addressof(callbackObject)));
     // check whether the cache already contains results for this query
     if (requestedPage < 1) {
         requestedPage = 1;
     }
     if (!cachedResults.empty()) {
         const int maxPotentialPages = getMaxPotentialPages();
-        if (maxPotentialPages > requestedPage) {
+        if (maxPotentialPages < requestedPage) {
             requestedPage = maxPotentialPages;
         }
     }
+    log::debug("Corrected page: {}", std::to_string(requestedPage));
     std::pair<int, int> readyRange = getReadyRange(requestedPage);
-    if (readyRange.second - readyRange.first >= 10) { // we have the results yaaaay
+    log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
+    if (readyRange.second - readyRange.first >= 10 || (onlinePagesFetched >= getOnlinePagesCount() && callbackObject != nullptr)) {
+        // we have the results yaaaay (or there's no way to get more, the other check only works when it's not the first request in this search)
+        log::debug("{}","We have the results!");
         GJSearchObject* searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-        handleSearchObject(searchObject, callbackObject);
+        handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
+        return;
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
+    log::debug("Formed request: {}", request);
     web::AsyncWebRequest()
             .fetch(request)
             .text()
             .then([requestedPage, callbackObject](std::string const &response) {
                 // append results
+                log::debug("{}", "Results fetched");
                 appendFetchedResults(response);
                 // test if there's enough of them
                 std::pair<int, int> readyRange = getReadyRange(requestedPage);
-                while(readyRange.second - readyRange.first < 10 && onlinePagesFetched < getMaxPotentialPages()) {
+                log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
+                while(readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
                     // not enough? fetch some more!
-                    auto anotherResponse = web::fetch(formSearchRequest());
-                    appendFetchedResults(response);
+                    log::debug("Still not enough!");
+                    std::string request = formSearchRequest();
+                    log::debug("Formed request: {}", request);
+                    auto anotherResponse = web::fetch(request);
+                    appendFetchedResults(anotherResponse.unwrap());
                     readyRange = getReadyRange(requestedPage);
+                    log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
                     // until it runs out of pages or sth
                 }
                 // and then call the callback
+                log::debug("Preparing results from {} to {}", std::to_string(readyRange.first), std::to_string(readyRange.second));
                 GJSearchObject* searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-                handleSearchObject(searchObject, callbackObject);
+                handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
             })
             .expect([](std::string const &error) {
+                log::debug("{}", "Error encountered");
                 FLAlertLayer::create("GDDL Search",
                                      "Search failed - either you're disconnected from the internet or the server did "
                                      "something wrong...",
@@ -835,6 +875,14 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer* cal
 int GDDLSearchLayer::getSearchResultsPageCount() { return getMaxPotentialPages(); }
 
 int GDDLSearchLayer::getSearchResultsCount() { return totalOnlineResults; }
+
+/**
+ * FALLBACK ONLY IF SOMEONE GOES A PAGE TOO FAR
+ */
+GJSearchObject *GDDLSearchLayer::getSearchObjectForPage(int requestedPage) {
+    std::pair<int, int> readyRange = getReadyRange(requestedPage);
+    return makeASearchObjectFrom(readyRange.first, readyRange.second);
+}
 
 bool GDDLSearchLayer::isSearching() {
     return searching;
