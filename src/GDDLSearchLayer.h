@@ -55,6 +55,14 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static LevelCompleteness completeness = ANY1;
     inline static bool completed = true, uncompleted = true;
     // have fun remembering all of that lmao
+    inline static bool modified = false;
+    // additional settings so the gddl demon split doesn't change the values
+    inline static std::string savedName, savedCreator, savedSong;
+    inline static int savedLowTier = -1, savedHighTier = 0, savedDifficulty = 5, savedSubLowCount = 0, savedSubHighCount = 0, savedEnjLowCount = 0, savedEnjHighCount = 0, savedSortOptionIndex = 0, savedSortDirectionIndex = 0;
+    inline static float savedEnjLow = 0.0f, savedEnjHigh = highestEnjoyment;
+    inline static bool savedCompleted = true, savedUncompleted = false, savedExactName = false, savedRemoveUnrated = false, savedRemoveRated = false, savedRemoveUnratedEnj = false, savedRemoveRatedEnj = false;
+    // assigned when gddl demon split requests a search, restored when the main layer is loaded
+    // -1 on savedLowTier means that there's nothing to restore
 
     const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
     inline static int totalOnlineResults = 0;
@@ -92,6 +100,8 @@ class GDDLSearchLayer : public FLAlertLayer {
     void loadValues();
     void saveValues();
     void resetValues();
+    static void cacheValues();
+    static void restoreValues();
     void onClose(CCObject *sender);
     TodoReturn keyBackClicked() override;
     void onInfo(CCObject *sender);
@@ -172,11 +182,13 @@ public:
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
     static void requestSearchPage(int page, GDDLBrowserLayer *callbackObject);
+    static void requestSearchFromDemonSplit(int tier);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
     static GJSearchObject *getSearchObjectForPage(int requestedPage);
     static bool isSearching();
     static void stopSearch();
+    static void restoreValuesAfterSplit();
 };
 
 template<typename T>

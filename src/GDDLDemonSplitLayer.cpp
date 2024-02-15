@@ -1,7 +1,7 @@
 #include "GDDLDemonSplitLayer.h"
 
-
 #include "RatingsManager.h"
+#include "GDDLSearchLayer.h"
 
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
@@ -87,9 +87,8 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) {
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
-    RatingsManager::setupSearch(tierNumber, COMPLETED);
-    const auto listLayer = LevelBrowserLayer::create(RatingsManager::getSearchPage(1));
-    cocos::switchToScene(listLayer);
+    GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber);
+    // the list should display itself hopefully
 }
 
 CCNode *GDDLDemonSplitLayer::createTierNode(int tier) {

@@ -7,7 +7,7 @@
 class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     bool init(int p0) {
         if(!LevelSearchLayer::init(p0)) return false;
-        RatingsManager::stopSearch();
+        GDDLSearchLayer::stopSearch();
         addGDDLButton();
         return true;
     }
