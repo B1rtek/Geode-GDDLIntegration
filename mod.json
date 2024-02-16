@@ -25,6 +25,7 @@
 		"sprites": [
 			"resources/tier.png",
 			"resources/split.png",
+			"resources/search.png",
 			"resources/tiers/*.png"
 		]
 	},
