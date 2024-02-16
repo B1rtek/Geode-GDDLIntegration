@@ -2,6 +2,7 @@
 #define GDDL_UTILS_H
 #include <chrono>
 #include <string>
+#include <sys/stat.h>
 
 class Utils {
 public:
@@ -30,6 +31,15 @@ public:
             vec.push_back(element);
         }
         return vec;
+    }
+
+    template<typename T>
+    static std::set<T> copyVectorToSet(std::vector<T> vectorToCopy) {
+        std::set<T> set;
+        for (auto element: vectorToCopy) {
+            set.insert(element);
+        }
+        return set;
     }
 };
 #endif // GDDL_UTILS_H

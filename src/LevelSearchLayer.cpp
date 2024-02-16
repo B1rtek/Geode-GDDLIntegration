@@ -1,3 +1,4 @@
+#include <Geode/Geode.hpp>
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelSearchLayer.hpp>
 
@@ -7,7 +8,7 @@
 class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     bool init(int p0) {
         if(!LevelSearchLayer::init(p0)) return false;
-        RatingsManager::stopSearch();
+        GDDLSearchLayer::stopSearch();
         addGDDLButton();
         return true;
     }
@@ -21,7 +22,7 @@ class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
         button->setID("gddl_search_button"_spr);
         getChildByIDRecursive("other-filter-menu")->addChild(button);
         auto buttonAbove = getChildByIDRecursive("lists-button");
-        button->setPosition({buttonAbove->getPositionX(), buttonAbove->getPositionY()-50.0f});
+        button->setPosition({buttonAbove->getPositionX(), buttonAbove->getPositionY()-(50.0f * (Mod::get()->getSettingValue<int64_t>("move-gddl-search-button-down") + 1))});
     }
 
     void onGDDLSearch(CCObject* sender) {
