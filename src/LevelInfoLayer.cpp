@@ -68,8 +68,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 tierLabelSprite->setScale(0.4f);
                 auto tierLabelMenu = CCMenu::create();
                 tierLabelMenu->setPosition({starsLabel->getPositionX(), starsLabel->getPositionY() - labelShiftRows * 15.5f});
-                tierLabelMenu->addChild(tierLabel);
+                tierLabelMenu->addChild(tierLabel, 10);
                 addChild(tierLabelMenu);
+                reorderChild(tierLabelMenu, 10);
             }
 
             int levelID = m_level->m_levelID;
