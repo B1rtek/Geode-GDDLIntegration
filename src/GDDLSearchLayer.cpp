@@ -68,15 +68,15 @@ void GDDLSearchLayer::loadPage() {
     // column 1
     // level name
     createLabel(m_buttonMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -37.5f});
-    createTextInputNode(m_buttonMenu, nameTextfield, "bigFont.fnt", "", {80.0f, 25.0f}, {60.0f, -62.5f});
+    createTextInputNode(m_buttonMenu, nameTextfield, "bigFont.fnt", "", 32, {80.0f, 25.0f}, {60.0f, -62.5f});
     createCheckbox(m_buttonMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleExactMatch));
     // creator
     createLabel(m_buttonMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -97.5f});
-    createTextInputNode(m_buttonMenu, creatorTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -122.5f});
+    createTextInputNode(m_buttonMenu, creatorTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -122.5f});
     // song name
     createLabel(m_buttonMenu, "bigFont.fnt", "Song name", 110.0f, {75.0f, -157.5f});
-    createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -182.5f});
+    createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
     // in-game difficulty
     createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
     auto bg = createLabelForChoice(m_buttonMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
@@ -87,11 +87,9 @@ void GDDLSearchLayer::loadPage() {
     // column 2
     // rating range
     createLabel(m_buttonMenu, "bigFont.fnt", "Tiers", 110.0f, {220.0f, -37.5f});
-    createTextInputNode(m_buttonMenu, tierLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -62.5f});
-    tierLowTextfield->setMaxLabelLength(2);
+    createTextInputNode(m_buttonMenu, tierLowTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {182.5f, -62.5f});
     tierLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, tierHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -62.5f});
-    tierHighTextfield->setMaxLabelLength(2);
+    createTextInputNode(m_buttonMenu, tierHighTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {257.5f, -62.5f});
     tierHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(tierLowTextfield, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onTierLowLeft),
                                  menu_selector(GDDLSearchLayer::onTierLowRight));
@@ -100,11 +98,9 @@ void GDDLSearchLayer::loadPage() {
     createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -62.5f});
     // enjoyment range
     createLabel(m_buttonMenu, "bigFont.fnt", "Enjoyment rating", 110.0f, {220.0f, -97.5f});
-    createTextInputNode(m_buttonMenu, enjoymentLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -122.5f});
-    enjoymentLowTextfield->setMaxLabelLength(5);
+    createTextInputNode(m_buttonMenu, enjoymentLowTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {182.5f, -122.5f});
     enjoymentLowTextfield->setAllowedChars("1234567890.");
-    createTextInputNode(m_buttonMenu, enjoymentHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -122.5f});
-    enjoymentHighTextfield->setMaxLabelLength(5);
+    createTextInputNode(m_buttonMenu, enjoymentHighTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {257.5f, -122.5f});
     enjoymentHighTextfield->setAllowedChars("1234567890.");
     createLeftRightButtonsAround(enjoymentLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjoymentLowLeft),
@@ -115,13 +111,11 @@ void GDDLSearchLayer::loadPage() {
     createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -122.5f});
     // submissions count
     createLabel(m_buttonMenu, "bigFont.fnt", "Submissions count", 110.0f, {220.0f, -157.5f});
-    createTextInputNode(m_buttonMenu, submissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(m_buttonMenu, submissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -182.5f});
-    submissionsCountLowTextfield->setMaxLabelLength(4);
     submissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, submissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(m_buttonMenu, submissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -182.5f});
-    submissionsCountHighTextfield->setMaxLabelLength(4);
     submissionsCountHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(submissionsCountLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onSubmissionCountLowLeft),
@@ -132,13 +126,11 @@ void GDDLSearchLayer::loadPage() {
     createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -182.5f});
     // enjoyment submissions count
     createLabel(m_buttonMenu, "bigFont.fnt", "Enj. submissions count", 110.0f, {220.0f, -217.5f});
-    createTextInputNode(m_buttonMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(m_buttonMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -242.5f});
-    enjSubmissionsCountLowTextfield->setMaxLabelLength(4);
     enjSubmissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(m_buttonMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -242.5f});
-    enjSubmissionsCountHighTextfield->setMaxLabelLength(4);
     enjSubmissionsCountHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(enjSubmissionsCountLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowLeft),
@@ -553,7 +545,7 @@ void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth) {
 }
 
 void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
-                                          std::string placeholder, CCPoint bgSize, CCPoint position, int zOrder) {
+                                          std::string placeholder, int maxCharacters, CCPoint bgSize, CCPoint position, int zOrder) {
     const auto bg = CCScale9Sprite::create("square02_small.png");
     parent->addChild(bg, zOrder);
     bg->setContentSize(bgSize);
@@ -564,7 +556,10 @@ void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&tex
     textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
     parent->addChild(textfield, zOrder + 1);
     textfield->setPosition(position);
-    textfield->setMaxLabelLength(32);
+#ifdef GEODE_IS_ANDROID
+    ++maxCharacters; // robert :)
+#endif
+    textfield->setMaxLabelLength(maxCharacters);
     textfield->setMaxLabelScale(0.7f);
 }
 

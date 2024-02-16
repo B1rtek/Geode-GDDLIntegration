@@ -128,7 +128,7 @@ class GDDLSearchLayer : public FLAlertLayer {
                                          int zOrder = 1);
     void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
     void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font, std::string placeholder,
-                             CCPoint bgSize, CCPoint position, int zOrder = 1);
+                             int maxCharacters, CCPoint bgSize, CCPoint position, int zOrder = 1);
     void createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
                                       SEL_MenuHandler rightCallback, int zOrder = 1);
     void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset, float scale,
