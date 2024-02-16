@@ -2,7 +2,7 @@
 #define RATINGSMANAGER_H
 
 #include <map>
-
+#include <Geode/Geode.hpp>
 #include <json.hpp>
 
 #include "GDDLRating.h"

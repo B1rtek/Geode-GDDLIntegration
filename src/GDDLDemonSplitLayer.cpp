@@ -1,5 +1,7 @@
 #include "GDDLDemonSplitLayer.h"
 
+#include <Geode/Geode.hpp>
+
 #include "RatingsManager.h"
 #include "GDDLSearchLayer.h"
 

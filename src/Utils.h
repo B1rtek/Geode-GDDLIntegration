@@ -2,6 +2,7 @@
 #define GDDL_UTILS_H
 #include <chrono>
 #include <string>
+#include <sys/stat.h>
 
 class Utils {
 public:
