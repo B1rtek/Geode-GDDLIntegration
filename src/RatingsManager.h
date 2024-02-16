@@ -17,6 +17,7 @@ enum TierSearchType {
 
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
+    static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
     inline static int searchedTier = -1;
@@ -26,6 +27,8 @@ class RatingsManager {
 
     static GDDLRating parseJson(std::string response);
 
+    static cocos2d::ccColor3B convertToColor(int hexColor);
+
     static void populateFromSave();
 
     static void cacheList();
@@ -34,6 +37,8 @@ class RatingsManager {
 
 public:
     static int getDemonTier(int id);
+
+    static cocos2d::ccColor3B getTierColor(int tier);
 
     static std::optional<GDDLRating> getRating(int id);
 
