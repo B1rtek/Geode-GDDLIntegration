@@ -63,6 +63,10 @@ public:
     static int getSearchResultsCount();
 
     static void stopSearch();
+
+    static void updateCacheFromSearch(int levelID, int tier);
+
+    static int getCachedTier(int levelID);
 };
 
 

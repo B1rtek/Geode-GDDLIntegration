@@ -238,6 +238,10 @@ int RatingsManager::getSearchResultsCount() {
     return searchResults.size();
 }
 
-void RatingsManager::stopSearch() {
-    searchingForTier = false;
+void RatingsManager::stopSearch() { searchingForTier = false; }
+
+void RatingsManager::updateCacheFromSearch(const int levelID, const int tier) { ratingsCache[levelID] = tier; }
+
+int RatingsManager::getCachedTier(const int levelID) {
+    return !ratingsCache.contains(levelID) ? -1 : ratingsCache[levelID];
 }

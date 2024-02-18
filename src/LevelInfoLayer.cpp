@@ -74,6 +74,10 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             }
 
             int levelID = m_level->m_levelID;
+            // just so it displays a bit earlier
+            int cachedTier = RatingsManager::getCachedTier(levelID);
+            updateButton(cachedTier);
+            // and then get the full one
             int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
                 updateButton(tier);
