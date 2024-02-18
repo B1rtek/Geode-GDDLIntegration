@@ -6,6 +6,7 @@
 #include "GDDLSearchLayer.h"
 
 class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
+    // ReSharper disable once CppHidingFunction
     bool init(int p0) {
         if(!LevelSearchLayer::init(p0)) return false;
         GDDLSearchLayer::stopSearch();
