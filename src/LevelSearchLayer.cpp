@@ -9,6 +9,7 @@ class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     bool init(int p0) {
         if(!LevelSearchLayer::init(p0)) return false;
         GDDLSearchLayer::stopSearch();
+        GDDLSearchLayer::restoreValuesAfterSplit();
         addGDDLButton();
         return true;
     }

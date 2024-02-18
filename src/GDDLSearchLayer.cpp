@@ -945,7 +945,26 @@ void GDDLSearchLayer::onSwapLayout(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
-    FLAlertLayer::create("GDDL Search", "onTierSearch() called", "OK")->show();
+    // save values before replacing them
+    saveValues();
+    cacheValues();
+    // and then
+    auto *senderNode = dynamic_cast<CCNode *>(sender);
+    const std::string tierStr = senderNode->getID();
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    if(tierNumber != -1) {
+        lowTier = tierNumber;
+        highTier = tierNumber;
+    } else {
+        removeRated = true;
+    }
+    completed = completedTogglerSimple->isToggled();
+    uncompleted = uncompletedTogglerSimple->isToggled();
+    totalOnlineResults = 0;
+    cachedResults.clear();
+    onlinePagesFetched = 0;
+    searching = true;
+    requestSearchPage(1, nullptr);
 }
 
 void GDDLSearchLayer::setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {
