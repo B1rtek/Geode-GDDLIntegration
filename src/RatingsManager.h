@@ -20,10 +20,6 @@ class RatingsManager {
     static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
-    inline static int searchedTier = -1;
-    inline static TierSearchType tierSearchType{};
-    inline static bool searchingForTier = false;
-    inline static std::vector<int> searchResults{};
 
     static GDDLRating parseJson(const std::string& response);
 
@@ -32,8 +28,6 @@ class RatingsManager {
     static void populateFromSave();
 
     static void cacheList();
-
-    static void prepareSearchResults(int tier, TierSearchType searchType);
 
 public:
     static int getDemonTier(int id);
@@ -51,18 +45,6 @@ public:
     static std::map<int, int> getTierStats();
 
     static bool alreadyCached();
-
-    static void setupSearch(int tier, TierSearchType searchType);
-
-    static bool isSearchingForTier();
-
-    static GJSearchObject *getSearchPage(int page);
-
-    static int getSearchResultsPageCount();
-
-    static int getSearchResultsCount();
-
-    static void stopSearch();
 
     static void updateCacheFromSearch(int levelID, int tier);
 

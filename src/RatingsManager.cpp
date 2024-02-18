@@ -1,7 +1,6 @@
 #include "RatingsManager.h"
 
 #include <Geode/utils/web.hpp>
-#include <chrono>
 #include "Utils.h"
 
 using namespace geode::prelude;
@@ -52,14 +51,14 @@ std::vector<int> RatingsManager::tierColors = {
 std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
-    json levelData = json::parse(response);
+    const json levelData = json::parse(response);
     return GDDLRating(levelData);
 }
 
-cocos2d::ccColor3B RatingsManager::convertToColor(int hexColor) {
-    int r = (hexColor >> (8*2)) & 0xff;
-    int g = (hexColor >> (8*1)) & 0xff;
-    int b = (hexColor >> (8*0)) & 0xff;
+cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
+    const int r = (hexColor >> (8 * 2)) & 0xff;
+    const int g = (hexColor >> (8 * 1)) & 0xff;
+    const int b = (hexColor >> (8*0)) & 0xff;
     return cocos2d::ccColor3B(r, g, b);
 }
 
@@ -78,6 +77,7 @@ void RatingsManager::populateFromSave() {
     std::ifstream f(cachedListPath);
     json data = json::parse(f);
     const unsigned int cachedTimestamp = data["cached"];
+    // ReSharper disable once CppTooWideScopeInitStatement
     const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
     if (currentTimestamp - cachedTimestamp < 86400 * 7) { // list less than 7 days old, load it
         for (auto idRatingPair: data["list"]) {
@@ -105,70 +105,38 @@ void RatingsManager::cacheList() {
     settingsFile.close();
 }
 
-void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchType) {
-    std::set<int> allLevelsFromTier;
-    for (auto [id, cachedTier]: ratingsCache) {
-        if (cachedTier == tier) {
-            allLevelsFromTier.insert(id);
-        }
-    }
-    if (searchType != ANY) {
-        std::set<int> allCompletedTierLevels;
-        GameLevelManager *levelManager = GameLevelManager::sharedState();
-        const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
-        CCObject *obj;
-        CCARRAY_FOREACH(completedLevels, obj) {
-            const auto level = dynamic_cast<GJGameLevel *>(obj);
-            // ReSharper disable once CppTooWideScopeInitStatement
-            const bool levelCompleted = level->m_normalPercent == 100;
-            if (allLevelsFromTier.contains(level->m_levelID) && levelCompleted) {
-                allCompletedTierLevels.insert(level->m_levelID);
-            }
-        }
-        if (searchType == COMPLETED) {
-            searchResults = Utils::copySetToVector(allCompletedTierLevels);
-        } else { // searchType == UNCOMPLETED
-            for (auto level: allCompletedTierLevels) {
-                allLevelsFromTier.erase(level);
-            }
-            searchResults = Utils::copySetToVector(allLevelsFromTier);
-        }
-    } else {
-        searchResults = Utils::copySetToVector(allLevelsFromTier);
-    }
-}
-
 // ReSharper disable once CppDFAConstantFunctionResult (it's not true!)
-int RatingsManager::getDemonTier(int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
+int RatingsManager::getDemonTier(const int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
 
-cocos2d::ccColor3B RatingsManager::getTierColor(int tier) {
-    if(tier > tierColors.size() || tier < 0) {
+cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
+    if (tier > tierColors.size() || tier < 0) {
         return cocos2d::ccColor3B(255, 255, 255);
     }
-    int hexColor = tierColors[tier];
+    const int hexColor = tierColors[tier];
     return convertToColor(hexColor);
 }
 
-std::optional<GDDLRating> RatingsManager::getRating(int id) {
+std::optional<GDDLRating> RatingsManager::getRating(const int id) {
     if (!demonMap.contains(id))
         return {};
     return demonMap[id];
 }
 
-std::string RatingsManager::getRequestUrl(int id) {
+std::string RatingsManager::getRequestUrl(const int id) {
     std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
     return requestURL;
 }
 
-bool RatingsManager::addRatingFromResponse(int id, const std::string &response) {
+bool RatingsManager::addRatingFromResponse(const int id, const std::string &response) {
     if (response.empty())
         return false;
-    GDDLRating rating = parseJson(response);
+    const GDDLRating rating = parseJson(response);
     demonMap[id] = rating;
     return true;
 }
 
 void RatingsManager::cacheRatings(const std::string &response) {
+    // ReSharper disable once CppTooWideScopeInitStatement
     json ratingsData = json::parse(response);
     for (auto element: ratingsData) {
         const int id = element["ID"];
@@ -181,11 +149,12 @@ void RatingsManager::cacheRatings(const std::string &response) {
 
 std::map<int, int> RatingsManager::getTierStats() {
     GameLevelManager *levelManager = GameLevelManager::sharedState();
-    cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
+    const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
     std::map<int, int> tierStats;
     CCObject *obj;
     CCARRAY_FOREACH(completedLevels, obj) {
-        auto level = dynamic_cast<GJGameLevel *>(obj);
+        // ReSharper disable once CppTooWideScopeInitStatement
+        const auto level = dynamic_cast<GJGameLevel *>(obj);
         if (level->m_normalPercent == 100 && level->m_stars == 10) {
             int cachedTier = -1;
             if (ratingsCache.contains(level->m_levelID)) {
@@ -200,46 +169,6 @@ bool RatingsManager::alreadyCached() {
     populateFromSave();
     return !ratingsCache.empty();
 }
-
-void RatingsManager::setupSearch(const int tier, const TierSearchType searchType) {
-    prepareSearchResults(tier, searchType);
-    searchingForTier = true;
-}
-
-bool RatingsManager::isSearchingForTier() {
-    return searchingForTier;
-}
-
-GJSearchObject *RatingsManager::getSearchPage(int page) {
-    if (page < 1) {
-        page = 1;
-    } else if (page > getSearchResultsPageCount()) {
-        page = getSearchResultsPageCount();
-    }
-    const int firstIndex = std::max(0, (page - 1) * 10);
-    const int lastIndex = std::min(firstIndex+10, static_cast<int>(searchResults.size()));
-    std::string requestString;
-    for (int i = firstIndex; i < lastIndex; i++) {
-        requestString += std::to_string(searchResults[i]) + ',';
-    }
-    if (!requestString.empty()) {
-        requestString.pop_back();
-    }
-    requestString += "&gameVersion=22";
-    return GJSearchObject::create(SearchType::Type19, requestString);
-}
-
-int RatingsManager::getSearchResultsPageCount() {
-    const unsigned int searchResultsCount = searchResults.size();
-    const int correction = searchResultsCount % 10 == 0 ? 0 : 1;
-    return searchResultsCount / 10 + correction; // NOLINT(*-narrowing-conversions)
-}
-
-int RatingsManager::getSearchResultsCount() {
-    return searchResults.size();
-}
-
-void RatingsManager::stopSearch() { searchingForTier = false; }
 
 void RatingsManager::updateCacheFromSearch(const int levelID, const int tier) { ratingsCache[levelID] = tier; }
 
