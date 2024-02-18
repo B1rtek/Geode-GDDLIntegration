@@ -1,6 +1,7 @@
 /**
  * Include the Geode headers.
  */
+// ReSharper disable once CppUnusedIncludeDirective
 #include <Geode/Geode.hpp>
 /**
  * Required to modify the MenuLayer class
