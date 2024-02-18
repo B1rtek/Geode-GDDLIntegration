@@ -55,7 +55,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static LevelCompleteness completeness = ANY1;
     inline static bool completed = true, uncompleted = true;
     // have fun remembering all of that lmao
-    inline static bool firstLoad = true;
+    inline static bool firstLoad = true, simplified = false, normalLoaded = false, simplifiedLoaded = false;
     // additional settings so the gddl demon split doesn't change the values
     inline static std::string savedName, savedCreator, savedSong;
     inline static int savedLowTier = -1, savedHighTier = 0, savedDifficulty = 5, savedSubLowCount = 0, savedSubHighCount = 0, savedEnjLowCount = 0, savedEnjHighCount = 0, savedSortOptionIndex = 0, savedSortDirectionIndex = 0;
@@ -71,6 +71,10 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static bool searching = false;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
+    // page normal
+    CCMenu *normalMenu = nullptr;
+    CCMenuItemSpriteExtra *searchButton = nullptr;
+    CCMenuItemSpriteExtra *resetButton = nullptr;
     CCTextInputNode *nameTextfield = nullptr;
     CCMenuItemToggler *nameExactMatchToggler = nullptr;
     CCTextInputNode *creatorTextfield = nullptr;
@@ -92,11 +96,20 @@ class GDDLSearchLayer : public FLAlertLayer {
     CCMenuItemToggler *uncompletedToggler = nullptr;
     CCLabelBMFont *sortByLabel = nullptr;
     CCLabelBMFont *sortDirectionLabel = nullptr;
+    // page simplified
+    CCMenu *simplifiedMenu = nullptr;
+    std::vector<CCMenuItemSpriteExtra*> tierButtons;
+    CCMenuItemToggler *completedTogglerSimple = nullptr;
+    CCMenuItemToggler *uncompletedTogglerSimple = nullptr;
+    CCLabelBMFont *completedLabelSimple = nullptr;
+    CCLabelBMFont *uncompletedLabelSimple = nullptr;
 
     const CCPoint popupSize = {440.0f, 290.0f};
 
     bool init() override;
-    void loadPage();
+    void loadPageFull();
+    void loadPageSimple();
+    void showPage();
     void loadValues();
     void saveValues();
     void resetValues();
@@ -134,6 +147,8 @@ class GDDLSearchLayer : public FLAlertLayer {
     void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset, float scale,
                         CCPoint position, SEL_MenuHandler callback, int zOrder = 1);
     float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
+    CCMenuItemSpriteExtra *createTierNode(int tier);
+    CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name, CCMenuItemToggler *&toggler, SEL_MenuHandler callback);
     // callbacks for all buttons that will be needed
     void onToggleExactMatch(CCObject *sender);
     void onInGameRatingLeft(CCObject *sender);
@@ -166,6 +181,10 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onSortDirectionRight(CCObject *sender);
     void onSearchClicked(CCObject *sender);
     void onResetClicked(CCObject *sender);
+    void onSwapLayout(CCObject *sender);
+    // page simplified
+
+    void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
     void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
