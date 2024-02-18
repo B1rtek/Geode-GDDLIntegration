@@ -5,7 +5,7 @@
 
 using namespace geode::prelude;
 
-class GDDLDemonSplitLayer : public FLAlertLayer {
+class GDDLDemonSplitLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
 
     bool init() override;
