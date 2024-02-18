@@ -7,6 +7,7 @@
 using namespace geode::prelude;
 
 class $modify(GDDLProfileMod, ProfilePage) {
+    // ReSharper disable once CppHidingFunction
     virtual TodoReturn loadPageFromUserInfo(GJUserScore* p0) {
         ProfilePage::loadPageFromUserInfo(p0);
         if(p0->m_accountID != GJAccountManager::sharedState()->m_accountID) return;
