@@ -55,7 +55,8 @@ class GDDLSearchLayer : public FLAlertLayer {
     inline static LevelCompleteness completeness = ANY1;
     inline static bool completed = true, uncompleted = true;
     // have fun remembering all of that lmao
-    inline static bool firstLoad = true, simplified = false, normalLoaded = false, simplifiedLoaded = false;
+    inline static bool firstLoad = true, simplified = false;
+    bool normalLoaded = false, simplifiedLoaded = false; // so they reset with each reopen
     // additional settings so the gddl demon split doesn't change the values
     inline static std::string savedName, savedCreator, savedSong;
     inline static int savedLowTier = -1, savedHighTier = 0, savedDifficulty = 5, savedSubLowCount = 0, savedSubHighCount = 0, savedEnjLowCount = 0, savedEnjHighCount = 0, savedSortOptionIndex = 0, savedSortDirectionIndex = 0;
@@ -183,7 +184,6 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onResetClicked(CCObject *sender);
     void onSwapLayout(CCObject *sender);
     // page simplified
-
     void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
     void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);

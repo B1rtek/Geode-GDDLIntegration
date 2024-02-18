@@ -59,7 +59,7 @@ bool GDDLSearchLayer::init() {
     simplifiedMenu = CCMenu::create();
     simplifiedMenu->setID("gddl-demon-old-search-menu"_spr);
     simplifiedMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
-    m_mainLayer->addChild(simplifiedMenu, 10);
+    m_mainLayer->addChild(simplifiedMenu, 1);
     showPage();
     loadValues();
     return true;
@@ -234,13 +234,18 @@ void GDDLSearchLayer::showPage() {
             loadPageFull();
         }
         normalMenu->setVisible(true);
+        m_mainLayer->reorderChild(simplifiedMenu, 0);
+        m_mainLayer->reorderChild(normalMenu, 1);
     } else { // the other way lmao
         normalMenu->setVisible(false);
         if(!simplifiedLoaded) {
             loadPageSimple();
         }
         simplifiedMenu->setVisible(true);
+        m_mainLayer->reorderChild(normalMenu, 0);
+        m_mainLayer->reorderChild(simplifiedMenu, 1);
     }
+    cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayer::loadValues() {
@@ -709,10 +714,10 @@ CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(int tier) {
     const std::string tierSpriteName = "tier_" + tierString + ".png";
     const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
     const auto tierSprite = CCSprite::create(textureName);
-    tierSprite->setScale(0.15f);
-    tierSprite->setContentSize({20.0f, 20.0f});
+    tierSprite->setScale(0.24f);
+    tierSprite->setContentSize({30.0f, 30.0f});
     const auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLSearchLayer::onTierSearch));
-    tierButton->setContentSize({20.0f, 20.0f});
+    tierButton->setContentSize({30.0f, 30.0f});
     tierButton->setID("button-tier-" + std::to_string(tier));
     return tierButton;
 }
