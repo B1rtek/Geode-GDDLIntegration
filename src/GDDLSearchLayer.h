@@ -135,19 +135,20 @@ class GDDLSearchLayer : public FLAlertLayer {
     static std::pair<int, int> getReadyRange(int requestedPage);
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     // utility
-    void createLabel(CCLayer *parent, const std::string &font, const std::string &text, int maxWidth,
+    void createLabel(CCLayer *parent, const std::string &font, const std::string &text, const float maxWidth,
                      const CCPoint &position, int zOrder = 1);
     CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                         const std::string &text, int maxWidth, CCPoint position, CCPoint bgSize,
-                                         int zOrder = 1);
-    void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
-    void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font, std::string placeholder,
-                             int maxCharacters, CCPoint bgSize, CCPoint position, int zOrder = 1);
-    void createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
+                                         const std::string &text, const float maxWidth, const CCPoint &position,
+                                         const CCPoint &bgSize, int zOrder = 1);
+    static void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
+    void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+                             const std::string &placeholder,
+                             int maxCharacters, const CCPoint &bgSize,
+                             const CCPoint &position, int zOrder = 1);
+    void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, SEL_MenuHandler leftCallback,
                                       SEL_MenuHandler rightCallback, int zOrder = 1);
-    void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset, float scale,
-                        CCPoint position, SEL_MenuHandler callback, int zOrder = 1);
-    float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
+    void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset, float scale, const CCPoint &position, SEL_MenuHandler callback, int zOrder = 1);
+    static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);
     CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name, CCMenuItemToggler *&toggler, SEL_MenuHandler callback);
     // callbacks for all buttons that will be needed
@@ -187,13 +188,13 @@ class GDDLSearchLayer : public FLAlertLayer {
     void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
     void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
-    void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
+    static void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
     void setDifficultyLabel();
     void setSortByLabel();
     void setSortDirectionLabel();
     // getters for the same thing
-    int getNumberTextfieldValue(CCTextInputNode *&textfield);
-    float getFloatTextfieldValue(CCTextInputNode *&textfield);
+    static int getNumberTextfieldValue(CCTextInputNode *&textfield);
+    static float getFloatTextfieldValue(CCTextInputNode *&textfield);
 
 public:
     static GDDLSearchLayer *create();

@@ -25,7 +25,7 @@ class RatingsManager {
     inline static bool searchingForTier = false;
     inline static std::vector<int> searchResults{};
 
-    static GDDLRating parseJson(std::string response);
+    static GDDLRating parseJson(const std::string& response);
 
     static cocos2d::ccColor3B convertToColor(int hexColor);
 
@@ -44,7 +44,7 @@ public:
 
     static std::string getRequestUrl(int id);
 
-    static bool addRatingFromResponse(int id, std::string response);
+    static bool addRatingFromResponse(int id, const std::string &response);
 
     static void cacheRatings(const std::string &response);
 

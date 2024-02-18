@@ -51,7 +51,7 @@ std::vector<int> RatingsManager::tierColors = {
 
 std::map<int, int> RatingsManager::ratingsCache;
 
-GDDLRating RatingsManager::parseJson(std::string response) {
+GDDLRating RatingsManager::parseJson(const std::string& response) {
     json levelData = json::parse(response);
     return GDDLRating(levelData);
 }
@@ -77,8 +77,8 @@ void RatingsManager::populateFromSave() {
         return;
     std::ifstream f(cachedListPath);
     json data = json::parse(f);
-    const int cachedTimestamp = data["cached"];
-    const int currentTimestamp = Utils::getCurrentTimestamp();
+    const unsigned int cachedTimestamp = data["cached"];
+    const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
     if (currentTimestamp - cachedTimestamp < 86400 * 7) { // list less than 7 days old, load it
         for (auto idRatingPair: data["list"]) {
             const int id = idRatingPair["ID"];
@@ -112,7 +112,7 @@ void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchT
             allLevelsFromTier.insert(id);
         }
     }
-    if(searchType != ANY) {
+    if (searchType != ANY) {
         std::set<int> allCompletedTierLevels;
         GameLevelManager *levelManager = GameLevelManager::sharedState();
         const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
@@ -125,7 +125,7 @@ void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchT
                 allCompletedTierLevels.insert(level->m_levelID);
             }
         }
-        if(searchType == COMPLETED) {
+        if (searchType == COMPLETED) {
             searchResults = Utils::copySetToVector(allCompletedTierLevels);
         } else { // searchType == UNCOMPLETED
             for (auto level: allCompletedTierLevels) {
@@ -138,6 +138,7 @@ void RatingsManager::prepareSearchResults(const int tier, TierSearchType searchT
     }
 }
 
+// ReSharper disable once CppDFAConstantFunctionResult (it's not true!)
 int RatingsManager::getDemonTier(int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
 
 cocos2d::ccColor3B RatingsManager::getTierColor(int tier) {
@@ -159,7 +160,7 @@ std::string RatingsManager::getRequestUrl(int id) {
     return requestURL;
 }
 
-bool RatingsManager::addRatingFromResponse(int id, std::string response) {
+bool RatingsManager::addRatingFromResponse(int id, const std::string &response) {
     if (response.empty())
         return false;
     GDDLRating rating = parseJson(response);
@@ -172,7 +173,7 @@ void RatingsManager::cacheRatings(const std::string &response) {
     for (auto element: ratingsData) {
         const int id = element["ID"];
         const float rating = element["Rating"].is_null() ? -1.0f : static_cast<float>(element["Rating"]);
-        const int roundedRating = round(rating);
+        const int roundedRating = static_cast<int>(round(rating));
         ratingsCache[id] = roundedRating;
     }
     cacheList();
@@ -229,9 +230,9 @@ GJSearchObject *RatingsManager::getSearchPage(int page) {
 }
 
 int RatingsManager::getSearchResultsPageCount() {
-    const int searchResultsCount = searchResults.size();
+    const unsigned int searchResultsCount = searchResults.size();
     const int correction = searchResultsCount % 10 == 0 ? 0 : 1;
-    return searchResultsCount / 10 + correction;
+    return searchResultsCount / 10 + correction; // NOLINT(*-narrowing-conversions)
 }
 
 int RatingsManager::getSearchResultsCount() {

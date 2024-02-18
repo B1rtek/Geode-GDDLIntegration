@@ -71,7 +71,7 @@ void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
     removeFromParentAndCleanup(true);
 }
 
-void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) {
+void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     std::map<int, int> tierStats = RatingsManager::getTierStats();
     int total = 0;
     for (auto tierCountPair: tierStats) {
@@ -85,7 +85,7 @@ void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) {
     FLAlertLayer::create("GDDL Demon Split", message.c_str(), "OK")->show();
 }
 
-void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) {
+void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));

@@ -173,8 +173,7 @@ void GDDLSearchLayer::loadPageFull() {
                    menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
     createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
-    bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f},
-                              {110.0f, 25.0f});
+    bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
     createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onSortByLeft),
                                  menu_selector(GDDLSearchLayer::onSortByRight));
     // sort direction
@@ -609,16 +608,17 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     }
 }
 
-void GDDLSearchLayer::createLabel(CCLayer *parent, const std::string &font, const std::string& text, const int maxWidth, const CCPoint& position, const int zOrder) {
+void GDDLSearchLayer::createLabel(CCLayer *parent, const std::string &font, const std::string &text,
+                                  const float maxWidth, const CCPoint &position, const int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
 }
 
-CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string& font,
-                                                      const std::string &placeholder, const int maxWidth, CCPoint position,
-                                                      CCPoint bgSize, int zOrder) {
+CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
+                                                      const std::string &placeholder, const float maxWidth,
+                                                      const CCPoint &position, const CCPoint &bgSize, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
@@ -632,14 +632,16 @@ CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBM
     bg->setOpacity(100);
     return bg;
 }
+
 void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth) {
     const float scale =
             0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
     label->setScale(scale);
 }
 
-void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
-                                          std::string placeholder, int maxCharacters, CCPoint bgSize, CCPoint position, int zOrder) {
+void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+                                          const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                          const CCPoint &position, int zOrder) {
     const auto bg = CCScale9Sprite::create("square02_small.png");
     parent->addChild(bg, zOrder);
     bg->setContentSize(bgSize);
@@ -657,7 +659,7 @@ void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&tex
     textfield->setMaxLabelScale(0.7f);
 }
 
-void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
+void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, const CCPoint &size, SEL_MenuHandler leftCallback,
                                                    SEL_MenuHandler rightCallback, int zOrder) {
     // left
     const CCPoint positionLeft =
@@ -681,8 +683,8 @@ void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size,
     rightButton->setContentSize(size);
 }
 
-void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset,
-                                     float scale, CCPoint position, SEL_MenuHandler callback, int zOrder) {
+void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset,
+                                     float scale, const CCPoint &position, SEL_MenuHandler callback, int zOrder) {
     toggler = CCMenuItemToggler::createWithStandardSprites(this, callback, scale);
     parent->addChild(toggler, zOrder);
     toggler->setPosition(position);
@@ -697,7 +699,7 @@ void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggle
 }
 
 float GDDLSearchLayer::calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound) {
-    int newValue = currentValue + (increase ? 1.0f : -1.0f);
+    float newValue = currentValue + (increase ? 1.0f : -1.0f);
     if (std::abs(currentValue - std::floor(currentValue)) >= 0.01f) {
         newValue = increase ? std::floor(currentValue) + 1 : std::floor(currentValue);
     }
@@ -741,14 +743,14 @@ CCMenu *GDDLSearchLayer::createCheckboxNode(const std::string &idSuffix, const s
     return menu;
 }
 
-void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) {
+void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     exactName = !dynamic_cast<CCMenuItemToggler *>(sender)->isOn();
 }
 
 void GDDLSearchLayer::onInGameRatingLeft(CCObject *sender) {
     difficulty--;
     if (difficulty < 0)
-        difficulty = demonDifficulties.size() - 1;
+        difficulty = demonDifficulties.size() - 1; // NOLINT(*-narrowing-conversions)
     setDifficultyLabel();
 }
 
@@ -788,25 +790,25 @@ void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
 
 void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
     float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
-    int newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
+    float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentLowRight(CCObject *sender) {
-    int currentValue = getNumberTextfieldValue(enjoymentLowTextfield);
-    int newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
+    float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighLeft(CCObject *sender) {
     float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
-    int newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
+    float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
     float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
-    int newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
+    float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
@@ -901,7 +903,7 @@ void GDDLSearchLayer::onToggleUncompleted(CCObject *sender) {
 void GDDLSearchLayer::onSortByLeft(CCObject *sender) {
     sortOptionIndex--;
     if (sortOptionIndex < 0)
-        sortOptionIndex = sort.size() - 1;
+        sortOptionIndex = sort.size() - 1; // NOLINT(*-narrowing-conversions)
     setSortByLabel();
 }
 
@@ -915,7 +917,7 @@ void GDDLSearchLayer::onSortByRight(CCObject *sender) {
 void GDDLSearchLayer::onSortDirectionLeft(CCObject *sender) {
     sortDirectionIndex--;
     if (sortDirectionIndex < 0)
-        sortDirectionIndex = sortDirection.size() - 1;
+        sortDirectionIndex = sortDirection.size() - 1; // NOLINT(*-narrowing-conversions)
     setSortDirectionLabel();
 }
 

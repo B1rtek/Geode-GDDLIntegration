@@ -21,7 +21,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
             if(!displayAsLabel) {
                 bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
-                int levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
+                long long levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
 
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
@@ -58,11 +58,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 // if(diamondIcon != nullptr && diamondIcon->getContentSize().height == 13.5) { // diamonds label
                 //     labelShiftRows += 1.0f;
                 // }
-                int moveRowsSetting = Mod::get()->getSettingValue<int64_t>("legacy-gddl-tier-offset");
+                long long moveRowsSetting = Mod::get()->getSettingValue<int64_t>("legacy-gddl-tier-offset");
                 if(moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
-                    labelShiftRows += moveRowsSetting;
+                    labelShiftRows += static_cast<float>(moveRowsSetting);
                 }
                 auto tierLabel = CCMenuItemSpriteExtra::create(tierLabelSprite, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
                 tierLabelSprite->setScale(0.4f);
@@ -74,10 +74,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             }
 
             int levelID = m_level->m_levelID;
-            // just so it displays a bit earlier
-            int cachedTier = RatingsManager::getCachedTier(levelID);
-            updateButton(cachedTier);
-            // and then get the full one
             int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
                 updateButton(tier);
@@ -125,7 +121,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         menu->setID("rating-menu"_spr);
         addChild(menu);
 
-        auto button = CCMenuItemSpriteExtra::create(getDefaultSprite(), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        int levelID = m_level->m_levelID;
+        // just so it displays a bit earlier
+        auto button = CCMenuItemSpriteExtra::create(getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
         button->setPosition(buttonPosition);
         button->setID("rating"_spr);
         menu->addChild(button);
@@ -141,11 +139,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             tierButton->removeAllChildren();
 
             auto tierSprite = getSpriteFromTier(tier);
-            if (tierSprite) {
-                tierButton->addChild(tierSprite);
-            } else {
-                tierButton->addChild(getDefaultSprite());
-            }
+            tierButton->addChild(tierSprite);
         } else {
             auto tierLabelSprite = typeinfo_cast<CCLabelBMFont*>(getChildByIDRecursive("gddl-rating_label"_spr));
             if (!tierLabelSprite) return;
@@ -155,10 +149,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         }
     }
 
-    CCSprite *getTierSpriteFromName(const char *name) {
+    static CCSprite *getTierSpriteFromName(const char *name) {
         auto textureName = Mod::get()->expandSpriteName(name);
         auto sprite = CCSprite::create(textureName);
-        if (!sprite) return getDefaultSprite();
 
         sprite->setScale(0.275f);
         sprite->setAnchorPoint({0, 0});
@@ -166,13 +159,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         return sprite;
     }
 
-    CCSprite *getSpriteFromTier(int tier) {
-        if (tier == -1) return getDefaultSprite();
+    static CCSprite *getSpriteFromTier(int tier) {
+        if (tier == -1) {
+            return getTierSpriteFromName("tier_unrated.png");
+        }
         return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
-    }
-
-    CCSprite *getDefaultSprite() {
-        return getTierSpriteFromName("tier_unrated.png");
     }
 
     void onGDDLInfo(CCObject *sender) {

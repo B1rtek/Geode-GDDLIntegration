@@ -29,7 +29,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         gddlButtonSprite->setPosition({gddlButtonSprite->getParent()->getContentSize().width/2, gddlButtonSprite->getParent()->getContentSize().height/2});
     }
 
-    void onGDDLDemonSplit(CCObject* sender) {
+    void onGDDLDemonSplit(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
         GDDLDemonSplitLayer::create()->show();
     }
 };
