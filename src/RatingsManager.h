@@ -9,31 +9,19 @@
 
 using namespace geode::prelude;
 
-enum TierSearchType {
-    ANY,
-    UNCOMPLETED,
-    COMPLETED
-};
-
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
-    inline static int searchedTier = -1;
-    inline static TierSearchType tierSearchType{};
-    inline static bool searchingForTier = false;
-    inline static std::vector<int> searchResults{};
 
-    static GDDLRating parseJson(std::string response);
+    static GDDLRating parseJson(const std::string& response);
 
     static cocos2d::ccColor3B convertToColor(int hexColor);
 
     static void populateFromSave();
 
     static void cacheList();
-
-    static void prepareSearchResults(int tier, TierSearchType searchType);
 
 public:
     static int getDemonTier(int id);
@@ -44,7 +32,7 @@ public:
 
     static std::string getRequestUrl(int id);
 
-    static bool addRatingFromResponse(int id, std::string response);
+    static bool addRatingFromResponse(int id, const std::string &response);
 
     static void cacheRatings(const std::string &response);
 
@@ -52,17 +40,9 @@ public:
 
     static bool alreadyCached();
 
-    static void setupSearch(int tier, TierSearchType searchType);
+    static void updateCacheFromSearch(int levelID, int tier);
 
-    static bool isSearchingForTier();
-
-    static GJSearchObject *getSearchPage(int page);
-
-    static int getSearchResultsPageCount();
-
-    static int getSearchResultsCount();
-
-    static void stopSearch();
+    static int getCachedTier(int levelID);
 };
 
 

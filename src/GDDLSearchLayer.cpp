@@ -1,3 +1,5 @@
+// ReSharper disable CppTooWideScopeInitStatement
+// ReSharper disable CppDFAConstantParameter
 #include "GDDLSearchLayer.h"
 
 #include <Geode/utils/web.hpp>
@@ -18,8 +20,8 @@ bool GDDLSearchLayer::init() {
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-demon-search-popup"_spr);
     m_mainLayer->addChild(bg, -1);
-    float aspectRatioFixX = (569.0f - winSize.width) / 2;
-    float aspectRatioFixY = (320.0f - winSize.height) / 2;
+    const float aspectRatioFixX = (569.0f - winSize.width) / 2;
+    const float aspectRatioFixY = (320.0f - winSize.height) / 2;
     // menu with the main layout
     m_buttonMenu = CCMenu::create();
     m_buttonMenu->setContentSize({winSize.width, winSize.height});
@@ -32,6 +34,11 @@ bool GDDLSearchLayer::init() {
             CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLSearchLayer::onClose));
     m_buttonMenu->addChild(closeButton, 1);
     closeButton->setPosition({10.0f, 0.0f});
+    // title
+    const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
+    m_buttonMenu->addChild(title, 1);
+    title->setPosition({220.0f, -10.0f});
+    title->setScale(0.7f);
     // info button
     const auto infoButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     const auto infoButton =
@@ -39,72 +46,79 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->addChild(infoButton);
     m_buttonMenu->reorderChild(infoButton, 1);
     infoButton->setPosition({423.0f, -7.0f});
-    // title
-    const auto title = CCLabelBMFont::create("GDDL Search", "goldFont.fnt");
-    m_buttonMenu->addChild(title, 1);
-    title->setPosition({220.0f, -10.0f});
-    title->setScale(0.7f);
-    // search button
-    const auto searchButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn06_001.png");
-    searchButtonSprite->setScale(0.7f);
-    const auto searchButton =
-            CCMenuItemSpriteExtra::create(searchButtonSprite, this, menu_selector(GDDLSearchLayer::onSearchClicked));
-    m_buttonMenu->addChild(searchButton, 1);
-    searchButton->setPosition({310.0f, -10.0f});
-    // reset button
-    const auto resetButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
-    resetButtonSprite->setScale(0.7f);
-    const auto resetButton =
-            CCMenuItemSpriteExtra::create(resetButtonSprite, this, menu_selector(GDDLSearchLayer::onResetClicked));
-    m_buttonMenu->addChild(resetButton, 1);
-    resetButton->setPosition({340.0f, -10.0f});
+    // change interface button
+    const auto changeInterfaceSprite = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
+    changeInterfaceSprite->setRotation(90.0f);
+    const auto changeInterfaceButton = CCMenuItemSpriteExtra::create(changeInterfaceSprite, this, menu_selector(GDDLSearchLayer::onSwapLayout));
+    m_buttonMenu->addChild(changeInterfaceButton, 1);
+    changeInterfaceButton->setPosition({popupSize.x-15.0f, -popupSize.y+22.0f});
     // interface
-    loadPage();
+    normalMenu = CCMenu::create();
+    normalMenu->setID("gddl-demon-new-search-menu"_spr);
+    normalMenu->setContentSize({winSize.width, winSize.height});
+    normalMenu->setPosition({64.5f - aspectRatioFixX, 295.0f - aspectRatioFixY});
+    m_mainLayer->addChild(normalMenu, 1);
+    simplifiedMenu = CCMenu::create();
+    simplifiedMenu->setID("gddl-demon-old-search-menu"_spr);
+    simplifiedMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
+    m_mainLayer->addChild(simplifiedMenu, 1);
+    showPage();
     loadValues();
     return true;
 }
 
-void GDDLSearchLayer::loadPage() {
+void GDDLSearchLayer::loadPageFull() {
+    // page - specific buttons
+    // search button
+    const auto searchButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn06_001.png");
+    searchButtonSprite->setScale(0.7f);
+    searchButton =
+            CCMenuItemSpriteExtra::create(searchButtonSprite, this, menu_selector(GDDLSearchLayer::onSearchClicked));
+    normalMenu->addChild(searchButton, 1);
+    searchButton->setPosition({310.0f, -10.0f});
+    // reset button
+    const auto resetButtonSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
+    resetButtonSprite->setScale(0.7f);
+    resetButton =
+            CCMenuItemSpriteExtra::create(resetButtonSprite, this, menu_selector(GDDLSearchLayer::onResetClicked));
+    normalMenu->addChild(resetButton, 1);
+    resetButton->setPosition({340.0f, -10.0f});
     // column 1
     // level name
-    createLabel(m_buttonMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -37.5f});
-    createTextInputNode(m_buttonMenu, nameTextfield, "bigFont.fnt", "", {80.0f, 25.0f}, {60.0f, -62.5f});
-    createCheckbox(m_buttonMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f},
+    createLabel(normalMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -37.5f});
+    createTextInputNode(normalMenu, nameTextfield, "bigFont.fnt", "", 32, {80.0f, 25.0f}, {60.0f, -62.5f});
+    createCheckbox(normalMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleExactMatch));
     // creator
-    createLabel(m_buttonMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -97.5f});
-    createTextInputNode(m_buttonMenu, creatorTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -122.5f});
+    createLabel(normalMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -97.5f});
+    createTextInputNode(normalMenu, creatorTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -122.5f});
     // song name
-    createLabel(m_buttonMenu, "bigFont.fnt", "Song name", 110.0f, {75.0f, -157.5f});
-    createTextInputNode(m_buttonMenu, songTextfield, "bigFont.fnt", "", {110.0f, 25.0f}, {75.0f, -182.5f});
+    createLabel(normalMenu, "bigFont.fnt", "Song name", 110.0f, {75.0f, -157.5f});
+    createTextInputNode(normalMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
     // in-game difficulty
-    createLabel(m_buttonMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
-    auto bg = createLabelForChoice(m_buttonMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
+    createLabel(normalMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
+    auto bg = createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
                                    {110.0f, 25.0f});
     createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft),
                                  menu_selector(GDDLSearchLayer::onInGameRatingRight));
 
     // column 2
     // rating range
-    createLabel(m_buttonMenu, "bigFont.fnt", "Tiers", 110.0f, {220.0f, -37.5f});
-    createTextInputNode(m_buttonMenu, tierLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -62.5f});
-    tierLowTextfield->setMaxLabelLength(2);
+    createLabel(normalMenu, "bigFont.fnt", "Tiers", 110.0f, {220.0f, -37.5f});
+    createTextInputNode(normalMenu, tierLowTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {182.5f, -62.5f});
     tierLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, tierHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -62.5f});
-    tierHighTextfield->setMaxLabelLength(2);
+    createTextInputNode(normalMenu, tierHighTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {257.5f, -62.5f});
     tierHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(tierLowTextfield, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onTierLowLeft),
                                  menu_selector(GDDLSearchLayer::onTierLowRight));
     createLeftRightButtonsAround(tierHighTextfield, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onTierHighLeft),
                                  menu_selector(GDDLSearchLayer::onTierHighRight));
-    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -62.5f});
+    createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -62.5f});
     // enjoyment range
-    createLabel(m_buttonMenu, "bigFont.fnt", "Enjoyment rating", 110.0f, {220.0f, -97.5f});
-    createTextInputNode(m_buttonMenu, enjoymentLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {182.5f, -122.5f});
-    enjoymentLowTextfield->setMaxLabelLength(5);
+    createLabel(normalMenu, "bigFont.fnt", "Enjoyment rating", 110.0f, {220.0f, -97.5f});
+    createTextInputNode(normalMenu, enjoymentLowTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {182.5f, -122.5f});
     enjoymentLowTextfield->setAllowedChars("1234567890.");
-    createTextInputNode(m_buttonMenu, enjoymentHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f}, {257.5f, -122.5f});
-    enjoymentHighTextfield->setMaxLabelLength(5);
+    createTextInputNode(normalMenu, enjoymentHighTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {257.5f, -122.5f});
     enjoymentHighTextfield->setAllowedChars("1234567890.");
     createLeftRightButtonsAround(enjoymentLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjoymentLowLeft),
@@ -112,16 +126,14 @@ void GDDLSearchLayer::loadPage() {
     createLeftRightButtonsAround(enjoymentHighTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjoymentHighLeft),
                                  menu_selector(GDDLSearchLayer::onEnjoymentHighRight));
-    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -122.5f});
+    createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -122.5f});
     // submissions count
-    createLabel(m_buttonMenu, "bigFont.fnt", "Submissions count", 110.0f, {220.0f, -157.5f});
-    createTextInputNode(m_buttonMenu, submissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createLabel(normalMenu, "bigFont.fnt", "Submissions count", 110.0f, {220.0f, -157.5f});
+    createTextInputNode(normalMenu, submissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -182.5f});
-    submissionsCountLowTextfield->setMaxLabelLength(4);
     submissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, submissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(normalMenu, submissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -182.5f});
-    submissionsCountHighTextfield->setMaxLabelLength(4);
     submissionsCountHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(submissionsCountLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onSubmissionCountLowLeft),
@@ -129,16 +141,14 @@ void GDDLSearchLayer::loadPage() {
     createLeftRightButtonsAround(submissionsCountHighTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onSubmissionCountHighLeft),
                                  menu_selector(GDDLSearchLayer::onSubmissionCountHighRight));
-    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -182.5f});
+    createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -182.5f});
     // enjoyment submissions count
-    createLabel(m_buttonMenu, "bigFont.fnt", "Enj. submissions count", 110.0f, {220.0f, -217.5f});
-    createTextInputNode(m_buttonMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createLabel(normalMenu, "bigFont.fnt", "Enj. submissions count", 110.0f, {220.0f, -217.5f});
+    createTextInputNode(normalMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -242.5f});
-    enjSubmissionsCountLowTextfield->setMaxLabelLength(4);
     enjSubmissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(m_buttonMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", {35.0f, 25.0f},
+    createTextInputNode(normalMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -242.5f});
-    enjSubmissionsCountHighTextfield->setMaxLabelLength(4);
     enjSubmissionsCountHighTextfield->setAllowedChars("1234567890");
     createLeftRightButtonsAround(enjSubmissionsCountLowTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowLeft),
@@ -146,82 +156,154 @@ void GDDLSearchLayer::loadPage() {
     createLeftRightButtonsAround(enjSubmissionsCountHighTextfield, {13.0f, 19.0f},
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighLeft),
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighRight));
-    createLabel(m_buttonMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -242.5f});
+    createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -242.5f});
 
     // column 3
     // tiers checkboxes
-    createCheckbox(m_buttonMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {325.0f, -62.5f},
+    createCheckbox(normalMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {325.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoUnrated));
-    createCheckbox(m_buttonMenu, noRatedToggler, "No rated", -19.5f, 0.9f, {365.0f, -62.5f},
+    createCheckbox(normalMenu, noRatedToggler, "No rated", -19.5f, 0.9f, {365.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoRated));
-    createCheckbox(m_buttonMenu, completedToggler, "Completed", 17.5f, 0.9f, {405.0f, -62.5f},
+    createCheckbox(normalMenu, completedToggler, "Completed", 17.5f, 0.9f, {405.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleCompleted));
     // enjoyment rating checkboxes
-    createCheckbox(m_buttonMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {325.0f, -122.5f},
+    createCheckbox(normalMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {325.0f, -122.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoUnratedEnj));
-    createCheckbox(m_buttonMenu, noRatedEnjToggler, "No rated enj.", -19.5f, 0.9f, {365.0f, -122.5f},
+    createCheckbox(normalMenu, noRatedEnjToggler, "No rated enj.", -19.5f, 0.9f, {365.0f, -122.5f},
                    menu_selector(GDDLSearchLayer::onToggleNoRatedEnj));
-    createCheckbox(m_buttonMenu, uncompletedToggler, "Uncompleted", 17.5f, 0.9f, {405.0f, -122.5f},
+    createCheckbox(normalMenu, uncompletedToggler, "Uncompleted", 17.5f, 0.9f, {405.0f, -122.5f},
                    menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
-    createLabel(m_buttonMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
-    bg = createLabelForChoice(m_buttonMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f},
-                              {110.0f, 25.0f});
+    createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
+    bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
     createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onSortByLeft),
                                  menu_selector(GDDLSearchLayer::onSortByRight));
     // sort direction
-    createLabel(m_buttonMenu, "bigFont.fnt", "Sort direction", 110.0f, {365.0f, -217.5f});
-    bg = createLabelForChoice(m_buttonMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
+    createLabel(normalMenu, "bigFont.fnt", "Sort direction", 110.0f, {365.0f, -217.5f});
+    bg = createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
                               {110.0f, 25.0f});
     createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onSortDirectionLeft),
                                  menu_selector(GDDLSearchLayer::onSortDirectionRight));
+    normalLoaded = true;
+}
+
+// because some people actually prefer the old ui
+void GDDLSearchLayer::loadPageSimple() {
+    // let's see what happens if I copypaste the old ui lmao >:)
+    // tier buttons
+    for (int row = 0; row < 5; row++) {
+        const auto rowNode = CCMenu::create();
+        rowNode->setLayout(RowLayout::create()->setGap(5.0f));
+        rowNode->setContentSize({popupSize.x-10.0f, 20.0f});
+        for (int column = 0; column < 7; column++) {
+            const auto tierNode = createTierNode(row+1+column*5);
+            rowNode->addChild(tierNode);
+            tierButtons.push_back(tierNode);
+        }
+        rowNode->updateLayout();
+        simplifiedMenu->addChild(rowNode);
+        simplifiedMenu->reorderChild(rowNode, row+1);
+    }
+    // togglers - container
+    const auto rowNode = CCMenu::create();
+    rowNode->setLayout(RowLayout::create()->setGap(5.0f));
+    rowNode->setContentSize({popupSize.x-10.0f, 35.0f});
+    // unknown tier
+    const auto unknownButton = createTierNode(-1);
+    rowNode->addChild(unknownButton);
+    tierButtons.push_back(unknownButton);
+    // togglers - checkboxes
+    const std::string ids[2] = {"completed", "uncompleted"};
+    const std::string labels[2] = {"Completed", "Uncompleted"};
+    const auto togglerNode = createCheckboxNode("completed", "Completed", completedTogglerSimple, menu_selector(GDDLSearchLayer::onToggleCompleted));
+    rowNode->addChild(togglerNode);
+    rowNode->reorderChild(togglerNode, 0);
+    const auto togglerNode2 = createCheckboxNode("uncompleted", "Uncompleted", uncompletedTogglerSimple, menu_selector(GDDLSearchLayer::onToggleUncompleted));
+    rowNode->addChild(togglerNode2);
+    rowNode->reorderChild(togglerNode2, 1);
+    rowNode->updateLayout();
+    simplifiedMenu->addChild(rowNode);
+    simplifiedMenu->reorderChild(rowNode, 9);
+    simplifiedMenu->updateLayout();
+    simplifiedLoaded = true;
+}
+
+void GDDLSearchLayer::showPage() {
+    if(!simplified) { // hide all simplified and show all complex ones
+        simplifiedMenu->setVisible(false);
+        if(!normalLoaded) {
+            loadPageFull();
+        }
+        normalMenu->setVisible(true);
+        m_mainLayer->reorderChild(simplifiedMenu, 0);
+        m_mainLayer->reorderChild(normalMenu, 1);
+    } else { // the other way lmao
+        normalMenu->setVisible(false);
+        if(!simplifiedLoaded) {
+            loadPageSimple();
+        }
+        simplifiedMenu->setVisible(true);
+        m_mainLayer->reorderChild(normalMenu, 0);
+        m_mainLayer->reorderChild(simplifiedMenu, 1);
+    }
+    cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayer::loadValues() {
-    page = 1;
-    nameTextfield->setString(name.c_str());
-    setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
-    setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
-    setDifficultyLabel();
-    creatorTextfield->setString(creator.c_str());
-    songTextfield->setString(song.c_str());
-    nameExactMatchToggler->toggle(exactName);
-    noUnratedToggler->toggle(removeUnrated);
-    noUnratedEnjToggler->toggle(removeUnratedEnj);
-    noRatedToggler->toggle(removeRated);
-    noRatedEnjToggler->toggle(removeRatedEnj);
-    completedToggler->toggle(completed);
-    uncompletedToggler->toggle(uncompleted);
-    setNumberWithDefZeroTextfield(subLowCount, submissionsCountLowTextfield);
-    setNumberWithDefZeroTextfield(subHighCount, submissionsCountHighTextfield);
-    setNumberWithDefZeroTextfield(enjLowCount, enjSubmissionsCountLowTextfield);
-    setNumberWithDefZeroTextfield(enjHighCount, enjSubmissionsCountHighTextfield);
-    setNumberFloatTextfield(enjLow, enjoymentLowTextfield);
-    setNumberFloatTextfield(enjHigh, enjoymentHighTextfield);
-    setSortDirectionLabel();
-    setSortByLabel();
+    if(!simplified) {
+        page = 1;
+        nameTextfield->setString(name.c_str());
+        setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
+        setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
+        setDifficultyLabel();
+        creatorTextfield->setString(creator.c_str());
+        songTextfield->setString(song.c_str());
+        nameExactMatchToggler->toggle(exactName);
+        noUnratedToggler->toggle(removeUnrated);
+        noUnratedEnjToggler->toggle(removeUnratedEnj);
+        noRatedToggler->toggle(removeRated);
+        noRatedEnjToggler->toggle(removeRatedEnj);
+        completedToggler->toggle(completed);
+        uncompletedToggler->toggle(uncompleted);
+        setNumberWithDefZeroTextfield(subLowCount, submissionsCountLowTextfield);
+        setNumberWithDefZeroTextfield(subHighCount, submissionsCountHighTextfield);
+        setNumberWithDefZeroTextfield(enjLowCount, enjSubmissionsCountLowTextfield);
+        setNumberWithDefZeroTextfield(enjHighCount, enjSubmissionsCountHighTextfield);
+        setNumberFloatTextfield(enjLow, enjoymentLowTextfield);
+        setNumberFloatTextfield(enjHigh, enjoymentHighTextfield);
+        setSortDirectionLabel();
+        setSortByLabel();
+    } else {
+        completedTogglerSimple->toggle(completed);
+        uncompletedTogglerSimple->toggle(uncompleted);
+    }
 }
 
 void GDDLSearchLayer::saveValues() {
     // fields with a set of choices don't have to be saved
-    name = nameTextfield->getString();
-    lowTier = getNumberTextfieldValue(tierLowTextfield);
-    highTier = getNumberTextfieldValue(tierHighTextfield);
-    creator = creatorTextfield->getString();
-    song = songTextfield->getString();
-    exactName = nameExactMatchToggler->isToggled();
-    removeUnrated = noUnratedToggler->isToggled();
-    removeUnratedEnj = noUnratedEnjToggler->isToggled();
-    removeRated = noRatedToggler->isToggled();
-    removeRatedEnj = noRatedEnjToggler->isToggled();
-    completed = completedToggler->isToggled();
-    uncompleted = uncompletedToggler->isToggled();
-    subLowCount = getNumberTextfieldValue(submissionsCountLowTextfield);
-    subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
-    enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
-    enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
-    enjLow = getFloatTextfieldValue(enjoymentLowTextfield);
-    enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
+    if(!simplified) {
+        name = nameTextfield->getString();
+        lowTier = getNumberTextfieldValue(tierLowTextfield);
+        highTier = getNumberTextfieldValue(tierHighTextfield);
+        creator = creatorTextfield->getString();
+        song = songTextfield->getString();
+        exactName = nameExactMatchToggler->isToggled();
+        removeUnrated = noUnratedToggler->isToggled();
+        removeUnratedEnj = noUnratedEnjToggler->isToggled();
+        removeRated = noRatedToggler->isToggled();
+        removeRatedEnj = noRatedEnjToggler->isToggled();
+        completed = completedToggler->isToggled();
+        uncompleted = uncompletedToggler->isToggled();
+        subLowCount = getNumberTextfieldValue(submissionsCountLowTextfield);
+        subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
+        enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
+        enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
+        enjLow = getFloatTextfieldValue(enjoymentLowTextfield);
+        enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
+    } else {
+        completed = completedTogglerSimple->isToggled();
+        uncompleted = uncompletedTogglerSimple->isToggled();
+    }
 }
 
 // ReSharper disable once CppDFAUnreachableFunctionCall
@@ -323,6 +405,8 @@ void GDDLSearchLayer::restoreValues() {
 void GDDLSearchLayer::onClose(CCObject *sender) {
     saveValues();
     saveSettings();
+    simplifiedLoaded = false;
+    normalLoaded = false;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
@@ -331,6 +415,7 @@ TodoReturn GDDLSearchLayer::keyBackClicked() {
     FLAlertLayer::keyBackClicked();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GDDLSearchLayer::onInfo(CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     std::string infoContent =
             "<co>Name - Ex. match</c> - will <cy>only</c> search for levels with <cy>exactly</c> matching "
@@ -338,6 +423,9 @@ void GDDLSearchLayer::onInfo(CCObject *sender) { // NOLINT(*-convert-member-func
             "the amount of <cj>enjoyment</c>/<cp>difficulty tier</c> submissions for a level\n<co>No unrated/No rated "
             "(Enj)</c> - <cy>only</c> search for levels <cg>with</c>(<cr>out</c>) a <cp>tier</c>/<cj>enjoyment</c> "
             "rating\n<cb>All</c> tier and submission ranges are <cy>inclusive</c> from <cy>both</c> sides";
+    if (simplified) {
+        infoContent = "Select the <cg>completed</c>/<cr>uncompleted</c> checkboxes and click a <co>button</c> to search for a corresponding <cy>tier</c>, click the <cp>?</c> button to search for levels that are <cb>not yet rated</c>";
+    }
     FLAlertLayer::create("GDDL Search Help", infoContent, "OK")->show();
 }
 
@@ -363,7 +451,7 @@ std::string GDDLSearchLayer::addStringToRequest(const std::string &paramName, co
     return "&" + paramName + "=" + urlEncodeString(value);
 }
 
-std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, bool value) {
+std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, const bool value) {
     std::string strValue = "true";
     if (!value) {
         strValue = "false";
@@ -420,11 +508,11 @@ std::string GDDLSearchLayer::formSearchRequest() {
 std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
     json responseJson = json::parse(response);
-    int total = responseJson["total"];
+    const int total = responseJson["total"];
     totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
     json levelList = responseJson["levels"];
     for (auto element: levelList) {
-        int levelID = element["LevelID"];
+        const int levelID = element["LevelID"];
         if (levelID > 3) { // to avoid official demons
             results.push_back(element["LevelID"]);
         }
@@ -432,10 +520,10 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     return results;
 }
 
-std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, LevelCompleteness completionStatus) {
+std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const LevelCompleteness completionStatus) {
     std::set<int> setOfIds = Utils::copyVectorToSet(std::move(ids));
     std::vector<int> filteredList;
-    if (completionStatus != ANY1) {
+    if (completionStatus != ANY) {
         std::set<int> allCompleted;
         GameLevelManager *levelManager = GameLevelManager::sharedState();
         const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
@@ -448,7 +536,7 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, LevelCompl
                 allCompleted.insert(level->m_levelID);
             }
         }
-        if (completionStatus == COMPLETED1) {
+        if (completionStatus == COMPLETED) {
             filteredList = Utils::copySetToVector(allCompleted);
         } else { // searchType == UNCOMPLETED
             for (auto level: allCompleted) {
@@ -475,8 +563,7 @@ int GDDLSearchLayer::getOnlinePagesCount() {
 GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, const int lastIndex) {
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
-        int id = cachedResults[i];
-        log::debug("Loop {} - adding level {}", std::to_string(i), std::to_string(id));
+        const int id = cachedResults[i];
         requestString += std::to_string(cachedResults[i]) + ',';
     }
     if (!requestString.empty()) {
@@ -487,34 +574,31 @@ GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, con
 }
 
 void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
-    std::vector<int> parsedResponse = parseResponse(response);
-    log::debug("Before filtration: {}", std::to_string(parsedResponse.size()));
+    const std::vector<int> parsedResponse = parseResponse(response);
     if (completed == uncompleted) {
-        completeness = ANY1;
+        completeness = ANY;
     } else {
         if (completed) {
-            completeness = COMPLETED1;
+            completeness = COMPLETED;
         } else {
-            completeness = UNCOMPLETED1;
+            completeness = UNCOMPLETED;
         }
     }
-    std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
-    log::debug("After filtration: {}", std::to_string(filteredResponse.size()));
+    const std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
     for (auto element: filteredResponse) {
         cachedResults.push_back(element);
     }
-    log::debug("Total cached: {}", std::to_string(cachedResults.size()));
     onlinePagesFetched++;
-    log::debug("Total pages fetched: {}", std::to_string(onlinePagesFetched));
 }
 
-std::pair<int, int> GDDLSearchLayer::getReadyRange(int requestedPage) {
+std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
     const int firstIndex = (requestedPage - 1) * 10;
-    const int lastIndex = std::min(firstIndex + 10, (int) cachedResults.size()); // last index + 1
+    const int lastIndex = std::min(firstIndex + 10, static_cast<int>(cachedResults.size())); // last index + 1
     return {firstIndex, lastIndex};
 }
 
-void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject, int resultsCount) {
+void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
+                                         const int resultsCount) {
     if(callbackObject != nullptr) { // search continues
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
@@ -523,16 +607,17 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     }
 }
 
-void GDDLSearchLayer::createLabel(CCLayer *parent, const std::string &font, const std::string& text, const int maxWidth, const CCPoint& position, const int zOrder) {
+void GDDLSearchLayer::createLabel(CCLayer *parent, const std::string &font, const std::string &text,
+                                  const float maxWidth, const CCPoint &position, const int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
 }
 
-CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string& font,
-                                                      const std::string &placeholder, const int maxWidth, CCPoint position,
-                                                      CCPoint bgSize, int zOrder) {
+CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
+                                                      const std::string &placeholder, const float maxWidth,
+                                                      const CCPoint &position, const CCPoint &bgSize, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
@@ -546,14 +631,16 @@ CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBM
     bg->setOpacity(100);
     return bg;
 }
-void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth) {
+
+void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, const float maxWidth) {
     const float scale =
             0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
     label->setScale(scale);
 }
 
-void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, std::string font,
-                                          std::string placeholder, CCPoint bgSize, CCPoint position, int zOrder) {
+void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+                                          const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                          const CCPoint &position, int zOrder) {
     const auto bg = CCScale9Sprite::create("square02_small.png");
     parent->addChild(bg, zOrder);
     bg->setContentSize(bgSize);
@@ -564,12 +651,16 @@ void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&tex
     textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
     parent->addChild(textfield, zOrder + 1);
     textfield->setPosition(position);
-    textfield->setMaxLabelLength(32);
+#ifdef GEODE_IS_ANDROID
+    ++maxCharacters; // robert :)
+#endif
+    textfield->setMaxLabelLength(maxCharacters);
     textfield->setMaxLabelScale(0.7f);
 }
 
-void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size, SEL_MenuHandler leftCallback,
-                                                   SEL_MenuHandler rightCallback, int zOrder) {
+void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, const CCPoint &size,
+                                                   const SEL_MenuHandler leftCallback,
+                                                   const SEL_MenuHandler rightCallback, int zOrder) {
     // left
     const CCPoint positionLeft =
             object->getPosition() -
@@ -592,8 +683,9 @@ void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, CCPoint size,
     rightButton->setContentSize(size);
 }
 
-void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, std::string label, float labelOffset,
-                                     float scale, CCPoint position, SEL_MenuHandler callback, int zOrder) {
+void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label,
+                                     const float labelOffset, const float scale, const CCPoint &position,
+                                     const SEL_MenuHandler callback, int zOrder) {
     toggler = CCMenuItemToggler::createWithStandardSprites(this, callback, scale);
     parent->addChild(toggler, zOrder);
     toggler->setPosition(position);
@@ -607,8 +699,10 @@ void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggle
     toggleLabel->setScale(labelScale);
 }
 
-float GDDLSearchLayer::calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound) {
-    int newValue = currentValue + (increase ? 1.0f : -1.0f);
+// ReSharper disable once CppDFAUnreachableFunctionCall NOT TRUE
+float GDDLSearchLayer::calculateNewFloat(const float currentValue, const bool increase, const float lowerbound,
+                                         const float upperbound) {
+    float newValue = currentValue + (increase ? 1.0f : -1.0f);
     if (std::abs(currentValue - std::floor(currentValue)) >= 0.01f) {
         newValue = increase ? std::floor(currentValue) + 1 : std::floor(currentValue);
     }
@@ -619,14 +713,49 @@ float GDDLSearchLayer::calculateNewFloat(float currentValue, bool increase, floa
     return newValue;
 }
 
-void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) {
+CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(const int tier) {
+    // tier sprite
+    const std::string tierString = tier != -1 ? std::to_string(tier) : "unrated";
+    const std::string tierSpriteName = "tier_" + tierString + ".png";
+    const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
+    const auto tierSprite = CCSprite::create(textureName);
+    tierSprite->setScale(0.24f);
+    tierSprite->setContentSize({30.0f, 30.0f});
+    const auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLSearchLayer::onTierSearch));
+    tierButton->setContentSize({30.0f, 30.0f});
+    tierButton->setID("button-tier-" + std::to_string(tier));
+    return tierButton;
+}
+
+CCMenu *GDDLSearchLayer::createCheckboxNode(const std::string &idSuffix, const std::string &name,
+                                            CCMenuItemToggler *&toggler, const SEL_MenuHandler callback) {
+    const auto menu = CCMenu::create();
+    menu->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
+    // checkbox
+    toggler = CCMenuItemToggler::createWithStandardSprites(this, callback, 0.8f);
+    toggler->setID("toggler-" + idSuffix);
+    menu->addChild(toggler);
+    menu->reorderChild(toggler, 0);
+    // label
+    const auto label = CCLabelBMFont::create(name.c_str(), "bigFont.fnt");
+    label->setContentSize({110.0f, 35.0f});
+    menu->addChild(label);
+    menu->reorderChild(label, 1);
+    menu->setContentSize({150.0f, 35.0f});
+    menu->updateLayout();
+    label->setScale(110.0f / label->getContentSize().width);
+    return menu;
+}
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void GDDLSearchLayer::onToggleExactMatch(CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     exactName = !dynamic_cast<CCMenuItemToggler *>(sender)->isOn();
 }
 
 void GDDLSearchLayer::onInGameRatingLeft(CCObject *sender) {
     difficulty--;
     if (difficulty < 0)
-        difficulty = demonDifficulties.size() - 1;
+        difficulty = demonDifficulties.size() - 1; // NOLINT(*-narrowing-conversions)
     setDifficultyLabel();
 }
 
@@ -665,26 +794,26 @@ void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
-    float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
-    int newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentLowRight(CCObject *sender) {
-    int currentValue = getNumberTextfieldValue(enjoymentLowTextfield);
-    int newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighLeft(CCObject *sender) {
-    float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
-    int newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
-    float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
-    int newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
@@ -744,34 +873,40 @@ void GDDLSearchLayer::onEnjSubmissionCountHighRight(CCObject *sender) {
     setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountHighTextfield);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void GDDLSearchLayer::onToggleNoUnrated(CCObject *sender) {
     if (!noUnratedToggler->isOn()) {
         noRatedToggler->toggle(false);
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void GDDLSearchLayer::onToggleNoRated(CCObject *sender) {
     if (!noRatedToggler->isOn()) {
         noUnratedToggler->toggle(false);
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void GDDLSearchLayer::onToggleNoUnratedEnj(CCObject *sender) {
     if (!noUnratedEnjToggler->isOn()) {
         noRatedEnjToggler->toggle(false);
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void GDDLSearchLayer::onToggleNoRatedEnj(CCObject *sender) {
     if (!noRatedEnjToggler->isOn()) {
         noUnratedEnjToggler->toggle(false);
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GDDLSearchLayer::onToggleCompleted(CCObject *sender) {
-     // do nothing
+    // do nothing
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GDDLSearchLayer::onToggleUncompleted(CCObject *sender) {
      // do nothing
 }
@@ -779,7 +914,7 @@ void GDDLSearchLayer::onToggleUncompleted(CCObject *sender) {
 void GDDLSearchLayer::onSortByLeft(CCObject *sender) {
     sortOptionIndex--;
     if (sortOptionIndex < 0)
-        sortOptionIndex = sort.size() - 1;
+        sortOptionIndex = sort.size() - 1; // NOLINT(*-narrowing-conversions)
     setSortByLabel();
 }
 
@@ -793,7 +928,7 @@ void GDDLSearchLayer::onSortByRight(CCObject *sender) {
 void GDDLSearchLayer::onSortDirectionLeft(CCObject *sender) {
     sortDirectionIndex--;
     if (sortDirectionIndex < 0)
-        sortDirectionIndex = sortDirection.size() - 1;
+        sortDirectionIndex = sortDirection.size() - 1; // NOLINT(*-narrowing-conversions)
     setSortDirectionLabel();
 }
 
@@ -815,14 +950,45 @@ void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
 
 void GDDLSearchLayer::onResetClicked(CCObject *sender) { resetValues(); }
 
-void GDDLSearchLayer::setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {
+void GDDLSearchLayer::onSwapLayout(CCObject *sender) {
+    saveValues();
+    simplified = !simplified;
+    showPage();
+    loadValues();
+}
+
+void GDDLSearchLayer::onTierSearch(CCObject *sender) {
+    // save values before replacing them
+    saveValues();
+    cacheValues();
+    // and then
+    auto *senderNode = dynamic_cast<CCNode *>(sender);
+    const std::string tierStr = senderNode->getID();
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    if(tierNumber != -1) {
+        lowTier = tierNumber;
+        highTier = tierNumber;
+    } else {
+        removeRated = true;
+    }
+    completed = completedTogglerSimple->isToggled();
+    uncompleted = uncompletedTogglerSimple->isToggled();
+    totalOnlineResults = 0;
+    cachedResults.clear();
+    onlinePagesFetched = 0;
+    searching = true;
+    requestSearchPage(1, nullptr);
+}
+
+void GDDLSearchLayer::setNumberWithDefZeroTextfield(const int value, CCTextInputNode *&textfield) {
     if (value != 0) {
         textfield->setString(std::to_string(value).c_str());
     } else {
         textfield->setString("");
     }
 }
-void GDDLSearchLayer::setNumberFloatTextfield(float value, CCTextInputNode *&textfield) {
+
+void GDDLSearchLayer::setNumberFloatTextfield(const float value, CCTextInputNode *&textfield) {
     std::stringstream ss;
     ss << std::fixed << std::setprecision(2);
     ss << value;
@@ -861,6 +1027,7 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield) {
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
     const auto newLayer = new GDDLSearchLayer();
+    // ReSharper disable once CppDFAConstantConditions
     if (newLayer != nullptr && newLayer->init()) {
         newLayer->autorelease();
         return newLayer;
@@ -900,6 +1067,7 @@ void GDDLSearchLayer::loadSettings() {
     sortDirectionIndex = Mod::get()->getSavedValue<int>("search-sortDirectionIndex", 0);
     completed = Mod::get()->getSavedValue<bool>("search-completed", true);
     uncompleted = Mod::get()->getSavedValue<bool>("search-uncompleted", true);
+    simplified = Mod::get()->getSavedValue<bool>("search-simplified", false);
 }
 
 void GDDLSearchLayer::saveSettings() {
@@ -925,6 +1093,7 @@ void GDDLSearchLayer::saveSettings() {
     Mod::get()->setSavedValue("search-sortDirectionIndex", sortDirectionIndex);
     Mod::get()->setSavedValue("search-completed", completed);
     Mod::get()->setSavedValue("search-uncompleted", uncompleted);
+    Mod::get()->setSavedValue("search-simplified", simplified);
 }
 
 void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject) {
@@ -938,43 +1107,34 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
             requestedPage = maxPotentialPages;
         }
     }
-    log::debug("Corrected page: {}", std::to_string(requestedPage));
-    std::pair<int, int> readyRange = getReadyRange(requestedPage);
-    if (readyRange.second - readyRange.first >= 10 ||
+    const auto [firstReadyIndex, lastReadyIndex] = getReadyRange(requestedPage);
+    if (lastReadyIndex - firstReadyIndex >= 10 ||
         (onlinePagesFetched >= getOnlinePagesCount() && callbackObject != nullptr)) {
         // we have the results yaaaay (or there's no way to get more, the other check only works when it's not the first
         // request in this search)
-        log::debug("{}","We have the results!");
-        GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-        handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
+        GJSearchObject *searchObject = makeASearchObjectFrom(firstReadyIndex, lastReadyIndex);
+        handleSearchObject(searchObject, callbackObject, lastReadyIndex - firstReadyIndex);
         return;
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
-    log::debug("Formed request: {}", request);
     web::AsyncWebRequest()
             .fetch(request)
             .text()
             .then([requestedPage, callbackObject](std::string const &response) {
                 // append results
-                log::debug("{}", "Results fetched");
                 appendFetchedResults(response);
                 // test if there's enough of them
                 std::pair<int, int> readyRange = getReadyRange(requestedPage);
-                log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
                 while (readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
                     // not enough? fetch some more!
-                    log::debug("Still not enough!");
-                    std::string request = formSearchRequest();
-                    log::debug("Formed request: {}", request);
-                    auto anotherResponse = web::fetch(request);
+                    std::string anotherRequest = formSearchRequest();
+                    auto anotherResponse = web::fetch(anotherRequest);
                     appendFetchedResults(anotherResponse.unwrap());
                     readyRange = getReadyRange(requestedPage);
-                    log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
                     // until it runs out of pages or sth
                 }
                 // and then call the callback
-                log::debug("Preparing results from {} to {}", std::to_string(readyRange.first), std::to_string(readyRange.second));
                 GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
                 handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
             })
@@ -987,7 +1147,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
             });
 }
 
-void GDDLSearchLayer::requestSearchFromDemonSplit(int tier) {
+void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     // save values before replacing them
     cacheValues();
     // and then
@@ -1009,9 +1169,9 @@ int GDDLSearchLayer::getSearchResultsCount() { return totalOnlineResults; }
 /**
  * FALLBACK ONLY IF SOMEONE GOES A PAGE TOO FAR
  */
-GJSearchObject *GDDLSearchLayer::getSearchObjectForPage(int requestedPage) {
-    std::pair<int, int> readyRange = getReadyRange(requestedPage);
-    return makeASearchObjectFrom(readyRange.first, readyRange.second);
+GJSearchObject *GDDLSearchLayer::getSearchObjectForPage(const int requestedPage) {
+    const auto [firstReadyIndex, lastReadyIndex] = getReadyRange(requestedPage);
+    return makeASearchObjectFrom(firstReadyIndex, lastReadyIndex);
 }
 
 bool GDDLSearchLayer::isSearching() {
@@ -1021,7 +1181,6 @@ bool GDDLSearchLayer::isSearching() {
 void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
-    log::debug("Saved Low Tier: {}", std::to_string(savedLowTier));
     if (savedLowTier == -1) return; // there's nothing to restore
     restoreValues();
     savedLowTier = -1;

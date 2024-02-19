@@ -7,6 +7,7 @@
 using namespace geode::prelude;
 
 class $modify(GDDLProfileMod, ProfilePage) {
+    // ReSharper disable once CppHidingFunction
     virtual TodoReturn loadPageFromUserInfo(GJUserScore* p0) {
         ProfilePage::loadPageFromUserInfo(p0);
         if(p0->m_accountID != GJAccountManager::sharedState()->m_accountID) return;
@@ -29,7 +30,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         gddlButtonSprite->setPosition({gddlButtonSprite->getParent()->getContentSize().width/2, gddlButtonSprite->getParent()->getContentSize().height/2});
     }
 
-    void onGDDLDemonSplit(CCObject* sender) {
+    void onGDDLDemonSplit(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
         GDDLDemonSplitLayer::create()->show();
     }
 };

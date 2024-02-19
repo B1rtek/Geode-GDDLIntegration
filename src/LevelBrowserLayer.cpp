@@ -1,3 +1,5 @@
+// ReSharper disable CppHidingFunction
+// ReSharper disable CppParameterMayBeConst
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelBrowserLayer.hpp>
 
@@ -13,7 +15,7 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         return LevelBrowserLayer::init(p0);
     }
 
-    void loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) {
+    void loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) override {
         LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
         if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;

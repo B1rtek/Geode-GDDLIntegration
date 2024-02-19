@@ -1,6 +1,7 @@
 /**
  * Include the Geode headers.
  */
+// ReSharper disable once CppUnusedIncludeDirective
 #include <Geode/Geode.hpp>
 /**
  * Required to modify the MenuLayer class
@@ -36,7 +37,7 @@ class $modify(MenuLayer) {
      * would not place a hook!
      */
 
-    bool init() {
+    bool init() override {
         if (!MenuLayer::init()) return false;
 
         GDDLSearchLayer::loadSettings(); // will only work if this is the first time the MenuLayer was loaded

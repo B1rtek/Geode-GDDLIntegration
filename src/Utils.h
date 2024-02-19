@@ -12,7 +12,7 @@ public:
         return stream.str();
     }
 
-    static int getCurrentTimestamp() {
+    static unsigned int getCurrentTimestamp() {
         const auto clockNow = std::chrono::system_clock::now();
         return std::chrono::duration_cast<std::chrono::seconds>(clockNow.time_since_epoch()).count();
     }

@@ -5,10 +5,10 @@
 
 using namespace geode::prelude;
 
-class GDDLDemonSplitLayer : public FLAlertLayer {
+class GDDLDemonSplitLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
 
-    bool init();
+    bool init() override;
     void onClose(cocos2d::CCObject* sender);
     void onInfo(cocos2d::CCObject *sender);
     void onTierSearch(cocos2d::CCObject* sender);
@@ -16,7 +16,7 @@ class GDDLDemonSplitLayer : public FLAlertLayer {
     CCNode* createTierNode(int tier);
 public:
     static GDDLDemonSplitLayer* create();
-    void show();
+    void show() override;
 };
 
 

@@ -8,5 +8,5 @@ GDDLRating::GDDLRating(json levelData) {
     this->enjoymentCount = levelData["EnjoymentCount"];
     this->submissionCount = levelData["SubmissionCount"];
 
-    this->roundedRating = round(this->rating);
+    this->roundedRating = static_cast<int>(round(this->rating));
 }
