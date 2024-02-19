@@ -6,9 +6,9 @@
 struct GDDLBrowserLayer;
 using namespace geode::prelude;
 
-enum LevelCompleteness { ANY1, UNCOMPLETED1, COMPLETED1 };
+enum LevelCompleteness { ANY, UNCOMPLETED, COMPLETED };
 
-class GDDLSearchLayer : public FLAlertLayer {
+class GDDLSearchLayer final : public FLAlertLayer {
     // endpoint args, ignoring chunk (always set to 10) and stddev args
     // value limits
     static constexpr int highestTier = 35;
@@ -52,7 +52,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
     const inline static std::vector<std::string> sortDirection = {"asc", "desc"};
     // LevelCompleteness - represented as two checkboxes for completed and uncompleted
-    inline static LevelCompleteness completeness = ANY1;
+    inline static LevelCompleteness completeness = ANY;
     inline static bool completed = true, uncompleted = true;
     // have fun remembering all of that lmao
     inline static bool firstLoad = true, simplified = false;
@@ -135,13 +135,13 @@ class GDDLSearchLayer : public FLAlertLayer {
     static std::pair<int, int> getReadyRange(int requestedPage);
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     // utility
-    void createLabel(CCLayer *parent, const std::string &font, const std::string &text, const float maxWidth,
-                     const CCPoint &position, int zOrder = 1);
-    CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                         const std::string &text, const float maxWidth, const CCPoint &position,
+    static void createLabel(CCLayer *parent, const std::string &font, const std::string &text, float maxWidth,
+                            const CCPoint &position, int zOrder = 1);
+    static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
+                                         const std::string &placeholder, float maxWidth, const CCPoint &position,
                                          const CCPoint &bgSize, int zOrder = 1);
     static void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
-    void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+    static void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
                              const std::string &placeholder,
                              int maxCharacters, const CCPoint &bgSize,
                              const CCPoint &position, int zOrder = 1);
@@ -187,7 +187,7 @@ class GDDLSearchLayer : public FLAlertLayer {
     // page simplified
     void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
-    void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
+    static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     static void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
     void setDifficultyLabel();
     void setSortByLabel();
@@ -201,7 +201,7 @@ public:
     void show() override;
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
-    static void requestSearchPage(int page, GDDLBrowserLayer *callbackObject);
+    static void requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject);
     static void requestSearchFromDemonSplit(int tier);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();

@@ -9,12 +9,6 @@
 
 using namespace geode::prelude;
 
-enum TierSearchType {
-    ANY,
-    UNCOMPLETED,
-    COMPLETED
-};
-
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::vector<int> tierColors;
