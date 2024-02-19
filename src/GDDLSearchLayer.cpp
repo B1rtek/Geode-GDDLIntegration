@@ -564,7 +564,6 @@ GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, con
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
         const int id = cachedResults[i];
-        log::debug("Loop {} - adding level {}", std::to_string(i), std::to_string(id));
         requestString += std::to_string(cachedResults[i]) + ',';
     }
     if (!requestString.empty()) {
@@ -576,7 +575,6 @@ GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, con
 
 void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
     const std::vector<int> parsedResponse = parseResponse(response);
-    log::debug("Before filtration: {}", std::to_string(parsedResponse.size()));
     if (completed == uncompleted) {
         completeness = ANY;
     } else {
@@ -587,13 +585,10 @@ void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
         }
     }
     const std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
-    log::debug("After filtration: {}", std::to_string(filteredResponse.size()));
     for (auto element: filteredResponse) {
         cachedResults.push_back(element);
     }
-    log::debug("Total cached: {}", std::to_string(cachedResults.size()));
     onlinePagesFetched++;
-    log::debug("Total pages fetched: {}", std::to_string(onlinePagesFetched));
 }
 
 std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
@@ -1112,43 +1107,34 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
             requestedPage = maxPotentialPages;
         }
     }
-    log::debug("Corrected page: {}", std::to_string(requestedPage));
     const auto [firstReadyIndex, lastReadyIndex] = getReadyRange(requestedPage);
     if (lastReadyIndex - firstReadyIndex >= 10 ||
         (onlinePagesFetched >= getOnlinePagesCount() && callbackObject != nullptr)) {
         // we have the results yaaaay (or there's no way to get more, the other check only works when it's not the first
         // request in this search)
-        log::debug("{}","We have the results!");
         GJSearchObject *searchObject = makeASearchObjectFrom(firstReadyIndex, lastReadyIndex);
         handleSearchObject(searchObject, callbackObject, lastReadyIndex - firstReadyIndex);
         return;
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
-    log::debug("Formed request: {}", request);
     web::AsyncWebRequest()
             .fetch(request)
             .text()
             .then([requestedPage, callbackObject](std::string const &response) {
                 // append results
-                log::debug("{}", "Results fetched");
                 appendFetchedResults(response);
                 // test if there's enough of them
                 std::pair<int, int> readyRange = getReadyRange(requestedPage);
-                log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
                 while (readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
                     // not enough? fetch some more!
-                    log::debug("Still not enough!");
                     std::string anotherRequest = formSearchRequest();
-                    log::debug("Formed request: {}", anotherRequest);
                     auto anotherResponse = web::fetch(anotherRequest);
                     appendFetchedResults(anotherResponse.unwrap());
                     readyRange = getReadyRange(requestedPage);
-                    log::debug("Ready range from page {}: {} - {}", std::to_string(requestedPage), std::to_string(readyRange.first), std::to_string(readyRange.second));
                     // until it runs out of pages or sth
                 }
                 // and then call the callback
-                log::debug("Preparing results from {} to {}", std::to_string(readyRange.first), std::to_string(readyRange.second));
                 GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
                 handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
             })
@@ -1195,7 +1181,6 @@ bool GDDLSearchLayer::isSearching() {
 void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
-    log::debug("Saved Low Tier: {}", std::to_string(savedLowTier));
     if (savedLowTier == -1) return; // there's nothing to restore
     restoreValues();
     savedLowTier = -1;
