@@ -1,6 +1,6 @@
 {
 	"geode": "2.0.0",
-	"version": "v1.1.0",
+	"version": "v1.1.1",
 	"gd": {
 		"android": "2.205",
 		"win": "2.204"
@@ -26,6 +26,7 @@
 			"resources/tier.png",
 			"resources/split.png",
 			"resources/search.png",
+			"resources/old_search.png",
 			"resources/tiers/*.png"
 		]
 	},
