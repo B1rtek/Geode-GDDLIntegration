@@ -181,8 +181,10 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
         const auto rating = RatingsManager::getRating(m_level->m_levelID);
-        if (!rating)
+        if (!rating) {
+            FLAlertLayer::create("GDDL Information", "Still loading...", "OK")->show();
             return;
+        }
         const auto info = rating.value();
 
         const std::string tier = info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2);
