@@ -410,9 +410,10 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
+
 TodoReturn GDDLSearchLayer::keyBackClicked() {
     saveValues();
-    FLAlertLayer::keyBackClicked();
+    FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -1026,6 +1027,12 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
     return std::stof(textfield->getString());
+}
+
+void GDDLSearchLayer::onEnter()
+{
+    FLAlertLayer::onEnter();
+    cocos::handleTouchPriority(this);
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
