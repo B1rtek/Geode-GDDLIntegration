@@ -12,6 +12,7 @@ class GDDLDemonSplitLayer final : public FLAlertLayer {
     void onClose(cocos2d::CCObject* sender);
     void onInfo(cocos2d::CCObject *sender);
     void onTierSearch(cocos2d::CCObject* sender);
+    void onEnter() override;
 
     CCNode* createTierNode(int tier);
 public:

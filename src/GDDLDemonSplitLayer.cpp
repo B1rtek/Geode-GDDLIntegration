@@ -96,6 +96,11 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     // the list should display itself hopefully
 }
 
+void GDDLDemonSplitLayer::onEnter() {
+    FLAlertLayer::onEnter();
+    cocos::handleTouchPriority(this);
+}
+
 CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
     const auto tierNode = CCMenu::create();
     tierNode->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
