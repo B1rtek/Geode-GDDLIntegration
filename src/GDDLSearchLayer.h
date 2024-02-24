@@ -23,7 +23,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static int lowTier = 0, highTier = 0;
     // difficulty - passed as a number from 2 to 6, shown as strings from the vector below, 5 = any
     // 1 is actually reserved for "Official" demons, but since they can't be displayed in a level browser, we can use it
-    // 0 is for nothing - just add 2 to the index and we're good
+    // 0 is for nothing - just add 1 (API 1.9.0 change) to the index and we're good
     inline static int difficulty = 5;
     const inline static std::vector<std::string> demonDifficulties = {
             "Easy", "Medium", "Hard", "Insane", "Extreme", "Any"
@@ -195,6 +195,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // getters for the same thing
     static int getNumberTextfieldValue(CCTextInputNode *&textfield);
     static float getFloatTextfieldValue(CCTextInputNode *&textfield);
+    void onEnter() override;
 
 public:
     static GDDLSearchLayer *create();

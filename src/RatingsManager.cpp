@@ -170,7 +170,10 @@ bool RatingsManager::alreadyCached() {
     return !ratingsCache.empty();
 }
 
-void RatingsManager::updateCacheFromSearch(const int levelID, const int tier) { ratingsCache[levelID] = tier; }
+void RatingsManager::updateCacheFromSearch(const int levelID, const float rating) {
+    const int tier = static_cast<int>(std::round(rating));
+    ratingsCache[levelID] = tier;
+}
 
 int RatingsManager::getCachedTier(const int levelID) {
     return !ratingsCache.contains(levelID) ? -1 : ratingsCache[levelID];

@@ -410,9 +410,10 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
+
 TodoReturn GDDLSearchLayer::keyBackClicked() {
     saveValues();
-    FLAlertLayer::keyBackClicked();
+    FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -465,7 +466,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addStringToRequest("name", name);
     request += addValueToRequest("lowTier", lowTier, 0);
     request += addValueToRequest("highTier", highTier, 0);
-    request += addValueToRequest("difficulty", difficulty+2, 7);
+    request += addValueToRequest("difficulty", difficulty+1, 6); // API 1.9.0 - diffs 1-5
     request += addStringToRequest("creator", creator);
     request += addStringToRequest("song", song);
     request += addBoolToRequest("exactName", exactName);
@@ -515,6 +516,10 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
         const int levelID = element["LevelID"];
         if (levelID > 3) { // to avoid official demons
             results.push_back(element["LevelID"]);
+            if(!element["Rating"].is_null()) {
+                const float rating = element["Rating"];
+                RatingsManager::updateCacheFromSearch(levelID, rating);
+            }
         }
     }
     return results;
@@ -603,7 +608,10 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         const auto listLayer = LevelBrowserLayer::create(searchObject);
-        cocos::switchToScene(listLayer);
+        const auto listLayerScene = CCScene::create();
+        listLayerScene->addChild(listLayer);
+        auto transition = CCTransitionFade::create(0.5, listLayerScene);
+        CCDirector::sharedDirector()->pushScene(transition);
     }
 }
 
@@ -1023,6 +1031,12 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
     return std::stof(textfield->getString());
+}
+
+void GDDLSearchLayer::onEnter()
+{
+    FLAlertLayer::onEnter();
+    cocos::handleTouchPriority(this);
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {

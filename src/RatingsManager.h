@@ -40,7 +40,7 @@ public:
 
     static bool alreadyCached();
 
-    static void updateCacheFromSearch(int levelID, int tier);
+    static void updateCacheFromSearch(int levelID, const float rating);
 
     static int getCachedTier(int levelID);
 };
