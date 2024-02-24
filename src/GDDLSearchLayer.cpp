@@ -516,6 +516,8 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
         const int levelID = element["LevelID"];
         if (levelID > 3) { // to avoid official demons
             results.push_back(element["LevelID"]);
+            const float rating = element["Rating"];
+            RatingsManager::updateCacheFromSearch(levelID, rating);
         }
     }
     return results;
