@@ -465,7 +465,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addStringToRequest("name", name);
     request += addValueToRequest("lowTier", lowTier, 0);
     request += addValueToRequest("highTier", highTier, 0);
-    request += addValueToRequest("difficulty", difficulty+2, 7);
+    request += addValueToRequest("difficulty", difficulty+1, 7); // API 1.9.0 - diffs 1-5
     request += addStringToRequest("creator", creator);
     request += addStringToRequest("song", song);
     request += addBoolToRequest("exactName", exactName);
