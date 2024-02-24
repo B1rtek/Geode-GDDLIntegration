@@ -465,7 +465,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addStringToRequest("name", name);
     request += addValueToRequest("lowTier", lowTier, 0);
     request += addValueToRequest("highTier", highTier, 0);
-    request += addValueToRequest("difficulty", difficulty+1, 7); // API 1.9.0 - diffs 1-5
+    request += addValueToRequest("difficulty", difficulty+1, 6); // API 1.9.0 - diffs 1-5
     request += addStringToRequest("creator", creator);
     request += addStringToRequest("song", song);
     request += addBoolToRequest("exactName", exactName);
@@ -603,7 +603,10 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         const auto listLayer = LevelBrowserLayer::create(searchObject);
-        cocos::switchToScene(listLayer);
+        const auto listLayerScene = CCScene::create();
+        listLayerScene->addChild(listLayer);
+        auto transition = CCTransitionFade::create(0.5, listLayerScene);
+        CCDirector::sharedDirector()->pushScene(transition);
     }
 }
 
