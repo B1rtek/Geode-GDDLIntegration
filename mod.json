@@ -1,6 +1,6 @@
 {
 	"geode": "2.0.0",
-	"version": "v1.1.1",
+	"version": "v1.1.2",
 	"gd": {
 		"android": "2.205",
 		"win": "2.204"
@@ -8,7 +8,7 @@
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
 	"developer": "B1rtek",
-	"description": "Displays GDDL tiers of demons along with enjoyment ratings",
+	"description": "Integration with Geometry Dash Demon Ladder - level tiers, search and more",
 	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration",
 	"dependencies": [
 		{
