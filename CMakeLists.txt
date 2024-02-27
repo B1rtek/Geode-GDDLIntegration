@@ -14,7 +14,7 @@ file(GLOB SOURCES
 )
 
 include_directories(extlibs)
-add_subdirectory(extlibs/simpletest)
+add_subdirectory(extlibs/GeodeTest)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES}
