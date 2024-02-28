@@ -14,11 +14,16 @@ file(GLOB SOURCES
 )
 
 include_directories(extlibs)
+
+# GeodeTest
 add_subdirectory(extlibs/GeodeTest)
+if (DEFINED ENV{GEODE_TEST})
+    set(TEST_SOURCES tests/test.cpp)
+endif()
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES}
-        src/test.cpp)
+        ${TEST_SOURCES})
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
@@ -31,5 +36,7 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 # Set up dependencies, resources, link Geode
 setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:1.1.4)
 
-# GeodeTest :tm:
-target_link_libraries(${PROJECT_NAME} SimpleTest)
+# GeodeTest
+if (DEFINED ENV{GEODE_TEST})
+    target_link_libraries(${PROJECT_NAME} SimpleTest)
+endif()

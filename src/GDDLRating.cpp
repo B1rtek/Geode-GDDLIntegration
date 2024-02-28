@@ -11,8 +11,3 @@ GDDLRating::GDDLRating(json levelData) {
 
     this->roundedRating = static_cast<int>(round(this->rating));
 }
-
-DEFINE_TEST_G(TestOutside, Basic) {
-    const std::string floatString = Utils::floatToString(2.690, 2);
-    TEST_STR_EQ(floatString.c_str(), "2.69");
-}

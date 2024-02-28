@@ -1,5 +1,5 @@
 #include <GeodeTest/GeodeTest.h>
-#include "RatingsManager.h"
+#include "../src/RatingsManager.h"
 
 DEFINE_TEST_G(GDDLTest, TestName) {
     TEST_EQ(1, 2-1);
