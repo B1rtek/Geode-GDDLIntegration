@@ -1,7 +1,4 @@
 #include "Utils.h"
-
-#include <simpletest/simpletest.h>
-
 #include "RatingsManager.h"
 
 GDDLRating::GDDLRating(json levelData) {

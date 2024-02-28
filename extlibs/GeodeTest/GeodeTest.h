@@ -3,35 +3,9 @@
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/MenuLayer.hpp>
-#include <simpletest.h>
+#include "simpletest/simpletest.h"
 
 using namespace geode::prelude;
-
-DEFINE_TEST_G(TestMessageSpace, Basic)
-{
-    bool found = false;
-    for (TestFixture* i = TestFixture::GetFirstTest(); i; i = i->GetNextTest())
-    {
-        if (strcmp(i->TestName(), "MaxErrors") == 0 && strcmp(i->TestGroup(), "MaxErrors") == 0)
-        {
-            i->ExecuteTest();
-
-            int errorCount = 0;
-            for (TestError const* err = i->GetFirstError(); err != i->GetLastError(); err = err->next)
-            {
-                ++errorCount;
-            }
-
-            TEST_EQ(i->NumErrors(), i->NumTests());
-            TEST_EQ(i->NumErrors(), errorCount + 1);
-
-            found = true;
-            break;
-        }
-    }
-
-    TEST(found);
-}
 
 class $modify(GeodeTest, MenuLayer) {
     bool init() override {
@@ -42,7 +16,7 @@ class $modify(GeodeTest, MenuLayer) {
 
     void addTestButton() {
         auto tierSprite = CCSprite::createWithSpriteFrameName("GJ_hammerIcon_001.png");
-        auto button = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLTestLayer::onTest));
+        auto button = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GeodeTest::onTest));
         button->setContentSize({25.0f, 25.0f});
         button->setID("geode_test_button"_spr);
         CCMenu* rightSideMenu = dynamic_cast<CCMenu *>(getChildByIDRecursive("right-side-menu"));
@@ -52,7 +26,7 @@ class $modify(GeodeTest, MenuLayer) {
 
     void onTest(CCObject* sender)  {
         std::string result = "not owo";
-        if(TestFixture::ExecuteAllTests()) {
+        if(TestFixture::ExecuteAllTests(nullptr, nullptr, TestFixture::Verbose)) {
             result = "Pass";
         }
         log::debug("Test results: {}", result);
