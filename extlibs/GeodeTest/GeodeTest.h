@@ -25,11 +25,7 @@ class $modify(GeodeTest, MenuLayer) {
     }
 
     void onTest(CCObject* sender)  {
-        std::string result = "not owo";
-        if(TestFixture::ExecuteAllTests(nullptr, nullptr, TestFixture::Verbose)) {
-            result = "Pass";
-        }
-        log::debug("Test results: {}", result);
+        TestFixture::ExecuteAllTests(nullptr, nullptr, TestFixture::Verbose);
     }
 };
 
