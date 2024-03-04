@@ -1037,6 +1037,7 @@ void GDDLSearchLayer::onEnter()
 {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
+    restoreValuesAfterSplit(); // scene switching won't come back to the init() reset in creatorlayer
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
@@ -1198,4 +1199,9 @@ void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
     restoreValues();
     savedLowTier = -1;
+}
+
+void GDDLSearchLayer::onExit() {
+    FLAlertLayer::onExit();
+    tierLowTextfield->keyBackClicked();
 }

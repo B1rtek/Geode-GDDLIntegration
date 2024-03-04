@@ -198,6 +198,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     void onEnter() override;
 
 public:
+    void onExit() override;
+
+public:
     static GDDLSearchLayer *create();
     void show() override;
     static void loadSettings(); // called on game startup
