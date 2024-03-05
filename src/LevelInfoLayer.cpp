@@ -7,6 +7,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "GDDLLevelInfoPopup.h"
 
 using namespace geode::prelude;
 
@@ -180,17 +181,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
-        const auto rating = RatingsManager::getRating(m_level->m_levelID);
-        if (!rating) {
-            FLAlertLayer::create("GDDL Information", "Still loading...", "OK")->show();
-            return;
-        }
-        const auto info = rating.value();
-
-        const std::string tier = info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2);
-        const std::string enjoyment = info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2);
-        const std::string submissionCount = info.submissionCount == -1 ? "N/A" : std::to_string(info.submissionCount);
-
-        FLAlertLayer::create("GDDL Information", "<cr>Tier:</c> " + tier + "\n<cg>Enjoyment:</c> " + enjoyment + "\n<cy>Total submissions:</c> " + submissionCount, "Close")->show();
+        GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
     }
 };
