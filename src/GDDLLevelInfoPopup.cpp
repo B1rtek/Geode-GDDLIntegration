@@ -30,24 +30,26 @@ bool GDDLLevelInfoPopup::init()
     title->setID("gddl-level-info-title"_spr);
     title->setScale(0.9f);
     m_buttonMenu->addChild(title, 1);
-    title->setPosition({0.0f, popupSize.y/2-27.5f});
+    title->setPosition({0.0f, popupSize.y/2-27.5f}); // or basically the standard position below the top border for a title
 
     // content
     addLevelInfo();
 
     // open in browser button
-    const auto browserButtonSprite = ButtonSprite::create("Open in browser", "goldFont.fnt", "GJ_button_02.png");
+    const auto browserButtonSprite = CCSprite::createWithSpriteFrameName("GJ_undoBtn_001.png");
+    browserButtonSprite->setFlipX(true);
+    browserButtonSprite->setScale(0.9f);
     const auto openInBrowserButton = CCMenuItemSpriteExtra::create(browserButtonSprite, this, menu_selector(GDDLLevelInfoPopup::onOpenInBrowser));
     openInBrowserButton->setID("gddl-level-info-browser"_spr);
     m_buttonMenu->addChild(openInBrowserButton, 9);
-    openInBrowserButton->setPosition({0.0f, -(popupSize.y)/2.0f + 70.0f});
+    openInBrowserButton->setPosition({50.0f, -(popupSize.y)/2.0f + 30.0f});
 
     // ok button
     const auto spr = ButtonSprite::create("OK");
     const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLLevelInfoPopup::onClose));
     okButton->setID("gddl-level-info-ok"_spr);
     m_buttonMenu->addChild(okButton, 10);
-    okButton->setPosition({0.0f, -(popupSize.y)/2.0f + 30.0f});
+    okButton->setPosition({0.0f, -(popupSize.y)/2.0f + 30.0f}); // or basically the standard position above the bottom border for a button
 
     m_buttonMenu->updateLayout();
     m_mainLayer->updateLayout();
@@ -94,5 +96,5 @@ void GDDLLevelInfoPopup::addLevelInfo() {
     }
     const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false);
     m_buttonMenu->addChild(levelInfoLabels, 2);
-    levelInfoLabels->setPosition({0.0f, 25.0f});
+    levelInfoLabels->setPosition({0.0f, 5.0f});
 }
