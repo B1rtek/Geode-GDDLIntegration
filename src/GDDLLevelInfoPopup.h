@@ -9,6 +9,7 @@ class GDDLLevelInfoPopup final : public FLAlertLayer {
     explicit GDDLLevelInfoPopup(int levelId);
     bool init() override;
     void onClose(CCObject *sender);
+    void onOpenInBrowser(CCObject *sender);
 
     int levelID;
     const CCPoint popupSize = {300.0f, 200.0f};

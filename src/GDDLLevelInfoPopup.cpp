@@ -1,4 +1,7 @@
 #include "GDDLLevelInfoPopup.h"
+
+#include <Geode/utils/web.hpp>
+
 #include "RatingsManager.h"
 #include "Utils.h"
 
@@ -29,13 +32,16 @@ bool GDDLLevelInfoPopup::init() {
     addLevelInfo();
 
     // open in browser button
+    const auto browserButtonSprite = ButtonSprite::create("Open in browser", "goldFont.fnt", "GJ_button_02.png");
+    const auto openInBrowserButton = CCMenuItemSpriteExtra::create(browserButtonSprite, this, menu_selector(GDDLLevelInfoPopup::onOpenInBrowser));
+    openInBrowserButton->setID("gddl-level-info-browser"_spr);
+    m_buttonMenu->addChild(openInBrowserButton, 9);
 
     // ok button
     const auto spr = ButtonSprite::create("OK");
     const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLLevelInfoPopup::onClose));
     okButton->setID("gddl-level-info-ok"_spr);
-    m_buttonMenu->addChild(okButton);
-    m_buttonMenu->reorderChild(okButton, 10);
+    m_buttonMenu->addChild(okButton, 10);
 
     m_buttonMenu->updateLayout();
     m_mainLayer->updateLayout();
@@ -45,6 +51,11 @@ bool GDDLLevelInfoPopup::init() {
 void GDDLLevelInfoPopup::onClose(CCObject *sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
+}
+
+void GDDLLevelInfoPopup::onOpenInBrowser(CCObject *sender) {
+    std::string url = "https://gdladder.com/level/" + std::to_string(levelID);
+    web::openLinkInBrowser(url);
 }
 
 GDDLLevelInfoPopup *GDDLLevelInfoPopup::create(int levelID) {
