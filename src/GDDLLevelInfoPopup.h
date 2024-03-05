@@ -12,7 +12,7 @@ class GDDLLevelInfoPopup final : public FLAlertLayer {
     void onOpenInBrowser(CCObject *sender);
 
     int levelID;
-    const CCPoint popupSize = {300.0f, 200.0f};
+    const inline static CCPoint popupSize = {300.0f, 190.0f};
     void addLevelInfo();
     void addTextRow(const std::string& text, int zOrder);
 public:

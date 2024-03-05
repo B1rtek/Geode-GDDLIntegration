@@ -5,7 +5,8 @@
 #include "RatingsManager.h"
 #include "Utils.h"
 
-bool GDDLLevelInfoPopup::init() {
+bool GDDLLevelInfoPopup::init()
+{
     if(!FLAlertLayer::init(150)) return false;
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -18,15 +19,18 @@ bool GDDLLevelInfoPopup::init() {
 
     // menu with the main layout
     m_buttonMenu = cocos2d::CCMenu::create();
+    m_buttonMenu->setContentSize(popupSize);
     m_buttonMenu->setID("button-menu"_spr);
-    m_buttonMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)->setAutoScale(true));
+    // m_buttonMenu->setLayout(ColumnLayout::create()->setGap(5.0f)->setAxisReverse(true)); // this won't do
     m_mainLayer->addChild(m_buttonMenu, 10);
+    m_buttonMenu->setPosition({ winSize.width / 2, winSize.height / 2 });
 
     // title
     const auto title = CCLabelBMFont::create("GDDL Level Info", "goldFont.fnt");
     title->setID("gddl-level-info-title"_spr);
     title->setScale(0.9f);
     m_buttonMenu->addChild(title, 1);
+    title->setPosition({0.0f, popupSize.y/2-27.5f});
 
     // content
     addLevelInfo();
@@ -36,12 +40,14 @@ bool GDDLLevelInfoPopup::init() {
     const auto openInBrowserButton = CCMenuItemSpriteExtra::create(browserButtonSprite, this, menu_selector(GDDLLevelInfoPopup::onOpenInBrowser));
     openInBrowserButton->setID("gddl-level-info-browser"_spr);
     m_buttonMenu->addChild(openInBrowserButton, 9);
+    openInBrowserButton->setPosition({0.0f, -(popupSize.y)/2.0f + 70.0f});
 
     // ok button
     const auto spr = ButtonSprite::create("OK");
     const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLLevelInfoPopup::onClose));
     okButton->setID("gddl-level-info-ok"_spr);
     m_buttonMenu->addChild(okButton, 10);
+    okButton->setPosition({0.0f, -(popupSize.y)/2.0f + 30.0f});
 
     m_buttonMenu->updateLayout();
     m_mainLayer->updateLayout();
@@ -88,4 +94,5 @@ void GDDLLevelInfoPopup::addLevelInfo() {
     }
     const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false);
     m_buttonMenu->addChild(levelInfoLabels, 2);
+    levelInfoLabels->setPosition({0.0f, 25.0f});
 }
