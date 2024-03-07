@@ -47,11 +47,10 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->reorderChild(infoButton, 1);
     infoButton->setPosition({423.0f, -7.0f});
     // change interface button
-    const auto changeInterfaceSprite = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    changeInterfaceSprite->setRotation(90.0f);
+    const auto changeInterfaceSprite = CCSprite::createWithSpriteFrameName("GJ_undoBtn_001.png");
     const auto changeInterfaceButton = CCMenuItemSpriteExtra::create(changeInterfaceSprite, this, menu_selector(GDDLSearchLayer::onSwapLayout));
     m_buttonMenu->addChild(changeInterfaceButton, 1);
-    changeInterfaceButton->setPosition({popupSize.x-15.0f, -popupSize.y+22.0f});
+    changeInterfaceButton->setPosition({popupSize.x-10.0f, -popupSize.y+17.0f});
     // interface
     normalMenu = CCMenu::create();
     normalMenu->setID("gddl-demon-new-search-menu"_spr);
