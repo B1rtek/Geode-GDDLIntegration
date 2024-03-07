@@ -194,7 +194,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     void setSortDirectionLabel();
     // getters for the same thing
     static int getNumberTextfieldValue(CCTextInputNode *&textfield);
-    static float getFloatTextfieldValue(CCTextInputNode *&textfield);
+    static float getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue);
     void onEnter() override;
 
 public:

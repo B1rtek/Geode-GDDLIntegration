@@ -298,8 +298,8 @@ void GDDLSearchLayer::saveValues() {
         subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
         enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
         enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
-        enjLow = getFloatTextfieldValue(enjoymentLowTextfield);
-        enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
+        enjLow = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
+        enjHigh = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     } else {
         completed = completedTogglerSimple->isToggled();
         uncompleted = uncompletedTogglerSimple->isToggled();
@@ -802,25 +802,25 @@ void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
     const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentLowRight(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
     const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighLeft(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
@@ -972,7 +972,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     // and then
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10)); // always valid
     if(tierNumber != -1) {
         lowTier = tierNumber;
         highTier = tierNumber;
@@ -1024,13 +1024,29 @@ void GDDLSearchLayer::setSortDirectionLabel() {
 int GDDLSearchLayer::getNumberTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
-    return std::stoi(textfield->getString());
+    int returnValue;
+    try {
+        returnValue = std::stoi(textfield->getString());
+    } catch (std::invalid_argument &e) {
+        returnValue = 0;
+    } catch (std::out_of_range &e) {
+        returnValue = 0;
+    }
+    return returnValue;
 }
 
-float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield) {
+float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue) {
     if (textfield->getString().empty())
         return 0;
-    return std::stof(textfield->getString());
+    float returnValue = defaultValue;
+    try {
+        returnValue = std::stof(textfield->getString());
+    } catch (std::invalid_argument &e) {
+        returnValue = defaultValue;
+    } catch (std::out_of_range &e) {
+        returnValue = defaultValue;
+    }
+    return returnValue;
 }
 
 void GDDLSearchLayer::onEnter()
