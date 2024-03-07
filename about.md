@@ -1,4 +1,6 @@
 # <cr> GDDL Integration </c>
+Integration with [Geometry Dash Demon Ladder](https://gdladder.com/)  
+GDDL Discord server: https://discord.gg/gddl
 
 ## Features
 - Displays <cr>GDDL ratings</c> of demon levels, click on the <cb>button</c> to see more info about the level
