@@ -47,11 +47,10 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->reorderChild(infoButton, 1);
     infoButton->setPosition({423.0f, -7.0f});
     // change interface button
-    const auto changeInterfaceSprite = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    changeInterfaceSprite->setRotation(90.0f);
+    const auto changeInterfaceSprite = CCSprite::createWithSpriteFrameName("GJ_undoBtn_001.png");
     const auto changeInterfaceButton = CCMenuItemSpriteExtra::create(changeInterfaceSprite, this, menu_selector(GDDLSearchLayer::onSwapLayout));
     m_buttonMenu->addChild(changeInterfaceButton, 1);
-    changeInterfaceButton->setPosition({popupSize.x-15.0f, -popupSize.y+22.0f});
+    changeInterfaceButton->setPosition({popupSize.x-10.0f, -popupSize.y+17.0f});
     // interface
     normalMenu = CCMenu::create();
     normalMenu->setID("gddl-demon-new-search-menu"_spr);
@@ -298,8 +297,8 @@ void GDDLSearchLayer::saveValues() {
         subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
         enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
         enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
-        enjLow = getFloatTextfieldValue(enjoymentLowTextfield);
-        enjHigh = getFloatTextfieldValue(enjoymentHighTextfield);
+        enjLow = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
+        enjHigh = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     } else {
         completed = completedTogglerSimple->isToggled();
         uncompleted = uncompletedTogglerSimple->isToggled();
@@ -802,25 +801,25 @@ void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
     const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentLowRight(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
     const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighLeft(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     const float newValue = calculateNewFloat(currentValue, false, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
-    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield);
+    const float currentValue = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     const float newValue = calculateNewFloat(currentValue, true, 0.0f, highestEnjoyment);
     setNumberFloatTextfield(newValue, enjoymentHighTextfield);
 }
@@ -972,7 +971,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     // and then
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10)); // always valid
     if(tierNumber != -1) {
         lowTier = tierNumber;
         highTier = tierNumber;
@@ -1024,19 +1023,36 @@ void GDDLSearchLayer::setSortDirectionLabel() {
 int GDDLSearchLayer::getNumberTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
-    return std::stoi(textfield->getString());
+    int returnValue;
+    try {
+        returnValue = std::stoi(textfield->getString());
+    } catch (std::invalid_argument &e) {
+        returnValue = 0;
+    } catch (std::out_of_range &e) {
+        returnValue = 0;
+    }
+    return returnValue;
 }
 
-float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield) {
+float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue) {
     if (textfield->getString().empty())
         return 0;
-    return std::stof(textfield->getString());
+    float returnValue = defaultValue;
+    try {
+        returnValue = std::stof(textfield->getString());
+    } catch (std::invalid_argument &e) {
+        returnValue = defaultValue;
+    } catch (std::out_of_range &e) {
+        returnValue = defaultValue;
+    }
+    return returnValue;
 }
 
 void GDDLSearchLayer::onEnter()
 {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
+    restoreValuesAfterSplit(); // scene switching won't come back to the init() reset in creatorlayer
 }
 
 GDDLSearchLayer *GDDLSearchLayer::create() {
@@ -1198,4 +1214,20 @@ void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
     restoreValues();
     savedLowTier = -1;
+}
+
+void GDDLSearchLayer::onExit() {
+    FLAlertLayer::onExit();
+    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27 fix??
+    nameTextfield->onClickTrackNode(false);
+    creatorTextfield->onClickTrackNode(false);
+    songTextfield->onClickTrackNode(false);
+    tierLowTextfield->onClickTrackNode(false);
+    tierHighTextfield->onClickTrackNode(false);
+    enjoymentLowTextfield->onClickTrackNode(false);
+    enjoymentHighTextfield->onClickTrackNode(false);
+    submissionsCountHighTextfield->onClickTrackNode(false);
+    submissionsCountLowTextfield->onClickTrackNode(false);
+    enjSubmissionsCountHighTextfield->onClickTrackNode(false);
+    enjSubmissionsCountLowTextfield->onClickTrackNode(false);
 }
