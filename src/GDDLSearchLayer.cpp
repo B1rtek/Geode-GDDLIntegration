@@ -1218,5 +1218,16 @@ void GDDLSearchLayer::restoreValuesAfterSplit() {
 
 void GDDLSearchLayer::onExit() {
     FLAlertLayer::onExit();
-    tierLowTextfield->keyBackClicked();
+    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27 fix??
+    nameTextfield->onClickTrackNode(false);
+    creatorTextfield->onClickTrackNode(false);
+    songTextfield->onClickTrackNode(false);
+    tierLowTextfield->onClickTrackNode(false);
+    tierHighTextfield->onClickTrackNode(false);
+    enjoymentLowTextfield->onClickTrackNode(false);
+    enjoymentHighTextfield->onClickTrackNode(false);
+    submissionsCountHighTextfield->onClickTrackNode(false);
+    submissionsCountLowTextfield->onClickTrackNode(false);
+    enjSubmissionsCountHighTextfield->onClickTrackNode(false);
+    enjSubmissionsCountLowTextfield->onClickTrackNode(false);
 }
