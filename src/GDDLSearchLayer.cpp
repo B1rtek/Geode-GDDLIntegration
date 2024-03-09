@@ -949,6 +949,7 @@ void GDDLSearchLayer::onSortDirectionRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
+    if (searching) return; // super good multithreaded code
     saveValues();
     totalOnlineResults = 0;
     cachedResults.clear();
@@ -967,6 +968,7 @@ void GDDLSearchLayer::onSwapLayout(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
+    if (searching) return; // super good multithreaded code
     // save values before replacing them
     saveValues();
     cacheValues();
@@ -1050,6 +1052,7 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float
 void GDDLSearchLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
+    stopSearch();
     restoreValuesAfterSplit(); // scene switching won't come back to the init() reset in creatorlayer
 }
 
@@ -1176,6 +1179,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
+    if (searching) return; // super good multithreaded code
     // save values before replacing them
     cacheValues();
     // and then

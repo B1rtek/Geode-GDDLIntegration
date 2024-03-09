@@ -105,6 +105,7 @@ void GDDLDemonSplitLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
     GDDLSearchLayer::restoreValuesAfterSplit();
+    GDDLSearchLayer::stopSearch();
 }
 
 CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
