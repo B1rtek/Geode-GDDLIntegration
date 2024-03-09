@@ -978,6 +978,8 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
         highTier = tierNumber;
     } else {
         removeRated = true;
+        lowTier = 0;
+        highTier = 0;
     }
     completed = completedTogglerSimple->isToggled();
     uncompleted = uncompletedTogglerSimple->isToggled();
