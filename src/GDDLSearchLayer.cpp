@@ -1024,13 +1024,11 @@ void GDDLSearchLayer::setSortDirectionLabel() {
 int GDDLSearchLayer::getNumberTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
-    int returnValue;
-    try {
-        returnValue = std::stoi(textfield->getString());
-    } catch (std::invalid_argument &e) {
-        returnValue = 0;
-    } catch (std::out_of_range &e) {
-        returnValue = 0;
+    // instead of try/catch because of android
+    int returnValue = 0;
+    auto returnValueResult = numFromString<int>(textfield->getString());
+    if (returnValueResult.isOk()) {
+        returnValue = returnValueResult.value();
     }
     return returnValue;
 }
@@ -1039,18 +1037,14 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float
     if (textfield->getString().empty())
         return 0;
     float returnValue = defaultValue;
-    try {
-        returnValue = std::stof(textfield->getString());
-    } catch (std::invalid_argument &e) {
-        returnValue = defaultValue;
-    } catch (std::out_of_range &e) {
-        returnValue = defaultValue;
+    auto returnValueResult = numFromString<float>(textfield->getString());
+    if (returnValueResult.isOk()) {
+        returnValue = returnValueResult.value();
     }
     return returnValue;
 }
 
-void GDDLSearchLayer::onEnter()
-{
+void GDDLSearchLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
     restoreValuesAfterSplit(); // scene switching won't come back to the init() reset in creatorlayer
