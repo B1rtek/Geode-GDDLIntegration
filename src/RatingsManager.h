@@ -21,8 +21,6 @@ class RatingsManager {
 
     static void populateFromSave();
 
-    static void cacheList();
-
 public:
     static int getDemonTier(int id);
 
@@ -43,6 +41,8 @@ public:
     static void updateCacheFromSearch(int levelID, const float rating);
 
     static int getCachedTier(int levelID);
+
+    static void cacheList();
 };
 
 
