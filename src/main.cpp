@@ -57,4 +57,9 @@ class $modify(MenuLayer) {
         }
         return true;
     }
+
+    void onQuit(cocos2d::CCObject* sender) {
+        MenuLayer::onQuit(sender);
+        RatingsManager::cacheList(); // cache modified list on every exit
+    }
 };

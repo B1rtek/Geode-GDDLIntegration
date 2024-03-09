@@ -195,7 +195,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // getters for the same thing
     static int getNumberTextfieldValue(CCTextInputNode *&textfield);
     static float getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue);
+    // bug fixes
     void onEnter() override;
+    void clickOffTextfields();
 
 public:
     void onExit() override;

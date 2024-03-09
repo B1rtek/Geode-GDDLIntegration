@@ -237,6 +237,7 @@ void GDDLSearchLayer::showPage() {
         m_mainLayer->reorderChild(simplifiedMenu, 0);
         m_mainLayer->reorderChild(normalMenu, 1);
     } else { // the other way lmao
+        clickOffTextfields(); // typing into invisible textfields crash prevention
         normalMenu->setVisible(false);
         if(!simplifiedLoaded) {
             loadPageSimple();
@@ -481,6 +482,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
+    log::debug("Search request: {}", request);
     return request;
 }
 
@@ -947,6 +949,7 @@ void GDDLSearchLayer::onSortDirectionRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
+    if (searching) return; // super good multithreaded code
     saveValues();
     totalOnlineResults = 0;
     cachedResults.clear();
@@ -965,6 +968,7 @@ void GDDLSearchLayer::onSwapLayout(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onTierSearch(CCObject *sender) {
+    if (searching) return; // super good multithreaded code
     // save values before replacing them
     saveValues();
     cacheValues();
@@ -977,6 +981,8 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
         highTier = tierNumber;
     } else {
         removeRated = true;
+        lowTier = 0;
+        highTier = 0;
     }
     completed = completedTogglerSimple->isToggled();
     uncompleted = uncompletedTogglerSimple->isToggled();
@@ -1023,13 +1029,11 @@ void GDDLSearchLayer::setSortDirectionLabel() {
 int GDDLSearchLayer::getNumberTextfieldValue(CCTextInputNode *&textfield) {
     if (textfield->getString().empty())
         return 0;
-    int returnValue;
-    try {
-        returnValue = std::stoi(textfield->getString());
-    } catch (std::invalid_argument &e) {
-        returnValue = 0;
-    } catch (std::out_of_range &e) {
-        returnValue = 0;
+    // instead of try/catch because of android
+    int returnValue = 0;
+    auto returnValueResult = numFromString<int>(textfield->getString());
+    if (returnValueResult.isOk()) {
+        returnValue = returnValueResult.value();
     }
     return returnValue;
 }
@@ -1038,20 +1042,17 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float
     if (textfield->getString().empty())
         return 0;
     float returnValue = defaultValue;
-    try {
-        returnValue = std::stof(textfield->getString());
-    } catch (std::invalid_argument &e) {
-        returnValue = defaultValue;
-    } catch (std::out_of_range &e) {
-        returnValue = defaultValue;
+    auto returnValueResult = numFromString<float>(textfield->getString());
+    if (returnValueResult.isOk()) {
+        returnValue = returnValueResult.value();
     }
     return returnValue;
 }
 
-void GDDLSearchLayer::onEnter()
-{
+void GDDLSearchLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
+    stopSearch();
     restoreValuesAfterSplit(); // scene switching won't come back to the init() reset in creatorlayer
 }
 
@@ -1178,11 +1179,18 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
+    if (searching) return; // super good multithreaded code
     // save values before replacing them
     cacheValues();
     // and then
-    lowTier = tier;
-    highTier = tier;
+    if (tier == -1) {
+        removeRated = true;
+        lowTier = 0;
+        highTier = 0;
+    } else {
+        lowTier = tier;
+        highTier = tier;
+    }
     completed = true;
     uncompleted = false;
     totalOnlineResults = 0;
@@ -1212,22 +1220,29 @@ void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
+    log::debug("{}", "Values restored");
     restoreValues();
     savedLowTier = -1;
 }
 
 void GDDLSearchLayer::onExit() {
     FLAlertLayer::onExit();
-    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27 fix??
-    nameTextfield->onClickTrackNode(false);
-    creatorTextfield->onClickTrackNode(false);
-    songTextfield->onClickTrackNode(false);
-    tierLowTextfield->onClickTrackNode(false);
-    tierHighTextfield->onClickTrackNode(false);
-    enjoymentLowTextfield->onClickTrackNode(false);
-    enjoymentHighTextfield->onClickTrackNode(false);
-    submissionsCountHighTextfield->onClickTrackNode(false);
-    submissionsCountLowTextfield->onClickTrackNode(false);
-    enjSubmissionsCountHighTextfield->onClickTrackNode(false);
-    enjSubmissionsCountLowTextfield->onClickTrackNode(false);
+    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27
+    clickOffTextfields();
+}
+
+void GDDLSearchLayer::clickOffTextfields() {
+    if(!simplified) { // if you do that in the simplified menu it'll crash if the full menu wasn't loaded
+        nameTextfield->onClickTrackNode(false);
+        creatorTextfield->onClickTrackNode(false);
+        songTextfield->onClickTrackNode(false);
+        tierLowTextfield->onClickTrackNode(false);
+        tierHighTextfield->onClickTrackNode(false);
+        enjoymentLowTextfield->onClickTrackNode(false);
+        enjoymentHighTextfield->onClickTrackNode(false);
+        submissionsCountHighTextfield->onClickTrackNode(false);
+        submissionsCountLowTextfield->onClickTrackNode(false);
+        enjSubmissionsCountHighTextfield->onClickTrackNode(false);
+        enjSubmissionsCountLowTextfield->onClickTrackNode(false);
+    }
 }
