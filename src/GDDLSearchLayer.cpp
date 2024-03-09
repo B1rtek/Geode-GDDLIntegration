@@ -237,6 +237,7 @@ void GDDLSearchLayer::showPage() {
         m_mainLayer->reorderChild(simplifiedMenu, 0);
         m_mainLayer->reorderChild(normalMenu, 1);
     } else { // the other way lmao
+        clickOffTextfields(); // typing into invisible textfields crash prevention
         normalMenu->setVisible(false);
         if(!simplifiedLoaded) {
             loadPageSimple();
@@ -1219,15 +1220,21 @@ void GDDLSearchLayer::restoreValuesAfterSplit() {
 void GDDLSearchLayer::onExit() {
     FLAlertLayer::onExit();
     // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27 fix??
-    nameTextfield->onClickTrackNode(false);
-    creatorTextfield->onClickTrackNode(false);
-    songTextfield->onClickTrackNode(false);
-    tierLowTextfield->onClickTrackNode(false);
-    tierHighTextfield->onClickTrackNode(false);
-    enjoymentLowTextfield->onClickTrackNode(false);
-    enjoymentHighTextfield->onClickTrackNode(false);
-    submissionsCountHighTextfield->onClickTrackNode(false);
-    submissionsCountLowTextfield->onClickTrackNode(false);
-    enjSubmissionsCountHighTextfield->onClickTrackNode(false);
-    enjSubmissionsCountLowTextfield->onClickTrackNode(false);
+    clickOffTextfields();
+}
+
+void GDDLSearchLayer::clickOffTextfields() {
+    if(!simplified) { // if you do that in the simplified menu it'll crash if the full menu wasn't loaded
+        nameTextfield->onClickTrackNode(false);
+        creatorTextfield->onClickTrackNode(false);
+        songTextfield->onClickTrackNode(false);
+        tierLowTextfield->onClickTrackNode(false);
+        tierHighTextfield->onClickTrackNode(false);
+        enjoymentLowTextfield->onClickTrackNode(false);
+        enjoymentHighTextfield->onClickTrackNode(false);
+        submissionsCountHighTextfield->onClickTrackNode(false);
+        submissionsCountLowTextfield->onClickTrackNode(false);
+        enjSubmissionsCountHighTextfield->onClickTrackNode(false);
+        enjSubmissionsCountLowTextfield->onClickTrackNode(false);
+    }
 }
