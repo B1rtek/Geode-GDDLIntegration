@@ -482,6 +482,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
+    log::debug("Search request: {}", request);
     return request;
 }
 
@@ -1178,8 +1179,14 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     // save values before replacing them
     cacheValues();
     // and then
-    lowTier = tier;
-    highTier = tier;
+    if (tier == -1) {
+        removeRated = true;
+        lowTier = 0;
+        highTier = 0;
+    } else {
+        lowTier = tier;
+        highTier = tier;
+    }
     completed = true;
     uncompleted = false;
     totalOnlineResults = 0;
@@ -1209,13 +1216,14 @@ void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
+    log::debug("{}", "Values restored");
     restoreValues();
     savedLowTier = -1;
 }
 
 void GDDLSearchLayer::onExit() {
     FLAlertLayer::onExit();
-    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27 fix??
+    // https://github.com/B1rtek/Geode-GDDLIntegration/issues/27
     clickOffTextfields();
 }
 

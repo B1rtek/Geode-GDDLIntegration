@@ -8,7 +8,7 @@
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
 
-    const CCPoint popupSize = {360.0f, 200.0f};
+    const CCPoint popupSize = {360.0f, 225.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // background
     const auto bg = CCScale9Sprite::create("GJ_square02.png", {0.0f, 0.0f, 80.0f, 80.0f});
@@ -52,6 +52,10 @@ bool GDDLDemonSplitLayer::init() {
         m_buttonMenu->addChild(rowNode);
         m_buttonMenu->reorderChild(rowNode, row+1);
     }
+    // unrated tier
+    const auto unratedTierNode = createTierNode(-1);
+    m_buttonMenu->addChild(unratedTierNode, 7);
+
     // ok button
     const auto spr = ButtonSprite::create("OK");
     const auto okButton = CCMenuItemSpriteExtra::create(spr, this, menu_selector(GDDLDemonSplitLayer::onClose));
@@ -92,6 +96,7 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
+    log::debug("Requesting tier {}", std::to_string(tierNumber));
     GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber);
     // the list should display itself hopefully
 }
@@ -99,6 +104,7 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
 void GDDLDemonSplitLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
+    GDDLSearchLayer::restoreValuesAfterSplit();
 }
 
 CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
@@ -106,7 +112,8 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
     tierNode->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     tierNode->setContentSize({50.0f, 20.0f});
     // tier sprite
-    const std::string tierSpriteName = "tier_" + std::to_string(tier) + ".png";
+    std::string tierStrName = tier != -1 ? std::to_string(tier) : "unrated";
+    const std::string tierSpriteName = "tier_" + tierStrName + ".png";
     const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
     const auto tierSprite = CCSprite::create(textureName);
     tierSprite->setScale(0.05f);
