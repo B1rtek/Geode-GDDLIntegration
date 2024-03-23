@@ -10,3 +10,13 @@ GDDLRating::GDDLRating(json levelData) {
 
     this->roundedRating = static_cast<int>(round(this->rating));
 }
+
+GDDLRating GDDLRating::createInvalid() {
+    auto rating = GDDLRating();
+    rating.ratingCount = -1;
+    return rating;
+}
+
+bool GDDLRating::isInvalid() const {
+    return ratingCount == -1;
+}

@@ -51,8 +51,12 @@ std::vector<int> RatingsManager::tierColors = {
 std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
-    const json levelData = json::parse(response);
-    return GDDLRating(levelData);
+    try {
+        const json levelData = json::parse(response);
+        return GDDLRating(levelData);
+    } catch (json::parse_error &error) {
+        return GDDLRating::createInvalid();
+    }
 }
 
 cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
@@ -72,19 +76,27 @@ cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
  * If the list is over a week old, don't load data from it
  */
 void RatingsManager::populateFromSave() {
-    if (!Utils::fileExists(cachedListPath))
+    if (!Utils::fileExists(cachedListPath)) {
         return;
+    }
     std::ifstream f(cachedListPath);
-    json data = json::parse(f);
-    const unsigned int cachedTimestamp = data["cached"];
-    // ReSharper disable once CppTooWideScopeInitStatement
-    const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
-    if (currentTimestamp - cachedTimestamp < 86400 * 7) { // list less than 7 days old, load it
-        for (auto idRatingPair: data["list"]) {
-            const int id = idRatingPair["ID"];
-            const int rating = idRatingPair["Rating"];
-            ratingsCache[id] = rating;
+    if (Utils::fileIsEmpty(f)) {
+        return;
+    }
+    try {
+        json data = json::parse(f);
+        const unsigned int cachedTimestamp = data["cached"];
+        // ReSharper disable once CppTooWideScopeInitStatement
+        const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
+        if (currentTimestamp - cachedTimestamp < 86400 * 7) { // list less than 7 days old, load it
+            for (auto idRatingPair: data["list"]) {
+                const int id = idRatingPair["ID"];
+                const int rating = idRatingPair["Rating"];
+                ratingsCache[id] = rating;
+            }
         }
+    } catch (json::parse_error &error) {
+        // just do nothing, the user will be notified that stuff happened
     }
 }
 
@@ -131,20 +143,27 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
     if (response.empty())
         return false;
     const GDDLRating rating = parseJson(response);
+    if (rating.isInvalid()) {
+        return false;
+    }
     demonMap[id] = rating;
     return true;
 }
 
 void RatingsManager::cacheRatings(const std::string &response) {
     // ReSharper disable once CppTooWideScopeInitStatement
-    json ratingsData = json::parse(response);
-    for (auto element: ratingsData) {
-        const int id = element["ID"];
-        const float rating = element["Rating"].is_null() ? -1.0f : static_cast<float>(element["Rating"]);
-        const int roundedRating = static_cast<int>(round(rating));
-        ratingsCache[id] = roundedRating;
+    try {
+        json ratingsData = json::parse(response);
+        for (auto element: ratingsData) {
+            const int id = element["ID"];
+            const float rating = element["Rating"].is_null() ? -1.0f : static_cast<float>(element["Rating"]);
+            const int roundedRating = static_cast<int>(round(rating));
+            ratingsCache[id] = roundedRating;
+        }
+        cacheList();
+    } catch (json::parse_error &error) {
+        // just do nothing, the user will be notified that stuff happened
     }
-    cacheList();
 }
 
 std::map<int, int> RatingsManager::getTierStats() {
