@@ -50,12 +50,19 @@ class $modify(MenuLayer) {
             .text()
             .then([](std::string const& response) {
                 RatingsManager::cacheRatings(response);
+                if(!RatingsManager::alreadyCached()) {
+                    somethingWentWrong();
+                }
             })
             .expect([](std::string const& error) {
-                FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
+                somethingWentWrong();
             });
         }
         return true;
+    }
+
+    static void somethingWentWrong() {
+        FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
     }
 
     void onQuit(cocos2d::CCObject* sender) {
