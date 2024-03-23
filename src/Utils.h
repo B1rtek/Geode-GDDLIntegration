@@ -24,6 +24,12 @@ public:
         return stat(name.c_str(), &buffer) == 0;
     }
 
+    // https://stackoverflow.com/questions/2390912/checking-for-an-empty-file-in-c
+    static bool fileIsEmpty(std::ifstream& pFile)
+    {
+        return pFile.peek() == std::ifstream::traits_type::eof();
+    }
+
     template<typename T>
     static std::vector<T> copySetToVector(std::set<T> setToCopy) {
         std::vector<T> vec;
