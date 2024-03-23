@@ -13,6 +13,7 @@ class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
+    inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
     static GDDLRating parseJson(const std::string& response);
@@ -22,6 +23,8 @@ class RatingsManager {
     static void populateFromSave();
 
 public:
+    inline static bool triedToCache = false;
+
     static int getDemonTier(int id);
 
     static cocos2d::ccColor3B getTierColor(int tier);
@@ -42,7 +45,7 @@ public:
 
     static int getCachedTier(int levelID);
 
-    static void cacheList();
+    static void cacheList(bool onQuit);
 };
 
 

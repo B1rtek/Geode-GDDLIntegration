@@ -44,7 +44,8 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached()) {
+        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
+            RatingsManager::triedToCache = true;
             web::AsyncWebRequest()
             .fetch("https://gdladder.com/api/theList")
             .text()
@@ -67,6 +68,6 @@ class $modify(MenuLayer) {
 
     void onQuit(cocos2d::CCObject* sender) {
         MenuLayer::onQuit(sender);
-        RatingsManager::cacheList(); // cache modified list on every exit
+        RatingsManager::cacheList(true); // cache modified list on every exit
     }
 };

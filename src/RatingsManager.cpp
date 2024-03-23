@@ -54,7 +54,7 @@ GDDLRating RatingsManager::parseJson(const std::string& response) {
     try {
         const json levelData = json::parse(response);
         return GDDLRating(levelData);
-    } catch (json::parse_error &error) {
+    } catch (json::exception &error) {
         return GDDLRating::createInvalid();
     }
 }
@@ -85,24 +85,30 @@ void RatingsManager::populateFromSave() {
     }
     try {
         json data = json::parse(f);
-        const unsigned int cachedTimestamp = data["cached"];
+        cacheTimestamp = data["cached"];
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
-        if (currentTimestamp - cachedTimestamp < 86400 * 7) { // list less than 7 days old, load it
+        if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
             for (auto idRatingPair: data["list"]) {
                 const int id = idRatingPair["ID"];
                 const int rating = idRatingPair["Rating"];
                 ratingsCache[id] = rating;
             }
         }
-    } catch (json::parse_error &error) {
+    } catch (json::exception &error) {
         // just do nothing, the user will be notified that stuff happened
     }
 }
 
-void RatingsManager::cacheList() {
+void RatingsManager::cacheList(bool onQuit) {
     json cachedList;
-    cachedList["cached"] = Utils::getCurrentTimestamp();
+    if (!onQuit) {
+        // update the timestamp because we're saving a new list
+        cacheTimestamp = Utils::getCurrentTimestamp(); // NOLINT(*-narrowing-conversions)
+        // else: if it was 0 then the request failed and will be tried again on the next game launch
+        // otherwise we retain the last value to keep track of the 7 days cache age
+    }
+    cachedList["cached"] = cacheTimestamp;
     std::vector<json> idRatingPairs;
     json element;
     for (auto [id, rating]: ratingsCache) {
@@ -160,8 +166,8 @@ void RatingsManager::cacheRatings(const std::string &response) {
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
-        cacheList();
-    } catch (json::parse_error &error) {
+        cacheList(false);
+    } catch (json::exception &error) {
         // just do nothing, the user will be notified that stuff happened
     }
 }
