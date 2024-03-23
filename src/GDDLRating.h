@@ -18,6 +18,10 @@ public:
     int ratingCount;
     int enjoymentCount;
     int submissionCount;
+
+    static GDDLRating createInvalid();
+
+    bool isInvalid() const;
 };
 
 

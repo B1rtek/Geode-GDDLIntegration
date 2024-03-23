@@ -44,22 +44,30 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached()) {
+        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
+            RatingsManager::triedToCache = true;
             web::AsyncWebRequest()
             .fetch("https://gdladder.com/api/theList")
             .text()
             .then([](std::string const& response) {
                 RatingsManager::cacheRatings(response);
+                if(!RatingsManager::alreadyCached()) {
+                    somethingWentWrong();
+                }
             })
             .expect([](std::string const& error) {
-                FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
+                somethingWentWrong();
             });
         }
         return true;
     }
 
+    static void somethingWentWrong() {
+        FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
+    }
+
     void onQuit(cocos2d::CCObject* sender) {
         MenuLayer::onQuit(sender);
-        RatingsManager::cacheList(); // cache modified list on every exit
+        RatingsManager::cacheList(true); // cache modified list on every exit
     }
 };
