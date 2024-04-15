@@ -1249,4 +1249,6 @@ void GDDLSearchLayer::clickOffTextfields() {
         enjSubmissionsCountHighTextfield->onClickTrackNode(false);
         enjSubmissionsCountLowTextfield->onClickTrackNode(false);
     }
+    // apart from that click off the stock search bar as well - https://github.com/B1rtek/Geode-GDDLIntegration/issues/33
+    dynamic_cast<CCTextInputNode*>(getParent()->getChildByIDRecursive("search-bar"))->onClickTrackNode(false);
 }
