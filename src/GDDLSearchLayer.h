@@ -117,7 +117,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void cacheValues();
     static void restoreValues();
     void onClose(CCObject *sender);
-    TodoReturn keyBackClicked() override;
+    void keyBackClicked() override;
     void onInfo(CCObject *sender);
     // request related
     static std::string urlEncodeString(std::string toEncode);

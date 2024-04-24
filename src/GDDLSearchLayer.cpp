@@ -411,7 +411,7 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     removeFromParentAndCleanup(true);
 }
 
-TodoReturn GDDLSearchLayer::keyBackClicked() {
+void GDDLSearchLayer::keyBackClicked() {
     saveValues();
     FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
