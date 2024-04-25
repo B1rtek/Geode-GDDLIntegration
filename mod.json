@@ -48,17 +48,6 @@
 				"slider": true
 			}
 		},
-		"move-gddl-search-button-down": {
-			"name": "Move GDDL Search button down",
-			"description": "Moves the GDDL Search button down a set number of spots, useful if you have Loquibot or other mods that also place buttons in the search menu which can result in buttons overlapping",
-			"type": "int",
-			"default": 0,
-			"min": 0,
-			"max": 3,
-			"control": {
-				"slider": true
-			}
-		},
 		"legacy-gddl-tier-label": {
 			"name": "Old GDDL Tier label",
 			"description": "Changes the tier button on the level info page into a clickable label, just like it used to be in the early versions of this mod",
