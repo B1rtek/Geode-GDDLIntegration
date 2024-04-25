@@ -10,7 +10,7 @@ project(GDDLIntegration VERSION 1.0.0)
 # to recursively add all source files 
 # under src/ 
 file(GLOB SOURCES
-	src/*.cpp src/*.h
+	src/*.cpp src/*.h src/*/*.cpp src/*/*.h
 )
 
 include_directories(extlibs)
