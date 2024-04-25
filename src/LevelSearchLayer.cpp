@@ -16,15 +16,15 @@ class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     }
 
     void addGDDLButton() {
-        std::string textureName = Mod::get()->expandSpriteName("tier_unrated.png");
-        auto tierSprite = CCSprite::create(textureName.c_str());
+        const std::string textureName = Mod::get()->expandSpriteName("tier_unrated.png");
+        const auto tierSprite = CCSprite::create(textureName.c_str());
         tierSprite->setScale(0.235f);
-        auto button = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLLevelSearchLayer::onGDDLSearch));
+        const auto button = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLLevelSearchLayer::onGDDLSearch));
         button->setContentSize({30.0f, 30.0f});
         button->setID("gddl_search_button"_spr);
-        getChildByIDRecursive("other-filter-menu")->addChild(button);
-        auto buttonAbove = getChildByIDRecursive("lists-button");
-        button->setPosition({buttonAbove->getPositionX(), buttonAbove->getPositionY()-(50.0f * (static_cast<float>(Mod::get()->getSettingValue<int64_t>("move-gddl-search-button-down") + 1)))});
+        const auto otherFilterMenu = getChildByIDRecursive("other-filter-menu");
+        otherFilterMenu->addChild(button);
+        otherFilterMenu->updateLayout();
     }
 
     void onGDDLSearch(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
