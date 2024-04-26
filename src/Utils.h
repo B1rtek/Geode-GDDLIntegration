@@ -125,5 +125,19 @@ public:
             textfield->setString("");
         }
     }
+
+    static void scaleLabelToWidth(CCLabelBMFont *&label, const float maxWidth) {
+        const float scale =
+                0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
+        label->setScale(scale);
+    }
+
+    static void createLabel(CCLayer *parent, const std::string &font, const std::string &text, float maxWidth,
+                            const CCPoint &position, int zOrder = 1) {
+        auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
+        parent->addChild(label, zOrder);
+        label->setPosition(position);
+        scaleLabelToWidth(label, maxWidth);
+    }
 };
 #endif // GDDL_UTILS_H
