@@ -85,74 +85,74 @@ void GDDLSearchLayer::loadPageFull() {
     // column 1
     // level name
     createLabel(normalMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -37.5f});
-    createTextInputNode(normalMenu, nameTextfield, "bigFont.fnt", "", 32, {80.0f, 25.0f}, {60.0f, -62.5f});
+    Utils::createTextInputNode(normalMenu, nameTextfield, "bigFont.fnt", "", 32, {80.0f, 25.0f}, {60.0f, -62.5f});
     createCheckbox(normalMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f},
                    menu_selector(GDDLSearchLayer::onToggleExactMatch));
     // creator
     createLabel(normalMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -97.5f});
-    createTextInputNode(normalMenu, creatorTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -122.5f});
+    Utils::createTextInputNode(normalMenu, creatorTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -122.5f});
     // song name
     createLabel(normalMenu, "bigFont.fnt", "Song name", 110.0f, {75.0f, -157.5f});
-    createTextInputNode(normalMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
+    Utils::createTextInputNode(normalMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
     // in-game difficulty
     createLabel(normalMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
     auto bg = createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
                                    {110.0f, 25.0f});
-    createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onInGameRatingLeft),
+    Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onInGameRatingLeft),
                                  menu_selector(GDDLSearchLayer::onInGameRatingRight));
 
     // column 2
     // rating range
     createLabel(normalMenu, "bigFont.fnt", "Tiers", 110.0f, {220.0f, -37.5f});
-    createTextInputNode(normalMenu, tierLowTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {182.5f, -62.5f});
+    Utils::createTextInputNode(normalMenu, tierLowTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {182.5f, -62.5f});
     tierLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(normalMenu, tierHighTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {257.5f, -62.5f});
+    Utils::createTextInputNode(normalMenu, tierHighTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f}, {257.5f, -62.5f});
     tierHighTextfield->setAllowedChars("1234567890");
-    createLeftRightButtonsAround(tierLowTextfield, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onTierLowLeft),
+    Utils::createLeftRightButtonsAround(tierLowTextfield, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onTierLowLeft),
                                  menu_selector(GDDLSearchLayer::onTierLowRight));
-    createLeftRightButtonsAround(tierHighTextfield, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onTierHighLeft),
+    Utils::createLeftRightButtonsAround(tierHighTextfield, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onTierHighLeft),
                                  menu_selector(GDDLSearchLayer::onTierHighRight));
     createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -62.5f});
     // enjoyment range
     createLabel(normalMenu, "bigFont.fnt", "Enjoyment rating", 110.0f, {220.0f, -97.5f});
-    createTextInputNode(normalMenu, enjoymentLowTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {182.5f, -122.5f});
+    Utils::createTextInputNode(normalMenu, enjoymentLowTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {182.5f, -122.5f});
     enjoymentLowTextfield->setAllowedChars("1234567890.");
-    createTextInputNode(normalMenu, enjoymentHighTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {257.5f, -122.5f});
+    Utils::createTextInputNode(normalMenu, enjoymentHighTextfield, "bigFont.fnt", "", 5, {35.0f, 25.0f}, {257.5f, -122.5f});
     enjoymentHighTextfield->setAllowedChars("1234567890.");
-    createLeftRightButtonsAround(enjoymentLowTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(enjoymentLowTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onEnjoymentLowLeft),
                                  menu_selector(GDDLSearchLayer::onEnjoymentLowRight));
-    createLeftRightButtonsAround(enjoymentHighTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(enjoymentHighTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onEnjoymentHighLeft),
                                  menu_selector(GDDLSearchLayer::onEnjoymentHighRight));
     createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -122.5f});
     // submissions count
     createLabel(normalMenu, "bigFont.fnt", "Submissions count", 110.0f, {220.0f, -157.5f});
-    createTextInputNode(normalMenu, submissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
+    Utils::createTextInputNode(normalMenu, submissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -182.5f});
     submissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(normalMenu, submissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
+    Utils::createTextInputNode(normalMenu, submissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -182.5f});
     submissionsCountHighTextfield->setAllowedChars("1234567890");
-    createLeftRightButtonsAround(submissionsCountLowTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(submissionsCountLowTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onSubmissionCountLowLeft),
                                  menu_selector(GDDLSearchLayer::onSubmissionCountLowRight));
-    createLeftRightButtonsAround(submissionsCountHighTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(submissionsCountHighTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onSubmissionCountHighLeft),
                                  menu_selector(GDDLSearchLayer::onSubmissionCountHighRight));
     createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -182.5f});
     // enjoyment submissions count
     createLabel(normalMenu, "bigFont.fnt", "Enj. submissions count", 110.0f, {220.0f, -217.5f});
-    createTextInputNode(normalMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
+    Utils::createTextInputNode(normalMenu, enjSubmissionsCountLowTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {182.5f, -242.5f});
     enjSubmissionsCountLowTextfield->setAllowedChars("1234567890");
-    createTextInputNode(normalMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
+    Utils::createTextInputNode(normalMenu, enjSubmissionsCountHighTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
                         {257.5f, -242.5f});
     enjSubmissionsCountHighTextfield->setAllowedChars("1234567890");
-    createLeftRightButtonsAround(enjSubmissionsCountLowTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(enjSubmissionsCountLowTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowLeft),
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountLowRight));
-    createLeftRightButtonsAround(enjSubmissionsCountHighTextfield, {13.0f, 19.0f},
+    Utils::createLeftRightButtonsAround(enjSubmissionsCountHighTextfield, {13.0f, 19.0f}, this,
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighLeft),
                                  menu_selector(GDDLSearchLayer::onEnjSubmissionCountHighRight));
     createLabel(normalMenu, "chatFont.fnt", "to", 30.0f, {220.0f, -242.5f});
@@ -175,13 +175,13 @@ void GDDLSearchLayer::loadPageFull() {
     // sort by
     createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
     bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
-    createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onSortByLeft),
+    Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortByLeft),
                                  menu_selector(GDDLSearchLayer::onSortByRight));
     // sort direction
     createLabel(normalMenu, "bigFont.fnt", "Sort direction", 110.0f, {365.0f, -217.5f});
     bg = createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
                               {110.0f, 25.0f});
-    createLeftRightButtonsAround(bg, {13.0f, 19.0f}, menu_selector(GDDLSearchLayer::onSortDirectionLeft),
+    Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortDirectionLeft),
                                  menu_selector(GDDLSearchLayer::onSortDirectionRight));
     normalLoaded = true;
 }
@@ -649,51 +649,6 @@ void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, const float maxWi
     const float scale =
             0.6f * label->getContentSize().width > maxWidth ? maxWidth / label->getContentSize().width : 0.6f;
     label->setScale(scale);
-}
-
-void GDDLSearchLayer::createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
-                                          const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
-                                          const CCPoint &position, int zOrder) {
-    const auto bg = CCScale9Sprite::create("square02_small.png");
-    parent->addChild(bg, zOrder);
-    bg->setContentSize(bgSize);
-    bg->setScale(0.5f);
-    bg->setContentSize(bg->getContentSize() / 0.5f);
-    bg->setPosition(position);
-    bg->setOpacity(100);
-    textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
-    parent->addChild(textfield, zOrder + 1);
-    textfield->setPosition(position);
-#ifdef GEODE_IS_ANDROID
-    ++maxCharacters; // robert :)
-#endif
-    textfield->setMaxLabelLength(maxCharacters);
-    textfield->setMaxLabelScale(0.7f);
-}
-
-void GDDLSearchLayer::createLeftRightButtonsAround(CCNode *object, const CCPoint &size,
-                                                   const SEL_MenuHandler leftCallback,
-                                                   const SEL_MenuHandler rightCallback, int zOrder) {
-    // left
-    const CCPoint positionLeft =
-            object->getPosition() -
-            CCPoint(object->getContentSize().width * object->getScale() / 2 + size.x / 2 + 0.5f, -1.0f);
-    const auto leftButtonSprite = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
-    leftButtonSprite->setScale(0.8f);
-    const auto leftButton = CCMenuItemSpriteExtra::create(leftButtonSprite, this, leftCallback);
-    object->getParent()->addChild(leftButton, zOrder);
-    leftButton->setPosition(positionLeft);
-    leftButton->setContentSize(size);
-    // right
-    const CCPoint positionRight = positionLeft + CCPoint(object->getContentSize().width * object->getScale() +
-                                                                 leftButton->getContentSize().width + 2.5f,
-                                                         0.0f); // why is this not symmetrical wtf
-    const auto rightButtonSprite = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
-    rightButtonSprite->setScale(0.8f);
-    const auto rightButton = CCMenuItemSpriteExtra::create(rightButtonSprite, this, rightCallback);
-    object->getParent()->addChild(rightButton, zOrder);
-    rightButton->setPosition(positionRight);
-    rightButton->setContentSize(size);
 }
 
 void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label,

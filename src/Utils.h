@@ -47,5 +47,49 @@ public:
         }
         return set;
     }
+
+    static void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+                                          const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                          const CCPoint &position, int zOrder = 1) {
+        const auto bg = CCScale9Sprite::create("square02_small.png");
+        parent->addChild(bg, zOrder);
+        bg->setContentSize(bgSize);
+        bg->setScale(0.5f);
+        bg->setContentSize(bg->getContentSize() / 0.5f);
+        bg->setPosition(position);
+        bg->setOpacity(100);
+        textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
+        parent->addChild(textfield, zOrder + 1);
+        textfield->setPosition(position);
+#ifdef GEODE_IS_ANDROID
+        ++maxCharacters; // robert :)
+#endif
+        textfield->setMaxLabelLength(maxCharacters);
+        textfield->setMaxLabelScale(0.7f);
+    }
+
+    static void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, CCObject *callbackObject, SEL_MenuHandler leftCallback,
+                                      SEL_MenuHandler rightCallback, int zOrder = 1) {
+        // left
+        const CCPoint positionLeft =
+                object->getPosition() -
+                CCPoint(object->getContentSize().width * object->getScale() / 2 + size.x / 2 + 0.5f, -1.0f);
+        const auto leftButtonSprite = CCSprite::createWithSpriteFrameName("edit_leftBtn_001.png");
+        leftButtonSprite->setScale(0.8f);
+        const auto leftButton = CCMenuItemSpriteExtra::create(leftButtonSprite, callbackObject, leftCallback);
+        object->getParent()->addChild(leftButton, zOrder);
+        leftButton->setPosition(positionLeft);
+        leftButton->setContentSize(size);
+        // right
+        const CCPoint positionRight = positionLeft + CCPoint(object->getContentSize().width * object->getScale() +
+                                                                     leftButton->getContentSize().width + 2.5f,
+                                                             0.0f); // why is this not symmetrical wtf
+        const auto rightButtonSprite = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
+        rightButtonSprite->setScale(0.8f);
+        const auto rightButton = CCMenuItemSpriteExtra::create(rightButtonSprite, callbackObject, rightCallback);
+        object->getParent()->addChild(rightButton, zOrder);
+        rightButton->setPosition(positionRight);
+        rightButton->setContentSize(size);
+    }
 };
 #endif // GDDL_UTILS_H
