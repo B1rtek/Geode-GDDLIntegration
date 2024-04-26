@@ -48,7 +48,7 @@ public:
         return set;
     }
 
-    static void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
+    static void createTextInputNode(CCNode *parent, CCTextInputNode *&textfield, const std::string &font,
                                           const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
                                           const CCPoint &position, int zOrder = 1) {
         const auto bg = CCScale9Sprite::create("square02_small.png");
@@ -90,6 +90,20 @@ public:
         object->getParent()->addChild(rightButton, zOrder);
         rightButton->setPosition(positionRight);
         rightButton->setContentSize(size);
+    }
+
+    static void createCheckbox(CCNode *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset, float scale, const CCPoint &position, CCObject* callbackObject, SEL_MenuHandler callback, int zOrder = 1) {
+        toggler = CCMenuItemToggler::createWithStandardSprites(callbackObject, callback, scale);
+        parent->addChild(toggler, zOrder);
+        toggler->setPosition(position);
+        const auto toggleLabel = CCLabelBMFont::create(label.c_str(), "bigFont.fnt");
+        parent->addChild(toggleLabel, zOrder);
+        toggleLabel->setPosition({toggler->getPositionX(), toggler->getPositionY() - labelOffset});
+        const float maxWidth = toggler->getContentSize().width * scale * 2.0f;
+        const float labelScale = 0.3f * toggleLabel->getContentSize().width > maxWidth
+                                         ? maxWidth / toggleLabel->getContentSize().width
+                                         : 0.3f;
+        toggleLabel->setScale(labelScale);
     }
 };
 #endif // GDDL_UTILS_H

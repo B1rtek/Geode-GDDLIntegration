@@ -141,7 +141,6 @@ class GDDLSearchLayer final : public FLAlertLayer {
                                          const std::string &placeholder, float maxWidth, const CCPoint &position,
                                          const CCPoint &bgSize, int zOrder = 1);
     static void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
-    void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset, float scale, const CCPoint &position, SEL_MenuHandler callback, int zOrder = 1);
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);
     CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name, CCMenuItemToggler *&toggler, SEL_MenuHandler callback);

@@ -86,7 +86,7 @@ void GDDLSearchLayer::loadPageFull() {
     // level name
     createLabel(normalMenu, "bigFont.fnt", "Name", 110.0f, {75.0f, -37.5f});
     Utils::createTextInputNode(normalMenu, nameTextfield, "bigFont.fnt", "", 32, {80.0f, 25.0f}, {60.0f, -62.5f});
-    createCheckbox(normalMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f},
+    Utils::createCheckbox(normalMenu, nameExactMatchToggler, "Ex. match", 17.5f, 0.9f, {117.0f, -62.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleExactMatch));
     // creator
     createLabel(normalMenu, "bigFont.fnt", "Creator", 110.0f, {75.0f, -97.5f});
@@ -159,18 +159,18 @@ void GDDLSearchLayer::loadPageFull() {
 
     // column 3
     // tiers checkboxes
-    createCheckbox(normalMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {325.0f, -62.5f},
+    Utils::createCheckbox(normalMenu, noUnratedToggler, "No unrated", 17.5f, 0.9f, {325.0f, -62.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleNoUnrated));
-    createCheckbox(normalMenu, noRatedToggler, "No rated", -19.5f, 0.9f, {365.0f, -62.5f},
+    Utils::createCheckbox(normalMenu, noRatedToggler, "No rated", -19.5f, 0.9f, {365.0f, -62.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleNoRated));
-    createCheckbox(normalMenu, completedToggler, "Completed", 17.5f, 0.9f, {405.0f, -62.5f},
+    Utils::createCheckbox(normalMenu, completedToggler, "Completed", 17.5f, 0.9f, {405.0f, -62.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleCompleted));
     // enjoyment rating checkboxes
-    createCheckbox(normalMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {325.0f, -122.5f},
+    Utils::createCheckbox(normalMenu, noUnratedEnjToggler, "No unr. enj.", 17.5f, 0.9f, {325.0f, -122.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleNoUnratedEnj));
-    createCheckbox(normalMenu, noRatedEnjToggler, "No rated enj.", -19.5f, 0.9f, {365.0f, -122.5f},
+    Utils::createCheckbox(normalMenu, noRatedEnjToggler, "No rated enj.", -19.5f, 0.9f, {365.0f, -122.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleNoRatedEnj));
-    createCheckbox(normalMenu, uncompletedToggler, "Uncompleted", 17.5f, 0.9f, {405.0f, -122.5f},
+    Utils::createCheckbox(normalMenu, uncompletedToggler, "Uncompleted", 17.5f, 0.9f, {405.0f, -122.5f}, this,
                    menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
     createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
@@ -651,21 +651,6 @@ void GDDLSearchLayer::scaleLabelToWidth(CCLabelBMFont *&label, const float maxWi
     label->setScale(scale);
 }
 
-void GDDLSearchLayer::createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label,
-                                     const float labelOffset, const float scale, const CCPoint &position,
-                                     const SEL_MenuHandler callback, int zOrder) {
-    toggler = CCMenuItemToggler::createWithStandardSprites(this, callback, scale);
-    parent->addChild(toggler, zOrder);
-    toggler->setPosition(position);
-    const auto toggleLabel = CCLabelBMFont::create(label.c_str(), "bigFont.fnt");
-    parent->addChild(toggleLabel, zOrder);
-    toggleLabel->setPosition({toggler->getPositionX(), toggler->getPositionY() - labelOffset});
-    const float maxWidth = toggler->getContentSize().width * scale * 2.0f;
-    const float labelScale = 0.3f * toggleLabel->getContentSize().width > maxWidth
-                                     ? maxWidth / toggleLabel->getContentSize().width
-                                     : 0.3f;
-    toggleLabel->setScale(labelScale);
-}
 
 // ReSharper disable once CppDFAUnreachableFunctionCall NOT TRUE
 float GDDLSearchLayer::calculateNewFloat(const float currentValue, const bool increase, const float lowerbound,
