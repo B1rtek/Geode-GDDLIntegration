@@ -12,13 +12,13 @@ class ExcludeRangeSettingNode : public SettingNode {
 protected:
     static constexpr int highestTier = 35;
 
-    int currentRangeBegin, currentRangeEnd;
-    bool currentInclude;
+    bool currentInclude = false; // stupid f***ing toggler
 
     std::vector<CCTextInputNode*> textfields = {nullptr, nullptr};
     CCMenuItemToggler* includeToggler;
 
     bool init(ExcludeRangeSetting* value, float width);
+    void loadValues();
 
     void onRangeBeginLeft(CCObject *sender);
     void onRangeBeginRight(CCObject *sender);

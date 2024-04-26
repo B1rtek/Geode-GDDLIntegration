@@ -48,19 +48,25 @@ bool ExcludeRangeSettingNode::init(ExcludeRangeSetting *value, float width) {
     this->addChild(menu);
     this->updateLayout();
     menu->setPosition({0.0f, 0.0f});
+
+    // load values
+    loadValues();
+
     cocos::handleTouchPriority(this);
     return true;
 }
 
-void ExcludeRangeSettingNode::onRangeBeginLeft(CCObject *sender) {
-    int newValue = Utils::getNumberTextfieldValue(textfields[0]) + 1;
-    if (newValue > highestTier)
-        newValue = 0;
-    Utils::setNumberWithDefZeroTextfield(newValue, textfields[0]);
-    this->dispatchChanged();
+
+
+void ExcludeRangeSettingNode::loadValues() {
+    const auto settingsObject = dynamic_cast<ExcludeRangeSetting *>(m_value);
+    Utils::setNumberWithDefZeroTextfield(settingsObject->getRangeBegin(), textfields[0]);
+    Utils::setNumberWithDefZeroTextfield(settingsObject->getRangeEnd(), textfields[1]);
+    includeToggler->toggle(settingsObject->isInclude());
+    currentInclude = settingsObject->isInclude();
 }
 
-void ExcludeRangeSettingNode::onRangeBeginRight(CCObject *sender) {
+void ExcludeRangeSettingNode::onRangeBeginLeft(CCObject *sender) {
     int newValue = Utils::getNumberTextfieldValue(textfields[0]) - 1;
     if (newValue < 0)
         newValue = highestTier;
@@ -68,15 +74,15 @@ void ExcludeRangeSettingNode::onRangeBeginRight(CCObject *sender) {
     this->dispatchChanged();
 }
 
-void ExcludeRangeSettingNode::onRangeEndLeft(CCObject *sender) {
-    int newValue = Utils::getNumberTextfieldValue(textfields[1]) + 1;
+void ExcludeRangeSettingNode::onRangeBeginRight(CCObject *sender) {
+    int newValue = Utils::getNumberTextfieldValue(textfields[0]) + 1;
     if (newValue > highestTier)
         newValue = 0;
-    Utils::setNumberWithDefZeroTextfield(newValue, textfields[1]);
+    Utils::setNumberWithDefZeroTextfield(newValue, textfields[0]);
     this->dispatchChanged();
 }
 
-void ExcludeRangeSettingNode::onRangeEndRight(CCObject *sender) {
+void ExcludeRangeSettingNode::onRangeEndLeft(CCObject *sender) {
     int newValue = Utils::getNumberTextfieldValue(textfields[1]) - 1;
     if (newValue < 0)
         newValue = highestTier;
@@ -84,7 +90,16 @@ void ExcludeRangeSettingNode::onRangeEndRight(CCObject *sender) {
     this->dispatchChanged();
 }
 
+void ExcludeRangeSettingNode::onRangeEndRight(CCObject *sender) {
+    int newValue = Utils::getNumberTextfieldValue(textfields[1]) + 1;
+    if (newValue > highestTier)
+        newValue = 0;
+    Utils::setNumberWithDefZeroTextfield(newValue, textfields[1]);
+    this->dispatchChanged();
+}
+
 void ExcludeRangeSettingNode::onToggleInclude(CCObject *sender) {
+    currentInclude = !includeToggler->isOn();
     this->dispatchChanged();
 }
 
@@ -95,7 +110,7 @@ void ExcludeRangeSettingNode::onInfo(CCObject *sender) {
 void ExcludeRangeSettingNode::commit() {
     log::info("ExcludeRangeSettingNode::commit called");
     const auto settingsObject = dynamic_cast<ExcludeRangeSetting *>(m_value);
-    settingsObject->setInclude(includeToggler->isToggled());
+    settingsObject->setInclude(currentInclude);
     settingsObject->setRangeBegin(Utils::getNumberTextfieldValue(textfields[0]));
     settingsObject->setRangeEnd(Utils::getNumberTextfieldValue(textfields[1]));
     this->dispatchCommitted();
@@ -104,14 +119,16 @@ void ExcludeRangeSettingNode::commit() {
 bool ExcludeRangeSettingNode::hasUncommittedChanges() {
     log::info("ExcludeRangeSettingNode::hasUncommittedChanges called");
     const auto settingsObject = dynamic_cast<ExcludeRangeSetting *>(m_value);
+    log::info("SettingsObject: rangeBegin = {}, rangeEnd = {}, include = {}", settingsObject->getRangeBegin(), settingsObject->getRangeEnd(), settingsObject->isInclude());
+    log::info("Read from UI: rangeBegin = {}, rangeEnd = {}, include = {}", Utils::getNumberTextfieldValue(textfields[0]), Utils::getNumberTextfieldValue(textfields[1]), currentInclude);
     return settingsObject->getRangeBegin() != Utils::getNumberTextfieldValue(textfields[0]) || settingsObject->
            getRangeEnd() != Utils::getNumberTextfieldValue(textfields[1]) || settingsObject->isInclude() !=
-           includeToggler->isToggled();
+           currentInclude;
 }
 
 bool ExcludeRangeSettingNode::hasNonDefaultValue() {
     log::info("ExcludeRangeSettingNode::hasNonDefaultValue called");
-    return Utils::getNumberTextfieldValue(textfields[0]) != 0 || Utils::getNumberTextfieldValue(textfields[1]) != 0 || !includeToggler->isToggled();
+    return Utils::getNumberTextfieldValue(textfields[0]) != 0 || Utils::getNumberTextfieldValue(textfields[1]) != 0 || !currentInclude;
 }
 
 void ExcludeRangeSettingNode::resetToDefault() {
@@ -119,6 +136,7 @@ void ExcludeRangeSettingNode::resetToDefault() {
     Utils::setNumberWithDefZeroTextfield(0, textfields[0]);
     Utils::setNumberWithDefZeroTextfield(0, textfields[1]);
     includeToggler->toggle(false);
+    currentInclude = false;
 }
 
 ExcludeRangeSettingNode * ExcludeRangeSettingNode::create(ExcludeRangeSetting *value, float width) {
