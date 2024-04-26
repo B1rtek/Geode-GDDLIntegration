@@ -253,8 +253,8 @@ void GDDLSearchLayer::loadValues() {
     if(!simplified) {
         page = 1;
         nameTextfield->setString(name.c_str());
-        setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
-        setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
+        Utils::setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
+        Utils::setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
         setDifficultyLabel();
         creatorTextfield->setString(creator.c_str());
         songTextfield->setString(song.c_str());
@@ -265,10 +265,10 @@ void GDDLSearchLayer::loadValues() {
         noRatedEnjToggler->toggle(removeRatedEnj);
         completedToggler->toggle(completed);
         uncompletedToggler->toggle(uncompleted);
-        setNumberWithDefZeroTextfield(subLowCount, submissionsCountLowTextfield);
-        setNumberWithDefZeroTextfield(subHighCount, submissionsCountHighTextfield);
-        setNumberWithDefZeroTextfield(enjLowCount, enjSubmissionsCountLowTextfield);
-        setNumberWithDefZeroTextfield(enjHighCount, enjSubmissionsCountHighTextfield);
+        Utils::setNumberWithDefZeroTextfield(subLowCount, submissionsCountLowTextfield);
+        Utils::setNumberWithDefZeroTextfield(subHighCount, submissionsCountHighTextfield);
+        Utils::setNumberWithDefZeroTextfield(enjLowCount, enjSubmissionsCountLowTextfield);
+        Utils::setNumberWithDefZeroTextfield(enjHighCount, enjSubmissionsCountHighTextfield);
         setNumberFloatTextfield(enjLow, enjoymentLowTextfield);
         setNumberFloatTextfield(enjHigh, enjoymentHighTextfield);
         setSortDirectionLabel();
@@ -283,8 +283,8 @@ void GDDLSearchLayer::saveValues() {
     // fields with a set of choices don't have to be saved
     if(!simplified) {
         name = nameTextfield->getString();
-        lowTier = getNumberTextfieldValue(tierLowTextfield);
-        highTier = getNumberTextfieldValue(tierHighTextfield);
+        lowTier = Utils::getNumberTextfieldValue(tierLowTextfield);
+        highTier = Utils::getNumberTextfieldValue(tierHighTextfield);
         creator = creatorTextfield->getString();
         song = songTextfield->getString();
         exactName = nameExactMatchToggler->isToggled();
@@ -294,10 +294,10 @@ void GDDLSearchLayer::saveValues() {
         removeRatedEnj = noRatedEnjToggler->isToggled();
         completed = completedToggler->isToggled();
         uncompleted = uncompletedToggler->isToggled();
-        subLowCount = getNumberTextfieldValue(submissionsCountLowTextfield);
-        subHighCount = getNumberTextfieldValue(submissionsCountHighTextfield);
-        enjLowCount = getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
-        enjHighCount = getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
+        subLowCount = Utils::getNumberTextfieldValue(submissionsCountLowTextfield);
+        subHighCount = Utils::getNumberTextfieldValue(submissionsCountHighTextfield);
+        enjLowCount = Utils::getNumberTextfieldValue(enjSubmissionsCountLowTextfield);
+        enjHighCount = Utils::getNumberTextfieldValue(enjSubmissionsCountHighTextfield);
         enjLow = getFloatTextfieldValue(enjoymentLowTextfield, 0.0f);
         enjHigh = getFloatTextfieldValue(enjoymentHighTextfield, 10.0f);
     } else {
@@ -310,8 +310,8 @@ void GDDLSearchLayer::saveValues() {
 void GDDLSearchLayer::resetValues() {
     page = 1;
     nameTextfield->setString("");
-    setNumberWithDefZeroTextfield(0, tierLowTextfield);
-    setNumberWithDefZeroTextfield(0, tierHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, tierLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, tierHighTextfield);
     difficulty = 5;
     setDifficultyLabel();
     creatorTextfield->setString("");
@@ -323,10 +323,10 @@ void GDDLSearchLayer::resetValues() {
     noRatedEnjToggler->toggle(false);
     completedToggler->toggle(true);
     uncompletedToggler->toggle(true);
-    setNumberWithDefZeroTextfield(0, submissionsCountLowTextfield);
-    setNumberWithDefZeroTextfield(0, submissionsCountHighTextfield);
-    setNumberWithDefZeroTextfield(0, enjSubmissionsCountLowTextfield);
-    setNumberWithDefZeroTextfield(0, enjSubmissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, submissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, submissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, enjSubmissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(0, enjSubmissionsCountHighTextfield);
     setNumberFloatTextfield(0.0f, enjoymentLowTextfield);
     setNumberFloatTextfield(highestEnjoyment, enjoymentHighTextfield);
     sortDirectionIndex = 0;
@@ -720,30 +720,30 @@ void GDDLSearchLayer::onInGameRatingRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onTierLowLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(tierLowTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(tierLowTextfield) - 1;
     if (newValue < 0)
         newValue = highestTier;
-    setNumberWithDefZeroTextfield(newValue, tierLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, tierLowTextfield);
 }
 void GDDLSearchLayer::onTierLowRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(tierLowTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(tierLowTextfield) + 1;
     if (newValue > highestTier)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, tierLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, tierLowTextfield);
 }
 
 void GDDLSearchLayer::onTierHighLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(tierHighTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(tierHighTextfield) - 1;
     if (newValue < 0)
         newValue = highestTier;
-    setNumberWithDefZeroTextfield(newValue, tierHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, tierHighTextfield);
 }
 
 void GDDLSearchLayer::onTierHighRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(tierHighTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(tierHighTextfield) + 1;
     if (newValue > highestTier)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, tierHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, tierHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjoymentLowLeft(CCObject *sender) {
@@ -771,59 +771,59 @@ void GDDLSearchLayer::onEnjoymentHighRight(CCObject *sender) {
 }
 
 void GDDLSearchLayer::onSubmissionCountLowLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(submissionsCountLowTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(submissionsCountLowTextfield) - 1;
     if (newValue < 0)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, submissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, submissionsCountLowTextfield);
 }
 
 void GDDLSearchLayer::onSubmissionCountLowRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(submissionsCountLowTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(submissionsCountLowTextfield) + 1;
     if (newValue > maxSubmissions)
         newValue = maxSubmissions;
-    setNumberWithDefZeroTextfield(newValue, submissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, submissionsCountLowTextfield);
 }
 
 void GDDLSearchLayer::onSubmissionCountHighLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(submissionsCountHighTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(submissionsCountHighTextfield) - 1;
     if (newValue < 0)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, submissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, submissionsCountHighTextfield);
 }
 
 void GDDLSearchLayer::onSubmissionCountHighRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(submissionsCountHighTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(submissionsCountHighTextfield) + 1;
     if (newValue > maxSubmissions)
         newValue = maxSubmissions;
-    setNumberWithDefZeroTextfield(newValue, submissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, submissionsCountHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjSubmissionCountLowLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(enjSubmissionsCountLowTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(enjSubmissionsCountLowTextfield) - 1;
     if (newValue < 0)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjSubmissionCountLowRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(enjSubmissionsCountLowTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(enjSubmissionsCountLowTextfield) + 1;
     if (newValue > maxSubmissions)
         newValue = maxSubmissions;
-    setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountLowTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountLowTextfield);
 }
 
 void GDDLSearchLayer::onEnjSubmissionCountHighLeft(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(enjSubmissionsCountHighTextfield) - 1;
+    int newValue = Utils::getNumberTextfieldValue(enjSubmissionsCountHighTextfield) - 1;
     if (newValue < 0)
         newValue = 0;
-    setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountHighTextfield);
 }
 
 void GDDLSearchLayer::onEnjSubmissionCountHighRight(CCObject *sender) {
-    int newValue = getNumberTextfieldValue(enjSubmissionsCountHighTextfield) + 1;
+    int newValue = Utils::getNumberTextfieldValue(enjSubmissionsCountHighTextfield) + 1;
     if (newValue > maxSubmissions)
         newValue = maxSubmissions;
-    setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountHighTextfield);
+    Utils::setNumberWithDefZeroTextfield(newValue, enjSubmissionsCountHighTextfield);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
@@ -937,14 +937,6 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     requestSearchPage(1, nullptr);
 }
 
-void GDDLSearchLayer::setNumberWithDefZeroTextfield(const int value, CCTextInputNode *&textfield) {
-    if (value != 0) {
-        textfield->setString(std::to_string(value).c_str());
-    } else {
-        textfield->setString("");
-    }
-}
-
 void GDDLSearchLayer::setNumberFloatTextfield(const float value, CCTextInputNode *&textfield) {
     std::stringstream ss;
     ss << std::fixed << std::setprecision(2);
@@ -968,18 +960,6 @@ void GDDLSearchLayer::setSortByLabel() {
 void GDDLSearchLayer::setSortDirectionLabel() {
     sortDirectionLabel->setString(orderDirection[sortDirectionIndex].c_str());
     scaleLabelToWidth(sortDirectionLabel, 110.0f);
-}
-
-int GDDLSearchLayer::getNumberTextfieldValue(CCTextInputNode *&textfield) {
-    if (textfield->getString().empty())
-        return 0;
-    // instead of try/catch because of android
-    int returnValue = 0;
-    auto returnValueResult = numFromString<int>(textfield->getString());
-    if (returnValueResult.isOk()) {
-        returnValue = returnValueResult.value();
-    }
-    return returnValue;
 }
 
 float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue) {

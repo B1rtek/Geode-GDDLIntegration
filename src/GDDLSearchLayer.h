@@ -180,13 +180,11 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // page simplified
     void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
-    static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     static void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
     void setDifficultyLabel();
     void setSortByLabel();
     void setSortDirectionLabel();
     // getters for the same thing
-    static int getNumberTextfieldValue(CCTextInputNode *&textfield);
     static float getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue);
     // bug fixes
     void onEnter() override;

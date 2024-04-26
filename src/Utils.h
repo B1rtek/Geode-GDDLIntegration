@@ -105,5 +105,25 @@ public:
                                          : 0.3f;
         toggleLabel->setScale(labelScale);
     }
+
+    static int getNumberTextfieldValue(CCTextInputNode *&textfield) {
+        if (textfield->getString().empty())
+            return 0;
+        // instead of try/catch because of android
+        int returnValue = 0;
+        auto returnValueResult = numFromString<int>(textfield->getString());
+        if (returnValueResult.isOk()) {
+            returnValue = returnValueResult.value();
+        }
+        return returnValue;
+    }
+
+    static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {
+        if (value != 0) {
+            textfield->setString(std::to_string(value).c_str());
+        } else {
+            textfield->setString("");
+        }
+    }
 };
 #endif // GDDL_UTILS_H
