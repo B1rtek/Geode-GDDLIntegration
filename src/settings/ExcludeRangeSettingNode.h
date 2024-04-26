@@ -25,6 +25,7 @@ protected:
     void onRangeEndLeft(CCObject *sender);
     void onRangeEndRight(CCObject *sender);
     void onToggleInclude(CCObject *sender);
+    void onInfo(CCObject *sender);
 
 public:
     void commit() override;
