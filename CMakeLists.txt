@@ -13,7 +13,7 @@ file(GLOB SOURCES
 	src/*.cpp src/*.h src/*/*.cpp src/*/*.h
 )
 
-include_directories(extlibs)
+include_directories(extlibs src)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES})

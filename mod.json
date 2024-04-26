@@ -64,6 +64,11 @@
 			"control": {
 				"slider": true
 			}
+		},
+		"exclude-range": {
+			"name": "Include/Exclude range",
+			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
+			"type": "custom"
 		}
 	}
 }

@@ -1,6 +1,7 @@
 #ifndef EXCLUDERANGESETTING_H
 #define EXCLUDERANGESETTING_H
 
+#include <Geode/loader/Log.hpp>
 #include <Geode/loader/Setting.hpp>
 
 using namespace geode::prelude;
@@ -12,8 +13,10 @@ protected:
 
 public:
     ExcludeRangeSetting(std::string const &key, std::string const &modID, int rangeBegin, int rangeEnd,
-                        bool include) : SettingValue(key, modID), rangeBegin(rangeBegin), rangeEnd(rangeBegin),
-                                        include(include) {}
+                        bool include) : SettingValue(key, modID), rangeBegin(0), rangeEnd(0),
+                                        include(false) {
+        log::info("{}", "Created ExcludeRangeSetting object");
+    }
 
     bool load(matjson::Value const& json) override;
 

@@ -8,6 +8,7 @@
  */
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ExcludeRangeSetting.h>
 
 
 #include "GDDLSearchLayer.h"
@@ -71,3 +72,12 @@ class $modify(MenuLayer) {
         RatingsManager::cacheList(true); // cache modified list on every exit
     }
 };
+
+$on_mod(Loaded) {
+    Mod::get()->registerCustomSetting(
+        "exclude-range",
+        std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)
+    );
+
+    log::info("{}", "Hello does this work at all");
+}
