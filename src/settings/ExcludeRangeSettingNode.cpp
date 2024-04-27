@@ -9,11 +9,9 @@
 #include "Utils.h"
 
 bool ExcludeRangeSettingNode::init(ExcludeRangeSetting *value, float width) {
-    log::info("ExcludeRangeSettingNode::init called");
     if (!SettingNode::init(value)) {
         return false;
     }
-    log::info("SettingNode::init returned true");
     this->setContentSize({width, 50.f});
 
     const auto menu = CCMenu::create();
@@ -44,7 +42,6 @@ bool ExcludeRangeSettingNode::init(ExcludeRangeSetting *value, float width) {
     // include/exclude toggle
     Utils::createCheckbox(menu, includeToggler, "Include", 17.5f, 0.6f, {315.0f, 30.0f}, this,
                           menu_selector(ExcludeRangeSettingNode::onToggleInclude));
-    log::info("ExcludeRangeSettingNode::init finished");
     this->addChild(menu);
     this->updateLayout();
     menu->setPosition({0.0f, 0.0f});
@@ -104,11 +101,10 @@ void ExcludeRangeSettingNode::onToggleInclude(CCObject *sender) {
 }
 
 void ExcludeRangeSettingNode::onInfo(CCObject *sender) {
-    FLAlertLayer::create("Exclude range", "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range.", "OK")->show();
+    FLAlertLayer::create("Exclude range", "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.", "OK")->show();
 }
 
 void ExcludeRangeSettingNode::commit() {
-    log::info("ExcludeRangeSettingNode::commit called");
     const auto settingsObject = dynamic_cast<ExcludeRangeSetting *>(m_value);
     settingsObject->setInclude(currentInclude);
     settingsObject->setRangeBegin(Utils::getNumberTextfieldValue(textfields[0]));
@@ -117,22 +113,17 @@ void ExcludeRangeSettingNode::commit() {
 }
 
 bool ExcludeRangeSettingNode::hasUncommittedChanges() {
-    log::info("ExcludeRangeSettingNode::hasUncommittedChanges called");
     const auto settingsObject = dynamic_cast<ExcludeRangeSetting *>(m_value);
-    log::info("SettingsObject: rangeBegin = {}, rangeEnd = {}, include = {}", settingsObject->getRangeBegin(), settingsObject->getRangeEnd(), settingsObject->isInclude());
-    log::info("Read from UI: rangeBegin = {}, rangeEnd = {}, include = {}", Utils::getNumberTextfieldValue(textfields[0]), Utils::getNumberTextfieldValue(textfields[1]), currentInclude);
     return settingsObject->getRangeBegin() != Utils::getNumberTextfieldValue(textfields[0]) || settingsObject->
            getRangeEnd() != Utils::getNumberTextfieldValue(textfields[1]) || settingsObject->isInclude() !=
            currentInclude;
 }
 
 bool ExcludeRangeSettingNode::hasNonDefaultValue() {
-    log::info("ExcludeRangeSettingNode::hasNonDefaultValue called");
     return Utils::getNumberTextfieldValue(textfields[0]) != 0 || Utils::getNumberTextfieldValue(textfields[1]) != 0 || !currentInclude;
 }
 
 void ExcludeRangeSettingNode::resetToDefault() {
-    log::info("ExcludeRangeSettingNode::resetToDefault called");
     Utils::setNumberWithDefZeroTextfield(0, textfields[0]);
     Utils::setNumberWithDefZeroTextfield(0, textfields[1]);
     includeToggler->toggle(false);
@@ -140,10 +131,8 @@ void ExcludeRangeSettingNode::resetToDefault() {
 }
 
 ExcludeRangeSettingNode * ExcludeRangeSettingNode::create(ExcludeRangeSetting *value, float width) {
-    log::info("ExcludeRangeSettingNode::create called");
     auto ret = new ExcludeRangeSettingNode;
     if (ret && ret->init(value, width)) {
-        log::info("ExcludeRangeSettingNode::create init returned true");
         ret->autorelease();
         return ret;
     }

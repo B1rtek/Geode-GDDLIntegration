@@ -78,6 +78,4 @@ $on_mod(Loaded) {
         "exclude-range",
         std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)
     );
-
-    log::info("{}", "Hello does this work at all");
 }
