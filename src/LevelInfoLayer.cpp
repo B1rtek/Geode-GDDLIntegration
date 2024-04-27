@@ -4,6 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ExcludeRangeSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
@@ -21,7 +22,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon) {
+        if (starsLabel && isDemon && notExcluded()) {
             m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
             if (!displayAsLabel) {
@@ -182,5 +183,16 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
         GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+    }
+
+    bool notExcluded() {
+        const auto setting = dynamic_cast<ExcludeRangeSetting*>(Mod::get()->getSetting("exclude-range"));
+        if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
+        const int cachedTier = RatingsManager::getCachedTier(m_level->m_levelID);
+        const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? 36 : setting->getRangeEnd();
+        if (setting->isInclude()) {
+            return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
+        }
+        return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
     }
 };
