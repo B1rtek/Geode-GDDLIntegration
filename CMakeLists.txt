@@ -10,10 +10,10 @@ project(GDDLIntegration VERSION 1.0.0)
 # to recursively add all source files 
 # under src/ 
 file(GLOB SOURCES
-	src/*.cpp src/*.h
+	src/*.cpp src/*.h src/*/*.cpp src/*/*.h
 )
 
-include_directories(extlibs)
+include_directories(extlibs src)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -27,4 +27,4 @@ endif()
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 # Set up dependencies, resources, link Geode
-setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:1.1.4)
+setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:1.9.0)

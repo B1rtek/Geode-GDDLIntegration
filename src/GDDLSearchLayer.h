@@ -117,7 +117,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void cacheValues();
     static void restoreValues();
     void onClose(CCObject *sender);
-    TodoReturn keyBackClicked() override;
+    void keyBackClicked() override;
     void onInfo(CCObject *sender);
     // request related
     static std::string urlEncodeString(std::string toEncode);
@@ -134,20 +134,10 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
-    // utility
-    static void createLabel(CCLayer *parent, const std::string &font, const std::string &text, float maxWidth,
-                            const CCPoint &position, int zOrder = 1);
+    // utility (that and Utils.h)
     static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
                                          const std::string &placeholder, float maxWidth, const CCPoint &position,
                                          const CCPoint &bgSize, int zOrder = 1);
-    static void scaleLabelToWidth(CCLabelBMFont *&label, float maxWidth);
-    static void createTextInputNode(CCLayer *parent, CCTextInputNode *&textfield, const std::string &font,
-                             const std::string &placeholder,
-                             int maxCharacters, const CCPoint &bgSize,
-                             const CCPoint &position, int zOrder = 1);
-    void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, SEL_MenuHandler leftCallback,
-                                      SEL_MenuHandler rightCallback, int zOrder = 1);
-    void createCheckbox(CCLayer *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset, float scale, const CCPoint &position, SEL_MenuHandler callback, int zOrder = 1);
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);
     CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name, CCMenuItemToggler *&toggler, SEL_MenuHandler callback);
@@ -187,13 +177,11 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // page simplified
     void onTierSearch(CCObject *sender);
     // setters so I don't have to repeat that spaghetti again
-    static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     static void setNumberFloatTextfield(float value, CCTextInputNode *&textfield);
     void setDifficultyLabel();
     void setSortByLabel();
     void setSortDirectionLabel();
     // getters for the same thing
-    static int getNumberTextfieldValue(CCTextInputNode *&textfield);
     static float getFloatTextfieldValue(CCTextInputNode *&textfield, float defaultValue);
     // bug fixes
     void onEnter() override;

@@ -1,6 +1,6 @@
 {
-	"geode": "2.0.0",
-	"version": "v1.1.5",
+	"geode": "2.0.0-beta.25",
+	"version": "v1.1.6",
 	"gd": {
 		"android": "2.205",
 		"win": "2.204"
@@ -13,7 +13,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=v1.1.4",
+			"version": ">=v1.9.0",
 			"importance": "required"
 		}
 	],
@@ -48,17 +48,6 @@
 				"slider": true
 			}
 		},
-		"move-gddl-search-button-down": {
-			"name": "Move GDDL Search button down",
-			"description": "Moves the GDDL Search button down a set number of spots, useful if you have Loquibot or other mods that also place buttons in the search menu which can result in buttons overlapping",
-			"type": "int",
-			"default": 0,
-			"min": 0,
-			"max": 3,
-			"control": {
-				"slider": true
-			}
-		},
 		"legacy-gddl-tier-label": {
 			"name": "Old GDDL Tier label",
 			"description": "Changes the tier button on the level info page into a clickable label, just like it used to be in the early versions of this mod",
@@ -75,6 +64,11 @@
 			"control": {
 				"slider": true
 			}
+		},
+		"exclude-range": {
+			"name": "Include/Exclude range",
+			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
+			"type": "custom"
 		}
 	}
 }
