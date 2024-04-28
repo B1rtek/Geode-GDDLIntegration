@@ -4,6 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
 
 #include "RatingsManager.h"
@@ -26,17 +27,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
             if (!displayAsLabel) {
-                const bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
-                const auto levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
-
+                const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
-                if (moveToLevelName && levelNamePos != 0) {
+                if (buttonPositionSetting != DEFAULT) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
                     const auto levelNameSize = levelNameLabel->getContentSize();
-                    if (levelNamePos > 0) { // right
+                    if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.5f,
                                                levelNamePosition.y - levelNameSize.height / 2.25f};
                     } else { // left
