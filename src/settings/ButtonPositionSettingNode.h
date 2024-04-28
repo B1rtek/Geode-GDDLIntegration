@@ -1,0 +1,12 @@
+#ifndef BUTTONPOSITIONSETTINGNODE_H
+#define BUTTONPOSITIONSETTINGNODE_H
+
+
+
+class ButtonPositionSettingNode {
+
+};
+
+
+
+#endif //BUTTONPOSITIONSETTINGNODE_H
