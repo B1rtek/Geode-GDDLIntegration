@@ -65,6 +65,11 @@
 				"slider": true
 			}
 		},
+		"button-position": {
+			"name": "Button position",
+			"description": "Sets the GDDL Button position on the level info page",
+			"type": "custom"
+		},
 		"exclude-range": {
 			"name": "Include/Exclude range",
 			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",

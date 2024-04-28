@@ -16,6 +16,7 @@ using namespace geode::prelude;
 class ButtonPositionSetting : public SettingValue {
 protected:
     ButtonPosition position;
+
 public:
     ButtonPositionSetting(std::string const &key, std::string const &modID, ButtonPosition position) : SettingValue(key, modID), position(position) {}
 

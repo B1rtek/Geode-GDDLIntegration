@@ -18,7 +18,7 @@ bool ButtonPositionSetting::save(matjson::Value &json) const {
 }
 
 SettingNode * ButtonPositionSetting::createNode(float width) {
-    // return ButtonPositionSettingNode::create(this, width);
+    return ButtonPositionSettingNode::create(this, width);
 }
 
 ButtonPosition ButtonPositionSetting::getPosition() const {
