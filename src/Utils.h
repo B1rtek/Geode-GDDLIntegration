@@ -2,6 +2,9 @@
 #define GDDL_UTILS_H
 #include <chrono>
 #include <string>
+#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
+#include <Geode/binding/CCMenuItemToggler.hpp>
+#include <Geode/binding/CCTextInputNode.hpp>
 #include <sys/stat.h>
 
 class Utils {

@@ -1,5 +1,7 @@
 #include "UseOldTierLabelSetting.h"
 
+#include "UseOldTierLabelSettingNode.h"
+
 
 bool UseOldTierLabelSetting::load(matjson::Value const &json) {
     if(!json.contains("enabled") || !json.contains("position-offset")) {
@@ -19,7 +21,7 @@ bool UseOldTierLabelSetting::save(matjson::Value &json) const {
 }
 
 SettingNode * UseOldTierLabelSetting::createNode(float width) {
-    // return UseOldTierLabelSettingNode::create(this, width);
+    return UseOldTierLabelSettingNode::create(this, width);
 }
 
 bool UseOldTierLabelSetting::isEnabled() const {

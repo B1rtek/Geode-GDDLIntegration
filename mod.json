@@ -53,6 +53,11 @@
 			"description": "Sets the GDDL Button position on the level info page",
 			"type": "custom"
 		},
+		"use-old-tier-label" : {
+			"name": "Use old tier label",
+			"description": "Changes the tier button into a label, allows for shifting it up and down",
+			"type": "custom"
+		},
 		"exclude-range": {
 			"name": "Include/Exclude range",
 			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
