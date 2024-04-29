@@ -26,7 +26,7 @@ bool ButtonPositionSettingNode::init(ButtonPositionSetting *value, float width) 
     infoButton->setPosition({135.0f, 20.0f});
 
     // choice label
-    const auto bg = Utils::createLabelForChoice(menu, positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {245.0f, 20.0f},
+    const auto bg = Utils::createLabelForChoice(menu, positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {242.5f, 20.0f},
                                    {labelWidth, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(ButtonPositionSettingNode::onPositionSettingLeft), menu_selector(ButtonPositionSettingNode::onPositionSettingRight));
 
@@ -96,6 +96,7 @@ bool ButtonPositionSettingNode::hasNonDefaultValue() {
 void ButtonPositionSettingNode::resetToDefault() {
     currentSetting = DEFAULT;
     setPositionSettingLabel();
+    this->dispatchChanged();
 }
 
 ButtonPositionSettingNode *ButtonPositionSettingNode::create(ButtonPositionSetting *value, float width) {
