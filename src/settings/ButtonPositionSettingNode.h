@@ -13,7 +13,7 @@ protected:
 
     CCLabelBMFont *positionSettingLabel = nullptr;
     static constexpr float labelWidth = 150.0f;
-    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
+    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "Right of the level title", "Demon face as button"};
 
 
     bool init(ButtonPositionSetting* value, float width);

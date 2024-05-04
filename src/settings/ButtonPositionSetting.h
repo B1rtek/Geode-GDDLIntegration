@@ -8,7 +8,8 @@
 enum ButtonPosition {
     DEFAULT,
     TO_THE_LEFT_OF_THE_LEVEL_TITLE,
-    TO_THE_RIGHT_OF_THE_LEVEL_TITLE
+    TO_THE_RIGHT_OF_THE_LEVEL_TITLE,
+    DEMON_FACE
 };
 
 using namespace geode::prelude;
