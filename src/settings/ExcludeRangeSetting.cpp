@@ -9,7 +9,6 @@ bool ExcludeRangeSetting::load(matjson::Value const &json) {
     rangeBegin = json["range-begin"].as_int();
     rangeEnd = json["range-end"].as_int();
     include = json["include"].as_bool();
-    log::info("ExcludeRangeSetting loaded from JSON");
     return true;
 }
 
@@ -19,12 +18,10 @@ bool ExcludeRangeSetting::save(matjson::Value &json) const {
         {"range-end", rangeEnd},
         {"include", include}
     };
-    log::info("ExcludeRangeSetting loaded from JSON");
     return true;
 }
 
 SettingNode * ExcludeRangeSetting::createNode(float width) {
-    log::info("ExcludeRangeSetting::createNode called");
     return ExcludeRangeSettingNode::create(this, width);
 }
 
