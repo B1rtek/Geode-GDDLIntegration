@@ -17,6 +17,10 @@ using namespace geode::prelude;
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
     bool gddlTierUpdated = false;
 
+    static void onModify(auto& self) {
+        self.setHookPriority("LevelInfoLayer::init", 256);
+    }
+
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
@@ -32,7 +36,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
-                if (buttonPositionSetting != DEFAULT) {
+                if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE || buttonPositionSetting == TO_THE_LEFT_OF_THE_LEVEL_TITLE) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
                     const auto levelNameSize = levelNameLabel->getContentSize();
@@ -46,13 +50,17 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     menuSize = CCSize{25, 25};
                     buttonPosition = CCPoint{12.5f, 12.5f};
                     buttonScale = 0.5f;
-                } else {
+                } else if (buttonPositionSetting == DEFAULT) {
                     const auto diffPosition = m_difficultySprite->getPosition();
                     const auto diffSize = m_difficultySprite->getContentSize();
                     menuPosition =
                             CCPoint{diffPosition.x - 50 - diffSize.width / 2, diffPosition.y - diffSize.height / 3.2f};
                     menuSize = CCSize{50, 50};
                     buttonPosition = CCPoint{25, 25};
+                } else {
+                    replaceDemonFaceWithButton();
+                    // the rest of the operations don't apply since we don't update the button
+                    return true;
                 }
                 placeGDDLButton(menuPosition, menuSize, buttonPosition, buttonScale);
             } else {
@@ -194,5 +202,20 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
         }
         return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
+    }
+
+    void replaceDemonFaceWithButton() {
+        // find the thing to replace
+        const CCSprite* demonFace = nullptr;
+        if (geode::Loader::get()->isModLoaded("itzkiba.grandpademon")) {
+            demonFace = dynamic_cast<CCSprite*>(getChildByTag(69420)); // funny haha number
+        } else {
+            demonFace = dynamic_cast<CCSprite*>(getChildByIDRecursive("difficulty-sprite")->getChildren()->objectAtIndex(0));
+        }
+        if (demonFace == nullptr) {
+            log::info("Didn't grab demon face");
+            return;
+        }
+        log::info("Grabbed demon face");
     }
 };
