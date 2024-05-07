@@ -96,7 +96,7 @@ void GDDLSearchLayer::loadPageFull() {
     Utils::createTextInputNode(normalMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
     // in-game difficulty
     Utils::createLabel(normalMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
-    auto bg = createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
+    auto bg = Utils::createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
                                    {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onInGameRatingLeft),
                                  menu_selector(GDDLSearchLayer::onInGameRatingRight));
@@ -174,12 +174,12 @@ void GDDLSearchLayer::loadPageFull() {
                    menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
     Utils::createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
-    bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
+    bg = Utils::createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortByLeft),
                                  menu_selector(GDDLSearchLayer::onSortByRight));
     // sort direction
     Utils::createLabel(normalMenu, "bigFont.fnt", "Sort direction", 110.0f, {365.0f, -217.5f});
-    bg = createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
+    bg = Utils::createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
                               {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortDirectionLeft),
                                  menu_selector(GDDLSearchLayer::onSortDirectionRight));
@@ -618,23 +618,6 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         auto transition = CCTransitionFade::create(0.5, listLayerScene);
         CCDirector::sharedDirector()->pushScene(transition);
     }
-}
-
-CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                                      const std::string &placeholder, const float maxWidth,
-                                                      const CCPoint &position, const CCPoint &bgSize, int zOrder) {
-    label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
-    parent->addChild(label, zOrder);
-    label->setPosition(position);
-    Utils::scaleLabelToWidth(label, maxWidth);
-    const auto bg = CCScale9Sprite::create("square02_small.png");
-    parent->addChild(bg, zOrder + 1);
-    bg->setContentSize(bgSize);
-    bg->setScale(0.5f);
-    bg->setContentSize(bg->getContentSize() / 0.5f);
-    bg->setPosition(position);
-    bg->setOpacity(100);
-    return bg;
 }
 
 

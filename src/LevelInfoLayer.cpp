@@ -4,7 +4,9 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
+#include <settings/UseOldTierLabelSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
@@ -15,6 +17,10 @@ using namespace geode::prelude;
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
     bool gddlTierUpdated = false;
 
+    static void onModify(auto& self) {
+        self.setHookPriority("LevelInfoLayer::init", 50);
+    }
+
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
@@ -24,19 +30,17 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && notExcluded()) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
+            const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
-                const auto levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
-
+                const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
-                if (moveToLevelName && levelNamePos != 0) {
+                if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE || buttonPositionSetting == TO_THE_LEFT_OF_THE_LEVEL_TITLE) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
                     const auto levelNameSize = levelNameLabel->getContentSize();
-                    if (levelNamePos > 0) { // right
+                    if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.5f,
                                                levelNamePosition.y - levelNameSize.height / 2.25f};
                     } else { // left
@@ -46,13 +50,17 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     menuSize = CCSize{25, 25};
                     buttonPosition = CCPoint{12.5f, 12.5f};
                     buttonScale = 0.5f;
-                } else {
+                } else if (buttonPositionSetting == DEFAULT) {
                     const auto diffPosition = m_difficultySprite->getPosition();
                     const auto diffSize = m_difficultySprite->getContentSize();
                     menuPosition =
                             CCPoint{diffPosition.x - 50 - diffSize.width / 2, diffPosition.y - diffSize.height / 3.2f};
                     menuSize = CCSize{50, 50};
                     buttonPosition = CCPoint{25, 25};
+                } else {
+                    replaceDemonFaceWithButton();
+                    // the rest of the operations don't apply since we don't update the button
+                    return true;
                 }
                 placeGDDLButton(menuPosition, menuSize, buttonPosition, buttonScale);
             } else {
@@ -67,7 +75,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 // if(diamondIcon != nullptr && diamondIcon->getContentSize().height == 13.5) { // diamonds label
                 //     labelShiftRows += 1.0f;
                 // }
-                const auto moveRowsSetting = Mod::get()->getSettingValue<int64_t>("legacy-gddl-tier-offset");
+                const auto moveRowsSetting = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -142,7 +150,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
+        const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)
@@ -194,5 +202,35 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
         }
         return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
+    }
+
+    void replaceDemonFaceWithButton() {
+        // find the thing to replace
+        CCSprite* demonFace = nullptr;
+        if (Loader::get()->isModLoaded("itzkiba.grandpademon")) {
+            demonFace = dynamic_cast<CCSprite*>(getChildByTag(69420)); // funny haha number
+        }
+        if (demonFace == nullptr) {
+            demonFace = dynamic_cast<CCSprite*>(getChildByIDRecursive("difficulty-sprite"));
+        }
+        // other potential conflicts
+        // godlike faces
+        // ids integration
+        // nlw integration
+        // ok this actually somehow works perfectly
+        if (demonFace == nullptr) {
+            log::info("Didn't grab demon face");
+            return;
+        }
+        CCMenu* demonFaceButtonMenu = CCMenu::create();
+        demonFaceButtonMenu->setID("demon-face-button-menu"_spr);
+        const auto buttonPosition = demonFace->getPosition();
+        const auto demonFaceButton = CCMenuItemSpriteExtra::create(demonFace, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        addChild(demonFaceButtonMenu);
+        const auto winSize = CCDirector::sharedDirector()->getWinSize();
+        demonFaceButtonMenu->setPosition({ 0, 0 });
+        demonFaceButtonMenu->addChild(demonFaceButton);
+        demonFaceButton->setPosition(buttonPosition);
+        cocos::handleTouchPriority(this);
     }
 };

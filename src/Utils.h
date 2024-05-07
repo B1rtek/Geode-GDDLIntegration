@@ -2,6 +2,9 @@
 #define GDDL_UTILS_H
 #include <chrono>
 #include <string>
+#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
+#include <Geode/binding/CCMenuItemToggler.hpp>
+#include <Geode/binding/CCTextInputNode.hpp>
 #include <sys/stat.h>
 
 class Utils {
@@ -138,6 +141,23 @@ public:
         parent->addChild(label, zOrder);
         label->setPosition(position);
         scaleLabelToWidth(label, maxWidth);
+    }
+
+    static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
+                                         const std::string &placeholder, float maxWidth, const CCPoint &position,
+                                         const CCPoint &bgSize, int zOrder = 1) {
+        label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
+        parent->addChild(label, zOrder);
+        label->setPosition(position);
+        scaleLabelToWidth(label, maxWidth);
+        const auto bg = CCScale9Sprite::create("square02_small.png");
+        parent->addChild(bg, zOrder + 1);
+        bg->setContentSize(bgSize);
+        bg->setScale(0.5f);
+        bg->setContentSize(bg->getContentSize() / 0.5f);
+        bg->setPosition(position);
+        bg->setOpacity(100);
+        return bg;
     }
 };
 #endif // GDDL_UTILS_H
