@@ -18,7 +18,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     bool gddlTierUpdated = false;
 
     static void onModify(auto& self) {
-        self.setHookPriority("LevelInfoLayer::init", 256);
+        self.setHookPriority("LevelInfoLayer::init", 50);
     }
 
     // ReSharper disable once CppParameterMayBeConst
@@ -206,16 +206,31 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     void replaceDemonFaceWithButton() {
         // find the thing to replace
-        const CCSprite* demonFace = nullptr;
-        if (geode::Loader::get()->isModLoaded("itzkiba.grandpademon")) {
+        CCSprite* demonFace = nullptr;
+        if (Loader::get()->isModLoaded("itzkiba.grandpademon")) {
             demonFace = dynamic_cast<CCSprite*>(getChildByTag(69420)); // funny haha number
-        } else {
-            demonFace = dynamic_cast<CCSprite*>(getChildByIDRecursive("difficulty-sprite")->getChildren()->objectAtIndex(0));
         }
+        if (demonFace == nullptr) {
+            demonFace = dynamic_cast<CCSprite*>(getChildByIDRecursive("difficulty-sprite"));
+        }
+        // other potential conflicts
+        // godlike faces
+        // ids integration
+        // nlw integration
+        // ok this actually somehow works perfectly
         if (demonFace == nullptr) {
             log::info("Didn't grab demon face");
             return;
         }
-        log::info("Grabbed demon face");
+        CCMenu* demonFaceButtonMenu = CCMenu::create();
+        demonFaceButtonMenu->setID("demon-face-button-menu"_spr);
+        const auto buttonPosition = demonFace->getPosition();
+        const auto demonFaceButton = CCMenuItemSpriteExtra::create(demonFace, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        addChild(demonFaceButtonMenu);
+        const auto winSize = CCDirector::sharedDirector()->getWinSize();
+        demonFaceButtonMenu->setPosition({ 0, 0 });
+        demonFaceButtonMenu->addChild(demonFaceButton);
+        demonFaceButton->setPosition(buttonPosition);
+        cocos::handleTouchPriority(this);
     }
 };
