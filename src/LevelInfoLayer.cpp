@@ -25,7 +25,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && notExcluded()) {
-            m_fields->gddlTierUpdated = false;
+            gddlTierUpdated = false;
             const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
                 const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
@@ -88,7 +88,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             const int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
                 updateButton(tier);
-                m_fields->gddlTierUpdated = true;
+                gddlTierUpdated = true;
             }
         }
 
@@ -99,7 +99,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         LevelInfoLayer::updateLabelValues();
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
+        if (!starsLabel || !isDemon || gddlTierUpdated) return;
 
         // fetch information
         retain();
