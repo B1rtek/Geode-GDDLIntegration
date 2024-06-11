@@ -1,5 +1,5 @@
 {
-	"geode": "2.0.0-beta.25",
+	"geode": "3.0.0-alpha.2",
 	"version": "v1.1.7",
 	"gd": {
 		"android": "2.205",
@@ -13,7 +13,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=v1.9.0",
+			"version": ">1.12.0-beta.1",
 			"importance": "required"
 		}
 	],
