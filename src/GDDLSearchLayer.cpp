@@ -1044,33 +1044,38 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
-    web::AsyncWebRequest()
-            .fetch(request)
-            .text()
-            .then([requestedPage, callbackObject](std::string const &response) {
-                // append results
-                appendFetchedResults(response);
-                // test if there's enough of them
-                std::pair<int, int> readyRange = getReadyRange(requestedPage);
-                while (readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                    // not enough? fetch some more!
-                    std::string anotherRequest = formSearchRequest();
-                    auto anotherResponse = web::fetch(anotherRequest);
-                    appendFetchedResults(anotherResponse.unwrap());
-                    readyRange = getReadyRange(requestedPage);
-                    // until it runs out of pages or sth
-                }
-                // and then call the callback
-                GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-                handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
-            })
-            .expect([](std::string const &error) {
-                FLAlertLayer::create("GDDL Search",
-                                     "Search failed - either you're disconnected from the internet or the server did "
-                                     "something wrong...",
-                                     "OK")
-                        ->show();
-            });
+    // web::AsyncWebRequest()
+    //         .fetch(request)
+    //         .text()
+    //         .then([requestedPage, callbackObject](std::string const &response) {
+    //             // append results
+    //             appendFetchedResults(response);
+    //             // test if there's enough of them
+    //             std::pair<int, int> readyRange = getReadyRange(requestedPage);
+    //             while (readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+    //                 // not enough? fetch some more!
+    //                 std::string anotherRequest = formSearchRequest();
+    //                 auto anotherResponse = web::fetch(anotherRequest); // aaaaaa recursion fuckkkk
+    //                 appendFetchedResults(anotherResponse.unwrap());
+    //                 readyRange = getReadyRange(requestedPage);
+    //                 // until it runs out of pages or sth
+    //             }
+    //             // and then call the callback
+    //             GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
+    //             handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
+    //         })
+    //         .expect([](std::string const &error) {
+    //             FLAlertLayer::create("GDDL Search",
+    //                                  "Search failed - either you're disconnected from the internet or the server did "
+    //                                  "something wrong...",
+    //                                  "OK")
+    //                     ->show();
+    //         });
+    FLAlertLayer::create("GDDL Search",
+                 "Search failed - either you're disconnected from the internet or the server did "
+                 "something wrong...",
+                 "OK")
+    ->show();
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {

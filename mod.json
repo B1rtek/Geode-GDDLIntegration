@@ -2,8 +2,8 @@
 	"geode": "3.0.0-alpha.2",
 	"version": "v1.1.7",
 	"gd": {
-		"android": "2.205",
-		"win": "2.204"
+		"android": "2.206",
+		"win": "2.206"
 	},
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
@@ -13,7 +13,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">1.12.0-beta.1",
+			"version": ">=1.12.0-beta.1",
 			"importance": "required"
 		}
 	],

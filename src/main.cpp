@@ -40,6 +40,8 @@ class $modify(MenuLayer) {
      * would not place a hook!
      */
 
+    EventListener<web::WebTask> cacheEventListener;
+
     bool init() override {
         if (!MenuLayer::init()) return false;
 
@@ -48,19 +50,23 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
         if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            RatingsManager::triedToCache = true;
-            web::AsyncWebRequest()
-            .fetch("https://gdladder.com/api/theList")
-            .text()
-            .then([](std::string const& response) {
-                RatingsManager::cacheRatings(response);
-                if(!RatingsManager::alreadyCached()) {
+            cacheEventListener.bind([] (web::WebTask::Event* e) {
+                if (web::WebResponse* res = e->getValue()) {
+                    const std::string response = res->string().unwrapOr("");
+                    if (response.empty()) {
+                        somethingWentWrong();
+                    } else {
+                        RatingsManager::cacheRatings(response);
+                        if(!RatingsManager::alreadyCached()) {
+                            somethingWentWrong();
+                        }
+                    }
+                } else if (e->isCancelled()) {
                     somethingWentWrong();
                 }
-            })
-            .expect([](std::string const& error) {
-                somethingWentWrong();
             });
+            auto req = web::WebRequest();
+            cacheEventListener.setFilter(req.get("https://gdladder.com/api/theList"));
         }
         return true;
     }

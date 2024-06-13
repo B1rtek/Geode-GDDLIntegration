@@ -16,11 +16,34 @@ using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
     bool gddlTierUpdated = false;
+    EventListener<web::WebTask> infoLayerGetRatingListener;
 
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
+
+        // setup web req
+        infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    updateButton(-1);
+                    release();
+                } else {
+                    const int levelID = m_level->m_levelID;
+                    int tierAfterFetch = -1;
+                    if(RatingsManager::addRatingFromResponse(levelID, response)) {
+                        tierAfterFetch = RatingsManager::getDemonTier(levelID);
+                    }
+                    updateButton(tierAfterFetch);
+                    release();
+                }
+            } else if (e->isCancelled()) {
+                updateButton(-1);
+                release();
+            }
+        });
 
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
@@ -103,24 +126,13 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         // fetch information
         retain();
-        int levelID = m_level->m_levelID;
+        const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
+
         if (tier == -1) {
-            web::AsyncWebRequest()
-            .fetch(RatingsManager::getRequestUrl(levelID))
-            .text()
-            .then([this, levelID](std::string const& response) {
-                int tierAfterFetch = -1;
-                if(RatingsManager::addRatingFromResponse(levelID, response)) {
-                    tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                }
-                updateButton(tierAfterFetch);
-                release();
-            })
-            .expect([this](std::string const& error) {
-                updateButton(-1);
-                release();
-            });
+            // web request 2.0 yaaay
+            auto req = web::WebRequest();
+            infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
         }
     }
 
