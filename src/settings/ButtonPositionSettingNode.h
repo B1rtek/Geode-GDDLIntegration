@@ -13,7 +13,6 @@ protected:
 
     CCLabelBMFont *positionSettingLabel = nullptr;
     static constexpr float labelWidth = 150.0f;
-    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
 
 
     bool init(ButtonPositionSetting* value, float width);
@@ -26,6 +25,8 @@ protected:
     void onInfo(CCObject *sender);
 
 public:
+    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
+
     void commit() override;
     bool hasUncommittedChanges() override;
     bool hasNonDefaultValue() override;

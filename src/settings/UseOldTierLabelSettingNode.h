@@ -10,8 +10,6 @@ using namespace geode::prelude;
 
 class UseOldTierLabelSettingNode : public SettingNode {
 protected:
-    static constexpr int minOffset = -1, maxOffset = 3;
-
     bool currentEnabled = false; // stupid f***ing toggler strikes back
 
     CCTextInputNode* positionOffsetTextfield = nullptr;
@@ -26,6 +24,8 @@ protected:
     void onInfo(CCObject *sender);
 
 public:
+    static constexpr int minOffset = -1, maxOffset = 3;
+
     void commit() override;
 
     bool hasUncommittedChanges() override;

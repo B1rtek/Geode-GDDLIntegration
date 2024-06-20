@@ -7,8 +7,10 @@ bool UseOldTierLabelSetting::load(matjson::Value const &json) {
     if(!json.contains("enabled") || !json.contains("position-offset")) {
         return false;
     }
-    enabled = json["enabled"].as_bool();
-    positionOffset = json["position-offset"].as_int();
+    enabled = json["enabled"].is_bool() ? json["enabled"].as_bool() : false;
+    positionOffset = json["position-offset"].is_number() ? json["position-offset"].as_int() : 0;
+    // in case the value are set to something stupid
+    positionOffset = std::min(UseOldTierLabelSettingNode::maxOffset, std::max(UseOldTierLabelSettingNode::minOffset, positionOffset));
     return true;
 }
 
