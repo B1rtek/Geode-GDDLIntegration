@@ -36,8 +36,7 @@ bool GDDLLevelInfoPopup::init()
     addLevelInfo();
 
     // open in browser button
-    const auto browserButtonSprite = CCSprite::createWithSpriteFrameName("GJ_undoBtn_001.png");
-    browserButtonSprite->setFlipX(true);
+    const auto browserButtonSprite = CCSprite::createWithSpriteFrameName("GJ_redoBtn_001.png");
     browserButtonSprite->setScale(0.9f);
     const auto openInBrowserButton = CCMenuItemSpriteExtra::create(browserButtonSprite, this, menu_selector(GDDLLevelInfoPopup::onOpenInBrowser));
     openInBrowserButton->setID("gddl-level-info-browser"_spr);
