@@ -4,7 +4,9 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
+#include <settings/UseOldTierLabelSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
@@ -13,30 +15,50 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
-    bool gddlTierUpdated = false;
+    struct Fields {
+        EventListener<web::WebTask> infoLayerGetRatingListener;
+        bool gddlTierUpdated = false;
+    };
 
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
 
+        // setup web req
+        m_fields->infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    updateButton(-1);
+                } else {
+                    const int levelID = m_level->m_levelID;
+                    int tierAfterFetch = -1;
+                    if(RatingsManager::addRatingFromResponse(levelID, response)) {
+                        tierAfterFetch = RatingsManager::getDemonTier(levelID);
+                    }
+                    updateButton(tierAfterFetch);
+                }
+            } else if (e->isCancelled()) {
+                updateButton(-1);
+            }
+        });
+
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && notExcluded()) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
+            const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const bool moveToLevelName = Mod::get()->getSettingValue<bool>("move-button-to-level-name");
-                const auto levelNamePos = Mod::get()->getSettingValue<int64_t>("pos-next-to-level-name");
-
+                const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
-                if (moveToLevelName && levelNamePos != 0) {
+                if (buttonPositionSetting != DEFAULT) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
                     const auto levelNameSize = levelNameLabel->getContentSize();
-                    if (levelNamePos > 0) { // right
+                    if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.5f,
                                                levelNamePosition.y - levelNameSize.height / 2.25f};
                     } else { // left
@@ -62,12 +84,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                // ok you know what I give up on trying to find this thing it's literally impossible
-                // auto* diamondIcon = dynamic_cast<CCSprite*>(getChildren()->objectAtIndex(11));
-                // if(diamondIcon != nullptr && diamondIcon->getContentSize().height == 13.5) { // diamonds label
-                //     labelShiftRows += 1.0f;
-                // }
-                const auto moveRowsSetting = Mod::get()->getSettingValue<int64_t>("legacy-gddl-tier-offset");
+                const auto moveRowsSetting = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -102,25 +119,13 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
-        retain();
-        int levelID = m_level->m_levelID;
+        const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
+
         if (tier == -1) {
-            web::AsyncWebRequest()
-            .fetch(RatingsManager::getRequestUrl(levelID))
-            .text()
-            .then([this, levelID](std::string const& response) {
-                int tierAfterFetch = -1;
-                if(RatingsManager::addRatingFromResponse(levelID, response)) {
-                    tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                }
-                updateButton(tierAfterFetch);
-                release();
-            })
-            .expect([this](std::string const& error) {
-                updateButton(-1);
-                release();
-            });
+            // web request 2.0 yaaay
+            auto req = web::WebRequest();
+            m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
         }
     }
 
@@ -142,7 +147,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = Mod::get()->getSettingValue<bool>("legacy-gddl-tier-label");
+        const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)
@@ -164,8 +169,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     static CCSprite *getTierSpriteFromName(const char *name) {
-        const auto textureName = Mod::get()->expandSpriteName(name);
-        const auto sprite = CCSprite::create(textureName);
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
 
         sprite->setScale(0.275f);
         sprite->setAnchorPoint({0, 0});

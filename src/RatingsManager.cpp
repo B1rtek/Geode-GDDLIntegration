@@ -1,10 +1,10 @@
 #include "RatingsManager.h"
 
 #include <Geode/utils/web.hpp>
+#include <matjson.hpp>
 #include "Utils.h"
 
 using namespace geode::prelude;
-using json = nlohmann::json;
 
 std::map<int, GDDLRating> RatingsManager::demonMap;
 
@@ -52,9 +52,9 @@ std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
     try {
-        const json levelData = json::parse(response);
+        const matjson::Value levelData = matjson::parse(response);
         return GDDLRating(levelData);
-    } catch (json::exception &error) {
+    } catch (std::runtime_error &error) {
         return GDDLRating::createInvalid();
     }
 }
@@ -83,25 +83,27 @@ void RatingsManager::populateFromSave() {
     if (Utils::fileIsEmpty(f)) {
         return;
     }
+    std::stringstream content;
+    content << f.rdbuf();
     try {
-        json data = json::parse(f);
-        cacheTimestamp = data["cached"];
+        matjson::Value data = matjson::parse(content.str());
+        cacheTimestamp = data["cached"].as_int();
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
         if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
-            for (auto idRatingPair: data["list"]) {
-                const int id = idRatingPair["ID"];
-                const int rating = idRatingPair["Rating"];
+            for (auto idRatingPair: data["list"].as_array()) {
+                const int id = idRatingPair["ID"].as_int();
+                const int rating = idRatingPair["Rating"].as_int();
                 ratingsCache[id] = rating;
             }
         }
-    } catch (json::exception &error) {
+    } catch (std::runtime_error &error) {
         // just do nothing, the user will be notified that stuff happened
     }
 }
 
 void RatingsManager::cacheList(bool onQuit) {
-    json cachedList;
+    matjson::Value cachedList;
     if (!onQuit) {
         // update the timestamp because we're saving a new list
         cacheTimestamp = Utils::getCurrentTimestamp(); // NOLINT(*-narrowing-conversions)
@@ -109,8 +111,8 @@ void RatingsManager::cacheList(bool onQuit) {
         // otherwise we retain the last value to keep track of the 7 days cache age
     }
     cachedList["cached"] = cacheTimestamp;
-    std::vector<json> idRatingPairs;
-    json element;
+    std::vector<matjson::Value> idRatingPairs;
+    matjson::Value element;
     for (auto [id, rating]: ratingsCache) {
         element["ID"] = id;
         element["Rating"] = rating;
@@ -119,7 +121,7 @@ void RatingsManager::cacheList(bool onQuit) {
     cachedList["list"] = idRatingPairs;
     std::fstream settingsFile;
     settingsFile.open(cachedListPath, std::ios::out);
-    settingsFile << cachedList;
+    settingsFile << cachedList.dump();
     settingsFile.close();
 }
 
@@ -159,15 +161,15 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
 void RatingsManager::cacheRatings(const std::string &response) {
     // ReSharper disable once CppTooWideScopeInitStatement
     try {
-        json ratingsData = json::parse(response);
-        for (auto element: ratingsData) {
-            const int id = element["ID"];
-            const float rating = element["Rating"].is_null() ? -1.0f : static_cast<float>(element["Rating"]);
+        matjson::Value ratingsData = matjson::parse(response);
+        for (auto element: ratingsData.as_array()) {
+            const int id = element["ID"].as_int();
+            const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
         cacheList(false);
-    } catch (json::exception &error) {
+    } catch (std::runtime_error &error) {
         // just do nothing, the user will be notified that stuff happened
     }
 }

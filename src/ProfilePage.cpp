@@ -14,8 +14,7 @@ class $modify(GDDLProfileMod, ProfilePage) {
         // get the existing nodes
         auto statsMenu = m_mainLayer->getChildByID("stats-menu");
         // create GDDL button
-        std::string gddlButtonSpritePath = Mod::get()->expandSpriteName("tier_unrated.png");
-        auto gddlButtonSprite = CCSprite::create(gddlButtonSpritePath.c_str());
+        auto gddlButtonSprite = CCSprite::create(Mod::get()->expandSpriteName(std::string_view{"tier_unrated.png"}).data());
         gddlButtonSprite->setScale(0.15f);
         auto gddlButton = CCMenuItemSpriteExtra::create(gddlButtonSprite, this, menu_selector(GDDLProfileMod::onGDDLDemonSplit));
         gddlButton->setScale(0.5f);

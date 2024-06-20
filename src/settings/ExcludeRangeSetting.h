@@ -13,10 +13,8 @@ protected:
 
 public:
     ExcludeRangeSetting(std::string const &key, std::string const &modID, int rangeBegin, int rangeEnd,
-                        bool include) : SettingValue(key, modID), rangeBegin(0), rangeEnd(0),
-                                        include(false) {
-        log::info("{}", "Created ExcludeRangeSetting object");
-    }
+                        bool include) : SettingValue(key, modID), rangeBegin(rangeBegin), rangeEnd(rangeEnd),
+                                        include(include) {}
 
     bool load(matjson::Value const& json) override;
 

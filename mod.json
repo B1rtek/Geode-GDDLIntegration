@@ -1,21 +1,29 @@
 {
-	"geode": "2.0.0-beta.25",
-	"version": "v1.1.7",
+	"geode": "3.0.0-beta.4",
+	"version": "v1.1.8",
 	"gd": {
-		"android": "2.205",
-		"win": "2.204"
+		"android": "2.206",
+		"win": "2.206"
 	},
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
-	"developer": "B1rtek",
+	"developers": ["B1rtek", "Diversion"],
 	"description": "Integration with Geometry Dash Demon Ladder - level tiers, search and more",
-	"repository": "https://github.com/B1rtek/Geode-GDDLIntegration",
+	"links": {
+		"source": "https://github.com/B1rtek/Geode-GDDLIntegration",
+		"community": "https://discord.gg/gddl"
+	},
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=v1.9.0",
+			"version": ">=1.12.0-beta.1",
 			"importance": "required"
 		}
+	],
+	"tags": [
+		"utility",
+		"interface",
+		"online"
 	],
 	"issues": {
 		"info": "You can submit an <cr>bug report</c>/<cj>feature request</c> directly to the mod's repo here",
@@ -31,39 +39,15 @@
 		]
 	},
 	"settings": {
-		"move-button-to-level-name": {
-			"name": "Move tier button to level name",
-			"description": "By default, the tier button is situated to the left of the demon face, if this is toggled on it'll be moved right to the level name.",
-			"type": "bool",
-			"default": false
+		"button-position": {
+			"name": "Button position",
+			"description": "Sets the GDDL Button position on the level info page",
+			"type": "custom"
 		},
-		"pos-next-to-level-name": {
-			"name": "Position of the button next to the level name",
-			"description": "According to the slider position (on the left or the right side of the level name), works only if the setting above is ticked.",
-			"type": "int",
-			"default": 1,
-			"min": -1,
-			"max": 1,
-			"control": {
-				"slider": true
-			}
-		},
-		"legacy-gddl-tier-label": {
-			"name": "Old GDDL Tier label",
-			"description": "Changes the tier button on the level info page into a clickable label, just like it used to be in the early versions of this mod",
-			"type": "bool",
-			"default": false
-		},
-		"legacy-gddl-tier-offset": {
-			"name": "Old GDDL Tier label offset",
-			"description": "Moves the old tier label down by the specified number of lines, useful if it collides with other objects placed in the same area, -1 puts it above the demon face",
-			"type": "int",
-			"default": 0,
-			"min": -1,
-			"max": 3,
-			"control": {
-				"slider": true
-			}
+		"use-old-tier-label" : {
+			"name": "Use old tier label",
+			"description": "Changes the tier button into a label, allows for shifting it up and down",
+			"type": "custom"
 		},
 		"exclude-range": {
 			"name": "Include/Exclude range",

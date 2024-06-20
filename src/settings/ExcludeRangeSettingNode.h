@@ -10,8 +10,6 @@ using namespace geode::prelude;
 
 class ExcludeRangeSettingNode : public SettingNode {
 protected:
-    static constexpr int highestTier = 35;
-
     bool currentInclude = false; // stupid f***ing toggler
 
     std::vector<CCTextInputNode*> textfields = {nullptr, nullptr};
@@ -28,6 +26,8 @@ protected:
     void onInfo(CCObject *sender);
 
 public:
+    static constexpr int highestTier = 35;
+
     void commit() override;
 
     bool hasUncommittedChanges() override;

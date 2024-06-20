@@ -1,3 +1,8 @@
+# v1.1.8
+- 2.206 support
+- Settings page overhaul, now it should make a bit more sense
+- Fixed the [open in browser button texture](https://github.com/B1rtek/Geode-GDDLIntegration/issues/46)
+
 # v1.1.7
 - Addressed a [bug that caused the game to crash when opening the GDDL Search menu](https://github.com/B1rtek/Geode-GDDLIntegration/issues/40)
 

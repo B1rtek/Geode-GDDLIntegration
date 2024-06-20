@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_OSX_ARCHITECTURES "x86_64")
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64") # this mod doesn't have a mac version anyway lol
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(GDDLIntegration VERSION 1.0.0)
@@ -13,7 +13,7 @@ file(GLOB SOURCES
 	src/*.cpp src/*.h src/*/*.cpp src/*/*.h
 )
 
-include_directories(extlibs src)
+include_directories(src)
 
 # Set up the mod binary
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -24,7 +24,11 @@ else()
     message(STATUS "Found Geode: $ENV{GEODE_SDK}")
 endif()
 
+# no yapping
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
+
+
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 # Set up dependencies, resources, link Geode
-setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:1.9.0)
+setup_geode_mod(${PROJECT_NAME} EXTERNALS geode.node-ids:1.12.0-beta.2)

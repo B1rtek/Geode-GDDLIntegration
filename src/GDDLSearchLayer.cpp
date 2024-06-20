@@ -63,6 +63,8 @@ bool GDDLSearchLayer::init() {
     m_mainLayer->addChild(simplifiedMenu, 1);
     showPage();
     loadValues();
+    // prepare the search request fun
+    prepareSearchListener();
     return true;
 }
 
@@ -96,7 +98,7 @@ void GDDLSearchLayer::loadPageFull() {
     Utils::createTextInputNode(normalMenu, songTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f}, {75.0f, -182.5f});
     // in-game difficulty
     Utils::createLabel(normalMenu, "bigFont.fnt", "Difficulty", 110.0f, {75.0f, -217.5f});
-    auto bg = createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
+    auto bg = Utils::createLabelForChoice(normalMenu, difficultyLabel, "bigFont.fnt", "Any", 110.0f, {75.0f, -242.5f},
                                    {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onInGameRatingLeft),
                                  menu_selector(GDDLSearchLayer::onInGameRatingRight));
@@ -174,12 +176,12 @@ void GDDLSearchLayer::loadPageFull() {
                    menu_selector(GDDLSearchLayer::onToggleUncompleted));
     // sort by
     Utils::createLabel(normalMenu, "bigFont.fnt", "Sort by", 110.0f, {365.0f, -157.5f});
-    bg = createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
+    bg = Utils::createLabelForChoice(normalMenu, sortByLabel, "bigFont.fnt", "ID", 110.0f, {365.0f, -182.5f}, {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortByLeft),
                                  menu_selector(GDDLSearchLayer::onSortByRight));
     // sort direction
     Utils::createLabel(normalMenu, "bigFont.fnt", "Sort direction", 110.0f, {365.0f, -217.5f});
-    bg = createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
+    bg = Utils::createLabelForChoice(normalMenu, sortDirectionLabel, "bigFont.fnt", "Ascending", 110.0f, {365.0f, -242.5f},
                               {110.0f, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayer::onSortDirectionLeft),
                                  menu_selector(GDDLSearchLayer::onSortDirectionRight));
@@ -510,21 +512,21 @@ std::string GDDLSearchLayer::formSearchRequest() {
 std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
     try {
-        json responseJson = json::parse(response);
-        const int total = responseJson["total"];
+        matjson::Value responseJson = matjson::parse(response);
+        const int total = responseJson["total"].as_int();
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
-        json levelList = responseJson["levels"];
-        for (auto element: levelList) {
-            const int levelID = element["LevelID"];
+        matjson::Value levelList = responseJson["levels"];
+        for (auto element: levelList.as_array()) {
+            const int levelID = element["LevelID"].as_int();
             if (levelID > 3) { // to avoid official demons
-                results.push_back(element["LevelID"]);
+                results.push_back(element["LevelID"].as_int());
                 if(!element["Rating"].is_null()) {
-                    const float rating = element["Rating"];
+                    const float rating = element["Rating"].as_double();
                     RatingsManager::updateCacheFromSearch(levelID, rating);
                 }
             }
         }
-    } catch (json::exception &error) {
+    } catch (std::runtime_error &error) {
         // well nothing really can be done here
     }
     return results;
@@ -620,24 +622,34 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     }
 }
 
-CCScale9Sprite *GDDLSearchLayer::createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                                      const std::string &placeholder, const float maxWidth,
-                                                      const CCPoint &position, const CCPoint &bgSize, int zOrder) {
-    label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
-    parent->addChild(label, zOrder);
-    label->setPosition(position);
-    Utils::scaleLabelToWidth(label, maxWidth);
-    const auto bg = CCScale9Sprite::create("square02_small.png");
-    parent->addChild(bg, zOrder + 1);
-    bg->setContentSize(bgSize);
-    bg->setScale(0.5f);
-    bg->setContentSize(bg->getContentSize() / 0.5f);
-    bg->setPosition(position);
-    bg->setOpacity(100);
-    return bg;
+void GDDLSearchLayer::prepareSearchListener() {
+    searchListener.bind([] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    FLAlertLayer::create("GDDL Search",
+                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                        "OK")->show();
+                } else {
+                    appendFetchedResults(response);
+                    auto [fst, snd] = getReadyRange(requestRequestedPage);
+                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                        // recurse
+                        const std::string anotherRequest = formSearchRequest();
+                        auto req = web::WebRequest();
+                        searchListener.setFilter(req.get(anotherRequest));
+                    } else {
+                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                    }
+                }
+            } else if (e->isCancelled()) {
+                FLAlertLayer::create("GDDL Search",
+                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                  "OK")->show();
+            }
+        });
 }
-
-
 
 
 // ReSharper disable once CppDFAUnreachableFunctionCall NOT TRUE
@@ -658,8 +670,7 @@ CCMenuItemSpriteExtra *GDDLSearchLayer::createTierNode(const int tier) {
     // tier sprite
     const std::string tierString = tier != -1 ? std::to_string(tier) : "unrated";
     const std::string tierSpriteName = "tier_" + tierString + ".png";
-    const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
-    const auto tierSprite = CCSprite::create(textureName);
+    const auto tierSprite = CCSprite::create(Mod::get()->expandSpriteName(tierSpriteName.c_str()).data());
     tierSprite->setScale(0.24f);
     tierSprite->setContentSize({30.0f, 30.0f});
     const auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLSearchLayer::onTierSearch));
@@ -1060,34 +1071,11 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
         return;
     }
     // well, time to get them in this case :/
-    std::string request = formSearchRequest();
-    web::AsyncWebRequest()
-            .fetch(request)
-            .text()
-            .then([requestedPage, callbackObject](std::string const &response) {
-                // append results
-                appendFetchedResults(response);
-                // test if there's enough of them
-                std::pair<int, int> readyRange = getReadyRange(requestedPage);
-                while (readyRange.second - readyRange.first < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                    // not enough? fetch some more!
-                    std::string anotherRequest = formSearchRequest();
-                    auto anotherResponse = web::fetch(anotherRequest);
-                    appendFetchedResults(anotherResponse.unwrap());
-                    readyRange = getReadyRange(requestedPage);
-                    // until it runs out of pages or sth
-                }
-                // and then call the callback
-                GJSearchObject *searchObject = makeASearchObjectFrom(readyRange.first, readyRange.second);
-                handleSearchObject(searchObject, callbackObject, readyRange.second - readyRange.first);
-            })
-            .expect([](std::string const &error) {
-                FLAlertLayer::create("GDDL Search",
-                                     "Search failed - either you're disconnected from the internet or the server did "
-                                     "something wrong...",
-                                     "OK")
-                        ->show();
-            });
+    const std::string request = formSearchRequest();
+    requestRequestedPage = requestedPage;
+    searchCallbackObject = callbackObject;
+    auto req = web::WebRequest();
+    searchListener.setFilter(req.get(request));
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
@@ -1109,6 +1097,7 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     cachedResults.clear();
     onlinePagesFetched = 0;
     searching = true;
+    prepareSearchListener();
     requestSearchPage(1, nullptr);
 }
 
@@ -1132,7 +1121,6 @@ void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
-    log::debug("{}", "Values restored");
     restoreValues();
     savedLowTier = -1;
 }

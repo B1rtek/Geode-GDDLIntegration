@@ -8,7 +8,9 @@
  */
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
+#include <settings/UseOldTierLabelSetting.h>
 
 
 #include "GDDLSearchLayer.h"
@@ -38,6 +40,11 @@ class $modify(MenuLayer) {
      * would not place a hook!
      */
 
+    struct Fields {
+        EventListener<web::WebTask> cacheEventListener;
+    };
+
+
     bool init() override {
         if (!MenuLayer::init()) return false;
 
@@ -46,19 +53,23 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
         if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            RatingsManager::triedToCache = true;
-            web::AsyncWebRequest()
-            .fetch("https://gdladder.com/api/theList")
-            .text()
-            .then([](std::string const& response) {
-                RatingsManager::cacheRatings(response);
-                if(!RatingsManager::alreadyCached()) {
+            m_fields->cacheEventListener.bind([] (web::WebTask::Event* e) {
+                if (web::WebResponse* res = e->getValue()) {
+                    const std::string response = res->string().unwrapOr("");
+                    if (response.empty()) {
+                        somethingWentWrong();
+                    } else {
+                        RatingsManager::cacheRatings(response);
+                        if(!RatingsManager::alreadyCached()) {
+                            somethingWentWrong();
+                        }
+                    }
+                } else if (e->isCancelled()) {
                     somethingWentWrong();
                 }
-            })
-            .expect([](std::string const& error) {
-                somethingWentWrong();
             });
+            auto req = web::WebRequest();
+            m_fields->cacheEventListener.setFilter(req.get("https://gdladder.com/api/theList"));
         }
         return true;
     }
@@ -74,6 +85,14 @@ class $modify(MenuLayer) {
 };
 
 $on_mod(Loaded) {
+    Mod::get()->registerCustomSetting(
+        "button-position",
+        std::make_unique<ButtonPositionSetting>("button-position", Mod::get()->getID(), DEFAULT)
+    );
+    Mod::get()->registerCustomSetting(
+        "use-old-tier-label",
+        std::make_unique<UseOldTierLabelSetting>("use-old-tier-label", Mod::get()->getID(), false, 0)
+    );
     Mod::get()->registerCustomSetting(
         "exclude-range",
         std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)

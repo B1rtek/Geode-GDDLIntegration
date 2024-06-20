@@ -128,6 +128,7 @@ void ExcludeRangeSettingNode::resetToDefault() {
     Utils::setNumberWithDefZeroTextfield(0, textfields[1]);
     includeToggler->toggle(false);
     currentInclude = false;
+    this->dispatchChanged();
 }
 
 ExcludeRangeSettingNode * ExcludeRangeSettingNode::create(ExcludeRangeSetting *value, float width) {

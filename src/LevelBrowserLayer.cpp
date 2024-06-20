@@ -6,7 +6,9 @@
 #include "GDDLSearchLayer.h"
 
 class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
-    int currentPage = 1;
+    struct Fields {
+        int currentPage = 1;
+    };
 
     bool init(GJSearchObject * p0) {
         if (!GDDLSearchLayer::isSearching() || p0->m_searchType != SearchType::Type19) {

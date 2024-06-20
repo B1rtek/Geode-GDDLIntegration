@@ -115,8 +115,7 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
     // tier sprite
     std::string tierStrName = tier != -1 ? std::to_string(tier) : "unrated";
     const std::string tierSpriteName = "tier_" + tierStrName + ".png";
-    const auto textureName = Mod::get()->expandSpriteName(tierSpriteName.c_str());
-    const auto tierSprite = CCSprite::create(textureName);
+    const auto tierSprite = CCSprite::create(Mod::get()->expandSpriteName(tierSpriteName.c_str()).data());
     tierSprite->setScale(0.05f);
     tierSprite->setContentSize({20.0f, 20.0f});
     const auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLDemonSplitLayer::onTierSearch));

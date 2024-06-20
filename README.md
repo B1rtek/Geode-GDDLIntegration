@@ -11,10 +11,10 @@ GDDL Discord server: https://discord.gg/gddl
 **<cy>Positions of UI elements can be adjusted in the settings, be sure to visit them if one of your other mods overlaps UI elements with this one</c>**
 
 ## Gallery
-![Example of a tier rating displaying on the level page](resources/tier.png)
-![Example of the full search menu](resources/search.png)
-![Example of the simple search menu](resources/old_search.png)
-![GDDL Tier Split menu](resources/split.png)
+![Example of a tier rating displaying on the level page](resources/tier.png)  
+![Example of the full search menu](resources/search.png)  
+![Example of the simple search menu](resources/old_search.png)  
+![GDDL Tier Split menu](resources/split.png)  
 
 ## Known issues
 If you encounter an <cy>issue</c> with the mod, [open an issue in the mod's GitHub repo](https://github.com/B1rtek/Geode-GDDLIntegration/issues/new/choose) or contact me on Discord (<cb>@b1rtek</c>)
@@ -26,4 +26,4 @@ If you encounter an <cy>issue</c> with the mod, [open an issue in the mod's GitH
 
 <cb>*Code contributions:*</c> <cy>**[Diversion](https://github.com/B1rtek/Geode-GDDLIntegration/pull/3)**</c>  
 <cg>*Feature suggestions:*</c> <cy>[MasterGamerY](https://github.com/B1rtek/Geode-GDDLIntegration/issues/1), [Weebifying](https://github.com/B1rtek/Geode-GDDLIntegration/pull/2), [averiee_](https://github.com/B1rtek/Geode-GDDLIntegration/milestone/4), [TheSuperJepphyKiller](https://github.com/B1rtek/Geode-GDDLIntegration/issues/6), [hoshinekosanti](https://github.com/B1rtek/Geode-GDDLIntegration/issues/11),  [epicmushroom.](https://github.com/B1rtek/Geode-GDDLIntegration/issues/15), [Koble](https://github.com/B1rtek/Geode-GDDLIntegration/issues/21), [Diversion](https://github.com/B1rtek/Geode-GDDLIntegration/issues/25), [peteratomic](https://github.com/B1rtek/Geode-GDDLIntegration/issues/34)</c>  
-<cr>*Bug reporters:*</c> <cy>croozington, bllue, [Fleeym](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780380), [matcool](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780699), [Lexicon](https://github.com/B1rtek/Geode-GDDLIntegration/issues/7), [patrick61804](https://github.com/B1rtek/Geode-GDDLIntegration/issues/16), [epicmushroom.](https://github.com/B1rtek/Geode-GDDLIntegration/issues/20), [GlassesCatandsteve](https://github.com/B1rtek/Geode-GDDLIntegration/issues/27), [HotKentang, wangko5383, dshifter, Ev212](https://github.com/B1rtek/Geode-GDDLIntegration/issues/29), Cvolton, [pointedbowl](https://github.com/B1rtek/Geode-GDDLIntegration/issues/33), [Neonyx27, ItzGabrix](https://github.com/B1rtek/Geode-GDDLIntegration/issues/40)</c>
+<cr>*Bug reporters:*</c> <cy>croozington, bllue, [Fleeym](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780380), [matcool](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913780699), [Lexicon](https://github.com/B1rtek/Geode-GDDLIntegration/issues/7), [patrick61804](https://github.com/B1rtek/Geode-GDDLIntegration/issues/16), [epicmushroom.](https://github.com/B1rtek/Geode-GDDLIntegration/issues/20), [GlassesCatandsteve](https://github.com/B1rtek/Geode-GDDLIntegration/issues/27), [HotKentang, wangko5383, dshifter, Ev212](https://github.com/B1rtek/Geode-GDDLIntegration/issues/29), Cvolton, [pointedbowl](https://github.com/B1rtek/Geode-GDDLIntegration/issues/33), [Neonyx27, ItzGabrix](https://github.com/B1rtek/Geode-GDDLIntegration/issues/40), [Aktimoose](https://github.com/B1rtek/Geode-GDDLIntegration/issues/46)</c>

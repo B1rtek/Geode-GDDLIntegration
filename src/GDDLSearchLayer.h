@@ -2,6 +2,7 @@
 #define GDDLSEARCHLAYER_H
 
 #include <Geode/Bindings.hpp>
+#include <Geode/utils/web.hpp>
 
 struct GDDLBrowserLayer;
 using namespace geode::prelude;
@@ -70,6 +71,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static std::vector<int> cachedResults = {};
     inline static int onlinePagesFetched = 0;
     inline static bool searching = false;
+    inline static EventListener<web::WebTask> searchListener;
+    inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
+    inline static GDDLBrowserLayer* searchCallbackObject;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
     // page normal
@@ -134,10 +138,8 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
+    static void prepareSearchListener();
     // utility (that and Utils.h)
-    static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                         const std::string &placeholder, float maxWidth, const CCPoint &position,
-                                         const CCPoint &bgSize, int zOrder = 1);
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);
     CCMenu *createCheckboxNode(const std::string &idSuffix, const std::string &name, CCMenuItemToggler *&toggler, SEL_MenuHandler callback);
