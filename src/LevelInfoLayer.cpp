@@ -169,7 +169,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     static CCSprite *getTierSpriteFromName(const char *name) {
-        std::cout << "trying to get sprite for " << name << ", time to crash!" << std::endl;
         const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
 
         sprite->setScale(0.275f);

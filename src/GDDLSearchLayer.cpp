@@ -509,7 +509,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
-    log::debug("Search request: {}", request);
+    // log::debug("Search request: {}", request);
     return request;
 }
 
@@ -1118,7 +1118,6 @@ void GDDLSearchLayer::stopSearch() { searching = false; }
 
 void GDDLSearchLayer::restoreValuesAfterSplit() {
     if (savedLowTier == -1) return; // there's nothing to restore
-    log::debug("{}", "Values restored");
     restoreValues();
     savedLowTier = -1;
 }
