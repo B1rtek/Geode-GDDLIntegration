@@ -11,10 +11,10 @@ GDDL Discord server: https://discord.gg/gddl
 **<cy>Positions of UI elements can be adjusted in the settings, be sure to visit them if one of your other mods overlaps UI elements with this one</c>**
 
 ## Gallery
-![Example of a tier rating displaying on the level page](resources/tier.png)
-![Example of the full search menu](resources/search.png)
-![Example of the simple search menu](resources/old_search.png)
-![GDDL Tier Split menu](resources/split.png)
+![Example of a tier rating displaying on the level page](resources/tier.png)  
+![Example of the full search menu](resources/search.png)  
+![Example of the simple search menu](resources/old_search.png)  
+![GDDL Tier Split menu](resources/split.png)  
 
 ## Known issues
 If you encounter an <cy>issue</c> with the mod, [open an issue in the mod's GitHub repo](https://github.com/B1rtek/Geode-GDDLIntegration/issues/new/choose) or contact me on Discord (<cb>@b1rtek</c>)
