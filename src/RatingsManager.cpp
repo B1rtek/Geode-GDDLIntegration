@@ -164,7 +164,7 @@ void RatingsManager::cacheRatings(const std::string &response) {
         matjson::Value ratingsData = matjson::parse(response);
         for (auto element: ratingsData.as_array()) {
             const int id = element["ID"].as_int();
-            const float rating = !element.contains("Rating") ? -1.0f : element["Rating"].as_double();
+            const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
