@@ -64,32 +64,7 @@ bool GDDLSearchLayer::init() {
     showPage();
     loadValues();
     // prepare the search request fun
-    searchListener.bind([this] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
-                const std::string response = res->string().unwrapOrDefault();
-                if (response.empty()) {
-                    FLAlertLayer::create("GDDL Search",
-                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                        "OK")->show();
-                } else {
-                    appendFetchedResults(response);
-                    auto [fst, snd] = getReadyRange(requestRequestedPage);
-                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                        // recurse
-                        const std::string anotherRequest = formSearchRequest();
-                        auto req = web::WebRequest();
-                        searchListener.setFilter(req.get(anotherRequest));
-                    } else {
-                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
-                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
-                    }
-                }
-            } else if (e->isCancelled()) {
-                FLAlertLayer::create("GDDL Search",
-                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                  "OK")->show();
-            }
-        });
+    prepareSearchListener();
     return true;
 }
 
@@ -509,7 +484,7 @@ std::string GDDLSearchLayer::formSearchRequest() {
     request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
-    // log::debug("Search request: {}", request);
+    log::debug("Search request: {}", request);
     return request;
 }
 
@@ -647,7 +622,34 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     }
 }
 
-
+void GDDLSearchLayer::prepareSearchListener() {
+    searchListener.bind([] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    FLAlertLayer::create("GDDL Search",
+                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                        "OK")->show();
+                } else {
+                    appendFetchedResults(response);
+                    auto [fst, snd] = getReadyRange(requestRequestedPage);
+                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                        // recurse
+                        const std::string anotherRequest = formSearchRequest();
+                        auto req = web::WebRequest();
+                        searchListener.setFilter(req.get(anotherRequest));
+                    } else {
+                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                    }
+                }
+            } else if (e->isCancelled()) {
+                FLAlertLayer::create("GDDL Search",
+                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                  "OK")->show();
+            }
+        });
+}
 
 
 // ReSharper disable once CppDFAUnreachableFunctionCall NOT TRUE
@@ -1095,6 +1097,7 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     cachedResults.clear();
     onlinePagesFetched = 0;
     searching = true;
+    prepareSearchListener();
     requestSearchPage(1, nullptr);
 }
 

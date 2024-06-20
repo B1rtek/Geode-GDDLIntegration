@@ -138,6 +138,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
+    static void prepareSearchListener();
     // utility (that and Utils.h)
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);
