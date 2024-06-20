@@ -15,16 +15,17 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
+    struct Fields {
+        EventListener<web::WebTask> infoLayerGetRatingListener;
+    };
     bool gddlTierUpdated = false;
-    EventListener<web::WebTask> infoLayerGetRatingListener;
-
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
 
         // setup web req
-        infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
+        m_fields->infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
@@ -132,7 +133,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (tier == -1) {
             // web request 2.0 yaaay
             auto req = web::WebRequest();
-            infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
+            m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
         }
     }
 
@@ -176,8 +177,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     static CCSprite *getTierSpriteFromName(const char *name) {
-        const auto textureName = Mod::get()->expandSpriteName(name);
-        const auto sprite = CCSprite::create(textureName);
+        std::cout << "trying to get sprite for " << name << ", time to crash!" << std::endl;
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
 
         sprite->setScale(0.275f);
         sprite->setAnchorPoint({0, 0});

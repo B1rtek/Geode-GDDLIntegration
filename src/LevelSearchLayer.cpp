@@ -16,8 +16,7 @@ class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     }
 
     void addGDDLButton() {
-        const std::string textureName = Mod::get()->expandSpriteName("tier_unrated.png");
-        const auto tierSprite = CCSprite::create(textureName.c_str());
+        const auto tierSprite = CCSprite::create(Mod::get()->expandSpriteName("tier_unrated.png").data());
         tierSprite->setScale(0.235f);
         const auto button = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLLevelSearchLayer::onGDDLSearch));
         button->setContentSize({30.0f, 30.0f});
