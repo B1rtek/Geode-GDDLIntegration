@@ -31,7 +31,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
                     updateButton(-1);
-                    // release();
                 } else {
                     const int levelID = m_level->m_levelID;
                     int tierAfterFetch = -1;
@@ -39,11 +38,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                         tierAfterFetch = RatingsManager::getDemonTier(levelID);
                     }
                     updateButton(tierAfterFetch);
-                    // release();
                 }
             } else if (e->isCancelled()) {
                 updateButton(-1);
-                // release();
             }
         });
 
@@ -87,11 +84,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                // ok you know what I give up on trying to find this thing it's literally impossible
-                // auto* diamondIcon = dynamic_cast<CCSprite*>(getChildren()->objectAtIndex(11));
-                // if(diamondIcon != nullptr && diamondIcon->getContentSize().height == 13.5) { // diamonds label
-                //     labelShiftRows += 1.0f;
-                // }
                 const auto moveRowsSetting = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
@@ -131,7 +123,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const int tier = RatingsManager::getDemonTier(levelID);
 
         if (tier == -1) {
-            // retain();
             // web request 2.0 yaaay
             auto req = web::WebRequest();
             m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
