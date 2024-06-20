@@ -40,7 +40,10 @@ class $modify(MenuLayer) {
      * would not place a hook!
      */
 
-    EventListener<web::WebTask> cacheEventListener;
+    struct Fields {
+        EventListener<web::WebTask> cacheEventListener;
+    };
+
 
     bool init() override {
         if (!MenuLayer::init()) return false;
@@ -50,7 +53,7 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
         if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            cacheEventListener.bind([] (web::WebTask::Event* e) {
+            m_fields->cacheEventListener.bind([] (web::WebTask::Event* e) {
                 if (web::WebResponse* res = e->getValue()) {
                     const std::string response = res->string().unwrapOr("");
                     if (response.empty()) {
@@ -66,7 +69,7 @@ class $modify(MenuLayer) {
                 }
             });
             auto req = web::WebRequest();
-            cacheEventListener.setFilter(req.get("https://gdladder.com/api/theList"));
+            m_fields->cacheEventListener.setFilter(req.get("https://gdladder.com/api/theList"));
         }
         return true;
     }

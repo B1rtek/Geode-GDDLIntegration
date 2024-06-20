@@ -17,8 +17,9 @@ using namespace geode::prelude;
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
     struct Fields {
         EventListener<web::WebTask> infoLayerGetRatingListener;
+        bool gddlTierUpdated = false;
     };
-    bool gddlTierUpdated = false;
+
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
@@ -30,7 +31,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
                     updateButton(-1);
-                    release();
+                    // release();
                 } else {
                     const int levelID = m_level->m_levelID;
                     int tierAfterFetch = -1;
@@ -38,18 +39,18 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                         tierAfterFetch = RatingsManager::getDemonTier(levelID);
                     }
                     updateButton(tierAfterFetch);
-                    release();
+                    // release();
                 }
             } else if (e->isCancelled()) {
                 updateButton(-1);
-                release();
+                // release();
             }
         });
 
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && notExcluded()) {
-            gddlTierUpdated = false;
+            m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
                 const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
@@ -112,7 +113,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             const int tier = RatingsManager::getDemonTier(levelID);
             if(tier != -1) {
                 updateButton(tier);
-                gddlTierUpdated = true;
+                m_fields->gddlTierUpdated = true;
             }
         }
 
@@ -123,14 +124,14 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         LevelInfoLayer::updateLabelValues();
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (!starsLabel || !isDemon || gddlTierUpdated) return;
+        if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
-        retain();
         const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
 
         if (tier == -1) {
+            // retain();
             // web request 2.0 yaaay
             auto req = web::WebRequest();
             m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
