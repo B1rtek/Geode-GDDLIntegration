@@ -63,6 +63,33 @@ bool GDDLSearchLayer::init() {
     m_mainLayer->addChild(simplifiedMenu, 1);
     showPage();
     loadValues();
+    // prepare the search request fun
+    searchListener.bind([this] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    FLAlertLayer::create("GDDL Search",
+                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                        "OK")->show();
+                } else {
+                    appendFetchedResults(response);
+                    auto [fst, snd] = getReadyRange(requestRequestedPage);
+                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                        // recurse
+                        std::string anotherRequest = formSearchRequest();
+                        auto req = web::WebRequest();
+                        searchListener.setFilter(req.get(anotherRequest));
+                    } else {
+                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                    }
+                }
+            } else if (e->isCancelled()) {
+                FLAlertLayer::create("GDDL Search",
+                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
+                  "OK")->show();
+            }
+        });
     return true;
 }
 
@@ -1043,6 +1070,10 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     }
     // well, time to get them in this case :/
     std::string request = formSearchRequest();
+    requestRequestedPage = requestedPage;
+    searchCallbackObject = callbackObject;
+    auto req = web::WebRequest();
+    searchListener.setFilter(req.get(request));
     // web::AsyncWebRequest()
     //         .fetch(request)
     //         .text()
@@ -1070,11 +1101,6 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     //                                  "OK")
     //                     ->show();
     //         });
-    FLAlertLayer::create("GDDL Search",
-                 "Search failed - either you're disconnected from the internet or the server did "
-                 "something wrong...",
-                 "OK")
-    ->show();
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {

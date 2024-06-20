@@ -2,6 +2,7 @@
 #define GDDLSEARCHLAYER_H
 
 #include <Geode/Bindings.hpp>
+#include <Geode/utils/web.hpp>
 
 struct GDDLBrowserLayer;
 using namespace geode::prelude;
@@ -70,6 +71,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static std::vector<int> cachedResults = {};
     inline static int onlinePagesFetched = 0;
     inline static bool searching = false;
+    inline static EventListener<web::WebTask> searchListener;
+    inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
+    inline static GDDLBrowserLayer* searchCallbackObject;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
     // page normal
