@@ -1,12 +1,12 @@
 #include "GDDLRating.h"
 
-GDDLRating::GDDLRating(json levelData) {
-    this->rating = !levelData["Rating"].is_null() ? static_cast<float>(levelData["Rating"]) : -1.0f;
-    this->enjoyment = !levelData["Enjoyment"].is_null() ? static_cast<float>(levelData["Enjoyment"]) : -1.0f;
-    this->deviation = !levelData["Deviation"].is_null() ? static_cast<double>(levelData["Deviation"]) : 0.0;
-    this->ratingCount = levelData["RatingCount"];
-    this->enjoymentCount = levelData["EnjoymentCount"];
-    this->submissionCount = levelData["SubmissionCount"];
+GDDLRating::GDDLRating(matjson::Value levelData) {
+    this->rating = levelData.contains("Rating") ? levelData["Rating"].as_double() : -1.0f;
+    this->enjoyment = levelData.contains("Enjoyment") ? levelData["Enjoyment"].as_double() : -1.0f;
+    this->deviation = levelData.contains("Deviation") ? levelData["Deviation"].as_double() : 0.0;
+    this->ratingCount = levelData["RatingCount"].as_int();
+    this->enjoymentCount = levelData["EnjoymentCount"].as_int();
+    this->submissionCount = levelData["SubmissionCount"].as_int();
 
     this->roundedRating = static_cast<int>(round(this->rating));
 }

@@ -537,21 +537,21 @@ std::string GDDLSearchLayer::formSearchRequest() {
 std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
     try {
-        json responseJson = json::parse(response);
-        const int total = responseJson["total"];
+        matjson::Value responseJson = matjson::parse(response);
+        const int total = responseJson["total"].as_int();
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
-        json levelList = responseJson["levels"];
-        for (auto element: levelList) {
-            const int levelID = element["LevelID"];
+        matjson::Value levelList = responseJson["levels"];
+        for (auto element: levelList.as_array()) {
+            const int levelID = element["LevelID"].as_int();
             if (levelID > 3) { // to avoid official demons
-                results.push_back(element["LevelID"]);
+                results.push_back(element["LevelID"].as_int());
                 if(!element["Rating"].is_null()) {
-                    const float rating = element["Rating"];
+                    const float rating = element["Rating"].as_double();
                     RatingsManager::updateCacheFromSearch(levelID, rating);
                 }
             }
         }
-    } catch (json::exception &error) {
+    } catch (std::runtime_error &error) {
         // well nothing really can be done here
     }
     return results;

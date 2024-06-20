@@ -1,13 +1,11 @@
 #ifndef GDDLRATING_H
 #define GDDLRATING_H
 
-#include <json.hpp>
-
-using json = nlohmann::json;
+#include <matjson.hpp>
 
 class GDDLRating {
 public:
-    explicit GDDLRating(json levelData);
+    explicit GDDLRating(matjson::Value levelData);
 
     GDDLRating() = default;
 
