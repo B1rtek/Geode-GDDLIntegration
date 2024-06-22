@@ -1,6 +1,6 @@
 {
-	"geode": "3.0.0-beta.4",
-	"version": "v1.1.8",
+	"geode": "3.0.0",
+	"version": "v1.1.9",
 	"gd": {
 		"android": "2.206",
 		"win": "2.206"
@@ -16,7 +16,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=1.12.0-beta.1",
+			"version": ">=1.12.0",
 			"importance": "required"
 		}
 	],
