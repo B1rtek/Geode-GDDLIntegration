@@ -1,3 +1,6 @@
+# v1.1.9
+- Fixed a very silly oversight (I accidentally removed a null check), I'm sorry for this :(
+
 # v1.1.8
 - 2.206 support
 - Settings page overhaul, now it should make a bit more sense
