@@ -143,7 +143,7 @@ std::optional<GDDLRating> RatingsManager::getRating(const int id) {
 }
 
 std::string RatingsManager::getRequestUrl(const int id) {
-    std::string requestURL = "https://gdladder.com/api/level?levelID=" + std::to_string(id);
+    std::string requestURL = "https://gdladder.com/api/level/" + std::to_string(id);
     return requestURL;
 }
 
