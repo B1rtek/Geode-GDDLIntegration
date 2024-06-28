@@ -1,3 +1,6 @@
+# v1.1.10
+- Switch to GDDL API 2.0
+
 # v1.1.9
 - Fixed a very silly oversight (I accidentally removed a null check), I'm sorry for this :(
 
