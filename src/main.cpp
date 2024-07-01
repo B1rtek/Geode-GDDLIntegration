@@ -69,7 +69,11 @@ class $modify(MenuLayer) {
                 }
             });
             auto req = web::WebRequest();
-            m_fields->cacheEventListener.setFilter(req.get("https://gdladder.com/api/theList"));
+            // if you're reading this because you treat this as an example of how to use the gddl api
+            // cache
+            // for the love of god
+            // please
+            m_fields->cacheEventListener.setFilter(req.get("https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL"));
         }
         return true;
     }
