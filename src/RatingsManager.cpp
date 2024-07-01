@@ -160,18 +160,52 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
 
 void RatingsManager::cacheRatings(const std::string &response) {
     // ReSharper disable once CppTooWideScopeInitStatement
-    try {
-        matjson::Value ratingsData = matjson::parse(response);
-        for (auto element: ratingsData.as_array()) {
-            const int id = element["ID"].as_int();
-            const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
+    // try {
+        // now we need to parse csv
+        std::stringstream ss;
+        std::string value, line;
+        ss << response;
+        // skip the headers
+        std::getline(ss, value);
+        // get the data
+        while(std::getline(ss, line)) {
+            line += ',';
+            int linePos = 0, currentQuoteCount = 0;
+            std::vector<std::string> values;
+            value = "";
+            while (linePos < line.size()) {
+                if (line[linePos] == '"') {
+                    ++currentQuoteCount;
+                    value.push_back(line[linePos]);
+                } else if (line[linePos] == ',' && currentQuoteCount % 2 == 0) {
+                    values.push_back(value);
+                    value = "";
+                    currentQuoteCount = 0;
+                } else {
+                    value.push_back(line[linePos]);
+                }
+                ++linePos;
+            }
+            // values are in the vector now, we're only interested in the ID and the Rating
+            const int id = std::stoi(values[4].substr(1, values[4].size() - 2));
+            std::string strRating = values[5].substr(1, values[5].size() - 2);
+            if (strRating.empty()) strRating = "-1.0";
+            const float rating = std::stof(strRating);
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
+        // old code in case /theList comes back
+        // matjson::Value ratingsData = matjson::parse(response);
+        // for (auto element: ratingsData.as_array()) {
+        //     const int id = element["ID"].as_int();
+        //     const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
+        //     const int roundedRating = static_cast<int>(round(rating));
+        //     ratingsCache[id] = roundedRating;
+        // }
         cacheList(false);
-    } catch (std::runtime_error &error) {
-        // just do nothing, the user will be notified that stuff happened
-    }
+    // } catch (std::runtime_error &error) {
+    //     // just do nothing, the user will be notified that stuff happened
+    // }
 }
 
 std::map<int, int> RatingsManager::getTierStats() {
