@@ -1,3 +1,6 @@
+# v1.1.11
+- Fixed (hopefully completely and finally) a bug causing the game to crash while browsing newly rated demon levels (thank you hiimjustin000)
+
 # v1.1.10
 - Switch to GDDL API 2.0
 
