@@ -63,7 +63,7 @@ cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
     const int r = (hexColor >> (8 * 2)) & 0xff;
     const int g = (hexColor >> (8 * 1)) & 0xff;
     const int b = (hexColor >> (8*0)) & 0xff;
-    return cocos2d::ccColor3B(r, g, b);
+    return ccc3(r, g, b);
 }
 
 /**
@@ -130,7 +130,7 @@ int RatingsManager::getDemonTier(const int id) { return !demonMap.contains(id) ?
 
 cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
     if (tier > tierColors.size() || tier < 0) {
-        return cocos2d::ccColor3B(255, 255, 255);
+        return ccc3(255, 255, 255);
     }
     const int hexColor = tierColors[tier];
     return convertToColor(hexColor);
