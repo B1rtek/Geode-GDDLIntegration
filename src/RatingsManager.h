@@ -19,12 +19,12 @@ class RatingsManager {
 
     static cocos2d::ccColor3B convertToColor(int hexColor);
 
-    static void populateFromSave();
-
 public:
     inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
 
     inline static bool triedToCache = false;
+
+    static void populateFromSave();
 
     static int getDemonTier(int id);
 
@@ -42,11 +42,15 @@ public:
 
     static bool alreadyCached();
 
+    static bool cacheNotEmpty();
+
     static void updateCacheFromSearch(int levelID, const float rating);
 
     static int getCachedTier(int levelID);
 
     static void cacheList(bool onQuit);
+
+    static void clearCache();
 };
 
 
