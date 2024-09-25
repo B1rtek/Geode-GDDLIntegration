@@ -171,8 +171,10 @@ public:
                     FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
                 } else {
                     RatingsManager::cacheRatings(response);
-                    if(!RatingsManager::alreadyCached()) {
+                    if(!RatingsManager::cacheNotEmpty()) {
                         FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                        // populate the cache from the save anyway, there could be something in there
+                        RatingsManager::populateFromSave();
                     } else if (notifySuccess) {
                         FLAlertLayer::create("Reset GDDL cache", "Cache refresh succeeded", "OK")->show();
                     }
