@@ -7,6 +7,7 @@
 using namespace geode::prelude;
 
 class DummySettingCR : public SettingValue {
+public:
     DummySettingCR(std::string const &key, std::string const &modID) : SettingValue(key, modID) {}
 
     bool load(matjson::Value const& json) override;

@@ -3,6 +3,7 @@
 
 
 #include <Geode/loader/SettingNode.hpp>
+#include <Geode/utils/web.hpp>
 
 #include "DummySettingCR.h"
 
@@ -10,6 +11,8 @@ using namespace geode::prelude;
 
 class CacheResetSettingNode : public SettingNode {
 protected:
+    EventListener<web::WebTask> cacheEventListener;
+
     bool init(DummySettingCR* value, float width);
 
     void onCacheResetButtonClicked(CCObject *sender);
