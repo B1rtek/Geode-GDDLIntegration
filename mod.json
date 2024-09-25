@@ -54,6 +54,11 @@
 			"name": "Include/Exclude range",
 			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
 			"type": "custom"
+		},
+		"cache-reset": {
+			"name": "Reset GDDL cache",
+			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
+			"type": "custom"
 		}
 	}
 }

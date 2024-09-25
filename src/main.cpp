@@ -16,6 +16,7 @@
 #include "GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "settings/DummySettingCR.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -83,5 +84,9 @@ $on_mod(Loaded) {
     Mod::get()->registerCustomSetting(
         "exclude-range",
         std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)
+    );
+    Mod::get()->registerCustomSetting(
+        "cache-reset",
+        std::make_unique<DummySettingCR>("exclude-range", Mod::get()->getID())
     );
 }
