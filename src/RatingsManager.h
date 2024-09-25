@@ -22,6 +22,8 @@ class RatingsManager {
     static void populateFromSave();
 
 public:
+    inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
+
     inline static bool triedToCache = false;
 
     static int getDemonTier(int id);
