@@ -1,3 +1,8 @@
+# v1.1.12
+- Added a GDDL cache reset button in the settings, in case the GDDL Split shows only zeroes you should use it, removing the json file will no longer be needed
+- If you're disconnected from the internet the mod should no longer show you an alert about that every time you're in the main menu
+- MacOS support (thanks ninXout), although I won't debug issues related only to it because I have no way to do that (that's why it wasn't supported in the first place)
+
 # v1.1.11
 - Fixed (hopefully completely and finally) a bug causing the game to crash while browsing newly rated demon levels (thank you hiimjustin000)
 
