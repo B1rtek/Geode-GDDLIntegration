@@ -3,7 +3,8 @@
 	"version": "v1.1.11",
 	"gd": {
 		"android": "2.206",
-		"win": "2.206"
+		"win": "2.206",
+		"mac": "2.206"
 	},
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
