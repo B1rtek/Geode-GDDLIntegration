@@ -55,6 +55,7 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
         if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
+            RatingsManager::triedToCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             // if you're reading this because you treat this as an example of how to use the gddl api
