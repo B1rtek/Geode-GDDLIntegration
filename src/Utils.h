@@ -163,8 +163,8 @@ public:
         return bg;
     }
 
-    static void bindCacheDownloadCallback(EventListener<web::WebTask> &cacheEventListener) {
-        cacheEventListener.bind([] (web::WebTask::Event* e) {
+    static void bindCacheDownloadCallback(EventListener<web::WebTask> &cacheEventListener, bool notifySuccess = false) {
+        cacheEventListener.bind([notifySuccess] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
                 const std::string response = res->string().unwrapOr("");
                 if (response.empty()) {
@@ -173,6 +173,8 @@ public:
                     RatingsManager::cacheRatings(response);
                     if(!RatingsManager::alreadyCached()) {
                         FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                    } else if (notifySuccess) {
+                        FLAlertLayer::create("Reset GDDL cache", "Cache refresh succeeded", "OK")->show();
                     }
                 }
             } else if (e->isCancelled()) {
