@@ -15,6 +15,7 @@
 
 #include "GDDLSearchLayer.h"
 #include "RatingsManager.h"
+#include "Utils.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -52,22 +53,8 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            m_fields->cacheEventListener.bind([] (web::WebTask::Event* e) {
-                if (web::WebResponse* res = e->getValue()) {
-                    const std::string response = res->string().unwrapOr("");
-                    if (response.empty()) {
-                        somethingWentWrong();
-                    } else {
-                        RatingsManager::cacheRatings(response);
-                        if(!RatingsManager::alreadyCached()) {
-                            somethingWentWrong();
-                        }
-                    }
-                } else if (e->isCancelled()) {
-                    somethingWentWrong();
-                }
-            });
+        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
+            Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             // if you're reading this because you treat this as an example of how to use the gddl api
             // cache
@@ -76,10 +63,6 @@ class $modify(MenuLayer) {
             m_fields->cacheEventListener.setFilter(req.get("https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL"));
         }
         return true;
-    }
-
-    static void somethingWentWrong() {
-        FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
     }
 
     void onQuit(cocos2d::CCObject* sender) {
