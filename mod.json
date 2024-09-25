@@ -1,6 +1,6 @@
 {
-	"geode": "3.4.0",
-	"version": "v1.1.11",
+	"geode": "3.7.1",
+	"version": "v1.1.12",
 	"gd": {
 		"android": "2.206",
 		"win": "2.206",
@@ -53,6 +53,11 @@
 		"exclude-range": {
 			"name": "Include/Exclude range",
 			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
+			"type": "custom"
+		},
+		"cache-reset": {
+			"name": "Reset GDDL cache",
+			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
 			"type": "custom"
 		}
 	}

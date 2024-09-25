@@ -202,7 +202,11 @@ void RatingsManager::cacheRatings(const std::string &response) {
         //     const int roundedRating = static_cast<int>(round(rating));
         //     ratingsCache[id] = roundedRating;
         // }
-        cacheList(false);
+        if (!ratingsCache.empty()) {
+            // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
+            cacheList(false);
+        }
+
     // } catch (std::runtime_error &error) {
     //     // just do nothing, the user will be notified that stuff happened
     // }
@@ -226,8 +230,19 @@ std::map<int, int> RatingsManager::getTierStats() {
     }
     return tierStats;
 }
+
+/**
+ * Populates the in-memory cache from file and then checks if that actually populated it
+ */
 bool RatingsManager::alreadyCached() {
     populateFromSave();
+    return !ratingsCache.empty();
+}
+
+/**
+ * Checks if cache is empty WIHTOUT trying to populate it
+ */
+bool RatingsManager::cacheNotEmpty() {
     return !ratingsCache.empty();
 }
 
@@ -238,4 +253,9 @@ void RatingsManager::updateCacheFromSearch(const int levelID, const float rating
 
 int RatingsManager::getCachedTier(const int levelID) {
     return !ratingsCache.contains(levelID) ? -1 : ratingsCache[levelID];
+}
+
+void RatingsManager::clearCache() {
+    // clears the cache in-memory, leaving the file intact in case the refresh fails for some reason
+    ratingsCache.clear();
 }

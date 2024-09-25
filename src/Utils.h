@@ -5,7 +5,10 @@
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <Geode/binding/CCMenuItemToggler.hpp>
 #include <Geode/binding/CCTextInputNode.hpp>
+#include <Geode/utils/web.hpp>
 #include <sys/stat.h>
+
+#include "RatingsManager.h"
 
 class Utils {
 public:
@@ -158,6 +161,28 @@ public:
         bg->setPosition(position);
         bg->setOpacity(100);
         return bg;
+    }
+
+    static void bindCacheDownloadCallback(EventListener<web::WebTask> &cacheEventListener, bool notifySuccess = false) {
+        cacheEventListener.bind([notifySuccess] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOr("");
+                if (response.empty()) {
+                    FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                } else {
+                    RatingsManager::cacheRatings(response);
+                    if(!RatingsManager::cacheNotEmpty()) {
+                        FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                        // populate the cache from the save anyway, there could be something in there
+                        RatingsManager::populateFromSave();
+                    } else if (notifySuccess) {
+                        FLAlertLayer::create("Reset GDDL cache", "Cache refresh succeeded", "OK")->show();
+                    }
+                }
+            } else if (e->isCancelled()) {
+                FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+            }
+        });
     }
 };
 #endif // GDDL_UTILS_H

@@ -15,6 +15,8 @@
 
 #include "GDDLSearchLayer.h"
 #include "RatingsManager.h"
+#include "Utils.h"
+#include "settings/DummySettingCR.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -52,34 +54,17 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            m_fields->cacheEventListener.bind([] (web::WebTask::Event* e) {
-                if (web::WebResponse* res = e->getValue()) {
-                    const std::string response = res->string().unwrapOr("");
-                    if (response.empty()) {
-                        somethingWentWrong();
-                    } else {
-                        RatingsManager::cacheRatings(response);
-                        if(!RatingsManager::alreadyCached()) {
-                            somethingWentWrong();
-                        }
-                    }
-                } else if (e->isCancelled()) {
-                    somethingWentWrong();
-                }
-            });
+        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
+            RatingsManager::triedToCache = true;
+            Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             // if you're reading this because you treat this as an example of how to use the gddl api
             // cache
             // for the love of god
             // please
-            m_fields->cacheEventListener.setFilter(req.get("https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL"));
+            m_fields->cacheEventListener.setFilter(req.get(RatingsManager::gddlSheetUrl));
         }
         return true;
-    }
-
-    static void somethingWentWrong() {
-        FLAlertLayer::create("GDDL Integration", "Could not cache ratings from gdladder.com! Check your internet connection and restart the game.", "OK")->show();
     }
 
     void onQuit(cocos2d::CCObject* sender) {
@@ -100,5 +85,9 @@ $on_mod(Loaded) {
     Mod::get()->registerCustomSetting(
         "exclude-range",
         std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)
+    );
+    Mod::get()->registerCustomSetting(
+        "cache-reset",
+        std::make_unique<DummySettingCR>("exclude-range", Mod::get()->getID())
     );
 }
