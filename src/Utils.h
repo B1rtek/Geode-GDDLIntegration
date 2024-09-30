@@ -184,5 +184,21 @@ public:
             }
         });
     }
+
+    static CCSprite *getTierSpriteFromName(const char *name) {
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
+
+        sprite->setScale(0.275f);
+        sprite->setAnchorPoint({0, 0});
+
+        return sprite;
+    }
+
+    static CCSprite *getSpriteFromTier(const int tier) {
+        if (tier == -1) {
+            return getTierSpriteFromName("tier_unrated.png");
+        }
+        return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
+    }
 };
 #endif // GDDL_UTILS_H

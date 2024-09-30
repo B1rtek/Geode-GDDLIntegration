@@ -140,7 +140,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         const int levelID = m_level->m_levelID;
         // just so it displays a bit earlier
-        const auto button = CCMenuItemSpriteExtra::create(getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        const auto button = CCMenuItemSpriteExtra::create(Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
         button->setPosition(buttonPosition);
         button->setID("rating"_spr);
         menu->addChild(button);
@@ -156,7 +156,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             if (!tierButton) return;
             tierButton->removeAllChildren();
 
-            const auto tierSprite = getSpriteFromTier(tier);
+            const auto tierSprite = Utils::getSpriteFromTier(tier);
             tierButton->addChild(tierSprite);
         } else {
             const auto tierLabelSprite = typeinfo_cast<CCLabelBMFont*>(getChildByIDRecursive("gddl-rating_label"_spr));
@@ -166,22 +166,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             tierLabelSprite->setString(newLabelContent.c_str());
             tierLabelSprite->setColor(RatingsManager::getTierColor(tier));
         }
-    }
-
-    static CCSprite *getTierSpriteFromName(const char *name) {
-        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
-
-        sprite->setScale(0.275f);
-        sprite->setAnchorPoint({0, 0});
-
-        return sprite;
-    }
-
-    static CCSprite *getSpriteFromTier(const int tier) {
-        if (tier == -1) {
-            return getTierSpriteFromName("tier_unrated.png");
-        }
-        return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst
