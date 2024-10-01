@@ -126,25 +126,25 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
     void removeFrom(int scrollLayerPage) {
         const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
         auto levelButton = getLevelButton(scrollLayerPage);
-        levelButton->removeChildByID("gddl-button-levelButton"_spr);
+        levelButton->removeChildByID("gddl-button-menu"_spr);
     }
 
     void addTo(int scrollLayerPage, int levelID) {
         // create the buttonMenu and the button
         const auto buttonMenu = CCMenu::create();
         buttonMenu->setID("gddl-button-menu"_spr);
-        buttonMenu->setContentSize({50, 50});
-        const auto button = CCMenuItemSpriteExtra::create(
-                Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this,
-                menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
+        buttonMenu->setContentSize({25, 25});
+        const auto sprite = Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID));
+        sprite->setScale(sprite->getScale() / 2);
+        const auto button = CCMenuItemSpriteExtra::create(sprite, this, menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
         button->setID("gddl-button"_spr);
         // add it
         auto levelButton = getLevelButton(scrollLayerPage);
         if (!levelButton) return;
         buttonMenu->addChild(button);
-        button->setPosition(25, 25);
+        button->setPosition(12.5, 12.5);
         levelButton->addChild(buttonMenu);
-        buttonMenu->setPosition(0, 0);
+        buttonMenu->setPosition(5, 69);
         // after placing the button fetch the full level info
         const int tier = RatingsManager::getDemonTier(levelID);
         if (tier == -1) {
@@ -183,11 +183,11 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         gddlButtonMenu->removeAllChildren();
         // add the new one
         const int levelID = convertPageToLevel(m_fields->currentPage);
-        const auto button = CCMenuItemSpriteExtra::create(
-                Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this,
-                menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
+        const auto sprite = Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID));
+        sprite->setScale(sprite->getScale() / 2);
+        const auto button = CCMenuItemSpriteExtra::create(sprite, this,menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
         button->setID("gddl-button"_spr);
         gddlButtonMenu->addChild(button);
-        button->setPosition(25, 25);
+        button->setPosition(12.5, 12.5);
     }
 };
