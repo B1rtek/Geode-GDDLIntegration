@@ -125,10 +125,8 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
 
     void removeFrom(int scrollLayerPage) {
         const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
-        auto menu = getChildByID("levels-list")->getChildByID("level-pages")->getChildByID(pageID)->getChildByID(
-                "level-menu")->getChildByID("level-button")->getChildByID("white-sprite")->getChildByID(
-                "scale-9-sprite");
-        menu->removeChildByID("gddl-button-menu"_spr);
+        auto levelButton = getLevelButton(scrollLayerPage);
+        levelButton->removeChildByID("gddl-button-levelButton"_spr);
     }
 
     void addTo(int scrollLayerPage, int levelID) {
@@ -140,17 +138,19 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
                 Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this,
                 menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
         button->setID("gddl-button"_spr);
-        // put together the page id
-        const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
-        // add it to a random place idk
-        auto levelButton = getChildByID("levels-list")->getChildByID("level-pages")->getChildByID(pageID)->getChildByID(
-                "level-menu")->getChildByID("level-button")->getChildByID("white-sprite")->getChildByID(
-                "scale-9-sprite");
+        // add it
+        auto levelButton = getLevelButton(scrollLayerPage);
         if (!levelButton) return;
         buttonMenu->addChild(button);
         button->setPosition(25, 25);
         levelButton->addChild(buttonMenu);
         buttonMenu->setPosition(0, 0);
+        // after placing the button fetch the full level info
+        const int tier = RatingsManager::getDemonTier(levelID);
+        if (tier == -1) {
+            auto req = web::WebRequest();
+            m_fields->robtopLevelsLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
+        }
     }
 
     int convertPageToLevel(int page) {
@@ -163,15 +163,31 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         return levelID;
     }
 
-    void onGDDLInfo(CCObject *sender) {
-        int levelID = convertPageToLevel(m_fields->currentPage);
-        // request details online if needed
+    CCNode* getLevelButton(int pageID) {
+        const std::string pageIDStr = "level-page-" + std::to_string(pageID);
+        return getChildByID("levels-list")->getChildByID("level-pages")->getChildByID(pageIDStr)->getChildByID(
+                "level-menu")->getChildByID("level-button")->getChildByID("white-sprite")->getChildByID(
+                "scale-9-sprite");
+    }
 
-        // show the thing
+    void onGDDLInfo(CCObject *sender) {
+        const int levelID = convertPageToLevel(m_fields->currentPage);
         GDDLLevelInfoPopup::create(levelID)->show();
     }
 
     void updateButton(const int tier) {
-        
+        // get the menu
+        auto gddlButtonMenu = getLevelButton(m_fields->currentPage % 3 + 1)->getChildByID("gddl-button-menu"_spr);
+        if (gddlButtonMenu == nullptr) return; // the user most likely scrolled past quicker than it loaded
+        // remove the old button
+        gddlButtonMenu->removeAllChildren();
+        // add the new one
+        const int levelID = convertPageToLevel(m_fields->currentPage);
+        const auto button = CCMenuItemSpriteExtra::create(
+                Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this,
+                menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
+        button->setID("gddl-button"_spr);
+        gddlButtonMenu->addChild(button);
+        button->setPosition(25, 25);
     }
 };
