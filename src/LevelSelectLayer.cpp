@@ -1,5 +1,10 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelSelectLayer.hpp>
+#include "RatingsManager.h"
+#include "Utils.h"
+#include "GDDLLevelInfoPopup.h"
+
+using namespace geode::prelude;
 
 class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
 
@@ -21,33 +26,53 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         int currentPage = 0;
         const static int pageCount = 24;
         bool buttonsAdded[3] = {false, false, false};
+        EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
     };
 
     bool init(int page) {
         if (!LevelSelectLayer::init(page)) {
             return false;
         }
+        // setup potential web req
+        m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    updateButton(-1);
+                } else {
+                    const int levelID = convertPageToLevel(m_fields->currentPage);
+                    int tierAfterFetch = -1;
+                    if(RatingsManager::addRatingFromResponse(levelID, response)) {
+                        tierAfterFetch = RatingsManager::getDemonTier(levelID);
+                    }
+                    updateButton(tierAfterFetch);
+                }
+            } else if (e->isCancelled()) {
+                updateButton(-1);
+            }
+        });
+
         m_fields->currentPage = page;
         pageChanged(-1);
         return true;
     }
 
-    void onNext(CCObject* sender) {
-        LevelSelectLayer::onNext(sender);
+    void onNext(CCObject *sender) {
         int previousPage = m_fields->currentPage++;
         if (m_fields->currentPage >= m_fields->pageCount) {
             m_fields->currentPage = 0;
         }
         pageChanged(previousPage);
+        LevelSelectLayer::onNext(sender);
     }
 
-    void onPrev(CCObject* sender) {
-        LevelSelectLayer::onPrev(sender);
+    void onPrev(CCObject *sender) {
         int previousPage = m_fields->currentPage--;
         if (m_fields->currentPage < 0) {
             m_fields->currentPage = m_fields->pageCount - 1;
         }
         pageChanged(previousPage);
+        LevelSelectLayer::onPrev(sender);
     }
 
     void pageChanged(int previousPage) {
@@ -65,27 +90,33 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
             m_fields->buttonsAdded[2] = true;
         }
         // a button might also be removed at the same time
-        if (m_fields->currentPage == Level::TOE && previousPage == Level::ELECTROMAN_ADVENTURES && m_fields->buttonsAdded[0]) {
+        if (m_fields->currentPage == Level::TOE && previousPage == Level::ELECTROMAN_ADVENTURES &&
+            m_fields->buttonsAdded[0]) {
             // navigated away from clubstep to the left, button should be removed
             removeFrom(2);
             m_fields->buttonsAdded[0] = false;
-        } else if (m_fields->currentPage == Level::HEXAGON_FORCE && previousPage == Level::ELECTRODYNAMIX && m_fields->buttonsAdded[0]) {
+        } else if (m_fields->currentPage == Level::HEXAGON_FORCE && previousPage == Level::ELECTRODYNAMIX &&
+                   m_fields->buttonsAdded[0]) {
             // navigated away from clubstep to the right, button should be removed
             removeFrom(2);
             m_fields->buttonsAdded[0] = false;
-        } else if (m_fields->currentPage == Level::HEXAGON_FORCE && previousPage == Level::BLAST_PROCESSING && m_fields->buttonsAdded[1]) {
+        } else if (m_fields->currentPage == Level::HEXAGON_FORCE && previousPage == Level::BLAST_PROCESSING &&
+                   m_fields->buttonsAdded[1]) {
             // navigated away from toe2 to the left, button should be removed
             removeFrom(3);
             m_fields->buttonsAdded[1] = false;
-        } else if (m_fields->currentPage == Level::DEADLOCKED && previousPage == Level::GEOMETRICAL_DOMINATOR && m_fields->buttonsAdded[1]) {
+        } else if (m_fields->currentPage == Level::DEADLOCKED && previousPage == Level::GEOMETRICAL_DOMINATOR &&
+                   m_fields->buttonsAdded[1]) {
             // navigated away from toe2 to the right, button should be removed
             removeFrom(3);
             m_fields->buttonsAdded[1] = false;
-        } else if (m_fields->currentPage == Level::TOE2 && previousPage == Level::GEOMETRICAL_DOMINATOR && m_fields->buttonsAdded[2]) {
+        } else if (m_fields->currentPage == Level::TOE2 && previousPage == Level::GEOMETRICAL_DOMINATOR &&
+                   m_fields->buttonsAdded[2]) {
             // navigated away from deadlocked to the left, button should be removed
             removeFrom(2);
             m_fields->buttonsAdded[2] = false;
-        } else if (m_fields->currentPage == Level::DASH && previousPage == Level::FINGERDASH && m_fields->buttonsAdded[2]) {
+        } else if (m_fields->currentPage == Level::DASH && previousPage == Level::FINGERDASH &&
+                   m_fields->buttonsAdded[2]) {
             // navigated away from deadlocked to the right, button should be removed
             removeFrom(2);
             m_fields->buttonsAdded[2] = false;
@@ -93,10 +124,54 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
     }
 
     void removeFrom(int scrollLayerPage) {
-        std::cout << "[gddlint] remove from page " << scrollLayerPage << std::endl;
+        const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
+        auto menu = getChildByID("levels-list")->getChildByID("level-pages")->getChildByID(pageID)->getChildByID(
+                "level-menu")->getChildByID("level-button")->getChildByID("white-sprite")->getChildByID(
+                "scale-9-sprite");
+        menu->removeChildByID("gddl-button-menu"_spr);
     }
 
     void addTo(int scrollLayerPage, int levelID) {
-        std::cout << "[gddlint] add to page " << scrollLayerPage << " level " << levelID << std::endl;
+        // create the buttonMenu and the button
+        const auto buttonMenu = CCMenu::create();
+        buttonMenu->setID("gddl-button-menu"_spr);
+        buttonMenu->setContentSize({50, 50});
+        const auto button = CCMenuItemSpriteExtra::create(
+                Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this,
+                menu_selector(GDDLRobtopLevelsLayer::onGDDLInfo));
+        button->setID("gddl-button"_spr);
+        // put together the page id
+        const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
+        // add it to a random place idk
+        auto levelButton = getChildByID("levels-list")->getChildByID("level-pages")->getChildByID(pageID)->getChildByID(
+                "level-menu")->getChildByID("level-button")->getChildByID("white-sprite")->getChildByID(
+                "scale-9-sprite");
+        if (!levelButton) return;
+        buttonMenu->addChild(button);
+        button->setPosition(25, 25);
+        levelButton->addChild(buttonMenu);
+        buttonMenu->setPosition(0, 0);
+    }
+
+    int convertPageToLevel(int page) {
+        int levelID = 1;
+        if (page == Level::TOE2) {
+            levelID = 2;
+        } else if (page == Level::DEADLOCKED) {
+            levelID = 3;
+        }
+        return levelID;
+    }
+
+    void onGDDLInfo(CCObject *sender) {
+        int levelID = convertPageToLevel(m_fields->currentPage);
+        // request details online if needed
+
+        // show the thing
+        GDDLLevelInfoPopup::create(levelID)->show();
+    }
+
+    void updateButton(const int tier) {
+        
     }
 };
