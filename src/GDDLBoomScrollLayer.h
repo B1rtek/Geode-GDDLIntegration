@@ -4,8 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/BoomScrollLayer.hpp>
 
-#include "LevelSelectLayer.cpp"
-
+#include "GDDLRobtopLevelsLayer.h"
 
 using namespace geode::prelude;
 
