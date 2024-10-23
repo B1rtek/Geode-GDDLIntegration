@@ -36,11 +36,13 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
 
     void onPrev(CCObject *sender);
 
-    void onBack(CCObject *sender);
-
     void swiped(const int newPage);
 
+    void onBack(CCObject *sender);
+
     virtual void keyBackClicked();
+
+    void backActions();
 
     void pageChanged(int previousPage);
 

@@ -6,7 +6,6 @@ void GDDLBoomScrollLayer::ccTouchEnded(cocos2d::CCTouch* p0, cocos2d::CCEvent* p
     while (actualPage < 0) {
         actualPage += GDDLRobtopLevelsLayer::Fields::pageCount;
     }
-    std::cout << "GDDLBoomScrollLayer::ccTouchEnded" << std::endl;
     if (GDDLRobtopLevelsLayer::Fields::beingBrowsed && Fields::robtopLevelsLayer != nullptr) {
         Fields::robtopLevelsLayer->swiped(actualPage);
     }

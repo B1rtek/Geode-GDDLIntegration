@@ -1,10 +1,13 @@
 #include "GDDLRobtopLevelsLayer.h"
 
+#include <GDDLBoomScrollLayer.h>
+
 bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
         return false;
     }
     m_fields->beingBrowsed = true;
+    GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
     // setup potential web req
     m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
@@ -50,7 +53,7 @@ void GDDLRobtopLevelsLayer::onPrev(CCObject* sender) {
 }
 
 void GDDLRobtopLevelsLayer::swiped(const int newPage) {
-    std::cout << "swiped(" << newPage << ")" << std::endl;
+    if (newPage == m_fields->currentPage) return;
     const int previousPage = m_fields->currentPage;
     m_fields->currentPage = newPage;
     pageChanged(previousPage);
@@ -58,12 +61,17 @@ void GDDLRobtopLevelsLayer::swiped(const int newPage) {
 
 void GDDLRobtopLevelsLayer::onBack(CCObject* sender) {
     LevelSelectLayer::onBack(sender);
-    m_fields->beingBrowsed = false;
+    backActions();
 }
 
 void GDDLRobtopLevelsLayer::keyBackClicked() {
     LevelSelectLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLRobtopLevelsLayer::backActions() {
     m_fields->beingBrowsed = false;
+    GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }
 
 void GDDLRobtopLevelsLayer::pageChanged(int previousPage) {
