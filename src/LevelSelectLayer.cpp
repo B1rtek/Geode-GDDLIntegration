@@ -25,6 +25,7 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
     struct Fields {
         int currentPage = 0;
         const static int pageCount = 24;
+        static inline bool beingBrowsed = false;
         bool buttonsAdded[3] = {false, false, false};
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
     };
@@ -33,6 +34,7 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         if (!LevelSelectLayer::init(page)) {
             return false;
         }
+        m_fields->beingBrowsed = true;
         // setup potential web req
         m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
@@ -73,6 +75,11 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         }
         pageChanged(previousPage);
         LevelSelectLayer::onPrev(sender);
+    }
+
+    void onBack(CCObject *sender) {
+        LevelSelectLayer::onBack(sender);
+        m_fields->beingBrowsed = false;
     }
 
     void pageChanged(int previousPage) {
