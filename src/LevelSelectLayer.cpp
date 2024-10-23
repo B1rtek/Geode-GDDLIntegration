@@ -24,7 +24,7 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
 
     struct Fields {
         int currentPage = 0;
-        const static int pageCount = 24;
+        static constexpr int pageCount = 24;
         static inline bool beingBrowsed = false;
         bool buttonsAdded[3] = {false, false, false};
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
@@ -77,8 +77,20 @@ class $modify(GDDLRobtopLevelsLayer, LevelSelectLayer) {
         LevelSelectLayer::onPrev(sender);
     }
 
+    void swiped(const int newPage) {
+        std::cout << "swiped(" << newPage << ")" << std::endl;
+        const int previousPage = m_fields->currentPage;
+        m_fields->currentPage = newPage;
+        pageChanged(previousPage);
+    }
+
     void onBack(CCObject *sender) {
         LevelSelectLayer::onBack(sender);
+        m_fields->beingBrowsed = false;
+    }
+
+    virtual void keyBackClicked() {
+        LevelSelectLayer::keyBackClicked();
         m_fields->beingBrowsed = false;
     }
 
