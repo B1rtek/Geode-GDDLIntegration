@@ -27,6 +27,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         static constexpr int pageCount = 24;
         static inline bool beingBrowsed = false;
         bool buttonsAdded[3] = {false, false, false};
+        bool changedBySwiping = false;
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
     };
 

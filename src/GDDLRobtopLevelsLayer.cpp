@@ -54,6 +54,7 @@ void GDDLRobtopLevelsLayer::onPrev(CCObject* sender) {
 
 void GDDLRobtopLevelsLayer::swiped(const int newPage) {
     if (newPage == m_fields->currentPage) return;
+    m_fields->changedBySwiping = true;
     const int previousPage = m_fields->currentPage;
     m_fields->currentPage = newPage;
     pageChanged(previousPage);
@@ -75,22 +76,7 @@ void GDDLRobtopLevelsLayer::backActions() {
 }
 
 void GDDLRobtopLevelsLayer::pageChanged(int previousPage) {
-    if (m_fields->currentPage == Level::CLUBSTEP && !m_fields->buttonsAdded[0]) {
-        // just navigated to clubstep
-        addTo(2, 1);
-        m_fields->buttonsAdded[0] = true;
-    }
-    else if (m_fields->currentPage == Level::TOE2 && !m_fields->buttonsAdded[1]) {
-        // just navigated to toe2
-        addTo(3, 2);
-        m_fields->buttonsAdded[1] = true;
-    }
-    else if (m_fields->currentPage == Level::DEADLOCKED && !m_fields->buttonsAdded[2]) {
-        // just navigated to deadlocked
-        addTo(2, 3);
-        m_fields->buttonsAdded[2] = true;
-    }
-    // a button might also be removed at the same time
+    // first, remove any buttons that should be removed
     if (m_fields->currentPage == Level::TOE && previousPage == Level::ELECTROMAN_ADVENTURES &&
         m_fields->buttonsAdded[0]) {
         // navigated away from clubstep to the left, button should be removed
@@ -127,12 +113,47 @@ void GDDLRobtopLevelsLayer::pageChanged(int previousPage) {
         removeFrom(2);
         m_fields->buttonsAdded[2] = false;
     }
+    // then add them if that's required
+    if (m_fields->currentPage == Level::CLUBSTEP && !m_fields->buttonsAdded[0]) {
+        // just navigated to clubstep
+        addTo(2, 1);
+        m_fields->buttonsAdded[0] = true;
+    }
+    else if (m_fields->currentPage == Level::TOE2 && !m_fields->buttonsAdded[1]) {
+        // just navigated to toe2
+        addTo(3, 2);
+        m_fields->buttonsAdded[1] = true;
+    }
+    else if (m_fields->currentPage == Level::DEADLOCKED && !m_fields->buttonsAdded[2]) {
+        // just navigated to deadlocked
+        addTo(2, 3);
+        m_fields->buttonsAdded[2] = true;
+    }
 }
 
 void GDDLRobtopLevelsLayer::removeFrom(int scrollLayerPage) {
-    const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
-    auto levelButton = getLevelButton(scrollLayerPage);
-    levelButton->removeChildByID("gddl-button-menu"_spr);
+    if (m_fields->changedBySwiping) {
+        // for some reason the usual way of doing that bugs out in that case
+        // find the button menu on all layers and remove them
+        auto buttonMenu = getChildByIDRecursive("gddl-button-menu"_spr);
+        while (buttonMenu != nullptr) {
+            auto buttonMenuParent = buttonMenu->getParent();
+            buttonMenuParent->removeChildByID("gddl-button-menu"_spr);
+            buttonMenu = getChildByIDRecursive("gddl-button-menu"_spr);
+        }
+        // same for the button because sometimes it decides to reattach itself to the nearest random menu????
+        auto button = getChildByIDRecursive("gddl-button"_spr);
+        while (button != nullptr) {
+            auto buttonParent = button->getParent();
+            buttonParent->removeChildByID("gddl-button"_spr);
+            button = getChildByIDRecursive("gddl-button"_spr);
+        }
+        m_fields->changedBySwiping = false;
+    } else {
+        const std::string pageID = "level-page-" + std::to_string(scrollLayerPage);
+        auto levelButton = getLevelButton(scrollLayerPage);
+        levelButton->removeChildByID("gddl-button-menu"_spr);
+    }
 }
 
 void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
