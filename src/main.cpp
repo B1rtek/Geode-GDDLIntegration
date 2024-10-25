@@ -75,10 +75,6 @@ class $modify(MenuLayer) {
 
 $on_mod(Loaded) {
     Mod::get()->registerCustomSetting(
-        "button-position",
-        std::make_unique<ButtonPositionSetting>("button-position", Mod::get()->getID(), DEFAULT)
-    );
-    Mod::get()->registerCustomSetting(
         "use-old-tier-label",
         std::make_unique<UseOldTierLabelSetting>("use-old-tier-label", Mod::get()->getID(), false, 0)
     );

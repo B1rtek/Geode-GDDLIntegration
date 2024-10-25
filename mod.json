@@ -42,8 +42,8 @@
 	"settings": {
 		"button-position": {
 			"name": "Button position",
-			"description": "Sets the GDDL Button position on the level info page",
-			"type": "custom"
+			"description": "Defines the <cr>GDDL Button</c> position on the <cb>level info</c> page. <cy>By default</c> it's positioned <cp>to the left</c> of the <cr>demon difficulty face</c>. This setting <cy>is overriden</c> by the setting \"<cb>Use old tier label</c>\"",
+			"type": "custom:button-position-v3"
 		},
 		"use-old-tier-label" : {
 			"name": "Use old tier label",
@@ -59,11 +59,6 @@
 			"name": "Reset GDDL cache",
 			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
 			"type": "custom"
-		},
-		"button-position-v3": {
-			"name": "Button position v3",
-			"description": "Sets the GDDL Button position on the level info page",
-			"type": "custom:button-position-v3"
 		}
 	}
 }

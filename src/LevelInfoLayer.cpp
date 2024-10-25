@@ -4,13 +4,13 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
-#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
 #include <settings/UseOldTierLabelSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "GDDLLevelInfoPopup.h"
+#include "settings/V3/ButtonPositionSettingV3.h"
 
 using namespace geode::prelude;
 
@@ -50,7 +50,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
+                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
