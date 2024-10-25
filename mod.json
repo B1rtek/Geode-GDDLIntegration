@@ -1,5 +1,5 @@
 {
-	"geode": "3.7.1",
+	"geode": "3.8.1",
 	"version": "v1.1.12",
 	"gd": {
 		"android": "2.206",
@@ -59,6 +59,11 @@
 			"name": "Reset GDDL cache",
 			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
 			"type": "custom"
+		},
+		"button-position-v3": {
+			"name": "Button position v3",
+			"description": "Sets the GDDL Button position on the level info page",
+			"type": "custom:button-position-v3"
 		}
 	}
 }
