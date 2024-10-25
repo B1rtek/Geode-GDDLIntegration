@@ -31,8 +31,4 @@ public:
     void setPosition(ButtonPosition position);
 };
 
-$execute {
-    (void)Mod::get()->registerCustomSettingType("button-position-v3", &ButtonPositionSettingV3::parse);
-}
-
 #endif //BUTTONPOSITIONSETTINGV3_H

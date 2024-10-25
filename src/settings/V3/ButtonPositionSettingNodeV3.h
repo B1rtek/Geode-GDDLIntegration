@@ -8,6 +8,7 @@
 class ButtonPositionSettingNodeV3 : public SettingNodeV3 {
 protected:
     ButtonPosition currentSetting = DEFAULT;
+    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
 
     CCLabelBMFont *positionSettingLabel = nullptr;
     static constexpr float labelWidth = 150.0f;
@@ -24,7 +25,6 @@ protected:
     void onResetToDefault() override;
 
 public:
-    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
 
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;

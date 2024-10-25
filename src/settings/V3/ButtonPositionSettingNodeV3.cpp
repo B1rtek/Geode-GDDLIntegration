@@ -61,7 +61,7 @@ void ButtonPositionSettingNodeV3::onCommit() {
 }
 
 void ButtonPositionSettingNodeV3::onResetToDefault() {
-    currentSetting = DEFAULT;
+    currentSetting = ButtonPositionSettingV3::defaultPosition;
     this->markChanged(nullptr);
 }
 
@@ -70,7 +70,7 @@ bool ButtonPositionSettingNodeV3::hasUncommittedChanges() const {
 }
 
 bool ButtonPositionSettingNodeV3::hasNonDefaultValue() const {
-    return currentSetting != ButtonPositionSettingV3::defaultPosition;
+    return !this->getSetting()->isDefaultValue();
 }
 
 std::shared_ptr<ButtonPositionSettingV3> ButtonPositionSettingNodeV3::getSetting() const {

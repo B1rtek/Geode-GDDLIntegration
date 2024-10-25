@@ -57,6 +57,10 @@ void ButtonPositionSettingV3::setPosition(ButtonPosition position) {
     markChanged();
 }
 
+$execute {
+    (void)Mod::get()->registerCustomSettingType("button-position-v3", &ButtonPositionSettingV3::parse);
+}
+
 
 
 
