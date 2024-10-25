@@ -67,3 +67,7 @@ void UseOldTierLabelSettingV3::setPositionOffset(int positionOffset) {
     this->positionOffset = positionOffset;
     markChanged();
 }
+
+$execute {
+    (void)Mod::get()->registerCustomSettingType("use-old-tier-label-v3", &UseOldTierLabelSettingV3::parse);
+}

@@ -31,9 +31,5 @@ public:
     void setPositionOffset(int positionOffset);
 };
 
-$execute {
-    (void)Mod::get()->registerCustomSettingType("use-old-tier-label-v3", &UseOldTierLabelSettingV3::parse);
-}
-
 
 #endif //GDDLINTEGRATION_USEOLDTIERLABELSETTINGV3_H

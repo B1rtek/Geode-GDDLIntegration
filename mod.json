@@ -47,8 +47,8 @@
 		},
 		"use-old-tier-label" : {
 			"name": "Use old tier label",
-			"description": "Changes the tier button into a label, allows for shifting it up and down",
-			"type": "custom"
+			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",
+			"type": "custom:use-old-tier-label-v3"
 		},
 		"exclude-range": {
 			"name": "Include/Exclude range",

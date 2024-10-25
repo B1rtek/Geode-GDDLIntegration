@@ -8,7 +8,6 @@
  */
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
-#include <settings/ButtonPositionSetting.h>
 #include <settings/ExcludeRangeSetting.h>
 #include <settings/UseOldTierLabelSetting.h>
 
@@ -74,10 +73,6 @@ class $modify(MenuLayer) {
 };
 
 $on_mod(Loaded) {
-    Mod::get()->registerCustomSetting(
-        "use-old-tier-label",
-        std::make_unique<UseOldTierLabelSetting>("use-old-tier-label", Mod::get()->getID(), false, 0)
-    );
     Mod::get()->registerCustomSetting(
         "exclude-range",
         std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)

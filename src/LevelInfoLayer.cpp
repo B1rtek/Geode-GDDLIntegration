@@ -5,12 +5,12 @@
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
 #include <settings/ExcludeRangeSetting.h>
-#include <settings/UseOldTierLabelSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "GDDLLevelInfoPopup.h"
 #include "settings/V3/ButtonPositionSettingV3.h"
+#include "settings/V3/UseOldTierLabelSettingV3.h"
 
 using namespace geode::prelude;
 
@@ -48,7 +48,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && notExcluded()) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
+            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
                 const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
@@ -84,7 +84,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                const auto moveRowsSetting = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
+                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -147,7 +147,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
+        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)
