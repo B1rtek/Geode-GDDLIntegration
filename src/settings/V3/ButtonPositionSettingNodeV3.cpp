@@ -7,18 +7,24 @@ bool ButtonPositionSettingNodeV3::init(std::shared_ptr<ButtonPositionSettingV3> 
     }
 
     // choice label
-    const auto bg = Utils::createLabelForChoice(this->getButtonMenu(), positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {242.5f, 20.0f},
+    const auto bg = Utils::createLabelForChoice(this->getButtonMenu(), positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {100.0f, 15.0f},
                                    {labelWidth, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(ButtonPositionSettingNodeV3::onPositionSettingLeft), menu_selector(ButtonPositionSettingNodeV3::onPositionSettingRight));
 
-    this->getButtonMenu()->setContentWidth(bg->getContentWidth() * 1.5f);
+    this->getButtonMenu()->setContentWidth(bg->getScaledContentWidth() * 1.3f);
     this->getButtonMenu()->updateLayout();
 
     // load values
+    loadValues();
     this->updateState(nullptr);
 
     return true;
 }
+
+void ButtonPositionSettingNodeV3::loadValues() {
+    currentSetting = this->getSetting()->getPosition();
+}
+
 
 void ButtonPositionSettingNodeV3::updateState(CCNode* invoker) {
     SettingNodeV3::updateState(invoker);
@@ -51,9 +57,7 @@ void ButtonPositionSettingNodeV3::onPositionSettingRight(CCObject* sender) {
 }
 
 void ButtonPositionSettingNodeV3::onCommit() {
-    const auto settingsObject = static_pointer_cast<ButtonPositionSettingV3>(this->getSetting());
-    settingsObject->setPosition(currentSetting);
-    this->commit();
+    this->getSetting()->setPosition(currentSetting);
 }
 
 void ButtonPositionSettingNodeV3::onResetToDefault() {
@@ -62,12 +66,15 @@ void ButtonPositionSettingNodeV3::onResetToDefault() {
 }
 
 bool ButtonPositionSettingNodeV3::hasUncommittedChanges() const {
-    const auto settingsObject = static_pointer_cast<ButtonPositionSettingV3>(this->getSetting());
-    return settingsObject->getPosition() != currentSetting;
+    return this->getSetting()->getPosition() != currentSetting;
 }
 
 bool ButtonPositionSettingNodeV3::hasNonDefaultValue() const {
     return currentSetting != ButtonPositionSettingV3::defaultPosition;
+}
+
+std::shared_ptr<ButtonPositionSettingV3> ButtonPositionSettingNodeV3::getSetting() const {
+    return std::static_pointer_cast<ButtonPositionSettingV3>(SettingNodeV3::getSetting());
 }
 
 ButtonPositionSettingNodeV3* ButtonPositionSettingNodeV3::create(std::shared_ptr<ButtonPositionSettingV3> setting,
@@ -80,4 +87,3 @@ ButtonPositionSettingNodeV3* ButtonPositionSettingNodeV3::create(std::shared_ptr
     CC_SAFE_DELETE(ret);
     return nullptr;
 }
-

@@ -13,6 +13,7 @@ protected:
     static constexpr float labelWidth = 150.0f;
 
     bool init(std::shared_ptr<ButtonPositionSettingV3> setting, float width);
+    void loadValues();
     void updateState(CCNode* invoker) override;
     void setPositionSettingLabel();
 
@@ -27,6 +28,7 @@ public:
 
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    std::shared_ptr<ButtonPositionSettingV3> getSetting() const;
 
     static ButtonPositionSettingNodeV3* create(std::shared_ptr<ButtonPositionSettingV3> setting, float width);
 };
