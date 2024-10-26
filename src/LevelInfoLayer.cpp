@@ -4,13 +4,13 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
-#include <settings/ExcludeRangeSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "GDDLLevelInfoPopup.h"
 #include "settings/V3/ButtonPositionSettingV3.h"
 #include "settings/V3/UseOldTierLabelSettingV3.h"
+#include "settings/V3/ExcludeRangeSettingV3.h"
 
 using namespace geode::prelude;
 
@@ -174,7 +174,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     bool notExcluded() {
-        const auto setting = dynamic_cast<ExcludeRangeSetting*>(Mod::get()->getSetting("exclude-range"));
+        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSettingV3("exclude-range"));
         if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
         const int cachedTier = RatingsManager::getCachedTier(m_level->m_levelID);
         const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? 36 : setting->getRangeEnd();

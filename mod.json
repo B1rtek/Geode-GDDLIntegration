@@ -50,10 +50,10 @@
 			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",
 			"type": "custom:use-old-tier-label-v3"
 		},
-		"exclude-range": {
+		"exclude-range" : {
 			"name": "Include/Exclude range",
-			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
-			"type": "custom"
+			"description": "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.",
+			"type": "custom:exclude-range-v3"
 		},
 		"cache-reset": {
 			"name": "Reset GDDL cache",
