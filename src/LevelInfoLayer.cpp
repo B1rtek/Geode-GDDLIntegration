@@ -8,9 +8,9 @@
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "GDDLLevelInfoPopup.h"
-#include "settings/V3/ButtonPositionSettingV3.h"
-#include "settings/V3/UseOldTierLabelSettingV3.h"
-#include "settings/V3/ExcludeRangeSettingV3.h"
+#include "settings/ButtonPositionSettingV3.h"
+#include "settings/UseOldTierLabelSettingV3.h"
+#include "settings/ExcludeRangeSettingV3.h"
 
 using namespace geode::prelude;
 
