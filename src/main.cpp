@@ -9,11 +9,9 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
 
-
 #include "GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "settings/DummySettingCR.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -69,10 +67,3 @@ class $modify(MenuLayer) {
         RatingsManager::cacheList(true); // cache modified list on every exit
     }
 };
-
-$on_mod(Loaded) {
-    Mod::get()->registerCustomSetting(
-        "cache-reset",
-        std::make_unique<DummySettingCR>("exclude-range", Mod::get()->getID())
-    );
-}

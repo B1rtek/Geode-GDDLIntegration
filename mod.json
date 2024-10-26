@@ -55,10 +55,10 @@
 			"description": "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.",
 			"type": "custom:exclude-range-v3"
 		},
-		"cache-reset": {
+		"cache-reset-v3": {
 			"name": "Reset GDDL cache",
-			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
-			"type": "custom"
+			"description": "Use if the <cr>GDDL Split layer</c> shows <cy>zero</c> for every tier or if the ratings on the level info page are <co>inaccurate</c>.",
+			"type": "custom:cache-reset-v3"
 		}
 	}
 }
