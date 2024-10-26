@@ -9,7 +9,6 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
 #include <settings/ExcludeRangeSetting.h>
-#include <settings/UseOldTierLabelSetting.h>
 
 
 #include "GDDLSearchLayer.h"
