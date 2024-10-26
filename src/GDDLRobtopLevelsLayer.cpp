@@ -158,6 +158,9 @@ void GDDLRobtopLevelsLayer::removeFrom(int scrollLayerPage) {
 
 void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
     // create the buttonMenu and the button
+    if (!Utils::notExcluded(levelID)) {
+        return;
+    }
     const auto buttonMenu = CCMenu::create();
     buttonMenu->setID("gddl-button-menu"_spr);
     buttonMenu->setContentSize({25, 25});
