@@ -8,15 +8,10 @@
  */
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
-#include <settings/ButtonPositionSetting.h>
-#include <settings/ExcludeRangeSetting.h>
-#include <settings/UseOldTierLabelSetting.h>
-
 
 #include "GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "settings/DummySettingCR.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -72,22 +67,3 @@ class $modify(MenuLayer) {
         RatingsManager::cacheList(true); // cache modified list on every exit
     }
 };
-
-$on_mod(Loaded) {
-    Mod::get()->registerCustomSetting(
-        "button-position",
-        std::make_unique<ButtonPositionSetting>("button-position", Mod::get()->getID(), DEFAULT)
-    );
-    Mod::get()->registerCustomSetting(
-        "use-old-tier-label",
-        std::make_unique<UseOldTierLabelSetting>("use-old-tier-label", Mod::get()->getID(), false, 0)
-    );
-    Mod::get()->registerCustomSetting(
-        "exclude-range",
-        std::make_unique<ExcludeRangeSetting>("exclude-range", Mod::get()->getID(), 0, 0, false)
-    );
-    Mod::get()->registerCustomSetting(
-        "cache-reset",
-        std::make_unique<DummySettingCR>("exclude-range", Mod::get()->getID())
-    );
-}

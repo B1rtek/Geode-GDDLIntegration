@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 #include "RatingsManager.h"
+#include "settings/ExcludeRangeSettingV3.h"
 
 class Utils {
 public:
@@ -184,5 +185,33 @@ public:
             }
         });
     }
+
+    static CCSprite *getTierSpriteFromName(const char *name) {
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
+
+        sprite->setScale(0.275f);
+        sprite->setAnchorPoint({0, 0});
+
+        return sprite;
+    }
+
+    static CCSprite *getSpriteFromTier(const int tier) {
+        if (tier == -1) {
+            return getTierSpriteFromName("tier_unrated.png");
+        }
+        return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
+    }
+
+    static bool notExcluded(int levelID) {
+        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSettingV3("exclude-range"));
+        if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
+        const int cachedTier = RatingsManager::getCachedTier(levelID);
+        const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? ExcludeRangeSettingV3::highestTier + 1 : setting->getRangeEnd();
+        if (setting->isInclude()) {
+            return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
+        }
+        return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
+    }
+
 };
 #endif // GDDL_UTILS_H

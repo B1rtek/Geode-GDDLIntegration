@@ -4,13 +4,13 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/utils/web.hpp>
-#include <settings/ButtonPositionSetting.h>
-#include <settings/ExcludeRangeSetting.h>
-#include <settings/UseOldTierLabelSetting.h>
 
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "GDDLLevelInfoPopup.h"
+#include "settings/ButtonPositionSettingV3.h"
+#include "settings/UseOldTierLabelSettingV3.h"
+#include "settings/ExcludeRangeSettingV3.h"
 
 using namespace geode::prelude;
 
@@ -46,11 +46,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon && notExcluded()) {
+        if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
+            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const auto buttonPositionSetting = dynamic_cast<ButtonPositionSetting*>(Mod::get()->getSetting("button-position"))->getPosition();
+                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
@@ -84,7 +84,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                const auto moveRowsSetting = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
+                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -140,14 +140,14 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         const int levelID = m_level->m_levelID;
         // just so it displays a bit earlier
-        const auto button = CCMenuItemSpriteExtra::create(getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        const auto button = CCMenuItemSpriteExtra::create(Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
         button->setPosition(buttonPosition);
         button->setID("rating"_spr);
         menu->addChild(button);
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = dynamic_cast<UseOldTierLabelSetting*>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
+        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)
@@ -156,7 +156,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             if (!tierButton) return;
             tierButton->removeAllChildren();
 
-            const auto tierSprite = getSpriteFromTier(tier);
+            const auto tierSprite = Utils::getSpriteFromTier(tier);
             tierButton->addChild(tierSprite);
         } else {
             const auto tierLabelSprite = typeinfo_cast<CCLabelBMFont*>(getChildByIDRecursive("gddl-rating_label"_spr));
@@ -168,35 +168,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         }
     }
 
-    static CCSprite *getTierSpriteFromName(const char *name) {
-        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
-
-        sprite->setScale(0.275f);
-        sprite->setAnchorPoint({0, 0});
-
-        return sprite;
-    }
-
-    static CCSprite *getSpriteFromTier(const int tier) {
-        if (tier == -1) {
-            return getTierSpriteFromName("tier_unrated.png");
-        }
-        return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
-    }
-
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
         GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
-    }
-
-    bool notExcluded() {
-        const auto setting = dynamic_cast<ExcludeRangeSetting*>(Mod::get()->getSetting("exclude-range"));
-        if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
-        const int cachedTier = RatingsManager::getCachedTier(m_level->m_levelID);
-        const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? 36 : setting->getRangeEnd();
-        if (setting->isInclude()) {
-            return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
-        }
-        return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
     }
 };

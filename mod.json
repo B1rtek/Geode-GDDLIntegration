@@ -1,6 +1,6 @@
 {
-	"geode": "3.7.1",
-	"version": "v1.1.12",
+	"geode": "3.8.1",
+	"version": "v1.1.13",
 	"gd": {
 		"android": "2.206",
 		"win": "2.206",
@@ -42,23 +42,23 @@
 	"settings": {
 		"button-position": {
 			"name": "Button position",
-			"description": "Sets the GDDL Button position on the level info page",
-			"type": "custom"
+			"description": "Defines the <cr>GDDL Button</c> position on the <cb>level info</c> page. <cy>By default</c> it's positioned <cp>to the left</c> of the <cr>demon difficulty face</c>. This setting <cy>is overriden</c> by the setting \"<cb>Use old tier label</c>\"",
+			"type": "custom:button-position-v3"
 		},
 		"use-old-tier-label" : {
 			"name": "Use old tier label",
-			"description": "Changes the tier button into a label, allows for shifting it up and down",
-			"type": "custom"
+			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",
+			"type": "custom:use-old-tier-label-v3"
 		},
-		"exclude-range": {
+		"exclude-range" : {
 			"name": "Include/Exclude range",
-			"description": "The GDDL Button will be hidden/shown on the level pages within the exclusion/inclusion range",
-			"type": "custom"
+			"description": "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.",
+			"type": "custom:exclude-range-v3"
 		},
-		"cache-reset": {
+		"cache-reset-v3": {
 			"name": "Reset GDDL cache",
-			"description": "Resets the GDDL cache, useful if the GDDL split isn't working",
-			"type": "custom"
+			"description": "Use if the <cr>GDDL Split layer</c> shows <cy>zero</c> for every tier or if the ratings on the level info page are <co>inaccurate</c>.",
+			"type": "custom:cache-reset-v3"
 		}
 	}
 }
