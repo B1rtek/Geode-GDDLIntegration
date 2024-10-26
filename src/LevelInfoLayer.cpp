@@ -46,7 +46,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
         const auto starsLabel = m_starsLabel;
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon && notExcluded()) {
+        if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
@@ -171,16 +171,5 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
         GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
-    }
-
-    bool notExcluded() {
-        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSettingV3("exclude-range"));
-        if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
-        const int cachedTier = RatingsManager::getCachedTier(m_level->m_levelID);
-        const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? 36 : setting->getRangeEnd();
-        if (setting->isInclude()) {
-            return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
-        }
-        return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
     }
 };
