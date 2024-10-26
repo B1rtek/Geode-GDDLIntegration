@@ -7,9 +7,9 @@
 
 class ExcludeRangeSettingNodeV3 : public SettingNodeV3 {
 protected:
-    bool currentInclude = ExcludeRangeSettingV3::defaultInclude;
     int currentRangeBegin = ExcludeRangeSettingV3::defaultRangeBegin;
     int currentRangeEnd = ExcludeRangeSettingV3::defaultRangeEnd;
+    bool currentInclude = ExcludeRangeSettingV3::defaultInclude;
     bool dontTouchTheToggler = false; // broken updateState() workaround
 
     std::vector<CCTextInputNode*> textfields = {nullptr, nullptr};
