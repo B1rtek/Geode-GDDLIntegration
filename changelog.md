@@ -1,3 +1,7 @@
+# v1.1.13
+- Added difficulty tiers to RobTop's demons
+- Ported settings to SettingsV3, making GDDL Integration one of the first mods to use the new standard (yaaaaay!)
+
 # v1.1.12
 - Added a GDDL cache reset button in the settings, in case the GDDL Split shows only zeroes you should use it, removing the json file will no longer be needed
 - If you're disconnected from the internet the mod should no longer show you an alert about that every time you're in the main menu
