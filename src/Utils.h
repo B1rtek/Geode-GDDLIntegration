@@ -13,6 +13,8 @@
 
 class Utils {
 public:
+    const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
+
     static std::string floatToString(float number, int precision) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(precision) << number;
