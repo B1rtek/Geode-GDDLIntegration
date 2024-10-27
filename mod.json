@@ -40,6 +40,11 @@
 		]
 	},
 	"settings": {
+		"login": {
+			"name": "GDDL Account",
+			"description": "<cb>Log in</c> to your <cr>GDDL Account</c> to be able to submit ratings <cg>directly from the game</c>.",
+			"type": "custom:login-v3"
+		},
 		"button-position": {
 			"name": "Button position",
 			"description": "Defines the <cr>GDDL Button</c> position on the <cb>level info</c> page. <cy>By default</c> it's positioned <cp>to the left</c> of the <cr>demon difficulty face</c>. This setting <cy>is overriden</c> by the setting \"<cb>Use old tier label</c>\"",
