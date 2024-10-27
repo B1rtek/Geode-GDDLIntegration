@@ -8,10 +8,15 @@ using namespace geode::prelude;
 
 class LoginSettingNodeV3 : public SettingNodeV3 {
 protected:
+    CCLabelBMFont* loginStatus = nullptr;
+    CCMenuItemSpriteExtra* loginLogoutButton = nullptr;
+
     bool init(std::shared_ptr<DummySettingLoginV3> setting, float width);
     void updateState(CCNode* invoker) override;
 
     void onLoginLogoutButtonClicked(CCObject *sender);
+    bool loggedIn();
+    ButtonSprite* getLoginLogoutButtonSprite(bool login);
 
     void onCommit() override;
     void onResetToDefault() override;
