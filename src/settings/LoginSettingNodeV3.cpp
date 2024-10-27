@@ -1,4 +1,5 @@
 #include "LoginSettingNodeV3.h"
+#include "layers/GDDLLoginLayer.h"
 
 bool LoginSettingNodeV3::init(std::shared_ptr<DummySettingLoginV3> setting, float width) {
     if (!SettingNodeV3::init(setting, width)) {
@@ -23,7 +24,7 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
 }
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
-    FLAlertLayer::create("GDDL", "Login: RobTop\nPassword: glubfub", "Login")->show();
+    GDDLLoginLayer::create()->show();
 }
 
 void LoginSettingNodeV3::onCommit() {
