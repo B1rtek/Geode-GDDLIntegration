@@ -4,6 +4,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "nodes/BarChartNode.h"
 
 bool GDDLLevelInfoPopup::init()
 {
@@ -49,6 +50,18 @@ bool GDDLLevelInfoPopup::init()
     okButton->setID("gddl-level-info-ok"_spr);
     m_buttonMenu->addChild(okButton, 10);
     okButton->setPosition({0.0f, -(popupSize.y)/2.0f + 30.0f}); // or basically the standard position above the bottom border for a button
+
+    const std::vector<BarChartData> barChartData = {
+            {ccc4f(1.0f, 0.0f, 0.0f, 1.0f), "Tier 69", 7},
+            {ccc4f(0.0f, 1.0f, 0.0f, 1.0f), "Tier 420", 5},
+            {ccc4f(0.0f, 0.0f, 1.0f, 1.0f), "Tier 1337", 14},
+            {ccc4f(1.0f, 1.0f, 0.0f, 1.0f), "Tier 1338", 2},
+            {ccc4f(1.0f, 0.859f, 0.529f, 1.0f), "Tier 80085", 3}
+    };
+
+    const auto barChart = BarChartNode::create(barChartData, {150.0f, 100.0f}, 50.0f, 20.0f);
+    barChart->setPosition({-100.0f, -180.0f});
+    m_buttonMenu->addChild(barChart);
 
     m_buttonMenu->updateLayout();
     m_mainLayer->updateLayout();

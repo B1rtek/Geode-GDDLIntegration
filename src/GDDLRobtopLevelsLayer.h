@@ -5,7 +5,7 @@
 #include <Geode/modify/LevelSelectLayer.hpp>
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "GDDLLevelInfoPopup.h"
+#include "layers/GDDLLevelInfoPopup.h"
 
 struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, LevelSelectLayer> {
     enum Level {

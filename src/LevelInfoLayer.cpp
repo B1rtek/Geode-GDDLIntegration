@@ -7,7 +7,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "GDDLLevelInfoPopup.h"
+#include "layers/GDDLLevelInfoPopup.h"
 #include "settings/ButtonPositionSettingV3.h"
 #include "settings/UseOldTierLabelSettingV3.h"
 #include "settings/ExcludeRangeSettingV3.h"
