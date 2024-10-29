@@ -28,7 +28,7 @@ BarChartNode::calculateBar(const BarChartData &barData, const int index, const i
                            const int maxValue) {
     // calculate stuff
     float percent = (float) barData.value / (float) sum;
-    float height = chartSize * ((float) barData.value / (float) sum) * ((float) sum / (float) maxValue);
+    float height = (chartSize - labelWidth) * ((float) barData.value / (float) sum) * ((float) sum / (float) maxValue);
     const std::string percentage = std::to_string(barData.value) + " (" + Utils::floatToString(percent * 100, 2) + "%)";
     // create labels
     auto labelLabel = CCLabelBMFont::create(barData.label.c_str(), "chatFont.fnt");
@@ -37,8 +37,9 @@ BarChartNode::calculateBar(const BarChartData &barData, const int index, const i
     labelLabel->setPosition({0.0f, this->getContentHeight() - (barHeight * index) - barHeight / 2});
     this->addChild(labelLabel);
     auto percentageLabel = CCLabelBMFont::create(percentage.c_str(), "chatFont.fnt");
+    Utils::scaleLabelToWidth(percentageLabel, labelWidth * 1.5f);
     percentageLabel->setAnchorPoint({0.0f, 0.5f});
-    percentageLabel->setPosition({labelWidth + height, this->getContentHeight() - (barHeight * index) - barHeight / 2});
+    percentageLabel->setPosition({labelWidth + height + 2.0f, this->getContentHeight() - (barHeight * index) - barHeight / 2});
     this->addChild(percentageLabel);
     return {barData.color, height};
 }
