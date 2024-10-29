@@ -11,6 +11,7 @@
 #include "settings/ButtonPositionSettingV3.h"
 #include "settings/UseOldTierLabelSettingV3.h"
 #include "settings/ExcludeRangeSettingV3.h"
+#include "layers/GDDLAdvancedLevelInfoPopup.h"
 
 using namespace geode::prelude;
 
@@ -170,6 +171,10 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
-        GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
+            GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        } else {
+            GDDLAdvancedLevelInfoPopup::create(m_level->m_levelID)->show();
+        }
     }
 };
