@@ -10,8 +10,8 @@ using namespace geode::prelude;
 
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
-    static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
+    inline static std::map<int, int> spreadsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
@@ -51,6 +51,9 @@ public:
     static void cacheList(bool onQuit);
 
     static void clearCache();
+
+    static
+    static std::vector<int> tierColors;
 };
 
 
