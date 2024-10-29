@@ -3,6 +3,7 @@
 
 #include <map>
 #include <Geode/Geode.hpp>
+#include <objects/RatingsSpread.h>
 
 #include "GDDLRating.h"
 
@@ -11,7 +12,7 @@ using namespace geode::prelude;
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::map<int, int> ratingsCache;
-    inline static std::map<int, int> spreadsCache{};
+    inline static std::map<int, RatingsSpread> spreadsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
@@ -52,7 +53,12 @@ public:
 
     static void clearCache();
 
-    static
+    static void cacheSpread(const int levelID, const RatingsSpread& spread);
+
+    static bool hasSpread(const int levelID);
+
+    static RatingsSpread getSpread(const int levelID);
+
     static std::vector<int> tierColors;
 };
 

@@ -259,3 +259,15 @@ void RatingsManager::clearCache() {
     // clears the cache in-memory, leaving the file intact in case the refresh fails for some reason
     ratingsCache.clear();
 }
+
+void RatingsManager::cacheSpread(const int levelID, const RatingsSpread& spread) {
+    spreadsCache[levelID] = spread;
+}
+
+bool RatingsManager::hasSpread(const int levelID) {
+    return spreadsCache.contains(levelID);
+}
+
+RatingsSpread RatingsManager::getSpread(const int levelID) {
+    return spreadsCache[levelID];
+}
