@@ -271,3 +271,15 @@ bool RatingsManager::hasSpread(const int levelID) {
 RatingsSpread RatingsManager::getSpread(const int levelID) {
     return spreadsCache[levelID];
 }
+
+void RatingsManager::cacheSkillsets(const int levelID, const Skillsets& skillsets) {
+    skillsetsCache[levelID] = skillsets;
+}
+
+bool RatingsManager::hasSkillsets(const int levelID) {
+    return skillsetsCache.contains(levelID);
+}
+
+Skillsets RatingsManager::getSkillsets(const int levelID) {
+    return skillsetsCache[levelID];
+}

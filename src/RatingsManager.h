@@ -4,6 +4,7 @@
 #include <map>
 #include <Geode/Geode.hpp>
 #include <objects/RatingsSpread.h>
+#include <objects/Skillsets.h>
 
 #include "objects/GDDLRating.h"
 
@@ -13,6 +14,7 @@ class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
     static std::map<int, int> ratingsCache;
     inline static std::map<int, RatingsSpread> spreadsCache{};
+    inline static std::map<int, Skillsets> skillsetsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
@@ -58,6 +60,12 @@ public:
     static bool hasSpread(const int levelID);
 
     static RatingsSpread getSpread(const int levelID);
+
+    static void cacheSkillsets(const int levelID, const Skillsets& skillsets);
+
+    static bool hasSkillsets(const int levelID);
+
+    static Skillsets getSkillsets(const int levelID);
 
     static std::vector<int> tierColors;
 };
