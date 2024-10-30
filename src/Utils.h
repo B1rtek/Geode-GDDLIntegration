@@ -232,6 +232,26 @@ public:
         return ccc4f(r, g, b, 1.0f);
     }
 
+    static ccColor3B hexColorTo3B(int hexColor) {
+        const int r = (hexColor >> (8 * 2)) & 0xff;
+        const int g = (hexColor >> (8 * 1)) & 0xff;
+        const int b = (hexColor >> (8*0)) & 0xff;
+        return ccc3(r, g, b);
+    }
+
+    static void recolorTextInLabel(CCLabelBMFont *label, std::string textToRecolor, int color, int searchOffset = 0) {
+        const std::string labelText = label->getString();
+        const int beginIndex = labelText.find(textToRecolor, searchOffset);
+        if (beginIndex == std::string::npos) return;
+        // calculate length without spaces
+        int fontSpriteLength = 0;
+        std::for_each(textToRecolor.begin(), textToRecolor.end(),
+                      [&fontSpriteLength](char letter) { if (letter != ' ') ++fontSpriteLength; });
+        // recolor
+        for (int i = beginIndex; i < beginIndex + fontSpriteLength; i++) {
+            typeinfo_cast<CCNodeRGBA*>(label->getChildren()->objectAtIndex(i))->setColor(hexColorTo3B(color));
+        }
+    }
 };
 
 #endif // GDDL_UTILS_H

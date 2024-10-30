@@ -59,13 +59,6 @@ GDDLRating RatingsManager::parseJson(const std::string& response) {
     }
 }
 
-cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
-    const int r = (hexColor >> (8 * 2)) & 0xff;
-    const int g = (hexColor >> (8 * 1)) & 0xff;
-    const int b = (hexColor >> (8*0)) & 0xff;
-    return ccc3(r, g, b);
-}
-
 /**
  * Cached json format:
  * {
@@ -133,7 +126,7 @@ cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
         return ccc3(255, 255, 255);
     }
     const int hexColor = tierColors[tier];
-    return convertToColor(hexColor);
+    return Utils::hexColorTo3B(hexColor);
 }
 
 std::optional<GDDLRating> RatingsManager::getRating(const int id) {

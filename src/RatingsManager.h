@@ -19,9 +19,6 @@ class RatingsManager {
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
     static GDDLRating parseJson(const std::string& response);
-
-    static cocos2d::ccColor3B convertToColor(int hexColor);
-
 public:
     inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
 
