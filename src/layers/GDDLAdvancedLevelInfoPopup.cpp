@@ -7,8 +7,8 @@
 #include "objects/RatingsSpread.h"
 #include "Utils.h"
 
-bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& levelName, const std::string& creator) {
-    if(!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
+bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &levelName, const std::string &creator) {
+    if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
     this->levelID = levelID;
     this->levelName = levelName;
@@ -20,7 +20,7 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& leve
     // background
     const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
-    bg->setPosition({ winSize.width / 2, winSize.height / 2 });
+    bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-advanced-level-info-bg"_spr);
     m_mainLayer->addChild(bg, -1);
 
@@ -28,11 +28,13 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& leve
     m_buttonMenu = cocos2d::CCMenu::create();
     m_buttonMenu->setID("gddl-advanced-level-info-menu"_spr);
     m_buttonMenu->setContentSize(popupSize);
-    m_buttonMenu->setPosition({ winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
+    m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,CircleBaseColor::Gray);
-    m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onClose));
+    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
+                                                                                 CircleBaseColor::Gray);
+    m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
+                                               menu_selector(GDDLAdvancedLevelInfoPopup::onClose));
     m_buttonMenu->addChild(m_closeBtn);
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
 
@@ -102,8 +104,8 @@ void GDDLAdvancedLevelInfoPopup::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
-    spreadListener.bind([this] (web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
+    spreadListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             const RatingsSpread spread = RatingsSpread(jsonResponse);
             RatingsManager::cacheSpread(this->levelID, spread);
@@ -113,8 +115,8 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
         }
     });
 
-    skillsetsListener.bind([this] (web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
+    skillsetsListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             const Skillsets spread = Skillsets(jsonResponse);
             RatingsManager::cacheSkillsets(this->levelID, spread);
@@ -132,7 +134,8 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     if (diffSpreadData.size() > 11) {
         barHeight = 11.0f / static_cast<float>(diffSpreadData.size()) * barHeight;
     }
-    const auto diffChart = BarChartNode::create(diffSpreadData, {150.0f, barHeight * diffSpreadData.size()}, 30.0f, barHeight);
+    const auto diffChart = BarChartNode::create(diffSpreadData, {150.0f, barHeight * diffSpreadData.size()}, 30.0f,
+                                                barHeight);
     if (diffSpreadData.size() <= 11) {
         diffChart->setPosition({10.0f, 40.0f + (11 - diffSpreadData.size()) * barHeight});
     } else {
@@ -149,10 +152,11 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
 void GDDLAdvancedLevelInfoPopup::addSkillsets() {
     std::vector<std::string> skillsets = RatingsManager::getSkillsets(levelID).getSkillsets();
     std::string skillsetsList = "Top skillsets:\n";
-    for (const auto& skillset : skillsets) {
+    for (const auto &skillset: skillsets) {
         skillsetsList += '\n' + skillset;
     }
-    const auto skillsetsListLabels = TextArea::create(skillsetsList, "chatFont.fnt", 1, 100.0f, {0.5f, 1.0f}, 20, false);
+    const auto skillsetsListLabels = TextArea::create(skillsetsList, "chatFont.fnt", 1, 100.0f, {0.5f, 1.0f}, 20,
+                                                      false);
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-skillsets-loading"_spr);
     m_buttonMenu->addChild(skillsetsListLabels);
 }
@@ -165,8 +169,10 @@ std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelI
     return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/tags";
 }
 
-GDDLAdvancedLevelInfoPopup *GDDLAdvancedLevelInfoPopup::create(const int levelID, const std::string& levelName, const std::string& creator) {
-    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(levelID, levelName, creator)) {
+GDDLAdvancedLevelInfoPopup *
+GDDLAdvancedLevelInfoPopup::create(const int levelID, const std::string &levelName, const std::string &creator) {
+    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr &&
+                                                                newLayer->init(levelID, levelName, creator)) {
         newLayer->autorelease();
         return newLayer;
     } else {
@@ -185,21 +191,31 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(levelID);
-    const auto& info = gddlRating.value();
+    const auto &info = gddlRating.value();
     std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
     if (info.rating != -1) {
         ratingText += " out of " + std::to_string(info.ratingCount) + " submissions";
     }
-    std::string enjoymentText = "Enjoyment: " + (info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2));
+    std::string enjoymentText =
+            "Enjoyment: " + (info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2));
     if (info.enjoyment != -1) {
         enjoymentText += " out of " + std::to_string(info.enjoymentCount) + " submissions";
     }
     const auto ratingLabel = CCLabelBMFont::create(ratingText.c_str(), "chatFont.fnt");
     ratingLabel->setScale(0.7f);
     ratingLabel->setPosition({110.0f, 215.0f});
+    // poor contrast unfortunately
+//    if (info.rating != -1) {
+//        Utils::recolorTextInLabel(ratingLabel, Utils::floatToString(info.rating, 2),
+//                                  RatingsManager::tierColors[info.roundedRating]);
+//    }
     m_buttonMenu->addChild(ratingLabel);
     const auto enjoymentLabel = CCLabelBMFont::create(enjoymentText.c_str(), "chatFont.fnt");
     enjoymentLabel->setScale(0.7f);
     enjoymentLabel->setPosition({330.0f, 215.0f});
+//    if (info.enjoyment != -1) {
+//        Utils::recolorTextInLabel(enjoymentLabel, Utils::floatToString(info.enjoyment, 2),
+//                                  RatingsSpread::enjColors[static_cast<int>(std::round(info.enjoyment))]);
+//    }
     m_buttonMenu->addChild(enjoymentLabel);
 }
