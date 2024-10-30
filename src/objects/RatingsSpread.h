@@ -9,6 +9,8 @@ class RatingsSpread {
     std::map<int, int> diffRatings{};
     std::map<int, int> enjRatings{};
     int minRating = 36, maxRating = -1, minEnj = 11, maxEnj = -1;
+
+public:
     const inline static int enjColors[] = {
             0xe67c73,
             0xea8b71,
@@ -23,7 +25,6 @@ class RatingsSpread {
             0x57bb8a
     };
 
-public:
     RatingsSpread() = default;
 
     explicit RatingsSpread(const matjson::Value& spreadJson);
