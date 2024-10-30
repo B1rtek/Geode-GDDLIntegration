@@ -7,7 +7,7 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID) {
 
     this->levelID = levelID;
 
-    const CCPoint popupSize = {280.0f, 185.0f};
+    const CCPoint popupSize = {450.0f, 330.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
@@ -30,8 +30,23 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID) {
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
 
     // content
+    // level name and creator
+//    const std::string levelName = static_cast<CCLabelBMFont*>(getParent()->getChildByIDRecursive("title-label"))->getString();
+//    const std::string creator = static_cast<CCLabelBMFont*>(getParent()->getChildByIDRecursive("creator-name"))->getString();
+    const auto levelNameLabel = CCLabelBMFont::create("Lodin da fish washer", "bigFont.fnt");
+    levelNameLabel->setAnchorPoint({0.0f, 0.5f});
+    levelNameLabel->setPosition({30.0f, popupSize.y - 20.0f});
+    levelNameLabel->setScale(0.7f);
+    m_buttonMenu->addChild(levelNameLabel);
+    const auto creatorLabel = CCLabelBMFont::create("by koko43", "goldFont.fnt");
+    creatorLabel->setAnchorPoint({0.0f, 0.5f});
+    creatorLabel->setPosition({30.0f, popupSize.y - 40.0f});
+    creatorLabel->setScale(0.7f);
+    m_buttonMenu->addChild(creatorLabel);
 
     prepareSearchListener();
+
+    // bar charts
 
     if (RatingsManager::hasSpread(levelID)) {
         addBarCharts();
@@ -72,12 +87,13 @@ std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) 
 
 void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     RatingsSpread spread = RatingsManager::getSpread(levelID);
+    const float barHeight = 15.0f;
     const auto diffSpreadData = spread.getDiffSpreadData();
-    const auto diffChart = BarChartNode::create(diffSpreadData, {150.0f, 20.0f * diffSpreadData.size()}, 50.0f, 20.0f);
-    diffChart->setPosition({-230.0f, -150.0f});
+    const auto diffChart = BarChartNode::create(diffSpreadData, {150.0f, barHeight * diffSpreadData.size()}, 30.0f, barHeight);
+    diffChart->setPosition({10.0f, 40.0f});
     const auto enjSpreadData = spread.getEnjSpreadData();
-    const auto enjChart = BarChartNode::create(enjSpreadData, {150.0f, 20.0f * enjSpreadData.size()}, 50.0f, 20.0f);
-    enjChart->setPosition({0.0f, -200.0f});
+    const auto enjChart = BarChartNode::create(enjSpreadData, {150.0f, barHeight * enjSpreadData.size()}, 30.0f, barHeight);
+    enjChart->setPosition({230.0f, 40.0f});
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-spread-label"_spr);
     m_buttonMenu->addChild(diffChart);
     m_buttonMenu->addChild(enjChart);
