@@ -1,5 +1,6 @@
 #include "GDDLAdvancedLevelInfoPopup.h"
 
+#include <Geode/ui/LoadingSpinner.hpp>
 #include <objects/Skillsets.h>
 
 #include "RatingsManager.h"
@@ -86,6 +87,11 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& leve
         auto req = web::WebRequest();
         skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(levelID)));
     }
+
+    // amazing experiment
+    const auto fidgetSpinner = LoadingSpinner::create(30.0f);
+    fidgetSpinner->setPosition({300.0f, popupSize.y - 60.0f});
+    m_buttonMenu->addChild(fidgetSpinner);
 
     return true;
 }

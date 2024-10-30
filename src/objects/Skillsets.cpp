@@ -29,8 +29,8 @@ Skillsets::Skillsets(const matjson::Value& tagsJson) {
 
 std::vector<std::string> Skillsets::getSkillsets() const {
     std::vector<std::string> justSkillsets;
-    std::ranges::transform(skillsets, justSkillsets.begin(), [](const std::pair<std::string, int>& element) {
-        return element.first;
-    });
+    for (const auto& skillsetPair : skillsets) {
+        justSkillsets.push_back(skillsetPair.first);
+    }
     return justSkillsets;
 }
