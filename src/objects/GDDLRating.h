@@ -16,6 +16,7 @@ public:
     int ratingCount;
     int enjoymentCount;
     int submissionCount;
+    std::string showcaseVideoID;
 
     static GDDLRating createInvalid();
 

@@ -5,7 +5,7 @@
 #include <Geode/Geode.hpp>
 #include <objects/RatingsSpread.h>
 
-#include "GDDLRating.h"
+#include "objects/GDDLRating.h"
 
 using namespace geode::prelude;
 
