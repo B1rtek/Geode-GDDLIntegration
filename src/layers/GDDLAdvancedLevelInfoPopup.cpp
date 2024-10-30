@@ -1,4 +1,7 @@
 #include "GDDLAdvancedLevelInfoPopup.h"
+
+#include <objects/Skillsets.h>
+
 #include "RatingsManager.h"
 #include "objects/RatingsSpread.h"
 #include "Utils.h"
@@ -58,10 +61,9 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& leve
         m_buttonMenu->addChild(stillLoadingLabel);
     }
 
-    prepareSearchListener();
+    prepareSearchListeners();
 
     // bar charts
-
     if (RatingsManager::hasSpread(levelID)) {
         addBarCharts();
     } else {
@@ -73,6 +75,18 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& leve
         spreadListener.setFilter(req.get(getSpreadEndpointUrl(levelID)));
     }
 
+    // skillsets
+    if (RatingsManager::hasSkillsets(levelID)) {
+        addSkillsets();
+    } else {
+        const auto reqInProgress = CCLabelBMFont::create("Loading skillsets...", "chatFont.fnt");
+        reqInProgress->setPosition({350.0f, 40.0f});
+        reqInProgress->setID("gddl-advanced-level-info-skillsets-loading"_spr);
+        m_buttonMenu->addChild(reqInProgress);
+        auto req = web::WebRequest();
+        skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(levelID)));
+    }
+
     return true;
 }
 
@@ -81,7 +95,7 @@ void GDDLAdvancedLevelInfoPopup::onClose(cocos2d::CCObject *sender) {
     removeFromParentAndCleanup(true);
 }
 
-void GDDLAdvancedLevelInfoPopup::prepareSearchListener() {
+void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
     spreadListener.bind([this] (web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
@@ -92,12 +106,18 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListener() {
             // :(
         }
     });
-}
 
-std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
-    return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/submissions/spread";
+    skillsetsListener.bind([this] (web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            const Skillsets spread = Skillsets(jsonResponse);
+            RatingsManager::cacheSkillsets(this->levelID, spread);
+            addSkillsets();
+        } else if (e->isCancelled()) {
+            // :(
+        }
+    });
 }
-
 
 void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     RatingsSpread spread = RatingsManager::getSpread(levelID);
@@ -118,6 +138,25 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-spread-label"_spr);
     m_buttonMenu->addChild(diffChart);
     m_buttonMenu->addChild(enjChart);
+}
+
+void GDDLAdvancedLevelInfoPopup::addSkillsets() {
+    std::vector<std::string> skillsets = RatingsManager::getSkillsets(levelID).getSkillsets();
+    std::string skillsetsList = "Top skillsets:\n";
+    for (const auto& skillset : skillsets) {
+        skillsetsList += '\n' + skillset;
+    }
+    const auto skillsetsListLabels = TextArea::create(skillsetsList, "chatFont.fnt", 1, 100.0f, {0.5f, 1.0f}, 20, false);
+    m_buttonMenu->removeChildByID("gddl-advanced-level-info-skillsets-loading"_spr);
+    m_buttonMenu->addChild(skillsetsListLabels);
+}
+
+std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
+    return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/submissions/spread";
+}
+
+std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelID) {
+    return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/tags";
 }
 
 GDDLAdvancedLevelInfoPopup *GDDLAdvancedLevelInfoPopup::create(const int levelID, const std::string& levelName, const std::string& creator) {

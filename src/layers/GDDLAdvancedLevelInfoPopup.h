@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 
 class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
-    EventListener<web::WebTask> spreadListener;
+    EventListener<web::WebTask> spreadListener, skillsetsListener;
     int levelID = 0;
     std::string levelName, creator;
 
@@ -16,9 +16,11 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     bool init(const int levelID, const std::string& levelName, const std::string& creator);
     void onClose(cocos2d::CCObject* sender);
 
-    void prepareSearchListener();
+    void prepareSearchListeners();
     void addBarCharts();
+    void addSkillsets();
     static std::string getSpreadEndpointUrl(const int levelID);
+    static std::string getSkillsetsEndpointUrl(const int levelID);
 
 public:
     static GDDLAdvancedLevelInfoPopup* create(const int levelID, const std::string& levelName, const std::string& creator);
