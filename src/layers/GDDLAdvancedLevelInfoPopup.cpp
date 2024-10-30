@@ -1,13 +1,16 @@
 #include "GDDLAdvancedLevelInfoPopup.h"
 #include "RatingsManager.h"
 #include "objects/RatingsSpread.h"
+#include "Utils.h"
 
-bool GDDLAdvancedLevelInfoPopup::init(const int levelID) {
+bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string& levelName, const std::string& creator) {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
     this->levelID = levelID;
+    this->levelName = levelName;
+    this->creator = "by " + creator;
 
-    const CCPoint popupSize = {450.0f, 330.0f};
+    constexpr CCPoint popupSize = {440.0f, 320.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
@@ -31,18 +34,29 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID) {
 
     // content
     // level name and creator
-//    const std::string levelName = static_cast<CCLabelBMFont*>(getParent()->getChildByIDRecursive("title-label"))->getString();
-//    const std::string creator = static_cast<CCLabelBMFont*>(getParent()->getChildByIDRecursive("creator-name"))->getString();
-    const auto levelNameLabel = CCLabelBMFont::create("Lodin da fish washer", "bigFont.fnt");
+    const auto levelNameLabel = CCLabelBMFont::create(levelName.c_str(), "bigFont.fnt");
     levelNameLabel->setAnchorPoint({0.0f, 0.5f});
     levelNameLabel->setPosition({30.0f, popupSize.y - 20.0f});
     levelNameLabel->setScale(0.7f);
     m_buttonMenu->addChild(levelNameLabel);
-    const auto creatorLabel = CCLabelBMFont::create("by koko43", "goldFont.fnt");
+    const auto creatorLabel = CCLabelBMFont::create(creator.c_str(), "goldFont.fnt");
     creatorLabel->setAnchorPoint({0.0f, 0.5f});
     creatorLabel->setPosition({30.0f, popupSize.y - 40.0f});
     creatorLabel->setScale(0.7f);
     m_buttonMenu->addChild(creatorLabel);
+
+    // average ratings and ratings counts
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    if (gddlRating) {
+        addRatingInfo();
+    } else {
+        const auto stillLoadingLabel = CCLabelBMFont::create("Rating details still loading...", "chatFont.fnt");
+        stillLoadingLabel->setAnchorPoint({0.5f, 0.0f});
+        stillLoadingLabel->setPosition({popupSize.x / 2, 215.0f});
+        stillLoadingLabel->setScale(0.7f);
+        stillLoadingLabel->setID("gddl-advanced-level-info-loading-text"_spr);
+        m_buttonMenu->addChild(stillLoadingLabel);
+    }
 
     prepareSearchListener();
 
@@ -51,8 +65,8 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID) {
     if (RatingsManager::hasSpread(levelID)) {
         addBarCharts();
     } else {
-        const auto reqInProgress = CCLabelBMFont::create("Downloading spread...", "chatFont.fnt");
-        reqInProgress->setPosition({-100.0f, -40.0f});
+        const auto reqInProgress = CCLabelBMFont::create("Loading spreads...", "chatFont.fnt");
+        reqInProgress->setPosition({popupSize.x / 2, 105.0f});
         reqInProgress->setID("gddl-advanced-level-info-spread-label"_spr);
         m_buttonMenu->addChild(reqInProgress);
         auto req = web::WebRequest();
@@ -87,20 +101,27 @@ std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) 
 
 void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     RatingsSpread spread = RatingsManager::getSpread(levelID);
-    const float barHeight = 15.0f;
+    float barHeight = 15.0f;
     const auto diffSpreadData = spread.getDiffSpreadData();
+    if (diffSpreadData.size() > 11) {
+        barHeight = 11.0f / static_cast<float>(diffSpreadData.size()) * barHeight;
+    }
     const auto diffChart = BarChartNode::create(diffSpreadData, {150.0f, barHeight * diffSpreadData.size()}, 30.0f, barHeight);
-    diffChart->setPosition({10.0f, 40.0f});
+    if (diffSpreadData.size() <= 11) {
+        diffChart->setPosition({10.0f, 40.0f + (11 - diffSpreadData.size()) * barHeight});
+    } else {
+        diffChart->setPosition({10.0f, 40.0f});
+    }
     const auto enjSpreadData = spread.getEnjSpreadData();
-    const auto enjChart = BarChartNode::create(enjSpreadData, {150.0f, barHeight * enjSpreadData.size()}, 30.0f, barHeight);
+    const auto enjChart = BarChartNode::create(enjSpreadData, {150.0f, 15.0f * enjSpreadData.size()}, 30.0f, 15.0f);
     enjChart->setPosition({230.0f, 40.0f});
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-spread-label"_spr);
     m_buttonMenu->addChild(diffChart);
     m_buttonMenu->addChild(enjChart);
 }
 
-GDDLAdvancedLevelInfoPopup *GDDLAdvancedLevelInfoPopup::create(const int levelID) {
-    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(levelID)) {
+GDDLAdvancedLevelInfoPopup *GDDLAdvancedLevelInfoPopup::create(const int levelID, const std::string& levelName, const std::string& creator) {
+    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(levelID, levelName, creator)) {
         newLayer->autorelease();
         return newLayer;
     } else {
@@ -112,4 +133,28 @@ GDDLAdvancedLevelInfoPopup *GDDLAdvancedLevelInfoPopup::create(const int levelID
 void GDDLAdvancedLevelInfoPopup::show() {
     FLAlertLayer::show();
     cocos::handleTouchPriority(this);
+}
+
+void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
+    // remove the loading label if it exists
+    m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
+    // add the level info
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto& info = gddlRating.value();
+    std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
+    if (info.rating != -1) {
+        ratingText += " out of " + std::to_string(info.ratingCount) + " submissions";
+    }
+    std::string enjoymentText = "Enjoyment: " + (info.enjoyment == -1 ? "N/A" : Utils::floatToString(info.enjoyment, 2));
+    if (info.enjoyment != -1) {
+        enjoymentText += " out of " + std::to_string(info.enjoymentCount) + " submissions";
+    }
+    const auto ratingLabel = CCLabelBMFont::create(ratingText.c_str(), "chatFont.fnt");
+    ratingLabel->setScale(0.7f);
+    ratingLabel->setPosition({110.0f, 215.0f});
+    m_buttonMenu->addChild(ratingLabel);
+    const auto enjoymentLabel = CCLabelBMFont::create(enjoymentText.c_str(), "chatFont.fnt");
+    enjoymentLabel->setScale(0.7f);
+    enjoymentLabel->setPosition({330.0f, 215.0f});
+    m_buttonMenu->addChild(enjoymentLabel);
 }

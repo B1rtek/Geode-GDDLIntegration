@@ -19,6 +19,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     struct Fields {
         EventListener<web::WebTask> infoLayerGetRatingListener;
         bool gddlTierUpdated = false;
+        GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
     };
 
     // ReSharper disable once CppParameterMayBeConst
@@ -39,6 +40,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                         tierAfterFetch = RatingsManager::getDemonTier(levelID);
                     }
                     updateButton(tierAfterFetch);
+                    if (m_fields->advancedLevelInfoPopup != nullptr) {
+                        m_fields->advancedLevelInfoPopup->addRatingInfo();
+                    }
                 }
             } else if (e->isCancelled()) {
                 updateButton(-1);
@@ -174,7 +178,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
             GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
         } else {
-            GDDLAdvancedLevelInfoPopup::create(m_level->m_levelID)->show();
+            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level->m_levelID, m_level->m_levelName, m_level->m_creatorName);
+            m_fields->advancedLevelInfoPopup->show();
         }
     }
 };
