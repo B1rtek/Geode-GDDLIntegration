@@ -45,10 +45,23 @@
 			"description": "<cb>Log in</c> to your <cr>GDDL Account</c> to be able to submit ratings <cg>directly from the game</c>.",
 			"type": "custom:login-v3"
 		},
+		"title-level-info-settings": {
+			"name": "Level info screen",
+			"type": "title"
+		},
 		"button-position": {
 			"name": "Button position",
 			"description": "Defines the <cr>GDDL Button</c> position on the <cb>level info</c> page. <cy>By default</c> it's positioned <cp>to the left</c> of the <cr>demon difficulty face</c>. This setting <cy>is overriden</c> by the setting \"<cb>Use old tier label</c>\"",
 			"type": "custom:button-position-v3"
+		},
+		"use-old-tier-label" : {
+			"name": "Use old tier label",
+			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",
+			"type": "custom:use-old-tier-label-v3"
+		},
+		"title-level-info-popup-settings": {
+			"name": "Level details popup",
+			"type": "title"
 		},
 		"use-old-info-popup": {
 			"name": "Use old level info popup",
@@ -62,10 +75,9 @@
 			"type": "bool",
 			"default": true
 		},
-		"use-old-tier-label" : {
-			"name": "Use old tier label",
-			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",
-			"type": "custom:use-old-tier-label-v3"
+		"title-misc-settings": {
+			"name": "Misc",
+			"type": "title"
 		},
 		"exclude-range" : {
 			"name": "Include/Exclude range",
