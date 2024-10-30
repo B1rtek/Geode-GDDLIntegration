@@ -56,6 +56,12 @@
 			"type": "bool",
 			"default": false
 		},
+		"thin-chart-bars": {
+			"name": "Spacing in spread charts",
+			"description": "Makes the bars in <cr>rating<c/> and <cg>enjoyment</c> spread charts thinner, when deactivated will leave <cb>no spacing between<c/> bars in the charts",
+			"type": "bool",
+			"default": true
+		},
 		"use-old-tier-label" : {
 			"name": "Use old tier label",
 			"description": "<cy>Changes</c> the <cr>tier button</c> on the <cb>level info page</c> into a <cg>clickable label</c>, just like it used to be in the <co>early versions of this mod</c>. Allows you to <cy>specify an offset</c> to move the label <cg>up</c> <cb>or</c> <cr>down</c> by the given number of rows. <cr>This settings overrides \"Button position\"!</c>",

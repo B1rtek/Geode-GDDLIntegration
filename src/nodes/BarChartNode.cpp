@@ -57,10 +57,11 @@ BarChartNode *BarChartNode::create(const std::vector<BarChartData> &data, const 
 
 void BarChartNode::draw() {
     CCNode::draw();
+    const float padding = Mod::get()->getSettingValue<bool>("thin-chart-bars") ? barHeight * 0.05f : 0.0f;
     for (int i = 0; i < processedData.size(); i++) {
-        ccDrawSolidRect({this->labelWidth, this->getContentHeight() - this->barHeight * i},
+        ccDrawSolidRect({this->labelWidth, this->getContentHeight() - this->barHeight * i - padding},
                         {this->labelWidth + processedData[i].height,
-                         this->getContentHeight() - this->barHeight * (i + 1)}, processedData[i].color);
+                         this->getContentHeight() - this->barHeight * (i + 1) + padding}, processedData[i].color);
     }
 }
 
