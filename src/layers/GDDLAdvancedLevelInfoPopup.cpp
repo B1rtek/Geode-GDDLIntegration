@@ -69,10 +69,10 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     if (RatingsManager::hasSpread(levelID)) {
         addBarCharts();
     } else {
-        const auto reqInProgress = CCLabelBMFont::create("Loading spreads...", "chatFont.fnt");
-        reqInProgress->setPosition({popupSize.x / 2, 105.0f});
-        reqInProgress->setID("gddl-advanced-level-info-spread-label"_spr);
-        m_buttonMenu->addChild(reqInProgress);
+        const auto loadingSpinner = LoadingSpinner::create(15.0f);
+        loadingSpinner->setPosition({levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f, popupSize.y - 22.0f});
+        loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
+        m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
         spreadListener.setFilter(req.get(getSpreadEndpointUrl(levelID)));
     }
@@ -81,18 +81,16 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     if (RatingsManager::hasSkillsets(levelID)) {
         addSkillsets();
     } else {
-        const auto reqInProgress = CCLabelBMFont::create("Loading skillsets...", "chatFont.fnt");
-        reqInProgress->setPosition({350.0f, 40.0f});
-        reqInProgress->setID("gddl-advanced-level-info-skillsets-loading"_spr);
-        m_buttonMenu->addChild(reqInProgress);
+        const auto loadingSpinner = LoadingSpinner::create(50.0f);
+        loadingSpinner->setPosition({popupSize.x / 2, 122.5f});
+        loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
+        m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
         skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(levelID)));
     }
 
     // amazing experiment
-    const auto fidgetSpinner = LoadingSpinner::create(30.0f);
-    fidgetSpinner->setPosition({300.0f, popupSize.y - 60.0f});
-    m_buttonMenu->addChild(fidgetSpinner);
+
 
     return true;
 }
@@ -108,6 +106,10 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
     const int end = senderID.size();
     const int skillsetID = std::stoi(senderID.substr(start, end - start));
     FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(), Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
+}
+
+void GDDLAdvancedLevelInfoPopup::onSkillsetInfo(CCObject *sender) {
+    FLAlertLayer::create("Top Skillsets", "These icons indicate main skillsets of the level, click on them to learn about their meaning.", "OK")->show();
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
@@ -151,7 +153,7 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     const auto enjSpreadData = spread.getEnjSpreadData();
     const auto enjChart = BarChartNode::create(enjSpreadData, {150.0f, 15.0f * enjSpreadData.size()}, 30.0f, 15.0f);
     enjChart->setPosition({230.0f, 40.0f});
-    m_buttonMenu->removeChildByID("gddl-advanced-level-info-spread-label"_spr);
+    m_buttonMenu->removeChildByID("gddl-advanced-level-info-spreads-loading"_spr);
     m_buttonMenu->addChild(diffChart);
     m_buttonMenu->addChild(enjChart);
 }
@@ -169,6 +171,15 @@ void GDDLAdvancedLevelInfoPopup::addSkillsets() {
         skillsetButton->setPosition({xPos, popupSize.y - 22.0f});
         skillsetButton->setID("gddl-advanced-level-info-skillset-" + std::to_string(skillsets[i]));
         m_buttonMenu->addChild(skillsetButton);
+    }
+    // potential info button
+    const float infoButtonXPos = skillsetsStartXPos + 20.0f * skillsets.size();
+    if (infoButtonXPos <= popupSize.x - 15.0f && !skillsets.empty()) {
+        const auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+        iButtonSprite->setScale(0.5f);
+        const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onSkillsetInfo));
+        iButton->setPosition(infoButtonXPos, popupSize.y - 22.0f);
+        m_buttonMenu->addChild(iButton);
     }
 }
 

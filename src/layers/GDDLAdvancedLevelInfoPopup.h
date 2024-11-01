@@ -18,6 +18,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     bool init(const int levelID, const std::string& levelName, const std::string& creator);
     void onClose(cocos2d::CCObject* sender);
     void onSkillsetClicked(CCObject* sender);
+    void onSkillsetInfo(CCObject* sender);
 
     void prepareSearchListeners();
     void addBarCharts();
