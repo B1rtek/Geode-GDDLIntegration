@@ -132,11 +132,19 @@ void GDDLAdvancedLevelInfoPopup::onSubmitClicked(CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
-    onClose(sender);
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto &info = gddlRating.value();
+    if (info.showcaseVideoID.empty()) {
+        Notification::create("This level has no showcase link available", NotificationIcon::Info, 2)->show();
+    } else {
+        std::string url = "https://youtu.be/" + info.showcaseVideoID;
+        web::openLinkInBrowser(url);
+    }
 }
 
 void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
-    onClose(sender);
+    std::string url = "https://gdladder.com/level/" + std::to_string(levelID);
+    web::openLinkInBrowser(url);
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
