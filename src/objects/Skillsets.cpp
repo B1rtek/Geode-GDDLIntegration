@@ -23,8 +23,13 @@ Skillsets::Skillsets(const matjson::Value &tagsJson) {
 
 std::vector<int> Skillsets::getSkillsets() const {
     std::vector<int> justSkillsets;
+    int count = 0; // the site only shows top 3
     for (const auto &skillsetPair: skillsets) {
         justSkillsets.push_back(skillsetPair.first);
+        ++count;
+        if (count >= 3) {
+            break;
+        }
     }
     return justSkillsets;
 }
