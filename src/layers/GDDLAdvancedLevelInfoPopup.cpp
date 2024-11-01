@@ -49,6 +49,19 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     creatorLabel->setPosition({30.0f, popupSize.y - 40.0f});
     creatorLabel->setScale(0.7f);
     m_buttonMenu->addChild(creatorLabel);
+    // buttons - submit
+    const auto submitButtonSprite = ButtonSprite::create("Submit rating", "bigFont.fnt", "GJ_button_01.png");
+    submitButtonSprite->setScale(0.42f);
+    const auto submitButton = CCMenuItemSpriteExtra::create(submitButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onSubmitClicked));
+    submitButton->setPosition({popupSize.x / 2, 22.0f});
+    m_buttonMenu->addChild(submitButton);
+    // showcase - added in addRatingInfo() because it depends on that actually
+    // open in browser
+    const auto openInBrowserButtonSprite = ButtonSprite::create("Open in browser", "bigFont.fnt", "GJ_button_02.png");
+    openInBrowserButtonSprite->setScale(0.42f);
+    const auto openInBrowserButton = CCMenuItemSpriteExtra::create(openInBrowserButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked));
+    openInBrowserButton->setPosition({popupSize.x / 2 + 136.0f, 22.0f});
+    m_buttonMenu->addChild(openInBrowserButton);
 
     // average ratings and ratings counts
     const auto gddlRating = RatingsManager::getRating(levelID);
@@ -61,6 +74,8 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
         stillLoadingLabel->setScale(0.7f);
         stillLoadingLabel->setID("gddl-advanced-level-info-loading-text"_spr);
         m_buttonMenu->addChild(stillLoadingLabel);
+        // add gray showcase button
+        addShowcaseButton(false);
     }
 
     prepareSearchListeners();
@@ -110,6 +125,18 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
 
 void GDDLAdvancedLevelInfoPopup::onSkillsetInfo(CCObject *sender) {
     FLAlertLayer::create("Top Skillsets", "These icons indicate main skillsets of the level, click on them to learn about their meaning.", "OK")->show();
+}
+
+void GDDLAdvancedLevelInfoPopup::onSubmitClicked(CCObject *sender) {
+    onClose(sender);
+}
+
+void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
+    onClose(sender);
+}
+
+void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
+    onClose(sender);
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
@@ -183,6 +210,16 @@ void GDDLAdvancedLevelInfoPopup::addSkillsets() {
     }
 }
 
+void GDDLAdvancedLevelInfoPopup::addShowcaseButton(bool active) {
+    const auto showcaseButtonSprite = ButtonSprite::create("Watch showcase", "bigFont.fnt", active ? "GJ_button_06.png" : "GJ_button_04.png");
+    showcaseButtonSprite->setScale(0.42f);
+    const auto showcaseButton = CCMenuItemSpriteExtra::create(showcaseButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onShowcaseClicked));
+    showcaseButton->setPosition({popupSize.x / 2 - 135.0f, 22.0f});
+    showcaseButton->setID("gddl-advanced-level-info-showcase-button"_spr);
+    log::info("Adding the button");
+    m_buttonMenu->addChild(showcaseButton);
+}
+
 std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
     return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/submissions/spread";
 }
@@ -240,4 +277,7 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
 //                                  RatingsSpread::enjColors[static_cast<int>(std::round(info.enjoyment))]);
 //    }
     m_buttonMenu->addChild(enjoymentLabel);
+    // handle the showcase button - delete the old one (if it even exists) and add a corrected one
+    m_buttonMenu->removeChildByID("gddl-advanced-level-info-showcase-button"_spr);
+    addShowcaseButton(!info.showcaseVideoID.empty());
 }
