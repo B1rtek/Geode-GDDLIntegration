@@ -49,6 +49,11 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     creatorLabel->setPosition({30.0f, popupSize.y - 40.0f});
     creatorLabel->setScale(0.7f);
     m_buttonMenu->addChild(creatorLabel);
+    // separator
+//    const auto separator = CCSprite::createWithSpriteFrameName("floorLine_001.png");
+//    separator->setPosition({popupSize.x / 2, popupSize.y - 55.0f});
+//    separator->setScale(0.9f);
+//    m_buttonMenu->addChild(separator);
     // buttons - submit
     const auto submitButtonSprite = ButtonSprite::create("Submit rating", "bigFont.fnt", "GJ_button_01.png");
     submitButtonSprite->setScale(0.42f);
@@ -84,8 +89,8 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     if (RatingsManager::hasSpread(levelID)) {
         addBarCharts();
     } else {
-        const auto loadingSpinner = LoadingSpinner::create(15.0f);
-        loadingSpinner->setPosition({levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f, popupSize.y - 22.0f});
+        const auto loadingSpinner = LoadingSpinner::create(50.0f);
+        loadingSpinner->setPosition({popupSize.x / 2, 122.5f});
         loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
@@ -96,8 +101,8 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     if (RatingsManager::hasSkillsets(levelID)) {
         addSkillsets();
     } else {
-        const auto loadingSpinner = LoadingSpinner::create(50.0f);
-        loadingSpinner->setPosition({popupSize.x / 2, 122.5f});
+        const auto loadingSpinner = LoadingSpinner::create(15.0f);
+        loadingSpinner->setPosition({levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f, popupSize.y - 22.0f});
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
@@ -133,13 +138,18 @@ void GDDLAdvancedLevelInfoPopup::onSubmitClicked(CCObject *sender) {
 
 void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
     const auto gddlRating = RatingsManager::getRating(levelID);
-    const auto &info = gddlRating.value();
-    if (info.showcaseVideoID.empty()) {
-        Notification::create("This level has no showcase link available", NotificationIcon::Info, 2)->show();
+    if (gddlRating) {
+        const auto &info = gddlRating.value();
+        if (info.showcaseVideoID.empty()) {
+            Notification::create("This level has no showcase link available", NotificationIcon::Info, 2)->show();
+        } else {
+            std::string url = "https://youtu.be/" + info.showcaseVideoID;
+            web::openLinkInBrowser(url);
+        }
     } else {
-        std::string url = "https://youtu.be/" + info.showcaseVideoID;
-        web::openLinkInBrowser(url);
+        Notification::create("Level details haven't loaded yet", NotificationIcon::Warning, 2)->show();
     }
+
 }
 
 void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
@@ -191,6 +201,12 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-spreads-loading"_spr);
     m_buttonMenu->addChild(diffChart);
     m_buttonMenu->addChild(enjChart);
+    // separator
+    const auto separator = CCSprite::createWithSpriteFrameName("floorLine_001.png");
+    separator->setRotation(90.0f);
+    separator->setPosition({popupSize.x / 2, 122.5f});
+    separator->setScale(0.4f);
+    m_buttonMenu->addChild(separator);
 }
 
 void GDDLAdvancedLevelInfoPopup::addSkillsets() {
