@@ -10,11 +10,14 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     EventListener<web::WebTask> spreadListener, skillsetsListener;
     int levelID = 0;
     std::string levelName, creator;
+    const CCPoint popupSize = {440.0f, 280.0f};
 
     CCMenuItemSpriteExtra* m_closeBtn{};
+    CCLabelBMFont* levelNameLabel = nullptr;
 
     bool init(const int levelID, const std::string& levelName, const std::string& creator);
     void onClose(cocos2d::CCObject* sender);
+    void onSkillsetClicked(CCObject* sender);
 
     void prepareSearchListeners();
     void addBarCharts();

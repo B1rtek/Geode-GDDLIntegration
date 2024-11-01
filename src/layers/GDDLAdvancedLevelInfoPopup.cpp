@@ -14,7 +14,6 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     this->levelName = levelName;
     this->creator = "by " + creator;
 
-    constexpr CCPoint popupSize = {440.0f, 320.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
@@ -40,7 +39,7 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
 
     // content
     // level name and creator
-    const auto levelNameLabel = CCLabelBMFont::create(levelName.c_str(), "bigFont.fnt");
+    levelNameLabel = CCLabelBMFont::create(levelName.c_str(), "bigFont.fnt");
     levelNameLabel->setAnchorPoint({0.0f, 0.5f});
     levelNameLabel->setPosition({30.0f, popupSize.y - 20.0f});
     levelNameLabel->setScale(0.7f);
@@ -103,6 +102,14 @@ void GDDLAdvancedLevelInfoPopup::onClose(cocos2d::CCObject *sender) {
     removeFromParentAndCleanup(true);
 }
 
+void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
+    const std::string senderID = dynamic_cast<CCMenuItemSpriteExtra *>(sender)->getID();
+    const int start = senderID.find("gddl-advanced-level-info-skillset-") + 34;
+    const int end = senderID.size();
+    const int skillsetID = std::stoi(senderID.substr(start, end - start));
+    FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(), Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
+}
+
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
     spreadListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
@@ -150,15 +157,19 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
 }
 
 void GDDLAdvancedLevelInfoPopup::addSkillsets() {
-    std::vector<std::string> skillsets = RatingsManager::getSkillsets(levelID).getSkillsets();
-    std::string skillsetsList = "Top skillsets:\n";
-    for (const auto &skillset: skillsets) {
-        skillsetsList += '\n' + skillset;
-    }
-    const auto skillsetsListLabels = TextArea::create(skillsetsList, "chatFont.fnt", 1, 100.0f, {0.5f, 1.0f}, 20,
-                                                      false);
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-skillsets-loading"_spr);
-    m_buttonMenu->addChild(skillsetsListLabels);
+    std::vector<int> skillsets = RatingsManager::getSkillsets(levelID).getSkillsets();
+    const float skillsetsStartXPos = levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f;
+    for (int i = 0; i < skillsets.size(); i++) {
+        const float xPos = skillsetsStartXPos + 20.0f * i;
+        if (xPos > popupSize.x - 15.0f) break;
+        const auto skillsetButton = CCMenuItemSpriteExtra::create(
+                Skillsets::skillsetsList[skillsets[i]].getButtonSprite(), this,
+                menu_selector(GDDLAdvancedLevelInfoPopup::onSkillsetClicked));
+        skillsetButton->setPosition({xPos, popupSize.y - 22.0f});
+        skillsetButton->setID("gddl-advanced-level-info-skillset-" + std::to_string(skillsets[i]));
+        m_buttonMenu->addChild(skillsetButton);
+    }
 }
 
 std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
