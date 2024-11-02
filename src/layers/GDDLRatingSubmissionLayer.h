@@ -47,6 +47,15 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     bool init(GJGameLevel* level);
     void onClose(CCObject* sender);
 
+    void onRatingLeft(CCObject* sender);
+    void onRatingRight(CCObject* sender);
+    void onEnjoymentLeft(CCObject* sender);
+    void onEnjoymentRight(CCObject* sender);
+    void onDeviceRight(CCObject* sender);
+    void onDeviceLeft(CCObject* sender);
+    void onToggleSoloCompletion(CCObject* sender);
+    void onSubmitClicked(CCObject* sender);
+
 public:
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
     void show() override;
