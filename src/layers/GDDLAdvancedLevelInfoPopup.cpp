@@ -6,13 +6,15 @@
 #include "RatingsManager.h"
 #include "objects/RatingsSpread.h"
 #include "Utils.h"
+#include "GDDLRatingSubmissionLayer.h"
 
-bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &levelName, const std::string &creator) {
+bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
-    this->levelID = levelID;
-    this->levelName = levelName;
-    this->creator = "by " + creator;
+    this->level = level;
+    this->levelID = level->m_levelID;
+    this->levelName = level->m_levelName;
+    this->creator = level->m_creatorName;
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -57,14 +59,16 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
     // buttons - submit
     const auto submitButtonSprite = ButtonSprite::create("Submit rating", "bigFont.fnt", "GJ_button_01.png");
     submitButtonSprite->setScale(0.42f);
-    const auto submitButton = CCMenuItemSpriteExtra::create(submitButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onSubmitClicked));
+    const auto submitButton = CCMenuItemSpriteExtra::create(submitButtonSprite, this,
+                                                            menu_selector(GDDLAdvancedLevelInfoPopup::onSubmitClicked));
     submitButton->setPosition({popupSize.x / 2, 22.0f});
     m_buttonMenu->addChild(submitButton);
     // showcase - added in addRatingInfo() because it depends on that actually
     // open in browser
     const auto openInBrowserButtonSprite = ButtonSprite::create("Open in browser", "bigFont.fnt", "GJ_button_02.png");
     openInBrowserButtonSprite->setScale(0.42f);
-    const auto openInBrowserButton = CCMenuItemSpriteExtra::create(openInBrowserButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked));
+    const auto openInBrowserButton = CCMenuItemSpriteExtra::create(openInBrowserButtonSprite, this, menu_selector(
+            GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked));
     openInBrowserButton->setPosition({popupSize.x / 2 + 136.0f, 22.0f});
     m_buttonMenu->addChild(openInBrowserButton);
 
@@ -102,7 +106,8 @@ bool GDDLAdvancedLevelInfoPopup::init(const int levelID, const std::string &leve
         addSkillsets();
     } else {
         const auto loadingSpinner = LoadingSpinner::create(15.0f);
-        loadingSpinner->setPosition({levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f, popupSize.y - 22.0f});
+        loadingSpinner->setPosition({levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f,
+                                     popupSize.y - 22.0f});
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
@@ -125,15 +130,18 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
     const int start = senderID.find("gddl-advanced-level-info-skillset-") + 34;
     const int end = senderID.size();
     const int skillsetID = std::stoi(senderID.substr(start, end - start));
-    FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(), Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
+    FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(),
+                         Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
 }
 
 void GDDLAdvancedLevelInfoPopup::onSkillsetInfo(CCObject *sender) {
-    FLAlertLayer::create("Top Skillsets", "These icons indicate main skillsets of the level, click on them to learn about their meaning.", "OK")->show();
+    FLAlertLayer::create("Top Skillsets",
+                         "These icons indicate main skillsets of the level, click on them to learn about their meaning.",
+                         "OK")->show();
 }
 
 void GDDLAdvancedLevelInfoPopup::onSubmitClicked(CCObject *sender) {
-    onClose(sender);
+    GDDLRatingSubmissionLayer::create(this->level)->show();
 }
 
 void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
@@ -228,16 +236,19 @@ void GDDLAdvancedLevelInfoPopup::addSkillsets() {
     if (infoButtonXPos <= popupSize.x - 15.0f && !skillsets.empty()) {
         const auto iButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
         iButtonSprite->setScale(0.5f);
-        const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onSkillsetInfo));
+        const auto iButton = CCMenuItemSpriteExtra::create(iButtonSprite, this,
+                                                           menu_selector(GDDLAdvancedLevelInfoPopup::onSkillsetInfo));
         iButton->setPosition(infoButtonXPos, popupSize.y - 22.0f);
         m_buttonMenu->addChild(iButton);
     }
 }
 
 void GDDLAdvancedLevelInfoPopup::addShowcaseButton(bool active) {
-    const auto showcaseButtonSprite = ButtonSprite::create("Watch showcase", "bigFont.fnt", active ? "GJ_button_06.png" : "GJ_button_04.png");
+    const auto showcaseButtonSprite = ButtonSprite::create("Watch showcase", "bigFont.fnt",
+                                                           active ? "GJ_button_06.png" : "GJ_button_04.png");
     showcaseButtonSprite->setScale(0.42f);
-    const auto showcaseButton = CCMenuItemSpriteExtra::create(showcaseButtonSprite, this, menu_selector(GDDLAdvancedLevelInfoPopup::onShowcaseClicked));
+    const auto showcaseButton = CCMenuItemSpriteExtra::create(showcaseButtonSprite, this, menu_selector(
+            GDDLAdvancedLevelInfoPopup::onShowcaseClicked));
     showcaseButton->setPosition({popupSize.x / 2 - 135.0f, 22.0f});
     showcaseButton->setID("gddl-advanced-level-info-showcase-button"_spr);
     log::info("Adding the button");
@@ -253,9 +264,8 @@ std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelI
 }
 
 GDDLAdvancedLevelInfoPopup *
-GDDLAdvancedLevelInfoPopup::create(const int levelID, const std::string &levelName, const std::string &creator) {
-    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr &&
-                                                                newLayer->init(levelID, levelName, creator)) {
+GDDLAdvancedLevelInfoPopup::create(GJGameLevel *level) {
+    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(level)) {
         newLayer->autorelease();
         return newLayer;
     } else {

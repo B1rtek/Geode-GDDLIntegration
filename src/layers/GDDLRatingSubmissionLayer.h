@@ -41,11 +41,14 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/login";
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
 
-    bool init(int levelID, int attempts, bool twoPlayer);
+    int levelID = 0, attempts = 0;
+    bool twoPlayer = false;
+
+    bool init(GJGameLevel* level);
     void onClose(CCObject* sender);
 
 public:
-    static GDDLRatingSubmissionLayer* create(int levelID, int attempts, bool twoPlayer);
+    static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
     void show() override;
 };
 

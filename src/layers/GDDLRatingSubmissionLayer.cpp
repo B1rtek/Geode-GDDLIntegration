@@ -1,7 +1,11 @@
 #include "GDDLRatingSubmissionLayer.h"
 
-bool GDDLRatingSubmissionLayer::init(int levelID, int attempts, bool twoPlayer) {
+bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
+
+    this->levelID = level->m_levelID;
+    this->attempts = level->m_attempts;
+    this->twoPlayer = level->m_twoPlayerMode;
 
     const CCPoint popupSize = {280.0f, 185.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -38,8 +42,8 @@ void GDDLRatingSubmissionLayer::onClose(CCObject *sender) {
     removeFromParentAndCleanup(true);
 }
 
-GDDLRatingSubmissionLayer *GDDLRatingSubmissionLayer::create(int levelID, int attempts, bool twoPlayer) {
-    if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(levelID, attempts, twoPlayer)) {
+GDDLRatingSubmissionLayer *GDDLRatingSubmissionLayer::create(GJGameLevel* level) {
+    if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(level)) {
         newLayer->autorelease();
         return newLayer;
     } else {

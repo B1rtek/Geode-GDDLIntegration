@@ -10,12 +10,13 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     EventListener<web::WebTask> spreadListener, skillsetsListener;
     int levelID = 0;
     std::string levelName, creator;
+    GJGameLevel* level = nullptr;
     const CCPoint popupSize = {440.0f, 280.0f};
 
     CCMenuItemSpriteExtra* m_closeBtn{};
     CCLabelBMFont* levelNameLabel = nullptr;
 
-    bool init(const int levelID, const std::string& levelName, const std::string& creator);
+    bool init(GJGameLevel* level);
     void onClose(cocos2d::CCObject* sender);
     void onSkillsetClicked(CCObject* sender);
     void onSkillsetInfo(CCObject* sender);
@@ -31,7 +32,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     static std::string getSkillsetsEndpointUrl(const int levelID);
 
 public:
-    static GDDLAdvancedLevelInfoPopup* create(const int levelID, const std::string& levelName, const std::string& creator);
+    static GDDLAdvancedLevelInfoPopup* create(GJGameLevel* level);
     void show() override;
 
     void addRatingInfo();
