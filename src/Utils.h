@@ -252,6 +252,10 @@ public:
             typeinfo_cast<CCNodeRGBA*>(label->getChildren()->objectAtIndex(i))->setColor(hexColorTo3B(color));
         }
     }
+
+    static int getFPS() {
+        return std::round(1.0f / CCDirector::get()->getDeltaTime());
+    }
 };
 
 #endif // GDDL_UTILS_H
