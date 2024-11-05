@@ -41,8 +41,9 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/login";
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
 
+    const inline static std::vector<std::string> device = {"PC", "Mobile"};
     int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
-    bool mobile = false, twoPlayer = false;
+    bool mobile = false, twoPlayer = false, soloCompletion = true;
 
     bool init(GJGameLevel* level);
     void onClose(CCObject* sender);

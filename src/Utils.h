@@ -138,11 +138,11 @@ public:
         setNumberWithGivenDefaultValueTextfield(value, textfield, 0);
     }
 
-    static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue) {
+    static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue, std::string emptyPlaceholder = "") {
         if (value != defaultValue) {
             textfield->setString(std::to_string(value).c_str());
         } else {
-            textfield->setString("");
+            textfield->setString(emptyPlaceholder);
         }
     }
 
