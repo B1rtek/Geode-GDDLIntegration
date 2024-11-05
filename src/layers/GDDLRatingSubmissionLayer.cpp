@@ -8,6 +8,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     this->percent = level->m_normalPercent;
     this->attempts = level->m_attempts;
     this->twoPlayer = level->m_twoPlayerMode;
+    setInitialValues();
 
     const CCPoint popupSize = {280.0f, this->twoPlayer ? 280.0f : 240.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -37,26 +38,27 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
 
     // content
-    const auto gddlRating = RatingsManager::getRating(levelID);
     // rating
     addLabel("Rating", {popupSize.x / 4, popupSize.y - 40.0f});
-    Utils::createTextInputNode(m_buttonMenu, ratingTextfield, "bigFont.fnt", gddlRating ? std::to_string(gddlRating.value().roundedRating) : "", 2, {35.0f, 25.0f}, {popupSize.x / 4, popupSize.y - 60.0f});
+    Utils::createTextInputNode(m_buttonMenu, ratingTextfield, "bigFont.fnt", rating != -1 ? std::to_string(rating) : "", 2, {35.0f, 25.0f}, {popupSize.x / 4, popupSize.y - 60.0f});
     ratingTextfield->setAllowedChars("1234567890");
     Utils::createLeftRightButtonsAround(ratingTextfield, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onRatingLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onRatingRight));
     // enjoyment
     addLabel("Enjoyment", {3 * popupSize.x / 4, popupSize.y - 40.0f});
-    Utils::createTextInputNode(m_buttonMenu, enjoymentTextfield, "bigFont.fnt", gddlRating ? std::to_string(static_cast<int>(std::round(gddlRating.value().enjoyment))) : "", 2, {35.0f, 25.0f}, {3 * popupSize.x / 4, popupSize.y - 60.0f});
+    Utils::createTextInputNode(m_buttonMenu, enjoymentTextfield, "bigFont.fnt", enjoyment != -1 ? std::to_string(enjoyment) : "", 2, {35.0f, 25.0f}, {3 * popupSize.x / 4, popupSize.y - 60.0f});
     enjoymentTextfield->setAllowedChars("1234567890");
     Utils::createLeftRightButtonsAround(enjoymentTextfield, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onEnjoymentLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onEnjoymentRight));
     // fps value
     addLabel("FPS", {popupSize.x / 4, popupSize.y - 80.0f});
-    Utils::createTextInputNode(m_buttonMenu, fpsTextfield, "bigFont.fnt", std::to_string(Utils::getFPS()), 4, {35.0f, 25.0f}, {popupSize.x / 4, popupSize.y - 100.0f});
+    Utils::createTextInputNode(m_buttonMenu, fpsTextfield, "bigFont.fnt", std::to_string(fps), 4, {35.0f, 25.0f}, {popupSize.x / 4, popupSize.y - 100.0f});
     fpsTextfield->setAllowedChars("1234567890");
+    Utils::createLeftRightButtonsAround(fpsTextfield, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onFPSLeft),
+                                        menu_selector(GDDLRatingSubmissionLayer::onFPSRight));
     // device
     addLabel("Device", {3 * popupSize.x / 4, popupSize.y - 80.0f});
-    const auto choiceLabelBG = Utils::createLabelForChoice(m_buttonMenu, deviceLabel, "bigFont.fnt", "PC", 80.0f, {3 * popupSize.x / 4, popupSize.y - 100.0f},
+    const auto choiceLabelBG = Utils::createLabelForChoice(m_buttonMenu, deviceLabel, "bigFont.fnt", mobile ? "Mobile" : "PC", 80.0f, {3 * popupSize.x / 4, popupSize.y - 100.0f},
                                           {80.0f, 25.0f});
     Utils::createLeftRightButtonsAround(choiceLabelBG, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onDeviceLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onDeviceRight));
@@ -110,6 +112,14 @@ void GDDLRatingSubmissionLayer::onEnjoymentRight(CCObject *sender) {
 
 }
 
+void GDDLRatingSubmissionLayer::onFPSLeft(CCObject *sender) {
+
+}
+
+void GDDLRatingSubmissionLayer::onFPSRight(CCObject *sender) {
+
+}
+
 void GDDLRatingSubmissionLayer::onDeviceRight(CCObject *sender) {
 
 }
@@ -124,6 +134,21 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject *sender) {
 
 void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject *sender) {
 
+}
+
+void GDDLRatingSubmissionLayer::addLabel(const std::string& text, const CCPoint& position, float scale) {
+    const auto label = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
+    label->setScale(scale);
+    label->setPosition(position);
+    m_buttonMenu->addChild(label);
+}
+
+void GDDLRatingSubmissionLayer::setInitialValues() {
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    rating = gddlRating ? gddlRating.value().rating : -1;
+    enjoyment = gddlRating ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
+    fps = Utils::getCorrectedFPS();
+    mobile = Utils::isMobile();
 }
 
 GDDLRatingSubmissionLayer *GDDLRatingSubmissionLayer::create(GJGameLevel* level) {
@@ -141,9 +166,3 @@ void GDDLRatingSubmissionLayer::show() {
     cocos::handleTouchPriority(this);
 }
 
-void GDDLRatingSubmissionLayer::addLabel(const std::string& text, const CCPoint& position, float scale) {
-    const auto label = CCLabelBMFont::create(text.c_str(), "chatFont.fnt");
-    label->setScale(scale);
-    label->setPosition(position);
-    m_buttonMenu->addChild(label);
-}

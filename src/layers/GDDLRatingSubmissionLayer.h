@@ -41,8 +41,8 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/login";
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
 
-    int levelID = 0, percent = 0, attempts = 0;
-    bool twoPlayer = false;
+    int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
+    bool mobile = false, twoPlayer = false;
 
     bool init(GJGameLevel* level);
     void onClose(CCObject* sender);
@@ -51,12 +51,15 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void onRatingRight(CCObject* sender);
     void onEnjoymentLeft(CCObject* sender);
     void onEnjoymentRight(CCObject* sender);
+    void onFPSLeft(CCObject* sender);
+    void onFPSRight(CCObject* sender);
     void onDeviceRight(CCObject* sender);
     void onDeviceLeft(CCObject* sender);
     void onToggleSoloCompletion(CCObject* sender);
     void onSubmitClicked(CCObject* sender);
 
     void addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f);
+    void setInitialValues();
 
 public:
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
