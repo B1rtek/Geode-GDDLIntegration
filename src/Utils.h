@@ -119,10 +119,14 @@ public:
     }
 
     static int getNumberTextfieldValue(CCTextInputNode *&textfield) {
+        return getNumberWithGivenDefaultTextfieldValue(textfield, 0);
+    }
+
+    static int getNumberWithGivenDefaultTextfieldValue(CCTextInputNode *&textfield, int defaultValue) {
         if (textfield->getString().empty())
-            return 0;
+            return defaultValue;
         // instead of try/catch because of android
-        int returnValue = 0;
+        int returnValue = defaultValue;
         auto returnValueResult = numFromString<int>(textfield->getString());
         if (returnValueResult.isOk()) {
             returnValue = returnValueResult.value();
@@ -131,7 +135,11 @@ public:
     }
 
     static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {
-        if (value != 0) {
+        setNumberWithGivenDefaultValueTextfield(value, textfield, 0);
+    }
+
+    static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue) {
+        if (value != defaultValue) {
             textfield->setString(std::to_string(value).c_str());
         } else {
             textfield->setString("");
@@ -255,6 +263,26 @@ public:
 
     static int getFPS() {
         return std::round(1.0f / CCDirector::get()->getDeltaTime());
+    }
+
+    static int getCorrectedFPS() {
+        std::vector<int> commonFPSValues = {60, 75, 90, 120, 144, 165, 180, 240, 288, 300, 360};
+        int readFPS = getFPS();
+        for (const auto value: commonFPSValues) {
+            if (std::abs(readFPS - value) <= 2) {
+                readFPS = value;
+                break;
+            }
+        }
+        return readFPS;
+    }
+
+    static bool isMobile() {
+#ifdef GEODE_IS_ANDROID
+        return true;
+#else
+        return false;
+#endif
     }
 };
 
