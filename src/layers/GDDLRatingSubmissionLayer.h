@@ -61,6 +61,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
     void addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f);
     void setInitialValues();
+    void updateTextfields();
 
 public:
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
