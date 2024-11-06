@@ -28,6 +28,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     void addBarCharts();
     void addSkillsets();
     void addShowcaseButton(bool active);
+    void addTierSprite(int tier);
     static std::string getSpreadEndpointUrl(const int levelID);
     static std::string getSkillsetsEndpointUrl(const int levelID);
 

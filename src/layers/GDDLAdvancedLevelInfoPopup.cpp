@@ -43,19 +43,17 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
     // level name and creator
     levelNameLabel = CCLabelBMFont::create(levelName.c_str(), "bigFont.fnt");
     levelNameLabel->setAnchorPoint({0.0f, 0.5f});
-    levelNameLabel->setPosition({30.0f, popupSize.y - 20.0f});
+    levelNameLabel->setPosition({70.0f, popupSize.y - 20.0f});
     levelNameLabel->setScale(0.7f);
+    if (levelNameLabel->getScaledContentWidth() > 260.0f) {
+        levelNameLabel->setScale(260.0f / levelNameLabel->getContentWidth());
+    }
     m_buttonMenu->addChild(levelNameLabel);
     const auto creatorLabel = CCLabelBMFont::create(creator.c_str(), "goldFont.fnt");
     creatorLabel->setAnchorPoint({0.0f, 0.5f});
-    creatorLabel->setPosition({30.0f, popupSize.y - 40.0f});
+    creatorLabel->setPosition({70.0f, popupSize.y - 40.0f});
     creatorLabel->setScale(0.7f);
     m_buttonMenu->addChild(creatorLabel);
-    // separator
-//    const auto separator = CCSprite::createWithSpriteFrameName("floorLine_001.png");
-//    separator->setPosition({popupSize.x / 2, popupSize.y - 55.0f});
-//    separator->setScale(0.9f);
-//    m_buttonMenu->addChild(separator);
     // buttons - submit
     const auto submitButtonSprite = ButtonSprite::create("Submit rating", "bigFont.fnt", "GJ_button_01.png");
     submitButtonSprite->setScale(0.42f);
@@ -85,6 +83,8 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
         m_buttonMenu->addChild(stillLoadingLabel);
         // add gray showcase button
         addShowcaseButton(false);
+        // add a ? tier sprite
+        addTierSprite(-1);
     }
 
     prepareSearchListeners();
@@ -255,6 +255,16 @@ void GDDLAdvancedLevelInfoPopup::addShowcaseButton(bool active) {
     m_buttonMenu->addChild(showcaseButton);
 }
 
+void GDDLAdvancedLevelInfoPopup::addTierSprite(const int tier) {
+    m_buttonMenu->removeChildByID("gddl-advanced-level-info-tier-button"_spr);
+    const auto tierSprite = Utils::getSpriteFromTier(tier);
+    tierSprite->setAnchorPoint({0.5f, 0.5f});
+    tierSprite->setPosition({45.0f, popupSize.y - 31.0f});
+    tierSprite->setID("gddl-advanced-level-info-tier-button"_spr);
+    m_buttonMenu->addChild(tierSprite);
+}
+
+
 std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
     return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/submissions/spread";
 }
@@ -314,4 +324,6 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     // handle the showcase button - delete the old one (if it even exists) and add a corrected one
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-showcase-button"_spr);
     addShowcaseButton(!info.showcaseVideoID.empty());
+    // correct the "tier button"
+    addTierSprite(info.roundedRating);
 }
