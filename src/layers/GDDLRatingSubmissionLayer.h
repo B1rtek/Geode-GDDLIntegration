@@ -58,8 +58,16 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void onDeviceLeft(CCObject* sender);
     void onToggleSoloCompletion(CCObject* sender);
     void onSubmitClicked(CCObject* sender);
+    void onRatingInfo(CCObject* sender);
+    void onEnjoymentInfo(CCObject* sender);
+    void onFPSInfo(CCObject* sender);
+    void onPercentInfo(CCObject* sender);
+    void onAttemptsInfo(CCObject* sender);
+    void onProofInfo(CCObject* sender);
+    void onSecondPlayerInfo(CCObject* sender);
 
-    void addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f);
+    CCLabelBMFont * addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f, std::string font = "chatFont.fnt");
+    void addInfoButton(CCLabelBMFont *label, CCSprite *iButtonSprite, SEL_MenuHandler callback);
     void setInitialValues();
     void updateTextfields();
 
