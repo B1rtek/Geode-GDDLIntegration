@@ -22,10 +22,24 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submit";
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
     EventListener<web::WebTask> submissionListener, userSearchListener;
+    matjson::Value submissionJson = matjson::Value();
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
     int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
     bool mobile = false, twoPlayer = false, soloCompletion = true;
+    const inline static std::vector<std::string> validProofURLs = {
+        "https://www.youtube.com/watch?v=",
+        "https://m.youtube.com/watch?v=",
+        "https://youtube.com/watch?v=",
+        "https://youtu.be/",
+        "https://www.twitch.tv/videos/",
+        "https://twitch.tv/videos/",
+        "https://drive.google.com/file/d/",
+        "https://www.bilibili.com/video/",
+        "https://m.bilibili.com/video/",
+        "https://bilibili.com/video/"
+    };
+
 
     bool init(GJGameLevel* level);
     void onClose(CCObject* sender);
@@ -49,11 +63,15 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void onProofInfo(CCObject* sender);
     void onSecondPlayerInfo(CCObject* sender);
 
-    CCLabelBMFont * addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f, std::string font = "chatFont.fnt");
-    void addInfoButton(CCLabelBMFont *label, CCSprite *iButtonSprite, SEL_MenuHandler callback);
+    CCLabelBMFont* addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f,
+                            std::string font = "chatFont.fnt");
+    void addInfoButton(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback);
     void setInitialValues();
     void updateTextfields();
     void prepareSubmissionListeners();
+    bool isValidProof(const std::string& proofURL);
+    std::string fillOutSubmissionJson();
+    void makeSubmissionRequest();
 
 public:
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level);

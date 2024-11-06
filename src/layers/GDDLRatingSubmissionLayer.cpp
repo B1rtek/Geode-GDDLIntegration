@@ -1,7 +1,7 @@
 #include "GDDLRatingSubmissionLayer.h"
 #include "Utils.h"
 
-bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
+bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
     this->levelID = level->m_levelID;
@@ -34,7 +34,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
     m_buttonMenu->addChild(title);
     // close button
     const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+        CircleBaseColor::Gray);
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLRatingSubmissionLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
@@ -100,7 +100,8 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
     addInfoButton(proofLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onProofInfo));
     if (twoPlayer) {
         addLabel("Solo completion", {popupSize.x / 4, popupSize.y - 220.0f}, 0.6f);
-        soloCompletionToggler = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(GDDLRatingSubmissionLayer::onToggleSoloCompletion), 0.9f);
+        soloCompletionToggler = CCMenuItemToggler::createWithStandardSprites(
+            this, menu_selector(GDDLRatingSubmissionLayer::onToggleSoloCompletion), 0.9f);
         soloCompletionToggler->setPosition({popupSize.x / 4, popupSize.y - 240.0f});
         soloCompletionToggler->toggle(soloCompletion);
         m_buttonMenu->addChild(soloCompletionToggler);
@@ -108,7 +109,8 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
         Utils::createTextInputNode(m_buttonMenu, secondPlayerTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f},
                                    {3 * popupSize.x / 4 - 35.0f, popupSize.y - 240.0f});
         secondPlayerTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-        addInfoButton(secondPlayerLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo));
+        addInfoButton(secondPlayerLabel, infoButtonSprite,
+                      menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo));
     }
     // submit button
     const auto submitButtonSprite = ButtonSprite::create("Submit", "bigFont.fnt", "GJ_button_01.png");
@@ -121,7 +123,9 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
     // guidelines button
     const auto guidelinesButtonSprite = ButtonSprite::create("Guidelines", "bigFont.fnt", "GJ_button_02.png");
     guidelinesButtonSprite->setScale(0.5f);
-    const auto guidelinesButton = CCMenuItemSpriteExtra::create(guidelinesButtonSprite, this, menu_selector(GDDLRatingSubmissionLayer::onGuidelinesClicked));
+    const auto guidelinesButton = CCMenuItemSpriteExtra::create(guidelinesButtonSprite, this,
+                                                                menu_selector(
+                                                                    GDDLRatingSubmissionLayer::onGuidelinesClicked));
     guidelinesButton->setPosition({69.0f, 22.0f});
     m_buttonMenu->addChild(guidelinesButton);
 
@@ -130,12 +134,12 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel *level) {
     return true;
 }
 
-void GDDLRatingSubmissionLayer::onClose(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onClose(CCObject* sender) {
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
 
-void GDDLRatingSubmissionLayer::onRatingLeft(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onRatingLeft(CCObject* sender) {
     rating = Utils::getNumberTextfieldValue(ratingTextfield) - 1;
     if (rating < 0) {
         rating = ExcludeRangeSettingV3::highestTier;
@@ -143,7 +147,7 @@ void GDDLRatingSubmissionLayer::onRatingLeft(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(rating, ratingTextfield, 0, "-");
 }
 
-void GDDLRatingSubmissionLayer::onRatingRight(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onRatingRight(CCObject* sender) {
     rating = Utils::getNumberTextfieldValue(ratingTextfield) + 1;
     if (rating > ExcludeRangeSettingV3::highestTier) {
         rating = 0;
@@ -151,7 +155,7 @@ void GDDLRatingSubmissionLayer::onRatingRight(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(rating, ratingTextfield, 0, "-");
 }
 
-void GDDLRatingSubmissionLayer::onEnjoymentLeft(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onEnjoymentLeft(CCObject* sender) {
     enjoyment = Utils::getNumberWithGivenDefaultTextfieldValue(enjoymentTextfield, -1) - 1;
     if (enjoyment < -1) {
         enjoyment = 10;
@@ -159,7 +163,7 @@ void GDDLRatingSubmissionLayer::onEnjoymentLeft(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(enjoyment, enjoymentTextfield, -1, "-");
 }
 
-void GDDLRatingSubmissionLayer::onEnjoymentRight(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onEnjoymentRight(CCObject* sender) {
     enjoyment = Utils::getNumberWithGivenDefaultTextfieldValue(enjoymentTextfield, -1) + 1;
     if (enjoyment > 10) {
         enjoyment = -1;
@@ -167,7 +171,7 @@ void GDDLRatingSubmissionLayer::onEnjoymentRight(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(enjoyment, enjoymentTextfield, -1, "-");
 }
 
-void GDDLRatingSubmissionLayer::onFPSLeft(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onFPSLeft(CCObject* sender) {
     fps = Utils::getNumberWithGivenDefaultTextfieldValue(fpsTextfield, -1) - 1;
     if (fps < 30) {
         fps = 30;
@@ -175,7 +179,7 @@ void GDDLRatingSubmissionLayer::onFPSLeft(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1);
 }
 
-void GDDLRatingSubmissionLayer::onFPSRight(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onFPSRight(CCObject* sender) {
     fps = Utils::getNumberWithGivenDefaultTextfieldValue(fpsTextfield, -1) + 1;
     if (fps > 9999) {
         fps = 9999;
@@ -183,17 +187,17 @@ void GDDLRatingSubmissionLayer::onFPSRight(CCObject *sender) {
     Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1);
 }
 
-void GDDLRatingSubmissionLayer::onDeviceRight(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onDeviceRight(CCObject* sender) {
     mobile = !mobile;
     deviceLabel->setString(device[mobile ? 1 : 0].c_str());
     Utils::scaleLabelToWidth(deviceLabel, 50.0f);
 }
 
-void GDDLRatingSubmissionLayer::onDeviceLeft(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onDeviceLeft(CCObject* sender) {
     onDeviceRight(sender);
 }
 
-void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject* sender) {
     soloCompletion = !soloCompletionToggler->isOn();
 }
 
@@ -216,74 +220,74 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject *sender) {
  *  Cookie: gddl.sid.sig=<sid.sig>; gddl.sid=<sid>
  */
 
-void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject *sender) {
-    auto json = matjson::Value();
-    json["levelID"] = levelID;
-    json["device"] = mobile ? 2 : 1;
-    if (const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35); correctedRating != 0) {
-        json["rating"] = correctedRating;
+void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
+    submissionJson = matjson::Value();
+    if (const std::string error = fillOutSubmissionJson(); !error.empty()) {
+        Notification::create(error, NotificationIcon::Warning, 2)->show();
+        return;
     }
-    if (const int correctedEnjoyment = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(enjoymentTextfield, -1)), 10); correctedEnjoyment != -1) {
-        json["enjoyment"] = correctedEnjoyment;
-    }
-    if (const int correctedFPS = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(fpsTextfield, -1)), 9999); correctedFPS != -1) {
-        json["refreshRate"] = correctedFPS;
-    }
-    if (!proofTextfield->getString().empty()) {
-        json["proof"] = proofTextfield->getString();
-    }
-    const int correctedProgress = std::min(std::max(0, Utils::getNumberWithGivenDefaultTextfieldValue(percentTextfield, 100)), 100);
-    json["progress"] = correctedProgress;
-    if (const int correctedAttempts = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, 100)), 999999999); correctedAttempts != -1) {
-        json["attempts"] = correctedAttempts;
-    }
+    // fill out 2p stuff
     if (this->twoPlayer) {
-        json["isSolo"] = soloCompletion;
+        submissionJson["isSolo"] = soloCompletion;
         if (!soloCompletion) {
-            json["secondPlayerID"] = 955;
+            // a request to retrieve the userid has to be made first before making the submission request
+            submissionJson["secondPlayerID"] = 955;
+            return;
         }
     }
-    log::debug("Request: {}", json.dump());
-    auto req = web::WebRequest();
-    req.bodyJSON(json);
-    req.header("Cookie", std::format("gddl.sid.sig={}; gddl.sid={}", Mod::get()->getSavedValue<std::string>("login-sig", ""), Mod::get()->getSavedValue<std::string>("login-sid", "")));
-    submissionListener.setFilter(req.post(submissionEndpoint));
+    makeSubmissionRequest();
 }
 
 void GDDLRatingSubmissionLayer::onGuidelinesClicked(CCObject* sender) {
     web::openLinkInBrowser("https://gdladder.com/about#guidelines");
 }
 
-void GDDLRatingSubmissionLayer::onRatingInfo(CCObject *sender) {
-    FLAlertLayer::create("Rating", "Must be from <cr>1</c> to <cr>" + std::to_string(ExcludeRangeSettingV3::highestTier) + "</c>, enter '-' if you don't want to submit the tier rating", "OK")->show();
+void GDDLRatingSubmissionLayer::onRatingInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        "Rating",
+        "Must be from <cr>1</c> to <cr>" + std::to_string(ExcludeRangeSettingV3::highestTier) +
+        "</c>, enter '-' if you don't want to submit the tier rating", "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onEnjoymentInfo(CCObject *sender) {
-    FLAlertLayer::create("Enjoyment", "From <cr>0</c> (abysmal) to <cg>10</c> (masterpiece), enter '-' if you don't want to submit the enjoyment rating", "OK")->show();
+void GDDLRatingSubmissionLayer::onEnjoymentInfo(CCObject* sender) {
+    FLAlertLayer::create("Enjoyment",
+                         "From <cr>0</c> (abysmal) to <cg>10</c> (masterpiece), enter '-' if you don't want to submit the enjoyment rating",
+                         "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onFPSInfo(CCObject *sender) {
+void GDDLRatingSubmissionLayer::onFPSInfo(CCObject* sender) {
     FLAlertLayer::create("FPS", "At least <cg>30</c>", "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onPercentInfo(CCObject *sender) {
-    FLAlertLayer::create("Percent", "Autofilled according to <cb>your current progress</c>, will not affect ratings or get sent to the queue if <cr>under 100</c>, defaults to 100", "OK")->show();
+void GDDLRatingSubmissionLayer::onPercentInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        "Percent",
+        "Autofilled according to <cb>your current progress</c>, will not affect ratings or get sent to the queue if <cr>under 100</c>, defaults to 100",
+        "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject *sender) {
-    FLAlertLayer::create("Percent", "Autofilled according to <cb>your current progress</c>, optional - if you don't want to share it, just <cr>remove it</c>", "OK")->show();
+void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        "Percent",
+        "Autofilled according to <cb>your current progress</c>, optional - if you don't want to share it, just <cr>remove it</c>",
+        "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onProofInfo(CCObject *sender) {
-    FLAlertLayer::create("Proof", "Proof is <cy>required</c> for <cr>extreme demons</c>. Clicks <cy>must be included</c> if the level is <cr>tier 31 or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.", "OK")->show();
+void GDDLRatingSubmissionLayer::onProofInfo(CCObject* sender) {
+    FLAlertLayer::create(
+        "Proof",
+        "Proof is <cy>required</c> for <cr>extreme demons</c>. Clicks <cy>must be included</c> if the level is <cr>tier 31 or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.",
+        "OK")->show();
 }
 
-void GDDLRatingSubmissionLayer::onSecondPlayerInfo(CCObject *sender) {
-    FLAlertLayer::create("Second player", "Fill out with the username of the <cy>person you completed the level with</c> if you <co>didn't complete it solo</c>, if they don't have a <cr>GDDL account</c> leave this blank", "OK")->show();
+void GDDLRatingSubmissionLayer::onSecondPlayerInfo(CCObject* sender) {
+    FLAlertLayer::create("Second player",
+                         "Fill out with the username of the <cy>person you completed the level with</c> if you <co>didn't complete it solo</c>, if they don't have a <cr>GDDL account</c> leave this blank",
+                         "OK")->show();
 }
 
-CCLabelBMFont *
-GDDLRatingSubmissionLayer::addLabel(const std::string &text, const CCPoint &position, float scale, std::string font) {
+CCLabelBMFont*
+GDDLRatingSubmissionLayer::addLabel(const std::string& text, const CCPoint& position, float scale, std::string font) {
     const auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     label->setScale(scale);
     label->setPosition(position);
@@ -291,10 +295,12 @@ GDDLRatingSubmissionLayer::addLabel(const std::string &text, const CCPoint &posi
     return label;
 }
 
-void GDDLRatingSubmissionLayer::addInfoButton(CCLabelBMFont *label, CCSprite *iButtonSprite, SEL_MenuHandler callback) {
+void GDDLRatingSubmissionLayer::addInfoButton(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback) {
     const auto ratingInfoButton = CCMenuItemSpriteExtra::create(iButtonSprite, this,
                                                                 callback);
-    ratingInfoButton->setPosition({label->getPositionX() + label->getScaledContentWidth() / 2 + 10.0f, label->getPositionY()});
+    ratingInfoButton->setPosition({
+        label->getPositionX() + label->getScaledContentWidth() / 2 + 10.0f, label->getPositionY()
+    });
     m_buttonMenu->addChild(ratingInfoButton);
 }
 
@@ -315,22 +321,92 @@ void GDDLRatingSubmissionLayer::updateTextfields() {
 }
 
 void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
-    submissionListener.bind([this](web::WebTask::Event *e) {
-        if (web::WebResponse *res = e->getValue()) {
+    submissionListener.bind([this](web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            log::debug("response from gdladder.com: {}", jsonResponse.dump());
-        } else if (e->isCancelled()) {
+        }
+        else if (e->isCancelled()) {
             // :(
         }
     });
 }
 
+bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
+    return std::ranges::any_of(validProofURLs, [proofURL](const std::string& validProofURL) {
+        return proofURL.starts_with(validProofURL);
+    });
+}
 
-GDDLRatingSubmissionLayer *GDDLRatingSubmissionLayer::create(GJGameLevel *level) {
+
+std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
+    submissionJson["levelID"] = levelID;
+    submissionJson["device"] = mobile ? 2 : 1;
+    const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
+    if (correctedRating != 0) {
+        submissionJson["rating"] = correctedRating;
+    }
+    const int correctedEnjoyment = std::min(
+        std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(enjoymentTextfield, -1)), 10);
+    if (correctedEnjoyment != -1) {
+        submissionJson["enjoyment"] = correctedEnjoyment;
+    }
+    if (correctedRating == 0 && correctedEnjoyment == -1) {
+        return "Rating and enjoyment can't both be empty";
+    }
+    int correctedFPS = Utils::getNumberWithGivenDefaultTextfieldValue(fpsTextfield, -1);
+    if (correctedFPS != -1 && correctedFPS < 30) {
+        return "Incorrect FPS value";
+    }
+    correctedFPS = std::min(std::max(-1, correctedFPS), 9999);
+    if (correctedFPS != -1) {
+        submissionJson["refreshRate"] = correctedFPS;
+    }
+    std::string correctedProof = proofTextfield->getString();
+    correctedProof.erase(correctedProof.begin(), std::ranges::find_if(correctedProof, [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+    if (!correctedProof.empty()) {
+        if (!isValidProof(correctedProof)) {
+            return "Invalid proof URL";
+        }
+        submissionJson["proof"] = correctedProof;
+    }
+    else if (correctedRating >= 21) {
+        return "Tier 21 and above submissions require proof";
+    }
+    const int correctedProgress = std::min(
+        std::max(0, Utils::getNumberWithGivenDefaultTextfieldValue(percentTextfield, 100)), 100);
+    if (correctedProgress == 0) {
+        return "Progress can't be 0%";
+    }
+    submissionJson["progress"] = correctedProgress;
+    if (const int correctedAttempts = std::min(
+        std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, 100)),
+        999999999); correctedAttempts != -1) {
+        if (correctedAttempts == 0) {
+            return "Attempts can't be 0";
+        }
+        submissionJson["attempts"] = correctedAttempts;
+    }
+    return "";
+}
+
+void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
+    auto req = web::WebRequest();
+    req.bodyJSON(submissionJson);
+    req.header("Cookie", std::format("gddl.sid.sig={}; gddl.sid={}",
+                                     Mod::get()->getSavedValue<std::string>("login-sig", ""),
+                                     Mod::get()->getSavedValue<std::string>("login-sid", "")));
+    submissionListener.setFilter(req.post(submissionEndpoint));
+}
+
+
+GDDLRatingSubmissionLayer* GDDLRatingSubmissionLayer::create(GJGameLevel* level) {
     if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(level)) {
         newLayer->autorelease();
         return newLayer;
-    } else {
+    }
+    else {
         delete newLayer;
         return nullptr;
     }
@@ -340,4 +416,3 @@ void GDDLRatingSubmissionLayer::show() {
     FLAlertLayer::show();
     cocos::handleTouchPriority(this);
 }
-
