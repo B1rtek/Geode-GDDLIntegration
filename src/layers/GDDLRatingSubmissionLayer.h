@@ -23,6 +23,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
     EventListener<web::WebTask> submissionListener, userSearchListener;
     matjson::Value submissionJson = matjson::Value();
+    std::string requestedUsername;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
     int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;

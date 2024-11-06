@@ -130,6 +130,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     m_buttonMenu->addChild(guidelinesButton);
 
     updateTextfields();
+    prepareSubmissionListeners();
 
     return true;
 }
@@ -231,11 +232,15 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
         submissionJson["isSolo"] = soloCompletion;
         if (!soloCompletion) {
             // a request to retrieve the userid has to be made first before making the submission request
-            submissionJson["secondPlayerID"] = 955;
-            return;
+            std::string requestURL = userSearchEndpoint;
+            requestedUsername = secondPlayerTextfield->getString();
+            requestURL += "?name=" + requestedUsername + "&chunk=25";
+            auto req = web::WebRequest();
+            userSearchListener.setFilter(req.get(requestURL));
         }
+    } else {
+        makeSubmissionRequest();
     }
-    makeSubmissionRequest();
 }
 
 void GDDLRatingSubmissionLayer::onGuidelinesClicked(CCObject* sender) {
@@ -324,9 +329,60 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
     submissionListener.bind([this](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            if (res->code() == 200) {
+                std::string message = "Rating submitted!";
+                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].as_bool()) {
+                    message = "Submission accepted!";
+                }
+                Notification::create(message, NotificationIcon::Success, 2)->show();
+                onClose(nullptr);
+            } else {
+                std::string error = "Unknown error";
+                if(jsonResponse.contains("error")) {
+                    error = jsonResponse["error"].as_string();
+                }
+                Notification::create(error, NotificationIcon::Error, 2)->show();
+            }
         }
         else if (e->isCancelled()) {
-            // :(
+            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+        }
+    });
+    userSearchListener.bind([this](web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            if (res->code() == 200) {
+                if (!jsonResponse.is_array()) {
+                    Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+                    return;
+                }
+                const auto resultsList = jsonResponse.as_array();
+                int id = -1;
+                for (const auto& result : resultsList) {
+                    if (!result.contains("Name") || !result.contains("ID")) {
+                        continue;
+                    }
+                    if (result["Name"] == requestedUsername) {
+                        id = result["ID"].as_int();
+                        break;
+                    }
+                }
+                if (id != -1) {
+                    submissionJson["secondPlayerID"] = id;
+                    makeSubmissionRequest();
+                } else {
+                    Notification::create("Second player not found!", NotificationIcon::Error, 2)->show();
+                }
+            } else {
+                std::string error = "Unknown error";
+                if(jsonResponse.contains("error")) {
+                    error = jsonResponse["error"].as_string();
+                }
+                Notification::create(error, NotificationIcon::Error, 2)->show();
+            }
+        }
+        else if (e->isCancelled()) {
+            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
         }
     });
 }
