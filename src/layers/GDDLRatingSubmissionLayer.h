@@ -58,6 +58,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void onDeviceLeft(CCObject* sender);
     void onToggleSoloCompletion(CCObject* sender);
     void onSubmitClicked(CCObject* sender);
+    void onGuidelinesClicked(CCObject* sender);
     void onRatingInfo(CCObject* sender);
     void onEnjoymentInfo(CCObject* sender);
     void onFPSInfo(CCObject* sender);
