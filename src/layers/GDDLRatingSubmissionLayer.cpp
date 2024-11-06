@@ -197,8 +197,57 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject *sender) {
     soloCompletion = !soloCompletionToggler->isOn();
 }
 
+/**
+ * json schema
+ * {
+ *  "levelID":341613,
+ *  "rating":2,
+ *  "enjoyment":6,
+ *  "refreshRate":60,
+ *  "device":1, - 1 for pc, 2 for mobile
+ *  "proof":"https://youtu.be/3-BUEoH9WBs",
+ *  "progress":100,
+ *  "attempts":403,
+ *  "isSolo":true - default for both 1p and 2p levels
+ *  "secondPlayerID": int | null
+ *  }
+ *
+ *  headers:
+ *  Cookie: gddl.sid.sig=<sid.sig>; gddl.sid=<sid>
+ */
+
 void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject *sender) {
-    FLAlertLayer::create("submit", "submit clicked", "yay")->show();
+    auto json = matjson::Value();
+    json["levelID"] = levelID;
+    json["device"] = mobile ? 2 : 1;
+    if (const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35); correctedRating != 0) {
+        json["rating"] = correctedRating;
+    }
+    if (const int correctedEnjoyment = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(enjoymentTextfield, -1)), 10); correctedEnjoyment != -1) {
+        json["enjoyment"] = correctedEnjoyment;
+    }
+    if (const int correctedFPS = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(fpsTextfield, -1)), 9999); correctedFPS != -1) {
+        json["refreshRate"] = correctedFPS;
+    }
+    if (!proofTextfield->getString().empty()) {
+        json["proof"] = proofTextfield->getString();
+    }
+    const int correctedProgress = std::min(std::max(0, Utils::getNumberWithGivenDefaultTextfieldValue(percentTextfield, 100)), 100);
+    json["progress"] = correctedProgress;
+    if (const int correctedAttempts = std::min(std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, 100)), 999999999); correctedAttempts != -1) {
+        json["attempts"] = correctedAttempts;
+    }
+    if (this->twoPlayer) {
+        json["isSolo"] = soloCompletion;
+        if (!soloCompletion) {
+            json["secondPlayerID"] = 955;
+        }
+    }
+    log::debug("Request: {}", json.dump());
+    auto req = web::WebRequest();
+    req.bodyJSON(json);
+    req.header("Cookie", std::format("gddl.sid.sig={}; gddl.sid={}", Mod::get()->getSavedValue<std::string>("login-sig", ""), Mod::get()->getSavedValue<std::string>("login-sid", "")));
+    submissionListener.setFilter(req.post(submissionEndpoint));
 }
 
 void GDDLRatingSubmissionLayer::onGuidelinesClicked(CCObject* sender) {
@@ -264,6 +313,18 @@ void GDDLRatingSubmissionLayer::updateTextfields() {
     percentTextfield->setString(std::to_string(this->percent));
     attemptsTextfield->setString(std::to_string(this->attempts));
 }
+
+void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
+    submissionListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse *res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            log::debug("response from gdladder.com: {}", jsonResponse.dump());
+        } else if (e->isCancelled()) {
+            // :(
+        }
+    });
+}
+
 
 GDDLRatingSubmissionLayer *GDDLRatingSubmissionLayer::create(GJGameLevel *level) {
     if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(level)) {

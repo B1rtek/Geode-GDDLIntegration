@@ -6,25 +6,6 @@
 
 using namespace geode::prelude;
 
-/**
- * json schema
- * {
- *  "levelID":341613,
- *  "rating":2,
- *  "enjoyment":6,
- *  "refreshRate":60,
- *  "device":1, - 1 for pc, 2 for mobile
- *  "proof":"https://youtu.be/3-BUEoH9WBs",
- *  "progress":100,
- *  "attempts":403,
- *  "isSolo":true - default for both 1p and 2p levels
- *  "secondPlayerID": int | null
- *  }
- *
- *  headers:
- *  Cookie: gddl.sid.sig=<sid.sig>; gddl.sid=<sid>
- */
-
 class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
 
@@ -38,8 +19,9 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCLabelBMFont* deviceLabel = nullptr;
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
-    const inline static std::string submissionEndpoint = "https://gdladder.com/api/login";
+    const inline static std::string submissionEndpoint = "https://gdladder.com/api/submit";
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
+    EventListener<web::WebTask> submissionListener, userSearchListener;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
     int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
@@ -71,6 +53,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void addInfoButton(CCLabelBMFont *label, CCSprite *iButtonSprite, SEL_MenuHandler callback);
     void setInitialValues();
     void updateTextfields();
+    void prepareSubmissionListeners();
 
 public:
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
