@@ -14,6 +14,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCTextInputNode* passwordTextField = nullptr;
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
+    matjson::Value reqJson;
     EventListener<web::WebTask> loginListener;
     LoginSettingNodeV3* settingNode;
 
@@ -25,6 +26,11 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void updateStatusLabel(const std::string& newStatus, bool error);
     void saveLoginData(const std::string& sid, const std::string& sig);
     void closeLoginPanel();
+
+    // getting around geode::web limitations
+    std::pair<std::string, std::string> getCookieValue(const char* content);
+    static size_t writeCallback(char *contents, size_t size, size_t nmemb, void *userp);
+    std::thread spawnLoginRequestThread();
 
 public:
     static GDDLLoginLayer* create();
