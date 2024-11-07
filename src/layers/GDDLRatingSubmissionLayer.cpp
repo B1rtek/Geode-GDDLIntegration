@@ -1,5 +1,7 @@
 #include "GDDLRatingSubmissionLayer.h"
 #include "Utils.h"
+#include "settings/LoginSettingNodeV3.h"
+#include "GDDLLoginLayer.h"
 
 bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
@@ -448,6 +450,12 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
 }
 
 void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
+    // check if the user is logged in
+    if (!LoginSettingNodeV3::loggedIn()) {
+        GDDLLoginLayer::create()->show();
+        Notification::create("You are not logged in!", NotificationIcon::Warning, 2)->show();
+        return;
+    }
     auto req = web::WebRequest();
     req.bodyJSON(submissionJson);
     req.header("Cookie", std::format("gddl.sid.sig={}; gddl.sid={}",

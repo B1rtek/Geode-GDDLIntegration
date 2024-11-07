@@ -15,7 +15,6 @@ protected:
     void updateState(CCNode* invoker) override;
 
     void onLoginLogoutButtonClicked(CCObject *sender);
-    bool loggedIn();
     ButtonSprite* getLoginLogoutButtonSprite(bool login);
 
     void onCommit() override;
@@ -26,6 +25,7 @@ public:
     bool hasNonDefaultValue() const override;
 
     void updateFromOutside();
+    static bool loggedIn();
 
     static LoginSettingNodeV3* create(std::shared_ptr<DummySettingLoginV3> setting, float width);
 };

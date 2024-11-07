@@ -122,7 +122,9 @@ void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &si
 }
 
 void GDDLLoginLayer::closeLoginPanel() {
-    settingNode->updateFromOutside();
+    if (settingNode != nullptr) {
+        settingNode->updateFromOutside();
+    }
     onClose(nullptr);
 }
 
