@@ -614,6 +614,12 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     if(callbackObject != nullptr) { // search continues
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
+        // remove any loading circles
+        if (demonSplitLayer != nullptr) {
+            demonSplitLayer->hideLoadingCircle();
+            demonSplitLayer = nullptr;
+        }
+        // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
         listLayerScene->addChild(listLayer);
@@ -1078,7 +1084,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     searchListener.setFilter(req.get(request));
 }
 
-void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
+void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplitLayer* layer) {
     if (searching) return; // super good multithreaded code
     // save values before replacing them
     cacheValues();
@@ -1098,6 +1104,8 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     onlinePagesFetched = 0;
     searching = true;
     prepareSearchListener();
+    // save the layer to remove the loading circle later
+    demonSplitLayer = layer;
     requestSearchPage(1, nullptr);
 }
 

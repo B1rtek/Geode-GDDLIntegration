@@ -1,6 +1,7 @@
 #include "GDDLDemonSplitLayer.h"
 
 #include <Geode/Geode.hpp>
+#include <Geode/ui/LoadingSpinner.hpp>
 
 #include "RatingsManager.h"
 #include "GDDLSearchLayer.h"
@@ -97,8 +98,9 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
     log::debug("Requesting tier {}", std::to_string(tierNumber));
-    GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber);
+    GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber, this);
     // the list should display itself hopefully
+    showLoadingCircle();
 }
 
 void GDDLDemonSplitLayer::onEnter() {
@@ -135,6 +137,26 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
         countLabel->setScale(0.8f);
     }
     return tierNode;
+}
+
+void GDDLDemonSplitLayer::showLoadingCircle() {
+    // ugh the layout I made for this is so god awful
+    const auto loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
+    loadingLabel->setScale(0.7f);
+    loadingLabel->setAnchorPoint({1.0f, 0.5f});
+    loadingLabel->setPosition({m_buttonMenu->getContentWidth() - 30.0f, dynamic_cast<CCMenuItemSpriteExtra*>(m_buttonMenu->getChildByIDRecursive("gddl-demon-split-ok"_spr))->getPositionY()});
+    loadingLabel->setID("gddl-demon-split-loading-label"_spr);
+    m_buttonMenu->addChild(loadingLabel);
+    const auto loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
+    loadingSpinner->setPosition({loadingLabel->getPositionX() + 5.0f, loadingLabel->getPositionY()});
+    loadingSpinner->setID("gddl-demon-split-loading-spinner"_spr);
+    m_buttonMenu->addChild(loadingSpinner);
+}
+
+void GDDLDemonSplitLayer::hideLoadingCircle() {
+    m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
+    m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
 }
 
 GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {

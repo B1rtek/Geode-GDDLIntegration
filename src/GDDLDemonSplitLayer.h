@@ -15,9 +15,12 @@ class GDDLDemonSplitLayer final : public FLAlertLayer {
     void onEnter() override;
 
     CCNode* createTierNode(int tier);
+    void showLoadingCircle();
 public:
     static GDDLDemonSplitLayer* create();
     void show() override;
+
+    void hideLoadingCircle();
 };
 
 
