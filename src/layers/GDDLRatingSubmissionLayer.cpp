@@ -439,7 +439,7 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
     }
     submissionJson["progress"] = correctedProgress;
     if (const int correctedAttempts = std::min(
-        std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, 100)),
+        std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, -1)),
         999999999); correctedAttempts != -1) {
         if (correctedAttempts == 0) {
             return "Attempts can't be 0";
