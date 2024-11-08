@@ -9,6 +9,9 @@ struct BarChartData {
     const _ccColor4F color;
     const std::string label;
     const int value;
+
+    BarChartData(const _ccColor4F &color, const std::string &label, const int value) : color(color), label(label),
+                                                                                       value(value) {}
 };
 
 struct BarChartBar {

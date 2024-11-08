@@ -119,7 +119,7 @@ void GDDLLoginLayer::updateStatusLabel(const std::string &newStatus, bool error)
 }
 
 void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig) {
-    Mod::get()->setSavedValue("login-username", usernameTextField->getString());
+    Mod::get()->setSavedValue("login-username", std::string(usernameTextField->getString()));
     Mod::get()->setSavedValue("login-sid", sid);
     Mod::get()->setSavedValue("login-sig", sig);
 }
