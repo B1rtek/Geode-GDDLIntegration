@@ -1,6 +1,6 @@
 {
 	"geode": "3.8.1",
-	"version": "v1.2.0-beta.2",
+	"version": "v1.2.0-beta.4",
 	"gd": {
 		"android": "2.206",
 		"win": "2.206",
@@ -11,6 +11,7 @@
 	"developers": ["B1rtek", "Diversion"],
 	"description": "Integration with Geometry Dash Demon Ladder - level tiers, search and more",
 	"links": {
+		"homepage": "https://gdladder.com",
 		"source": "https://github.com/B1rtek/Geode-GDDLIntegration",
 		"community": "https://discord.gg/gddl"
 	},
