@@ -1,3 +1,6 @@
+# Welcome to GDDL Integration beta!
+If you encounter crashes please tell me (@B1rtek on Discord) about them, provide logs, describe what you were doing before it happened. Read the changelog below to learn what's new! (and what parts of the mod therefore need testing!)
+
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login
 - Attempts no longer default to 100 when submitting a rating without them
