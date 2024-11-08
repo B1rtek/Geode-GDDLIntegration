@@ -458,7 +458,7 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
     }
     auto req = web::WebRequest();
     req.bodyJSON(submissionJson);
-    req.header("Cookie", std::format("gddl.sid.sig={}; gddl.sid={}",
+    req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
                                      Mod::get()->getSavedValue<std::string>("login-sig", ""),
                                      Mod::get()->getSavedValue<std::string>("login-sid", "")));
     submissionListener.setFilter(req.post(submissionEndpoint));

@@ -85,8 +85,8 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     reqJson = matjson::Value();
-    reqJson["username"] = usernameTextField->getString();
-    reqJson["password"] = passwordTextField->getString();
+    reqJson["username"] = std::string(usernameTextField->getString());
+    reqJson["password"] = std::string(passwordTextField->getString());
     spawnLoginRequestThread().detach();
     updateStatusLabel("Logging in...", false);
 }
