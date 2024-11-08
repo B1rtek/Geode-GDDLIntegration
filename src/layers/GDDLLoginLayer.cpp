@@ -209,7 +209,7 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                 saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
                 updateStatusLabel("Logged in!", false);
                 Loader::get()->queueInMainThread([this]() {
-                    onClose(nullptr);
+                    closeLoginPanel();
                 });
             } else {
                 // something went wrong - get the error
