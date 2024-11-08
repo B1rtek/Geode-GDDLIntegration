@@ -1,3 +1,6 @@
+# v1.2.0-beta.2
+Hello and welcome to v1.2.0-beta.2 (now android compatible)! If you encounter crashes please tell me (@B1rtek on Discord) about them, provide logs, describe what you were doing before it happened. The main part I'd like to test is the login process and records submission - you can do both through clicking on the GDDL button on the level info page and then clicking "submit rating".
+
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
 - Ported settings to SettingsV3, making GDDL Integration one of the first mods to use the new standard (yaaaaay!)
