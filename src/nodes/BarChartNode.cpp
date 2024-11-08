@@ -34,7 +34,8 @@ BarChartNode::calculateBar(const BarChartData &barData, const int index, const i
     auto labelLabel = CCLabelBMFont::create(barData.label.c_str(), "chatFont.fnt");
     Utils::scaleLabelToWidth(labelLabel, labelWidth);
     labelLabel->setAnchorPoint({0.0f, 0.5f});
-    labelLabel->setPosition({0.0f, this->getContentHeight() - (barHeight * index) - barHeight / 2});
+    const float labelPositionAdjustement = labelLabel->getContentWidth() * (CCDirector::get()->getLoadedTextureQuality() == TextureQuality::kTextureQualityHigh ? 0.0f : 0.05f);
+    labelLabel->setPosition({0.0f - labelPositionAdjustement, this->getContentHeight() - (barHeight * index) - barHeight / 2});
     this->addChild(labelLabel);
     auto percentageLabel = CCLabelBMFont::create(percentage.c_str(), "chatFont.fnt");
     Utils::scaleLabelToWidth(percentageLabel, labelWidth * 1.5f);

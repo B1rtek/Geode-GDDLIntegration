@@ -1,6 +1,9 @@
 # Welcome to GDDL Integration beta!
 If you encounter crashes please tell me (@B1rtek on Discord) about them, provide logs, describe what you were doing before it happened. Read the changelog below to learn what's new! (and what parts of the mod therefore need testing!)
 
+# v1.2.0-beta.5
+- When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
+
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login
 - Attempts no longer default to 100 when submitting a rating without them
@@ -14,6 +17,8 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
   - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
   - In case you don't like it, you can always turn it off and still use the old one in the mod settings
 - Settings have been split into categories, so they aren't as cluttered anymore
+
+MASSIVE THANKS TO [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/) (the gd multiplayer mod in case you live under a rock and you haven't heard about it)) for help with the login thread!!! <3 (tldr geode::web isn't ready for cookies)
 
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
