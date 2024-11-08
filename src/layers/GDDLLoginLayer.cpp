@@ -208,7 +208,9 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                 log::debug("cookies read");
                 saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
                 updateStatusLabel("Logged in!", false);
-//                closeLoginPanel();
+                Loader::get()->queueInMainThread([this]() {
+                    onClose(nullptr);
+                });
             } else {
                 // something went wrong - get the error
                 std::string error = "Unknown error", parseError;
