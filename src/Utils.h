@@ -182,25 +182,19 @@ public:
             if (web::WebResponse * res = e->getValue()) {
                 const std::string response = res->string().unwrapOr("");
                 if (response.empty()) {
-                    FLAlertLayer::create("GDDL Integration",
-                                         "Failed to cache ratings from gdladder.com, check your internet connection.",
-                                         "OK")->show();
+                    Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
                 } else {
                     RatingsManager::cacheRatings(response);
                     if (!RatingsManager::cacheNotEmpty()) {
-                        FLAlertLayer::create("GDDL Integration",
-                                             "Failed to cache ratings from gdladder.com, check your internet connection.",
-                                             "OK")->show();
+                        Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
                         // populate the cache from the save anyway, there could be something in there
                         RatingsManager::populateFromSave();
                     } else if (notifySuccess) {
-                        FLAlertLayer::create("Reset GDDL cache", "Cache refresh succeeded", "OK")->show();
+                        Notification::create("GDDL Cache refresh succeded", NotificationIcon::Success, 2)->show();
                     }
                 }
             } else if (e->isCancelled()) {
-                FLAlertLayer::create("GDDL Integration",
-                                     "Failed to cache ratings from gdladder.com, check your internet connection.",
-                                     "OK")->show();
+                Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
             }
         });
     }
