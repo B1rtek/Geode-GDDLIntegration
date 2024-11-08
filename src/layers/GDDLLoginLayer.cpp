@@ -49,7 +49,7 @@ bool GDDLLoginLayer::init() {
     usernameLabel->setID("gddl-login-username-label"_spr);
     usernameLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 50.0f});
     m_buttonMenu->addChild(usernameLabel);
-    Utils::createTextInputNode(m_buttonMenu, usernameTextField, "bigFont.fnt", "", 32, {200.0f, 25.0f},
+    Utils::createTextInputNode(m_buttonMenu, usernameTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 75.0f});
     usernameTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
     usernameTextField->setString(Mod::get()->getSavedValue<std::string>("login-username", ""));
@@ -59,7 +59,7 @@ bool GDDLLoginLayer::init() {
     passwordLabel->setID("gddl-login-password-label"_spr);
     passwordLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 100.0f});
     m_buttonMenu->addChild(passwordLabel);
-    Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 32, {200.0f, 25.0f},
+    Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 125.0f});
     passwordTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
     passwordTextField->m_usePasswordChar = true;
