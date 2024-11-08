@@ -1,3 +1,17 @@
+# v1.2.0-beta.4
+- The login popup automatically closes upon a successful login
+- Attempts no longer default to 100 when submitting a rating without them
+- The LoginSettingNode updates itself after logging in now
+- Increased the characters cap for fields in the login form to 64 characters (Thanks @7w7y !)
+
+# v1.2.0-beta.1
+- Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
+  - This requires you to log in to your GDDL account, you can log in on the mod settings page (or the mod will prompt you to do so when you try to submit a rating while logged out)
+- Completely overhauled the popup with rating and enjoyment information that appears after clicking the GDDL button on the level info page
+  - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
+  - In case you don't like it, you can always turn it off and still use the old one in the mod settings
+- Settings have been split into categories, so they aren't as cluttered anymore
+
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
 - Ported settings to SettingsV3, making GDDL Integration one of the first mods to use the new standard (yaaaaay!)
