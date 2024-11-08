@@ -97,3 +97,4 @@ void GDDLLevelInfoPopup::addLevelInfo() {
     m_buttonMenu->addChild(levelInfoLabels, 2);
     levelInfoLabels->setPosition({0.0f, 5.0f});
 }
+

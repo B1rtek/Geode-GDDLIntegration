@@ -59,13 +59,6 @@ GDDLRating RatingsManager::parseJson(const std::string& response) {
     }
 }
 
-cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
-    const int r = (hexColor >> (8 * 2)) & 0xff;
-    const int g = (hexColor >> (8 * 1)) & 0xff;
-    const int b = (hexColor >> (8*0)) & 0xff;
-    return ccc3(r, g, b);
-}
-
 /**
  * Cached json format:
  * {
@@ -133,7 +126,7 @@ cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
         return ccc3(255, 255, 255);
     }
     const int hexColor = tierColors[tier];
-    return convertToColor(hexColor);
+    return Utils::hexColorTo3B(hexColor);
 }
 
 std::optional<GDDLRating> RatingsManager::getRating(const int id) {
@@ -258,4 +251,28 @@ int RatingsManager::getCachedTier(const int levelID) {
 void RatingsManager::clearCache() {
     // clears the cache in-memory, leaving the file intact in case the refresh fails for some reason
     ratingsCache.clear();
+}
+
+void RatingsManager::cacheSpread(const int levelID, const RatingsSpread& spread) {
+    spreadsCache[levelID] = spread;
+}
+
+bool RatingsManager::hasSpread(const int levelID) {
+    return spreadsCache.contains(levelID);
+}
+
+RatingsSpread RatingsManager::getSpread(const int levelID) {
+    return spreadsCache[levelID];
+}
+
+void RatingsManager::cacheSkillsets(const int levelID, const Skillsets& skillsets) {
+    skillsetsCache[levelID] = skillsets;
+}
+
+bool RatingsManager::hasSkillsets(const int levelID) {
+    return skillsetsCache.contains(levelID);
+}
+
+Skillsets RatingsManager::getSkillsets(const int levelID) {
+    return skillsetsCache[levelID];
 }

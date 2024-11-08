@@ -7,6 +7,7 @@ GDDLRating::GDDLRating(matjson::Value levelData) {
     this->ratingCount = levelData.contains("RatingCount") && !levelData["RatingCount"].is_null() ? levelData["RatingCount"].as_int() : 0;
     this->enjoymentCount = levelData.contains("EnjoymentCount") && !levelData["EnjoymentCount"].is_null() ? levelData["EnjoymentCount"].as_int() : 0;
     this->submissionCount = levelData.contains("SubmissionCount") && !levelData["SubmissionCount"].is_null() ? levelData["SubmissionCount"].as_int() : 0;
+    this->showcaseVideoID = levelData.contains("Showcase") && !levelData["Showcase"].is_null() ? levelData["Showcase"].as_string() : "";
 
     this->roundedRating = static_cast<int>(round(this->rating));
 }

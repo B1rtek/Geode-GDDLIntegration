@@ -7,10 +7,11 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "GDDLLevelInfoPopup.h"
+#include "layers/GDDLLevelInfoPopup.h"
 #include "settings/ButtonPositionSettingV3.h"
 #include "settings/UseOldTierLabelSettingV3.h"
 #include "settings/ExcludeRangeSettingV3.h"
+#include "layers/GDDLAdvancedLevelInfoPopup.h"
 
 using namespace geode::prelude;
 
@@ -18,6 +19,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     struct Fields {
         EventListener<web::WebTask> infoLayerGetRatingListener;
         bool gddlTierUpdated = false;
+        GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
     };
 
     // ReSharper disable once CppParameterMayBeConst
@@ -38,6 +40,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                         tierAfterFetch = RatingsManager::getDemonTier(levelID);
                     }
                     updateButton(tierAfterFetch);
+                    if (m_fields->advancedLevelInfoPopup != nullptr) {
+                        m_fields->advancedLevelInfoPopup->addRatingInfo();
+                    }
                 }
             } else if (e->isCancelled()) {
                 updateButton(-1);
@@ -170,6 +175,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
-        GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
+            GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        } else {
+            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level);
+            m_fields->advancedLevelInfoPopup->show();
+        }
     }
 };
