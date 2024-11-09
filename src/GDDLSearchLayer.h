@@ -76,6 +76,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
     inline static GDDLBrowserLayer* searchCallbackObject;
     inline static GDDLDemonSplitLayer* demonSplitLayer = nullptr;
+    inline static GDDLSearchLayer* searchLayer = nullptr;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
     // page normal
@@ -116,6 +117,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     bool init() override;
     void loadPageFull();
     void loadPageSimple();
+    void showLoadingCircle();
     void showPage();
     void loadValues();
     void saveValues();
@@ -207,6 +209,7 @@ public:
     static bool isSearching();
     static void stopSearch();
     static void restoreValuesAfterSplit();
+    void hideLoadingCircle();
 };
 
 template<typename T>
