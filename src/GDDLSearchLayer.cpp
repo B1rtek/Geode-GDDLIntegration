@@ -653,9 +653,7 @@ void GDDLSearchLayer::prepareSearchListener() {
             if (web::WebResponse* res = e->getValue()) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
-                    FLAlertLayer::create("GDDL Search",
-                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                        "OK")->show();
+                    Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
                 } else {
                     appendFetchedResults(response);
                     auto [fst, snd] = getReadyRange(requestRequestedPage);
@@ -670,9 +668,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                     }
                 }
             } else if (e->isCancelled()) {
-                FLAlertLayer::create("GDDL Search",
-                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                  "OK")->show();
+                Notification::create("Search failed - check your internet connection!", NotificationIcon::Error, 2)->show();
             }
         });
 }

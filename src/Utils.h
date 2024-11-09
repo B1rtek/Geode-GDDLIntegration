@@ -182,11 +182,11 @@ public:
             if (web::WebResponse * res = e->getValue()) {
                 const std::string response = res->string().unwrapOr("");
                 if (response.empty()) {
-                    Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
+                    Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
                 } else {
                     RatingsManager::cacheRatings(response);
                     if (!RatingsManager::cacheNotEmpty()) {
-                        Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
+                        Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
                         // populate the cache from the save anyway, there could be something in there
                         RatingsManager::populateFromSave();
                     } else if (notifySuccess) {
@@ -194,7 +194,7 @@ public:
                     }
                 }
             } else if (e->isCancelled()) {
-                Notification::create("GDDL - Failed to cache ratings from gdladder.com, check your internet connection.", NotificationIcon::Error, 3)->show();
+                Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
             }
         });
     }
