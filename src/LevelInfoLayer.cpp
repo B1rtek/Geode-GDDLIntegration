@@ -178,7 +178,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
             GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
         } else {
-            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level);
+            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level, m_level->m_levelID);
             m_fields->advancedLevelInfoPopup->show();
         }
     }

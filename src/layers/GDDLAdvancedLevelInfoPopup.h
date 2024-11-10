@@ -8,7 +8,7 @@ using namespace geode::prelude;
 
 class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     EventListener<web::WebTask> spreadListener, skillsetsListener;
-    int levelID = 0;
+    int gddlLevelID = 0;
     std::string levelName, creator;
     GJGameLevel* level = nullptr;
     const CCPoint popupSize = {440.0f, 280.0f};
@@ -16,7 +16,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
     CCLabelBMFont* levelNameLabel = nullptr;
 
-    bool init(GJGameLevel* level, int gddlLevelID = -1);
+    bool init(GJGameLevel* level, int gddlLevelID);
     void onClose(cocos2d::CCObject* sender);
     void onSkillsetClicked(CCObject* sender);
     void onSkillsetInfo(CCObject* sender);
@@ -33,7 +33,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     static std::string getSkillsetsEndpointUrl(const int levelID);
 
 public:
-    static GDDLAdvancedLevelInfoPopup* create(GJGameLevel* level, int gddlLevelID = -1);
+    static GDDLAdvancedLevelInfoPopup* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
 
     void addRatingInfo();

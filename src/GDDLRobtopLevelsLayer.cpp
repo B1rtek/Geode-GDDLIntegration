@@ -208,7 +208,7 @@ void GDDLRobtopLevelsLayer::onGDDLInfo(CCObject *sender) {
     if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
         GDDLLevelInfoPopup::create(levelID)->show();
     } else {
-        GJGameLevel* levelObject = LevelTools::getLevel(m_fields->currentPage+1, false);
+        GJGameLevel* levelObject = GameLevelManager::get()->getMainLevel(m_fields->currentPage+1, true);
         m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(levelObject, levelID);
         m_fields->advancedLevelInfoPopup->show();
     }

@@ -26,7 +26,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     std::string requestedUsername;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
-    int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
+    int rating = -1, enjoyment = -1, fps = 0, gddlLevelID = 0, percent = 0, attempts = 0;
     bool mobile = false, twoPlayer = false, soloCompletion = true;
     const inline static std::vector<std::string> validProofURLs = {
         "https://www.youtube.com/watch?v=",
@@ -42,7 +42,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     };
 
 
-    bool init(GJGameLevel* level);
+    bool init(GJGameLevel* level, int gddlLevelID);
     void onClose(CCObject* sender);
 
     void onRatingLeft(CCObject* sender);
@@ -75,7 +75,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void makeSubmissionRequest();
 
 public:
-    static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
+    static GDDLRatingSubmissionLayer* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
 };
 

@@ -3,10 +3,10 @@
 #include "settings/LoginSettingNodeV3.h"
 #include "GDDLLoginLayer.h"
 
-bool GDDLRatingSubmissionLayer::init(GJGameLevel* level) {
+bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
-    this->levelID = level->m_levelID;
+    this->gddlLevelID = gddlLevelID;
     this->percent = level->m_normalPercent;
     this->attempts = level->m_attempts;
     this->twoPlayer = level->m_twoPlayerMode;
@@ -312,7 +312,7 @@ void GDDLRatingSubmissionLayer::addInfoButton(CCLabelBMFont* label, CCSprite* iB
 }
 
 void GDDLRatingSubmissionLayer::setInitialValues() {
-    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     rating = gddlRating ? gddlRating.value().rating : -1;
     enjoyment = gddlRating ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
     fps = Utils::getCorrectedFPS();
@@ -397,7 +397,7 @@ bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
 
 
 std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
-    submissionJson["levelID"] = levelID;
+    submissionJson["levelID"] = this->gddlLevelID;
     submissionJson["device"] = mobile ? 2 : 1;
     const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
     if (correctedRating != 0) {
@@ -465,8 +465,8 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
 }
 
 
-GDDLRatingSubmissionLayer* GDDLRatingSubmissionLayer::create(GJGameLevel* level) {
-    if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(level)) {
+GDDLRatingSubmissionLayer* GDDLRatingSubmissionLayer::create(GJGameLevel* level, int gddlLevelID) {
+    if (const auto newLayer = new GDDLRatingSubmissionLayer(); newLayer != nullptr && newLayer->init(level, gddlLevelID)) {
         newLayer->autorelease();
         return newLayer;
     }
