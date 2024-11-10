@@ -16,7 +16,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
     CCLabelBMFont* levelNameLabel = nullptr;
 
-    bool init(GJGameLevel* level);
+    bool init(GJGameLevel* level, int gddlLevelID = -1);
     void onClose(cocos2d::CCObject* sender);
     void onSkillsetClicked(CCObject* sender);
     void onSkillsetInfo(CCObject* sender);
@@ -33,7 +33,7 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     static std::string getSkillsetsEndpointUrl(const int levelID);
 
 public:
-    static GDDLAdvancedLevelInfoPopup* create(GJGameLevel* level);
+    static GDDLAdvancedLevelInfoPopup* create(GJGameLevel* level, int gddlLevelID = -1);
     void show() override;
 
     void addRatingInfo();

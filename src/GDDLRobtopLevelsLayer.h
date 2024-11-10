@@ -29,6 +29,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         bool buttonsAdded[3] = {false, false, false};
         bool changedBySwiping = false;
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
+        GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
     };
 
     bool init(int page);

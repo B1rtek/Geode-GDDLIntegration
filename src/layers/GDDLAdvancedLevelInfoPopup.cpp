@@ -8,13 +8,14 @@
 #include "Utils.h"
 #include "GDDLRatingSubmissionLayer.h"
 
-bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
+bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
     this->level = level;
-    this->levelID = level->m_levelID;
+    this->levelID = gddlLevelID == -1 ? level->m_levelID : gddlLevelID;
     this->levelName = level->m_levelName;
     this->creator = level->m_creatorName;
+    log::debug("Level {} by {}, ID: {}", this->levelName, this->creator, this->levelID);
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -274,8 +275,8 @@ std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelI
 }
 
 GDDLAdvancedLevelInfoPopup *
-GDDLAdvancedLevelInfoPopup::create(GJGameLevel *level) {
-    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(level)) {
+GDDLAdvancedLevelInfoPopup::create(GJGameLevel *level, int gddlLevelID) {
+    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(level, gddlLevelID)) {
         newLayer->autorelease();
         return newLayer;
     } else {

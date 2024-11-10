@@ -3,6 +3,8 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
 
 # v1.2.0-beta.5
 - When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
+- Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSplit, GDDLSearch and GDDLLogin layers
+- Added a loading circle to GDDLSplitLayer
 
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login
@@ -18,7 +20,7 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
   - In case you don't like it, you can always turn it off and still use the old one in the mod settings
 - Settings have been split into categories, so they aren't as cluttered anymore
 
-MASSIVE THANKS TO [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/) (the gd multiplayer mod in case you live under a rock and you haven't heard about it)) for help with the login thread!!! <3 (tldr geode::web isn't ready for cookies)
+MASSIVE THANKS TO [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/) (the gd multiplayer mod in case you live under a rock, and you haven't heard about it)) for help with the login thread!!! <3 (tldr geode::web isn't ready for cookies)
 
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
