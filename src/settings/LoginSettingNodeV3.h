@@ -26,6 +26,7 @@ public:
 
     void updateFromOutside();
     static bool loggedIn();
+    static void logOut();
 
     static LoginSettingNodeV3* create(std::shared_ptr<DummySettingLoginV3> setting, float width);
 };

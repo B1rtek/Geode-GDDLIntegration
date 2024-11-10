@@ -344,6 +344,12 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 std::string error = "Unknown error";
                 if(jsonResponse.contains("error")) {
                     error = jsonResponse["error"].as_string();
+                    if (error == "Authentication failed!") {
+                        LoginSettingNodeV3::logOut();
+                        GDDLLoginLayer::create()->show();
+                        Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
+                        return;
+                    }
                 }
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
