@@ -239,6 +239,8 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
             requestURL += "?name=" + requestedUsername + "&chunk=25";
             auto req = web::WebRequest();
             userSearchListener.setFilter(req.get(requestURL));
+        } else {
+            makeSubmissionRequest();
         }
     } else {
         makeSubmissionRequest();
