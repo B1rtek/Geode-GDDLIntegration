@@ -7,6 +7,7 @@
 #include <objects/Skillsets.h>
 
 #include "objects/GDDLRating.h"
+#include "objects/Submission.h"
 
 using namespace geode::prelude;
 
@@ -15,14 +16,15 @@ class RatingsManager {
     static std::map<int, int> ratingsCache;
     inline static std::map<int, RatingsSpread> spreadsCache{};
     inline static std::map<int, Skillsets> skillsetsCache{};
+    inline static std::map<int, Submission> submissionsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
     static GDDLRating parseJson(const std::string& response);
 public:
     inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
-
     inline static bool triedToCache = false;
+    static std::vector<int> tierColors;
 
     static void populateFromSave();
 
@@ -64,7 +66,11 @@ public:
 
     static Skillsets getSkillsets(const int levelID);
 
-    static std::vector<int> tierColors;
+    static void cacheSubmission(const int levelID, const Submission& submission);
+
+    static bool hasSubmission(const int levelID);
+
+    static Submission getSubmission(const int levelID);
 };
 
 
