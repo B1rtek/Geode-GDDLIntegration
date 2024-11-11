@@ -1,7 +1,20 @@
-# Welcome to GDDL Integration beta!
-If you encounter crashes please tell me (@B1rtek on Discord) about them, provide logs, describe what you were doing before it happened. Read the changelog below to learn what's new! (and what parts of the mod therefore need testing!)
-
 # v1.2.0-beta.5
+This version is **considered ready**, but not released publicly due to Geode not being updated for 2.207x yet. This version will not receive any updates (most likely), but if you encounter bugs report them to me (@b1rtek on Discord)
+## v1.2.0 is the biggest update for GDDL Integration yet!
+- Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
+  - This requires you to log in to your GDDL account, you can log in on the mod settings page, but if you forget to do that you will be prompted to do so when you try submitting a rating
+  - You will be warned if you have already submitted a rating for the level, don't worry about that
+- Completely overhauled the popup with rating and enjoyment information that appears after clicking the GDDL button on the level info page
+  - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
+  - In case you don't like it, you can always turn it off and still use the old one in the mod settings
+- Settings have been split into categories, so they aren't as cluttered anymore
+- Some popups were replaced with toast messages instead, loading indicators have been added in multiple places
+- Fixed the bug that caused sorting in GDDL search to malfunction
+- Fixed a bug that caused the GDDL tier button to be placed far away from the level name in certain cases when using the "to the left/right of the level title" setting
+
+MASSIVE THANKS to [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/)) for help with this update! <3
+
+Changes from the previous betas:
 - When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
 - Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSearch and GDDLLogin layers
 - Added a loading circle to GDDLSplitLayer
@@ -28,7 +41,6 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
   - In case you don't like it, you can always turn it off and still use the old one in the mod settings
 - Settings have been split into categories, so they aren't as cluttered anymore
 
-MASSIVE THANKS TO [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/) (the gd multiplayer mod in case you live under a rock, and you haven't heard about it)) for help with the login thread!!! <3 (tldr geode::web isn't ready for cookies)
 
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
