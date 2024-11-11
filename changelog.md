@@ -10,6 +10,8 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
 - Added a prompt to relog if GDDL session expires
 - Labels no longer overlap in rating bar charts in levels with a wide spread like Multition and others
 - Fixed the wrong sorting order bug in search!!
+- Fixed a bug that caused the GDDL button next to level title get placed far away from it
+- Fixed a typo in "Spacing in spread charts" setting's description
 
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login

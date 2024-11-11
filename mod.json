@@ -72,7 +72,7 @@
 		},
 		"thin-chart-bars": {
 			"name": "Spacing in spread charts",
-			"description": "Makes the bars in <cr>rating<c/> and <cg>enjoyment</c> spread charts thinner, when deactivated will leave <cb>no spacing between<c/> bars in the charts",
+			"description": "Makes the bars in <cr>rating</c> and <cg>enjoyment</c> spread charts thinner, when deactivated will leave <cb>no spacing between</c> bars in the charts",
 			"type": "bool",
 			"default": true
 		},
