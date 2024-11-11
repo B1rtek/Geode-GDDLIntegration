@@ -288,3 +288,7 @@ bool RatingsManager::hasSubmission(const int levelID) {
 Submission RatingsManager::getSubmission(const int levelID) {
     return submissionsCache[levelID];
 }
+
+void RatingsManager::clearSubmissionCache() {
+    submissionsCache.clear();
+}

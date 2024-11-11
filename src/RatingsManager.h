@@ -71,6 +71,8 @@ public:
     static bool hasSubmission(const int levelID);
 
     static Submission getSubmission(const int levelID);
+
+    static void clearSubmissionCache();
 };
 
 
