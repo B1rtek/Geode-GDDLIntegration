@@ -526,6 +526,10 @@ void GDDLRatingSubmissionLayer::show() {
             auto req = web::WebRequest();
             userSubmissionCheckListener.setFilter(req.get(getUserSubmissionCheckEndpoint(userID, this->gddlLevelID)));
         }
+    } else {
+        // the user would probably like to log in at this point I guess
+        GDDLLoginLayer::create()->show();
+        Notification::create("You are not logged in!", NotificationIcon::Warning, 2)->show();
     }
 }
 
