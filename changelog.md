@@ -12,6 +12,7 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
 - Fixed the wrong sorting order bug in search!!
 - Fixed a bug that caused the GDDL button next to level title get placed far away from it
 - Fixed a typo in "Spacing in spread charts" setting's description
+- Added a check that tells the user whether they already submitted a rating for a level or not
 
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login
