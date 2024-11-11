@@ -9,7 +9,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
 
-#include "GDDLSearchLayer.h"
+#include "layers/GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
 

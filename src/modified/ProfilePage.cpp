@@ -2,7 +2,7 @@
 #include <Geode/Bindings.hpp>
 #include "Geode/modify/ProfilePage.hpp"
 
-#include "GDDLDemonSplitLayer.h"
+#include "layers/GDDLDemonSplitLayer.h"
 
 using namespace geode::prelude;
 
