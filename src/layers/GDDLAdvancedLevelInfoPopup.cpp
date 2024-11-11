@@ -14,7 +14,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     this->level = level;
     this->gddlLevelID = gddlLevelID;
     this->levelName = level->m_levelName;
-    this->creator = level->m_creatorName;
+    this->creator = gddlLevelID < 10 && level->m_creatorName.empty() ? "RobTop" : level->m_creatorName;
     log::debug("Level {} by {}, ID: {}", this->levelName, this->creator, this->gddlLevelID);
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
