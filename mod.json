@@ -33,10 +33,8 @@
 	},
 	"resources": {
 		"sprites": [
-			"resources/tier.png",
-			"resources/split.png",
 			"resources/search.png",
-			"resources/old_search.png",
+			"resources/gddlpopup.png",
 			"resources/tiers/*.png"
 		]
 	},
