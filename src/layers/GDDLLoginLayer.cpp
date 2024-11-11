@@ -131,12 +131,9 @@ void GDDLLoginLayer::prepareSearchListener() {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                log::debug("received the id json");
                 const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
-                log::debug("got the id from the json: {}", id);
                 if (id > -1) {
                     Mod::get()->setSavedValue("login-userid", id);
-                    log::debug("saved the id from the json: {}", id);
                     Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                     closeLoginPanel();
                 } else {
@@ -306,7 +303,6 @@ int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, con
     if (!jsonResponse.is_array()) {
         return -2;
     }
-    log::debug("it's an array, requested username: {}", requestedUsername);
     const auto resultsList = jsonResponse.as_array();
     int id = -1;
     for (const auto& result : resultsList) {

@@ -15,7 +15,6 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     this->gddlLevelID = gddlLevelID;
     this->levelName = level->m_levelName;
     this->creator = gddlLevelID < 10 && level->m_creatorName.empty() ? "RobTop" : level->m_creatorName;
-    log::debug("Level {} by {}, ID: {}", this->levelName, this->creator, this->gddlLevelID);
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -252,7 +251,6 @@ void GDDLAdvancedLevelInfoPopup::addShowcaseButton(bool active) {
             GDDLAdvancedLevelInfoPopup::onShowcaseClicked));
     showcaseButton->setPosition({popupSize.x / 2 - 135.0f, 22.0f});
     showcaseButton->setID("gddl-advanced-level-info-showcase-button"_spr);
-    log::info("Adding the button");
     m_buttonMenu->addChild(showcaseButton);
 }
 

@@ -344,7 +344,6 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     message = "Submission accepted!";
                 }
                 // cache submitted submission
-                log::debug("submissionListener callback: rating submitted, cache it");
                 Submission submitted = Submission(submissionJson, true);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submitted);
                 Notification::create(message, NotificationIcon::Success, 2)->show();
@@ -361,14 +360,12 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     }
                 }
                 // cache that no submission was made
-                log::debug("submissionListener callback: rating not submitted, cache that it doesn't exist");
                 RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         }
         else if (e->isCancelled()) {
             // cache that no submission was made
-            log::debug("submissionListener callback: rating not submitted, cache that it doesn't exist");
             RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
             Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
         }
@@ -401,7 +398,6 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 // submission found, cache it
-                log::debug("userSubmissionCheckListener callback: check returned positive after request, show the popup");
                 const Submission submission = Submission(jsonResponse, false);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
@@ -410,7 +406,6 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
                 } else {
                     // save an empty one
-                    log::debug("userSubmissionCheckListener callback: check returned negative after request, save that we don't have it");
                     RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 }
             }
@@ -513,15 +508,11 @@ void GDDLRatingSubmissionLayer::show() {
     cocos::handleTouchPriority(this);
     // submission check should be here to make it appear on top
     if (LoginSettingNodeV3::loggedIn()) {
-        log::debug("show(): submission check");
         if(RatingsManager::hasSubmission(this->gddlLevelID)) {
-            log::debug("show(): submission check - there is a submission");
             if (!RatingsManager::getSubmission(this->gddlLevelID).isEmpty()) {
-                log::debug("show(): submission check - it's not empty");
                 showAlreadySubmittedWarning();
             }
         } else {
-            log::debug("show(): submission check - we don't have it, let's fetch it in that case");
             int userID = Mod::get()->getSavedValue<int>("login-userid", 0);
             auto req = web::WebRequest();
             userSubmissionCheckListener.setFilter(req.get(getUserSubmissionCheckEndpoint(userID, this->gddlLevelID)));
@@ -538,10 +529,8 @@ std::string GDDLRatingSubmissionLayer::getUserSubmissionCheckEndpoint(int userID
 }
 
 void GDDLRatingSubmissionLayer::showAlreadySubmittedWarning() {
-    log::debug("showAlreadySubmittedWarning(): submission check");
     auto submission = RatingsManager::getSubmission(this->gddlLevelID);
     if (submission.isEmpty()) return;
-    log::debug("showAlreadySubmittedWarning(): submission check - the submission isn't empty");
     std::string description = submission.describe();
     std::string text = "<co>You have already submitted a rating for this level</c>: " + description + " Submitting <cy>another rating</c> will <cr>overwrite</c> the previous one!";
     FLAlertLayer::create("Warning", text, "OK")->show();

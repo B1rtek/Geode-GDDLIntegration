@@ -97,7 +97,6 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
     const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
-    log::debug("Requesting tier {}", std::to_string(tierNumber));
     GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber, this);
     // the list should display itself hopefully
     showLoadingCircle();
