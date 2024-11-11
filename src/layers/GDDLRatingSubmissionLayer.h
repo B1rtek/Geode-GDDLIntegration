@@ -20,7 +20,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submit";
-    EventListener<web::WebTask> submissionListener, userSearchListener;
+    EventListener<web::WebTask> submissionListener, userSearchListener, userSubmissionCheckListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
 
@@ -72,12 +72,15 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     bool isValidProof(const std::string& proofURL);
     std::string fillOutSubmissionJson();
     void makeSubmissionRequest();
+    void showAlreadySubmittedWarning();
 
 public:
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
 
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
+
+    static std::string getUserSubmissionCheckEndpoint(int userID, int levelID);
 };
 
 
