@@ -62,6 +62,7 @@ void LoginSettingNodeV3::logOut() {
     const std::string emptyString;
     Mod::get()->setSavedValue("login-sid", emptyString);
     Mod::get()->setSavedValue("login-sig", emptyString);
+    RatingsManager::clearSubmissionCache();
 }
 
 void LoginSettingNodeV3::onCommit() {

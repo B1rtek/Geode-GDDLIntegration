@@ -111,6 +111,7 @@ void GDDLLoginLayer::prepareSearchListener() {
             if (res->code() == 200) {
                 Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                 saveLoginData("gddl.sid", "gddl.sid.sig");
+                RatingsManager::clearSubmissionCache();
                 closeLoginPanel();
             } else {
                 // not success!
@@ -134,7 +135,7 @@ void GDDLLoginLayer::prepareSearchListener() {
                 const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
                 log::debug("got the id from the json: {}", id);
                 if (id > -1) {
-                    Mod::get()->setSavedValue("login-userid", std::to_string(id));
+                    Mod::get()->setSavedValue("login-userid", id);
                     log::debug("saved the id from the json: {}", id);
                     Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                     closeLoginPanel();
