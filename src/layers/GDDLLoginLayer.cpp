@@ -2,6 +2,7 @@
 
 #include "Utils.h"
 #include "external/ca_bundle.h"
+#include "GDDLRatingSubmissionLayer.h"
 #include <Geode/Loader.hpp>
 #include <curl/curl.h>
 #include <Geode/ui/LoadingSpinner.hpp>
@@ -125,6 +126,29 @@ void GDDLLoginLayer::prepareSearchListener() {
             Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
         }
     });
+    userIDListener.bind([this](web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            if (res->code() == 200) {
+                log::debug("received the id json");
+                const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
+                log::debug("got the id from the json: {}", id);
+                if (id > -1) {
+                    Mod::get()->setSavedValue("login-userid", std::to_string(id));
+                    log::debug("saved the id from the json: {}", id);
+                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                    closeLoginPanel();
+                } else {
+                    Notification::create(id == -1 ? "Your player ID wasn't found, try relogging later" : "An error occurred", NotificationIcon::Error, 2)->show();
+                }
+            } else {
+                Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
+            }
+        }
+        else if (e->isCancelled()) {
+            Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
+        }
+    });
 }
 
 void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig) {
@@ -227,8 +251,12 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                 }
                 saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
                 Loader::get()->queueInMainThread([this]() {
-                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                    closeLoginPanel();
+                    // get the uid
+                    std::string requestURL = GDDLRatingSubmissionLayer::userSearchEndpoint;
+                    const std::string requestedUsername = Mod::get()->getSavedValue<std::string>("login-username", "");
+                    requestURL += "?name=" + requestedUsername + "&chunk=25";
+                    auto req = web::WebRequest();
+                    userIDListener.setFilter(req.get(requestURL));
                 });
             } else {
                 // something went wrong - get the error
@@ -277,6 +305,7 @@ int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, con
     if (!jsonResponse.is_array()) {
         return -2;
     }
+    log::debug("it's an array, requested username: {}", requestedUsername);
     const auto resultsList = jsonResponse.as_array();
     int id = -1;
     for (const auto& result : resultsList) {
