@@ -289,8 +289,16 @@ void GDDLAdvancedLevelInfoPopup::show() {
 }
 
 void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
-    // remove the loading label if it exists
+    // there's a weird bug on rob's levels layer that causes this stuff to appear in it somehow, idk how, hopefully this fixes it
     if (m_buttonMenu == nullptr) return;
+    const auto layer = m_buttonMenu->getParent();
+    if (layer == nullptr) return; // no cclayer?? how
+    if (layer->getParent() == nullptr) return; // no layer?? how
+    if (typeinfo_cast<GDDLAdvancedLevelInfoPopup*>(layer->getParent()) == nullptr) {
+        // layer isn't the popup? go away!
+        return;
+    }
+    // remove the loading label if it exists
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
