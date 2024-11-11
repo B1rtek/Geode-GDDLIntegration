@@ -4,10 +4,11 @@
 
 #include <Geode/utils/web.hpp>
 #include <utility>
+#include <Geode/ui/LoadingSpinner.hpp>
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "LevelBrowserLayer.cpp"
+#include "modified/LevelBrowserLayer.cpp"
 
 bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(150))
@@ -39,6 +40,7 @@ bool GDDLSearchLayer::init() {
     m_buttonMenu->addChild(title, 1);
     title->setPosition({220.0f, -10.0f});
     title->setScale(0.7f);
+    title->setID("gddl-demon-search-title"_spr);
     // info button
     const auto infoButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     const auto infoButton =
@@ -65,6 +67,7 @@ bool GDDLSearchLayer::init() {
     loadValues();
     // prepare the search request fun
     prepareSearchListener();
+    searchLayer = this;
     return true;
 }
 
@@ -227,6 +230,19 @@ void GDDLSearchLayer::loadPageSimple() {
     simplifiedMenu->reorderChild(rowNode, 9);
     simplifiedMenu->updateLayout();
     simplifiedLoaded = true;
+}
+
+void GDDLSearchLayer::showLoadingCircle() {
+    const auto loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setID("gddl-demon-search-loading-spinner"_spr);
+    if (simplified) {
+        const auto title = m_buttonMenu->getChildByIDRecursive("gddl-demon-search-title"_spr);
+        loadingSpinner->setPosition({title->getPositionX() + title->getScaledContentWidth() / 2 + 10.0f, title->getPositionY() - 2.0f});
+        m_buttonMenu->addChild(loadingSpinner);
+    } else {
+        loadingSpinner->setPosition({370.0f, -10.0f});
+        m_buttonMenu->addChild(loadingSpinner);
+    }
 }
 
 void GDDLSearchLayer::showPage() {
@@ -409,6 +425,7 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     saveSettings();
     simplifiedLoaded = false;
     normalLoaded = false;
+    searchLayer = nullptr;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
@@ -533,7 +550,7 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
 }
 
 std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const LevelCompleteness completionStatus) {
-    std::set<int> setOfIds = Utils::copyVectorToSet(std::move(ids));
+    std::set<int> setOfIds = Utils::copyVectorToSet(ids);
     std::vector<int> filteredList;
     if (completionStatus != ANY) {
         std::set<int> allCompleted;
@@ -549,15 +566,23 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const Leve
             }
         }
         if (completionStatus == COMPLETED) {
-            filteredList = Utils::copySetToVector(allCompleted);
+            for (const auto level: ids) {
+                if (allCompleted.contains(level)) {
+                    filteredList.push_back(level);
+                }
+            }
         } else { // searchType == UNCOMPLETED
             for (auto level: allCompleted) {
                 setOfIds.erase(level);
             }
-            filteredList = Utils::copySetToVector(setOfIds);
+            for (const auto level: ids) {
+                if (setOfIds.contains(level)) {
+                    filteredList.push_back(level);
+                }
+            }
         }
     } else {
-        filteredList = Utils::copySetToVector(setOfIds);
+        filteredList = ids;
     }
     return filteredList;
 }
@@ -596,6 +621,7 @@ void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
             completeness = UNCOMPLETED;
         }
     }
+
     const std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
     for (auto element: filteredResponse) {
         cachedResults.push_back(element);
@@ -614,6 +640,15 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     if(callbackObject != nullptr) { // search continues
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
+        // remove any loading circles
+        if (demonSplitLayer != nullptr) {
+            demonSplitLayer->hideLoadingCircle();
+            demonSplitLayer = nullptr;
+        }
+        if (searchLayer != nullptr) {
+            searchLayer->hideLoadingCircle();
+        }
+        // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
         listLayerScene->addChild(listLayer);
@@ -627,9 +662,7 @@ void GDDLSearchLayer::prepareSearchListener() {
             if (web::WebResponse* res = e->getValue()) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
-                    FLAlertLayer::create("GDDL Search",
-                    "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                        "OK")->show();
+                    Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
                 } else {
                     appendFetchedResults(response);
                     auto [fst, snd] = getReadyRange(requestRequestedPage);
@@ -644,9 +677,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                     }
                 }
             } else if (e->isCancelled()) {
-                FLAlertLayer::create("GDDL Search",
-                  "Search failed - either you're disconnected from the internet or the server did something wrong...",
-                  "OK")->show();
+                Notification::create("Search failed - check your internet connection!", NotificationIcon::Error, 2)->show();
             }
         });
 }
@@ -898,6 +929,7 @@ void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
     cachedResults.clear();
     onlinePagesFetched = 0;
     searching = true;
+    showLoadingCircle();
     requestSearchPage(1, nullptr);
 }
 
@@ -933,6 +965,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     cachedResults.clear();
     onlinePagesFetched = 0;
     searching = true;
+    showLoadingCircle();
     requestSearchPage(1, nullptr);
 }
 
@@ -1078,7 +1111,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     searchListener.setFilter(req.get(request));
 }
 
-void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
+void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplitLayer* layer) {
     if (searching) return; // super good multithreaded code
     // save values before replacing them
     cacheValues();
@@ -1098,6 +1131,8 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier) {
     onlinePagesFetched = 0;
     searching = true;
     prepareSearchListener();
+    // save the layer to remove the loading circle later
+    demonSplitLayer = layer;
     requestSearchPage(1, nullptr);
 }
 
@@ -1154,4 +1189,8 @@ void GDDLSearchLayer::clickOffTextfields() {
     const auto searchBarTextInputNode = dynamic_cast<CCTextInputNode*>(searchBar);
     if (searchBarTextInputNode == nullptr) return;
     searchBarTextInputNode->onClickTrackNode(false);
+}
+
+void GDDLSearchLayer::hideLoadingCircle() {
+    m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
 }

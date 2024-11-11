@@ -2,7 +2,7 @@
 #define GDDLBOOMSCROLLLAYER_H
 
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/BoomScrollLayer.hpp>
+#include "Geode/modify/BoomScrollLayer.hpp"
 
 #include "GDDLRobtopLevelsLayer.h"
 

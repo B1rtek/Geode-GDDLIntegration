@@ -276,3 +276,19 @@ bool RatingsManager::hasSkillsets(const int levelID) {
 Skillsets RatingsManager::getSkillsets(const int levelID) {
     return skillsetsCache[levelID];
 }
+
+void RatingsManager::cacheSubmission(const int levelID, const Submission &submission) {
+    submissionsCache[levelID] = submission;
+}
+
+bool RatingsManager::hasSubmission(const int levelID) {
+    return submissionsCache.contains(levelID);
+}
+
+Submission RatingsManager::getSubmission(const int levelID) {
+    return submissionsCache[levelID];
+}
+
+void RatingsManager::clearSubmissionCache() {
+    submissionsCache.clear();
+}

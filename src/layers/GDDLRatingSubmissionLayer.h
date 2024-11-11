@@ -20,13 +20,12 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submit";
-    const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
-    EventListener<web::WebTask> submissionListener, userSearchListener;
+    EventListener<web::WebTask> submissionListener, userSearchListener, userSubmissionCheckListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
-    int rating = -1, enjoyment = -1, fps = 0, levelID = 0, percent = 0, attempts = 0;
+    int rating = -1, enjoyment = -1, fps = 0, gddlLevelID = 0, percent = 0, attempts = 0;
     bool mobile = false, twoPlayer = false, soloCompletion = true;
     const inline static std::vector<std::string> validProofURLs = {
         "https://www.youtube.com/watch?v=",
@@ -42,7 +41,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     };
 
 
-    bool init(GJGameLevel* level);
+    bool init(GJGameLevel* level, int gddlLevelID);
     void onClose(CCObject* sender);
 
     void onRatingLeft(CCObject* sender);
@@ -66,17 +65,22 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
     CCLabelBMFont* addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f,
                             std::string font = "chatFont.fnt");
-    void addInfoButton(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback);
+    void addInfoButtonAndCenterLabel(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback, const float centerAroundX);
     void setInitialValues();
     void updateTextfields();
     void prepareSubmissionListeners();
     bool isValidProof(const std::string& proofURL);
     std::string fillOutSubmissionJson();
     void makeSubmissionRequest();
+    void showAlreadySubmittedWarning();
 
 public:
-    static GDDLRatingSubmissionLayer* create(GJGameLevel* level);
+    const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
+
+    static GDDLRatingSubmissionLayer* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
+
+    static std::string getUserSubmissionCheckEndpoint(int userID, int levelID);
 };
 
 

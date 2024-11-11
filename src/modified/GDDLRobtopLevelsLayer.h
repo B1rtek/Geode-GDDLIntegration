@@ -2,7 +2,7 @@
 #define GDDLROBTOPLEVELSLAYER_H
 
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelSelectLayer.hpp>
+#include "Geode/modify/LevelSelectLayer.hpp"
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "layers/GDDLLevelInfoPopup.h"
@@ -29,6 +29,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         bool buttonsAdded[3] = {false, false, false};
         bool changedBySwiping = false;
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
+        GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
     };
 
     bool init(int page);

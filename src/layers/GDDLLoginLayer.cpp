@@ -2,8 +2,10 @@
 
 #include "Utils.h"
 #include "external/ca_bundle.h"
+#include "GDDLRatingSubmissionLayer.h"
 #include <Geode/Loader.hpp>
 #include <curl/curl.h>
+#include <Geode/ui/LoadingSpinner.hpp>
 
 bool GDDLLoginLayer::init() {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
@@ -66,7 +68,7 @@ bool GDDLLoginLayer::init() {
     // login button
     const auto loginButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_02.png");
     loginButtonSprite->setScale(0.6f);
-    const auto loginButton = CCMenuItemSpriteExtra::create(loginButtonSprite, this,
+    loginButton = CCMenuItemSpriteExtra::create(loginButtonSprite, this,
                                                            menu_selector(GDDLLoginLayer::onLoginClicked));
     loginButton->setID("gddl-login-login-button"_spr);
     loginButton->setPosition({popupSize.x / 2, popupSize.y - 160.0f});
@@ -85,19 +87,31 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     reqJson = matjson::Value();
-    reqJson["username"] = std::string(usernameTextField->getString());
-    reqJson["password"] = std::string(passwordTextField->getString());
+    std::string username = std::string(usernameTextField->getString());
+    if (username.empty()) {
+        Notification::create("Missing username", NotificationIcon::Warning, 2)->show();
+        return;
+    }
+    std::string password = std::string(passwordTextField->getString());
+    if (password.empty()) {
+        Notification::create("Missing password", NotificationIcon::Warning, 2)->show();
+        return;
+    }
+    reqJson["username"] = username;
+    reqJson["password"] = password;
+    showLoadingCircle();
     spawnLoginRequestThread().detach();
-    updateStatusLabel("Logging in...", false);
 }
 
+// left here because once geode 4.0.0 comes out raw curl won't be needed
 void GDDLLoginLayer::prepareSearchListener() {
     loginListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                updateStatusLabel("Success!", false);
+                Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                 saveLoginData("gddl.sid", "gddl.sid.sig");
+                RatingsManager::clearSubmissionCache();
                 closeLoginPanel();
             } else {
                 // not success!
@@ -105,17 +119,34 @@ void GDDLLoginLayer::prepareSearchListener() {
                 if (jsonResponse.contains("error")) {
                     error = jsonResponse["error"].as_string();
                 }
-                updateStatusLabel(error, true);
+                hideLoadingCircle();
+                Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         } else if (e->isCancelled()) {
-            updateStatusLabel("An error occurred", true);
+            hideLoadingCircle();
+            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
         }
     });
-}
-
-void GDDLLoginLayer::updateStatusLabel(const std::string &newStatus, bool error) {
-    statusLabel->setString(newStatus.c_str());
-    statusLabel->setColor(error ? ccc3(237, 67, 55) : ccc3(255, 255, 255));
+    userIDListener.bind([this](web::WebTask::Event* e) {
+        if (web::WebResponse* res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            if (res->code() == 200) {
+                const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
+                if (id > -1) {
+                    Mod::get()->setSavedValue("login-userid", id);
+                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                    closeLoginPanel();
+                } else {
+                    Notification::create(id == -1 ? "Your player ID wasn't found, try relogging later" : "An error occurred", NotificationIcon::Error, 2)->show();
+                }
+            } else {
+                Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
+            }
+        }
+        else if (e->isCancelled()) {
+            Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
+        }
+    });
 }
 
 void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig) {
@@ -129,6 +160,18 @@ void GDDLLoginLayer::closeLoginPanel() {
         settingNode->updateFromOutside();
     }
     onClose(nullptr);
+}
+
+void GDDLLoginLayer::showLoadingCircle() {
+    const auto loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
+    loadingSpinner->setPosition({loginButton->getPositionX() + loginButton->getScaledContentWidth() / 2 + 5.0f, loginButton->getPositionY()});
+    loadingSpinner->setID("gddl-login-loading-spinner"_spr);
+    m_buttonMenu->addChild(loadingSpinner);
+}
+
+void GDDLLoginLayer::hideLoadingCircle() {
+    m_buttonMenu->removeChildByID("gddl-login-loading-spinner"_spr);
 }
 
 size_t GDDLLoginLayer::writeCallback(char *contents, size_t size, size_t nmemb, void *userp) {
@@ -177,22 +220,21 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GDDLLoginLayer::writeCallback);
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
             // dew it
-            log::debug("doing the request");
             res = curl_easy_perform(curl);
 
             /* Check for errors */
             if(res != CURLE_OK) {
-                updateStatusLabel("An error occurred", true);
-                log::debug("curl_easy_perform() failed: {}", curl_easy_strerror(res));
+                hideLoadingCircle();
+                Loader::get()->queueInMainThread([]() {
+                    Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+                });
                 return;
             }
-            log::debug("request went through");
 
             long httpCode = 0;
             curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpCode);
             if (httpCode == 200) {
                 // extract the cookies and log in
-                log::debug("code 200");
                 CURLHcode h;
                 int i = 0;
                 std::map<std::string, std::string> cookies;
@@ -205,27 +247,31 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                     cookies[cookieNameValuePair.first] = cookieNameValuePair.second;
                     ++i;
                 }
-                log::debug("cookies read");
                 saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
-                updateStatusLabel("Logged in!", false);
                 Loader::get()->queueInMainThread([this]() {
-                    closeLoginPanel();
+                    // get the uid
+                    std::string requestURL = GDDLRatingSubmissionLayer::userSearchEndpoint;
+                    const std::string requestedUsername = Mod::get()->getSavedValue<std::string>("login-username", "");
+                    requestURL += "?name=" + requestedUsername + "&chunk=25";
+                    auto req = web::WebRequest();
+                    userIDListener.setFilter(req.get(requestURL));
                 });
             } else {
                 // something went wrong - get the error
                 std::string error = "Unknown error", parseError;
-                log::debug("login failed: {}" , readBuffer);
                 const std::optional<matjson::Value> maybeJsonResponse = matjson::parse(readBuffer, parseError);
                 if (maybeJsonResponse.has_value()) {
-                    log::debug("json parse success");
                     const auto jsonResponse = maybeJsonResponse.value();
                     if (jsonResponse.contains("error")) {
                         error = jsonResponse["error"].as_string();
                     }
                 } else {
-                    log::debug("json parse error: {}", parseError);
+                    error = "Server returned an invalid response";
                 }
-                updateStatusLabel(error, true);
+                hideLoadingCircle();
+                Loader::get()->queueInMainThread([error]() {
+                    Notification::create(error, NotificationIcon::Error, 2)->show();
+                });
             }
 
             curl_easy_cleanup(curl);
@@ -250,4 +296,23 @@ void GDDLLoginLayer::show() {
 
 void GDDLLoginLayer::setSettingNode(LoginSettingNodeV3 *settingNode) {
     this->settingNode = settingNode;
+}
+
+// -2 = error, -1 = not found, >0 = uid
+int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, const std::string& requestedUsername) {
+    if (!jsonResponse.is_array()) {
+        return -2;
+    }
+    const auto resultsList = jsonResponse.as_array();
+    int id = -1;
+    for (const auto& result : resultsList) {
+        if (!result.contains("Name") || !result.contains("ID")) {
+            continue;
+        }
+        if (result["Name"] == requestedUsername) {
+            id = result["ID"].as_int();
+            break;
+        }
+    }
+    return id;
 }

@@ -1,9 +1,9 @@
 // ReSharper disable CppHidingFunction
 // ReSharper disable CppParameterMayBeConst
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelBrowserLayer.hpp>
+#include "Geode/modify/LevelBrowserLayer.hpp"
 
-#include "GDDLSearchLayer.h"
+#include "layers/GDDLSearchLayer.h"
 
 class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
     struct Fields {

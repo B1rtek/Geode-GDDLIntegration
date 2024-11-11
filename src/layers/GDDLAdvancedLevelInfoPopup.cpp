@@ -8,13 +8,13 @@
 #include "Utils.h"
 #include "GDDLRatingSubmissionLayer.h"
 
-bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
+bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
 
     this->level = level;
-    this->levelID = level->m_levelID;
+    this->gddlLevelID = gddlLevelID;
     this->levelName = level->m_levelName;
-    this->creator = level->m_creatorName;
+    this->creator = gddlLevelID < 10 && level->m_creatorName.empty() ? "RobTop" : level->m_creatorName;
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -71,7 +71,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
     m_buttonMenu->addChild(openInBrowserButton);
 
     // average ratings and ratings counts
-    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (gddlRating) {
         addRatingInfo();
     } else {
@@ -90,7 +90,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
     prepareSearchListeners();
 
     // bar charts
-    if (RatingsManager::hasSpread(levelID)) {
+    if (RatingsManager::hasSpread(this->gddlLevelID)) {
         addBarCharts();
     } else {
         const auto loadingSpinner = LoadingSpinner::create(50.0f);
@@ -98,11 +98,11 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
         loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
-        spreadListener.setFilter(req.get(getSpreadEndpointUrl(levelID)));
+        spreadListener.setFilter(req.get(getSpreadEndpointUrl(this->gddlLevelID)));
     }
 
     // skillsets
-    if (RatingsManager::hasSkillsets(levelID)) {
+    if (RatingsManager::hasSkillsets(this->gddlLevelID)) {
         addSkillsets();
     } else {
         const auto loadingSpinner = LoadingSpinner::create(15.0f);
@@ -111,7 +111,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level) {
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
-        skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(levelID)));
+        skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(this->gddlLevelID)));
     }
 
     // amazing experiment
@@ -141,11 +141,11 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetInfo(CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::onSubmitClicked(CCObject *sender) {
-    GDDLRatingSubmissionLayer::create(this->level)->show();
+    GDDLRatingSubmissionLayer::create(this->level, this->gddlLevelID)->show();
 }
 
 void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
-    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (gddlRating) {
         const auto &info = gddlRating.value();
         if (info.showcaseVideoID.empty()) {
@@ -161,7 +161,7 @@ void GDDLAdvancedLevelInfoPopup::onShowcaseClicked(CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
-    std::string url = "https://gdladder.com/level/" + std::to_string(levelID);
+    std::string url = "https://gdladder.com/level/" + std::to_string(this->gddlLevelID);
     web::openLinkInBrowser(url);
 }
 
@@ -170,7 +170,7 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             const RatingsSpread spread = RatingsSpread(jsonResponse);
-            RatingsManager::cacheSpread(this->levelID, spread);
+            RatingsManager::cacheSpread(this->gddlLevelID, spread);
             addBarCharts();
         } else if (e->isCancelled()) {
             // :(
@@ -181,7 +181,7 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             const Skillsets spread = Skillsets(jsonResponse);
-            RatingsManager::cacheSkillsets(this->levelID, spread);
+            RatingsManager::cacheSkillsets(this->gddlLevelID, spread);
             addSkillsets();
         } else if (e->isCancelled()) {
             // :(
@@ -190,7 +190,7 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
 }
 
 void GDDLAdvancedLevelInfoPopup::addBarCharts() {
-    RatingsSpread spread = RatingsManager::getSpread(levelID);
+    RatingsSpread spread = RatingsManager::getSpread(this->gddlLevelID);
     float barHeight = 15.0f;
     const auto diffSpreadData = spread.getDiffSpreadData();
     if (diffSpreadData.size() > 11) {
@@ -219,7 +219,7 @@ void GDDLAdvancedLevelInfoPopup::addBarCharts() {
 
 void GDDLAdvancedLevelInfoPopup::addSkillsets() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-skillsets-loading"_spr);
-    std::vector<int> skillsets = RatingsManager::getSkillsets(levelID).getSkillsets();
+    std::vector<int> skillsets = RatingsManager::getSkillsets(this->gddlLevelID).getSkillsets();
     const float skillsetsStartXPos = levelNameLabel->getPositionX() + levelNameLabel->getScaledContentWidth() + 10.0f;
     for (int i = 0; i < skillsets.size(); i++) {
         const float xPos = skillsetsStartXPos + 20.0f * i;
@@ -251,7 +251,6 @@ void GDDLAdvancedLevelInfoPopup::addShowcaseButton(bool active) {
             GDDLAdvancedLevelInfoPopup::onShowcaseClicked));
     showcaseButton->setPosition({popupSize.x / 2 - 135.0f, 22.0f});
     showcaseButton->setID("gddl-advanced-level-info-showcase-button"_spr);
-    log::info("Adding the button");
     m_buttonMenu->addChild(showcaseButton);
 }
 
@@ -274,8 +273,8 @@ std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelI
 }
 
 GDDLAdvancedLevelInfoPopup *
-GDDLAdvancedLevelInfoPopup::create(GJGameLevel *level) {
-    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(level)) {
+GDDLAdvancedLevelInfoPopup::create(GJGameLevel *level, int gddlLevelID) {
+    if (const auto newLayer = new GDDLAdvancedLevelInfoPopup(); newLayer != nullptr && newLayer->init(level, gddlLevelID)) {
         newLayer->autorelease();
         return newLayer;
     } else {
@@ -290,10 +289,19 @@ void GDDLAdvancedLevelInfoPopup::show() {
 }
 
 void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
+    // there's a weird bug on rob's levels layer that causes this stuff to appear in it somehow, idk how, hopefully this fixes it
+    if (m_buttonMenu == nullptr) return;
+    const auto layer = m_buttonMenu->getParent();
+    if (layer == nullptr) return; // no cclayer?? how
+    if (layer->getParent() == nullptr) return; // no layer?? how
+    if (typeinfo_cast<GDDLAdvancedLevelInfoPopup*>(layer->getParent()) == nullptr) {
+        // layer isn't the popup? go away!
+        return;
+    }
     // remove the loading label if it exists
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
-    const auto gddlRating = RatingsManager::getRating(levelID);
+    const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     const auto &info = gddlRating.value();
     std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
     if (info.rating != -1) {

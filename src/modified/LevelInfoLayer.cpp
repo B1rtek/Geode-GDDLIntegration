@@ -2,7 +2,7 @@
 // ReSharper disable CppHidingFunction
 #include <Geode/Geode.hpp>
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelInfoLayer.hpp>
+#include "Geode/modify/LevelInfoLayer.hpp"
 #include <Geode/utils/web.hpp>
 
 #include "RatingsManager.h"
@@ -62,13 +62,13 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (buttonPositionSetting != DEFAULT) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
-                    const auto levelNameSize = levelNameLabel->getContentSize();
+                    const auto levelNameSize = levelNameLabel->getScaledContentSize();
                     if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
-                        menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.5f,
-                                               levelNamePosition.y - levelNameSize.height / 2.25f};
+                        menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.0f,
+                                               levelNamePosition.y - 14.5f};
                     } else { // left
-                        menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.5f - 25.0f,
-                                               levelNamePosition.y - levelNameSize.height / 2.25f};
+                        menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.0f - 25.0f,
+                                               levelNamePosition.y - 14.0f};
                     }
                     menuSize = CCSize{25, 25};
                     buttonPosition = CCPoint{12.5f, 12.5f};
@@ -178,7 +178,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
             GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
         } else {
-            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level);
+            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level, m_level->m_levelID);
             m_fields->advancedLevelInfoPopup->show();
         }
     }

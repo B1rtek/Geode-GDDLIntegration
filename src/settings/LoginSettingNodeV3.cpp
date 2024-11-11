@@ -45,9 +45,7 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
     if (loggedIn()) {
-        const std::string emptyString;
-        Mod::get()->setSavedValue("login-sid", emptyString);
-        Mod::get()->setSavedValue("login-sig", emptyString);
+        logOut();
         this->markChanged(nullptr);
     } else {
         const auto loginLayer = GDDLLoginLayer::create();
@@ -58,6 +56,13 @@ void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
 
 bool LoginSettingNodeV3::loggedIn() {
     return !Mod::get()->getSavedValue<std::string>("login-sig", "").empty();
+}
+
+void LoginSettingNodeV3::logOut() {
+    const std::string emptyString;
+    Mod::get()->setSavedValue("login-sid", emptyString);
+    Mod::get()->setSavedValue("login-sig", emptyString);
+    RatingsManager::clearSubmissionCache();
 }
 
 void LoginSettingNodeV3::onCommit() {
