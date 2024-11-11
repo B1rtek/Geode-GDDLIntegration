@@ -16,7 +16,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
     matjson::Value reqJson;
-    EventListener<web::WebTask> loginListener;
+    EventListener<web::WebTask> loginListener, userIDListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
@@ -39,6 +39,7 @@ public:
     void show() override;
 
     void setSettingNode(LoginSettingNodeV3* settingNode);
+    static int getUserIDFromUserSearchJSON(matjson::Value jsonResponse, const std::string& requestedUsername);
 };
 
 

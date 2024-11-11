@@ -271,3 +271,22 @@ void GDDLLoginLayer::show() {
 void GDDLLoginLayer::setSettingNode(LoginSettingNodeV3 *settingNode) {
     this->settingNode = settingNode;
 }
+
+// -2 = error, -1 = not found, >0 = uid
+int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, const std::string& requestedUsername) {
+    if (!jsonResponse.is_array()) {
+        return -2;
+    }
+    const auto resultsList = jsonResponse.as_array();
+    int id = -1;
+    for (const auto& result : resultsList) {
+        if (!result.contains("Name") || !result.contains("ID")) {
+            continue;
+        }
+        if (result["Name"] == requestedUsername) {
+            id = result["ID"].as_int();
+            break;
+        }
+    }
+    return id;
+}

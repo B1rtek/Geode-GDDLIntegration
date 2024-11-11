@@ -367,26 +367,12 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                if (!jsonResponse.is_array()) {
-                    Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
-                    return;
-                }
-                const auto resultsList = jsonResponse.as_array();
-                int id = -1;
-                for (const auto& result : resultsList) {
-                    if (!result.contains("Name") || !result.contains("ID")) {
-                        continue;
-                    }
-                    if (result["Name"] == requestedUsername) {
-                        id = result["ID"].as_int();
-                        break;
-                    }
-                }
-                if (id != -1) {
+                const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, requestedUsername);
+                if (id > -1) {
                     submissionJson["secondPlayerID"] = id;
                     makeSubmissionRequest();
                 } else {
-                    Notification::create("Second player not found!", NotificationIcon::Error, 2)->show();
+                    Notification::create(id == -1 ? "Second player not found!" : "An error occurred", NotificationIcon::Error, 2)->show();
                 }
             } else {
                 std::string error = "Unknown error";
