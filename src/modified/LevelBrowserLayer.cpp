@@ -1,7 +1,7 @@
 // ReSharper disable CppHidingFunction
 // ReSharper disable CppParameterMayBeConst
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelBrowserLayer.hpp>
+#include "Geode/modify/LevelBrowserLayer.hpp"
 
 #include "GDDLSearchLayer.h"
 

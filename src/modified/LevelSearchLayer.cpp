@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelSearchLayer.hpp>
+#include "Geode/modify/LevelSearchLayer.hpp"
 
 #include "RatingsManager.h"
 #include "GDDLSearchLayer.h"

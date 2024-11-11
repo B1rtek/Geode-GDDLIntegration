@@ -8,7 +8,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "LevelBrowserLayer.cpp"
+#include "modified/LevelBrowserLayer.cpp"
 
 bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(150))

@@ -2,7 +2,7 @@
 // ReSharper disable CppHidingFunction
 #include <Geode/Geode.hpp>
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelInfoLayer.hpp>
+#include "Geode/modify/LevelInfoLayer.hpp"
 #include <Geode/utils/web.hpp>
 
 #include "RatingsManager.h"
