@@ -292,6 +292,7 @@ void GDDLAdvancedLevelInfoPopup::show() {
 
 void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     // remove the loading label if it exists
+    if (m_buttonMenu == nullptr) return;
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
