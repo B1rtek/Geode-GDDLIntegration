@@ -66,7 +66,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
     CCLabelBMFont* addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f,
                             std::string font = "chatFont.fnt");
-    void addInfoButton(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback);
+    void addInfoButtonAndCenterLabel(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback, const float centerAroundX);
     void setInitialValues();
     void updateTextfields();
     void prepareSubmissionListeners();
