@@ -550,7 +550,7 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
 }
 
 std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const LevelCompleteness completionStatus) {
-    std::set<int> setOfIds = Utils::copyVectorToSet(std::move(ids));
+    std::set<int> setOfIds = Utils::copyVectorToSet(ids);
     std::vector<int> filteredList;
     if (completionStatus != ANY) {
         std::set<int> allCompleted;
@@ -566,15 +566,23 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const Leve
             }
         }
         if (completionStatus == COMPLETED) {
-            filteredList = Utils::copySetToVector(allCompleted);
+            for (const auto level: ids) {
+                if (allCompleted.contains(level)) {
+                    filteredList.push_back(level);
+                }
+            }
         } else { // searchType == UNCOMPLETED
             for (auto level: allCompleted) {
                 setOfIds.erase(level);
             }
-            filteredList = Utils::copySetToVector(setOfIds);
+            for (const auto level: ids) {
+                if (setOfIds.contains(level)) {
+                    filteredList.push_back(level);
+                }
+            }
         }
     } else {
-        filteredList = Utils::copySetToVector(setOfIds);
+        filteredList = ids;
     }
     return filteredList;
 }
@@ -613,6 +621,7 @@ void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
             completeness = UNCOMPLETED;
         }
     }
+
     const std::vector<int> filteredResponse = filterResults(parsedResponse, completeness);
     for (auto element: filteredResponse) {
         cachedResults.push_back(element);

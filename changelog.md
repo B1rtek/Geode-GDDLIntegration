@@ -3,8 +3,13 @@ If you encounter crashes please tell me (@B1rtek on Discord) about them, provide
 
 # v1.2.0-beta.5
 - When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
-- Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSplit, GDDLSearch and GDDLLogin layers
+- Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSearch and GDDLLogin layers
 - Added a loading circle to GDDLSplitLayer
+- Added new GDDLInfo popups to RobTop's levels
+- Fixed a bug that didn't allow submitting 2p levels without a second player
+- Added a prompt to relog if GDDL session expires
+- Labels no longer overlap in rating bar charts in levels with a wide spread like Multition and others
+- Fixed the wrong sorting order bug in search!!
 
 # v1.2.0-beta.4
 - The login popup automatically closes upon a successful login
