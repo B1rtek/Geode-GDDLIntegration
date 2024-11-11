@@ -9,13 +9,15 @@ using namespace geode::prelude;
 class Submission {
     int levelID, rating, enjoyment, refreshRate, device;
     std::string proof;
-    int progress, attempts;
+    int progress = -1, attempts;
     bool isSolo;
     int secondPlayerID;
 public:
     Submission() = default;
 
     Submission(matjson::Value json, bool request);
+
+    bool isEmpty() const;
 
     std::string describe() const;
 };

@@ -57,17 +57,21 @@ Submission::Submission(matjson::Value json, bool request) {
     }
 }
 
+bool Submission::isEmpty() const {
+    return this->progress == -1;
+}
+
 std::string Submission::describe() const {
     std::string description;
     if (this->rating != 0) {
-        description += "No rating, ";
+        description += "Tier <cr>" + std::to_string(this->rating) + "</c>, ";
     } else {
-        description += "Tier <cr>" + std::to_string(this->rating) + "</c>,";
+        description += "No rating, ";
     }
     if (this->enjoyment != -1) {
-        description += "no enjoyment, ";
+        description += "enjoyment <cg>" + std::to_string(this->enjoyment) + "</c>, ";
     } else {
-        description += "enjoyment <cg>" + std::to_string(this->enjoyment) + "</c>,";
+        description += "no enjoyment, ";
     }
     std::string deviceStr = this->device == 1 ? "PC" : "mobile";
     description += "achieved on <cb>" + deviceStr + "</c>";
