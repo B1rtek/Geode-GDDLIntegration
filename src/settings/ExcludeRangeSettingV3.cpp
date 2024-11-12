@@ -27,11 +27,9 @@ bool ExcludeRangeSettingV3::load(const matjson::Value &json) {
 }
 
 bool ExcludeRangeSettingV3::save(matjson::Value &json) const {
-    json = matjson::Object {
-            {"range-begin", rangeBegin},
-            {"range-end", rangeEnd},
-            {"include", include}
-    };
+    json["range-begin"] = rangeBegin;
+    json["range-end"] = rangeEnd;
+    json["include"] = include;
     return true;
 }
 

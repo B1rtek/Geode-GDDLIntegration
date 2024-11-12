@@ -26,9 +26,7 @@ bool ButtonPositionSettingV3::load(const matjson::Value& json) {
 }
 
 bool ButtonPositionSettingV3::save(matjson::Value& json) const {
-    json = matjson::Object {
-            {"button-position", static_cast<int>(position)}
-    };
+    json["button-position"] = static_cast<int>(position);
     return true;
 }
 

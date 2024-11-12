@@ -26,10 +26,8 @@ bool UseOldTierLabelSettingV3::load(const matjson::Value &json) {
 }
 
 bool UseOldTierLabelSettingV3::save(matjson::Value &json) const {
-    json = matjson::Object {
-            {"enabled", enabled},
-            {"position-offset", positionOffset}
-    };
+    json["enabled"] = enabled;
+    json["position-offset"] = positionOffset;
     return true;
 }
 
