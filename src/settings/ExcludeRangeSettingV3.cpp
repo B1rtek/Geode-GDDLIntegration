@@ -17,9 +17,9 @@ bool ExcludeRangeSettingV3::load(const matjson::Value &json) {
     if (!json.contains("range-begin") || !json.contains("range-end") || !json.contains("include")) {
         return false;
     }
-    rangeBegin = json["range-begin"].is_number() ? json["range-begin"].as_int() : 0;
-    rangeEnd = json["range-end"].is_number() ? json["range-end"].as_int() : 0;
-    include = json["include"].is_bool() ? json["include"].as_bool() : false;
+    rangeBegin = json["range-begin"].isNumber() ? json["range-begin"].asInt().unwrap() : 0;
+    rangeEnd = json["range-end"].isNumber() ? json["range-end"].asInt().unwrap() : 0;
+    include = json["include"].isBool() ? json["include"].asBool().unwrap() : false;
     // in case the values are set to something stupid
     rangeBegin = std::min(ExcludeRangeSettingV3::highestTier, std::max(0, rangeBegin));
     rangeEnd = std::min(ExcludeRangeSettingV3::highestTier, std::max(0, rangeEnd));

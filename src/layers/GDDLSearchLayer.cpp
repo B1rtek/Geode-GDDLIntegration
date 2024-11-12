@@ -530,15 +530,15 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
     try {
         matjson::Value responseJson = matjson::parse(response);
-        const int total = responseJson["total"].as_int();
+        const int total = responseJson["total"].asInt().unwrap();
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
         matjson::Value levelList = responseJson["levels"];
-        for (auto element: levelList.as_array()) {
-            const int levelID = element["ID"].as_int();
+        for (auto element: levelList.asArray().unwrap()) {
+            const int levelID = element["ID"].asInt().unwrap();
             if (levelID > 3) { // to avoid official demons
-                results.push_back(element["ID"].as_int());
-                if(!element["Rating"].is_null()) {
-                    const float rating = element["Rating"].as_double();
+                results.push_back(element["ID"].asInt().unwrap());
+                if(!element["Rating"].isNull()) {
+                    const float rating = element["Rating"].asDouble().unwrap();
                     RatingsManager::updateCacheFromSearch(levelID, rating);
                 }
             }

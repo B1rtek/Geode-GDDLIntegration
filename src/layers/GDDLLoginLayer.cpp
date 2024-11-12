@@ -117,7 +117,7 @@ void GDDLLoginLayer::prepareSearchListener() {
                 // not success!
                 std::string error = "Unknown error";
                 if (jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].as_string();
+                    error = jsonResponse["error"].asString().unwrap();
                 }
                 hideLoadingCircle();
                 Notification::create(error, NotificationIcon::Error, 2)->show();
@@ -263,7 +263,7 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                 if (maybeJsonResponse.has_value()) {
                     const auto jsonResponse = maybeJsonResponse.value();
                     if (jsonResponse.contains("error")) {
-                        error = jsonResponse["error"].as_string();
+                        error = jsonResponse["error"].asString().unwrap();
                     }
                 } else {
                     error = "Server returned an invalid response";
@@ -300,17 +300,17 @@ void GDDLLoginLayer::setSettingNode(LoginSettingNodeV3 *settingNode) {
 
 // -2 = error, -1 = not found, >0 = uid
 int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, const std::string& requestedUsername) {
-    if (!jsonResponse.is_array()) {
+    if (!jsonResponse.isArray()) {
         return -2;
     }
-    const auto resultsList = jsonResponse.as_array();
+    const auto resultsList = jsonResponse.asArray().unwrap();
     int id = -1;
     for (const auto& result : resultsList) {
         if (!result.contains("Name") || !result.contains("ID")) {
             continue;
         }
         if (result["Name"] == requestedUsername) {
-            id = result["ID"].as_int();
+            id = result["ID"].asInt().unwrap();
             break;
         }
     }

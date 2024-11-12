@@ -340,7 +340,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 std::string message = "Rating submitted!";
-                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].as_bool()) {
+                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].asBool().unwrap()) {
                     message = "Submission accepted!";
                 }
                 // cache submitted submission
@@ -351,7 +351,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             } else {
                 std::string error = "Unknown error";
                 if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].as_string();
+                    error = jsonResponse["error"].asString().unwrap();
                     if (error == "Authentication failed!") {
                         LoginSettingNodeV3::logOut();
                         GDDLLoginLayer::create()->show();
@@ -384,7 +384,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             } else {
                 std::string error = "Unknown error";
                 if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].as_string();
+                    error = jsonResponse["error"].asString().unwrap();
                 }
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
@@ -402,7 +402,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
             } else {
-                if (!jsonResponse.contains("error") || jsonResponse["error"].as_string() != "Submission not found!") {
+                if (!jsonResponse.contains("error") || jsonResponse["error"].asString().unwrap() != "Submission not found!") {
                     Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
                 } else {
                     // save an empty one

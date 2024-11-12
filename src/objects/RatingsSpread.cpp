@@ -3,31 +3,31 @@
 #include "Utils.h"
 
 RatingsSpread::RatingsSpread(const matjson::Value &spreadJson) {
-    if (!spreadJson.contains("rating") || !spreadJson.contains("enjoyment") || !spreadJson["rating"].is_array() ||
-        !spreadJson["enjoyment"].is_array()) {
+    if (!spreadJson.contains("rating") || !spreadJson.contains("enjoyment") || !spreadJson["rating"].isArray() ||
+        !spreadJson["enjoyment"].isArray()) {
         return;
     }
 
-    const auto ratings = spreadJson["rating"].as_array();
-    const auto enjoyments = spreadJson["enjoyment"].as_array();
+    const auto ratings = spreadJson["rating"].asArray().unwrap();
+    const auto enjoyments = spreadJson["enjoyment"].asArray().unwrap();
     for (const auto &diffRating: ratings) {
-        if (!diffRating.contains("Rating") || !diffRating.contains("Count") || !diffRating["Rating"].is_number() ||
-            !diffRating["Count"].is_number()) {
+        if (!diffRating.contains("Rating") || !diffRating.contains("Count") || !diffRating["Rating"].isNumber() ||
+            !diffRating["Count"].isNumber()) {
             continue;
         }
-        const int rating = diffRating["Rating"].as_int();
-        const int count = diffRating["Count"].as_int();
+        const int rating = diffRating["Rating"].asInt().unwrap();
+        const int count = diffRating["Count"].asInt().unwrap();
         minRating = std::min(minRating, rating);
         maxRating = std::max(maxRating, rating);
         diffRatings[rating] = count;
     }
     for (const auto &enjRating: enjoyments) {
-        if (!enjRating.contains("Enjoyment") || !enjRating.contains("Count") || !enjRating["Enjoyment"].is_number() ||
-            !enjRating["Count"].is_number()) {
+        if (!enjRating.contains("Enjoyment") || !enjRating.contains("Count") || !enjRating["Enjoyment"].isNumber() ||
+            !enjRating["Count"].isNumber()) {
             continue;
         }
-        const int enjoyment = enjRating["Enjoyment"].as_int();
-        const int count = enjRating["Count"].as_int();
+        const int enjoyment = enjRating["Enjoyment"].asInt().unwrap();
+        const int count = enjRating["Count"].asInt().unwrap();
         minEnj = std::min(minEnj, enjoyment);
         maxEnj = std::max(maxEnj, enjoyment);
         enjRatings[enjoyment] = count;

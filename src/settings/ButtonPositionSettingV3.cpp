@@ -17,7 +17,7 @@ bool ButtonPositionSettingV3::load(const matjson::Value& json) {
     if (!json.contains("button-position")) {
         return false;
     }
-    int positionNumber = json["button-position"].is_number() ? json["button-position"].as_int() : 0;
+    int positionNumber = json["button-position"].isNumber() ? json["button-position"].asInt().unwrap() : 0;
     // in case it's set to something stupid
     positionNumber = std::min(static_cast<int>(ButtonPosition::NUM_VALUES - 1), std::max(0, positionNumber));
     position = static_cast<ButtonPosition>(positionNumber);

@@ -33,27 +33,27 @@
 Submission::Submission(matjson::Value json, bool request) {
     // request and response jsons are slightly different, idk why
     if (request) {
-        this->levelID = json["levelID"].as_int();
-        this->rating = json.contains("rating") ? json["rating"].as_int() : 0;
-        this->enjoyment = json.contains("enjoyment") ? json["enjoyment"].as_int() : -1;
-        this->refreshRate = json.contains("refreshRate") ? json["refreshRate"].as_int() : -1;
-        this->device = json["device"].as_int();
-        this->proof = json.contains("proof") ? json["proof"].as_string() : "";
-        this->progress = json["progress"].as_int();
-        this->attempts = json.contains("attempts") ? json["attempts"].as_int() : -1;
-        this->isSolo = json.contains("isSolo") ? json["isSolo"].as_bool() : true;
-        this->secondPlayerID = !this->isSolo ? json["secondPlayerID"].as_int() : -1;
+        this->levelID = json["levelID"].asInt().unwrap();
+        this->rating = json.contains("rating") ? json["rating"].asInt().unwrap() : 0;
+        this->enjoyment = json.contains("enjoyment") ? json["enjoyment"].asInt().unwrap() : -1;
+        this->refreshRate = json.contains("refreshRate") ? json["refreshRate"].asInt().unwrap() : -1;
+        this->device = json["device"].asInt().unwrap();
+        this->proof = json.contains("proof") ? json["proof"].asString().unwrap() : "";
+        this->progress = json["progress"].asInt().unwrap();
+        this->attempts = json.contains("attempts") ? json["attempts"].asInt().unwrap() : -1;
+        this->isSolo = json.contains("isSolo") ? json["isSolo"].asBool().unwrap() : true;
+        this->secondPlayerID = !this->isSolo ? json["secondPlayerID"].asInt().unwrap() : -1;
     } else {
-        this->levelID = json["LevelID"].as_int();
-        this->rating = !json["Rating"].is_null() ? json["Rating"].as_int() : 0;
-        this->enjoyment = !json["Enjoyment"].is_null() ? json["Enjoyment"].as_int() : -1;
-        this->refreshRate = !json["RefreshRate"].is_null() ? json["RefreshRate"].as_int() : -1;
-        this->device = !json["Device"].is_null() ? (json["Device"].as_string() == "PC" ? 1 : 2) : 1;
-        this->proof = !json["Proof"].is_null() ? json["Proof"].as_string() : "";
-        this->isSolo = !json["IsSolo"].is_null() ? json["IsSolo"].as_bool() : true;
-        this->secondPlayerID = !json["SecondPlayerID"].is_null() ? json["SecondPlayerID"].as_int() : -1;
-        this->progress = !json["Progress"].is_null() ? json["Progress"].as_int() : -1;
-        this->attempts = !json["Attempts"].is_null() ? json["Attempts"].as_int() : -1;
+        this->levelID = json["LevelID"].asInt().unwrap();
+        this->rating = !json["Rating"].isNull() ? json["Rating"].asInt().unwrap() : 0;
+        this->enjoyment = !json["Enjoyment"].isNull() ? json["Enjoyment"].asInt().unwrap() : -1;
+        this->refreshRate = !json["RefreshRate"].isNull() ? json["RefreshRate"].asInt().unwrap() : -1;
+        this->device = !json["Device"].isNull() ? (json["Device"].asString().unwrap() == "PC" ? 1 : 2) : 1;
+        this->proof = !json["Proof"].isNull() ? json["Proof"].asString().unwrap() : "";
+        this->isSolo = !json["IsSolo"].isNull() ? json["IsSolo"].asBool().unwrap() : true;
+        this->secondPlayerID = !json["SecondPlayerID"].isNull() ? json["SecondPlayerID"].asInt().unwrap() : -1;
+        this->progress = !json["Progress"].isNull() ? json["Progress"].asInt().unwrap() : -1;
+        this->attempts = !json["Attempts"].isNull() ? json["Attempts"].asInt().unwrap() : -1;
     }
 }
 

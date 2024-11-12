@@ -80,13 +80,13 @@ void RatingsManager::populateFromSave() {
     content << f.rdbuf();
     try {
         matjson::Value data = matjson::parse(content.str());
-        cacheTimestamp = data["cached"].as_int();
+        cacheTimestamp = data["cached"].asInt().unwrap();
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
         if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
-            for (auto idRatingPair: data["list"].as_array()) {
-                const int id = idRatingPair["ID"].as_int();
-                const int rating = idRatingPair["Rating"].as_int();
+            for (auto idRatingPair: data["list"].asArray().unwrap()) {
+                const int id = idRatingPair["ID"].asInt().unwrap();
+                const int rating = idRatingPair["Rating"].asInt().unwrap();
                 ratingsCache[id] = rating;
             }
         }
@@ -189,9 +189,9 @@ void RatingsManager::cacheRatings(const std::string &response) {
         }
         // old code in case /theList comes back
         // matjson::Value ratingsData = matjson::parse(response);
-        // for (auto element: ratingsData.as_array()) {
-        //     const int id = element["ID"].as_int();
-        //     const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
+        // for (auto element: ratingsData.asArray().unwrap()) {
+        //     const int id = element["ID"].asInt().unwrap();
+        //     const float rating = element["Rating"].isNull() ? -1.0f : element["Rating"].asDouble().unwrap();
         //     const int roundedRating = static_cast<int>(round(rating));
         //     ratingsCache[id] = roundedRating;
         // }
