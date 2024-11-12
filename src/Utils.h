@@ -129,7 +129,7 @@ public:
         int returnValue = defaultValue;
         auto returnValueResult = numFromString<int>(textfield->getString());
         if (returnValueResult.isOk()) {
-            returnValue = returnValueResult.value();
+            returnValue = returnValueResult.unwrap();
         }
         return returnValue;
     }
