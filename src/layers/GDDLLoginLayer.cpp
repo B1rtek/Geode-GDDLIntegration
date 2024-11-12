@@ -259,9 +259,8 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
             } else {
                 // something went wrong - get the error
                 std::string error = "Unknown error", parseError;
-                const std::optional<matjson::Value> maybeJsonResponse = matjson::parse(readBuffer, parseError);
-                if (maybeJsonResponse.has_value()) {
-                    const auto jsonResponse = maybeJsonResponse.value();
+                if (const auto maybeJsonResponse = matjson::parse(readBuffer); maybeJsonResponse.isOk()) {
+                    const auto& jsonResponse = maybeJsonResponse.unwrap();
                     if (jsonResponse.contains("error")) {
                         error = jsonResponse["error"].asString().unwrap();
                     }

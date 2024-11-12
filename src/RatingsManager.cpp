@@ -51,12 +51,11 @@ std::vector<int> RatingsManager::tierColors = {
 std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
-    try {
-        const matjson::Value levelData = matjson::parse(response);
+    if (const auto maybeLevelData = matjson::parse(response); maybeLevelData.isOk()) {
+        const matjson::Value& levelData = maybeLevelData.unwrap();
         return GDDLRating(levelData);
-    } catch (std::runtime_error &error) {
-        return GDDLRating::createInvalid();
     }
+    return GDDLRating::createInvalid();
 }
 
 /**
@@ -78,8 +77,8 @@ void RatingsManager::populateFromSave() {
     }
     std::stringstream content;
     content << f.rdbuf();
-    try {
-        matjson::Value data = matjson::parse(content.str());
+    if (const auto maybeData = matjson::parse(content.str()); maybeData.isOk()) {
+        matjson::Value data = maybeData.unwrap();
         cacheTimestamp = data["cached"].asInt().unwrap();
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
@@ -90,9 +89,8 @@ void RatingsManager::populateFromSave() {
                 ratingsCache[id] = rating;
             }
         }
-    } catch (std::runtime_error &error) {
-        // just do nothing, the user will be notified that stuff happened
     }
+    // if not - do nothing, the user will be notified that stuff happened
 }
 
 void RatingsManager::cacheList(bool onQuit) {
@@ -187,7 +185,7 @@ void RatingsManager::cacheRatings(const std::string &response) {
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
-        // old code in case /theList comes back
+        // old code in case /theList comes back (it never will, there's no point in editing this for the new version of matjson but whatever)
         // matjson::Value ratingsData = matjson::parse(response);
         // for (auto element: ratingsData.asArray().unwrap()) {
         //     const int id = element["ID"].asInt().unwrap();

@@ -528,8 +528,9 @@ std::string GDDLSearchLayer::formSearchRequest() {
 
 std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
-    try {
-        matjson::Value responseJson = matjson::parse(response);
+    const auto maybeResponseJson = matjson::parse(response);
+    if (maybeResponseJson.isOk()) {
+        const matjson::Value& responseJson = maybeResponseJson.unwrap();
         const int total = responseJson["total"].asInt().unwrap();
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
         matjson::Value levelList = responseJson["levels"];
@@ -543,8 +544,8 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
                 }
             }
         }
-    } catch (std::runtime_error &error) {
-        // well nothing really can be done here
+    } else {
+        // well, nothing can really be done here
     }
     return results;
 }
