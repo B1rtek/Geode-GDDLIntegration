@@ -1001,7 +1001,7 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float
     float returnValue = defaultValue;
     auto returnValueResult = numFromString<float>(textfield->getString());
     if (returnValueResult.isOk()) {
-        returnValue = returnValueResult.value();
+        returnValue = returnValueResult.unwrap();
     }
     return returnValue;
 }
