@@ -53,9 +53,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
+                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
@@ -89,7 +89,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->getPositionOffset();
+                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -152,7 +152,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)

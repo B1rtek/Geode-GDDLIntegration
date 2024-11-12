@@ -216,7 +216,7 @@ public:
     }
 
     static bool notExcluded(int levelID) {
-        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSettingV3("exclude-range"));
+        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSetting("exclude-range"));
         if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
         const int cachedTier = RatingsManager::getCachedTier(levelID);
         const int effectiveRangeEnd =
