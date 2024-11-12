@@ -1,8 +1,8 @@
 #include "DummySettingLoginV3.h"
 #include "LoginSettingNodeV3.h"
 
-Result<std::shared_ptr<DummySettingLoginV3>>
-DummySettingLoginV3::parse(const std::string &key, const std::string &modID, const matjson::Value &json) {
+Result<std::shared_ptr<SettingV3>>
+DummySettingLoginV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<DummySettingLoginV3>();
     auto root = checkJson(json, "DummySettingLoginV3");
 
@@ -10,7 +10,7 @@ DummySettingLoginV3::parse(const std::string &key, const std::string &modID, con
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool DummySettingLoginV3::load(const matjson::Value &json) {

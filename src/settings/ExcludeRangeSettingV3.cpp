@@ -1,8 +1,8 @@
 #include "ExcludeRangeSettingV3.h"
 #include "ExcludeRangeSettingNodeV3.h"
 
-Result<std::shared_ptr<ExcludeRangeSettingV3>>
-ExcludeRangeSettingV3::parse(const std::string &key, const std::string &modID, const matjson::Value &json) {
+Result<std::shared_ptr<SettingV3>>
+ExcludeRangeSettingV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<ExcludeRangeSettingV3>();
     auto root = checkJson(json, "ExcludeRangeSettingV3");
 
@@ -10,7 +10,7 @@ ExcludeRangeSettingV3::parse(const std::string &key, const std::string &modID, c
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool ExcludeRangeSettingV3::load(const matjson::Value &json) {

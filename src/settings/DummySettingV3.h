@@ -7,8 +7,8 @@ using namespace geode::prelude;
 
 class DummySettingV3 final : public SettingV3 {
 public:
-    static Result<std::shared_ptr<DummySettingV3>>
-    parse(std::string const &key, std::string const &modID, matjson::Value const &json);
+    static Result<std::shared_ptr<SettingV3>>
+    parse(std::string const& key, std::string const& modID, matjson::Value const& json);
 
     bool load(matjson::Value const &json) override;
     bool save(matjson::Value &json) const override;

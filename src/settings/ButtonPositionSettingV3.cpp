@@ -1,8 +1,8 @@
 #include "ButtonPositionSettingV3.h"
 #include "ButtonPositionSettingNodeV3.h"
 
-Result<std::shared_ptr<ButtonPositionSettingV3>> ButtonPositionSettingV3::parse(std::string const& key,
-    std::string const& modID, matjson::Value const& json) {
+Result<std::shared_ptr<SettingV3>> ButtonPositionSettingV3::parse(std::string const& key,
+                                                                  std::string const& modID, matjson::Value const& json) {
     const auto res = std::make_shared<ButtonPositionSettingV3>();
     auto root = checkJson(json, "ButtonPositionSettingV3");
 
@@ -10,7 +10,7 @@ Result<std::shared_ptr<ButtonPositionSettingV3>> ButtonPositionSettingV3::parse(
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool ButtonPositionSettingV3::load(const matjson::Value& json) {

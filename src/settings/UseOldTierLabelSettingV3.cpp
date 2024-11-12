@@ -2,8 +2,8 @@
 
 #include "UseOldTierLabelSettingNodeV3.h"
 
-Result<std::shared_ptr<UseOldTierLabelSettingV3>>
-UseOldTierLabelSettingV3::parse(const std::string &key, const std::string &modID, const matjson::Value &json) {
+Result<std::shared_ptr<SettingV3>>
+UseOldTierLabelSettingV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<UseOldTierLabelSettingV3>();
     auto root = checkJson(json, "UseOldTierLabelSettingV3");
 
@@ -11,7 +11,7 @@ UseOldTierLabelSettingV3::parse(const std::string &key, const std::string &modID
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool UseOldTierLabelSettingV3::load(const matjson::Value &json) {

@@ -16,8 +16,8 @@ public:
     static constexpr int minOffset = -1;
     static constexpr int maxOffset = 3;
 
-    static Result<std::shared_ptr<UseOldTierLabelSettingV3>> parse(std::string const& key, std::string const& modID,
-                                                                   matjson::Value const& json);
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID,
+                                                    matjson::Value const& json);
 
     bool load(const matjson::Value &json) override;
     bool save(matjson::Value &json) const override;
