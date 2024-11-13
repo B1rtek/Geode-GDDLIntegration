@@ -1,6 +1,4 @@
-# v1.2.0-beta.5
-This version is **considered ready**, but not released publicly due to Geode not being updated for 2.207x yet. This version will not receive any updates (most likely), but if you encounter bugs report them to me (@b1rtek on Discord)
-## v1.2.0 is the biggest update for GDDL Integration yet!
+# v1.2.0
 - Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
   - This requires you to log in to your GDDL account, you can log in on the mod settings page, but if you forget to do that you will be prompted to do so when you try submitting a rating
   - You will be warned if you have already submitted a rating for the level, don't worry about that
@@ -13,34 +11,6 @@ This version is **considered ready**, but not released publicly due to Geode not
 - Fixed a bug that caused the GDDL tier button to be placed far away from the level name in certain cases when using the "to the left/right of the level title" setting
 
 MASSIVE THANKS to [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/)) for help with this update! <3
-
-Changes from the previous betas:
-- When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
-- Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSearch and GDDLLogin layers
-- Added a loading circle to GDDLSplitLayer
-- Added new GDDLInfo popups to RobTop's levels
-- Fixed a bug that didn't allow submitting 2p levels without a second player
-- Added a prompt to relog if GDDL session expires
-- Labels no longer overlap in rating bar charts in levels with a wide spread like Multition and others
-- Fixed the wrong sorting order bug in search!!
-- Fixed a bug that caused the GDDL button next to level title get placed far away from it
-- Fixed a typo in "Spacing in spread charts" setting's description
-- Added a check that tells the user whether they already submitted a rating for a level or not
-
-# v1.2.0-beta.4
-- The login popup automatically closes upon a successful login
-- Attempts no longer default to 100 when submitting a rating without them
-- The LoginSettingNode updates itself after logging in now
-- Increased the characters cap for fields in the login form to 64 characters (Thanks @7w7y !)
-
-# v1.2.0-beta.1
-- Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
-  - This requires you to log in to your GDDL account, you can log in on the mod settings page (or the mod will prompt you to do so when you try to submit a rating while logged out)
-- Completely overhauled the popup with rating and enjoyment information that appears after clicking the GDDL button on the level info page
-  - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
-  - In case you don't like it, you can always turn it off and still use the old one in the mod settings
-- Settings have been split into categories, so they aren't as cluttered anymore
-
 
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
