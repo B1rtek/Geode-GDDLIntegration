@@ -1,3 +1,6 @@
+# v1.2.0-beta.6
+- added the skillsets crash fix from the 2.2074 version
+
 # v1.2.0-beta.5
 This version is **considered ready**, but not released publicly due to Geode not being updated for 2.207x yet. This version will not receive any updates (most likely), but if you encounter bugs report them to me (@b1rtek on Discord)
 ## v1.2.0 is the biggest update for GDDL Integration yet!
