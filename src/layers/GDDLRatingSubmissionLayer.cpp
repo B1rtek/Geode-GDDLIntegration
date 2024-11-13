@@ -320,7 +320,7 @@ void GDDLRatingSubmissionLayer::addInfoButtonAndCenterLabel(CCLabelBMFont* label
 
 void GDDLRatingSubmissionLayer::setInitialValues() {
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
-    rating = gddlRating ? gddlRating.value().rating : -1;
+    rating = gddlRating ? gddlRating.value().roundedRating : -1;
     enjoyment = gddlRating ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
     fps = Utils::getCorrectedFPS();
     mobile = Utils::isMobile();
