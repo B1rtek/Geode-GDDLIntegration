@@ -1,11 +1,10 @@
-name: Build Geode Mod
+name: Build Geode Mod (Nightly)
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - "master"
-      - "beta-builds"
+      - "beta-builds-v4"
 
 jobs:
   build:
@@ -37,6 +36,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
+          sdk: nightly
           target: ${{ matrix.config.target }}
 
   package:
