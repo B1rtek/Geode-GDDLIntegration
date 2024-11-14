@@ -100,7 +100,10 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     reqJson["username"] = username;
     reqJson["password"] = password;
     showLoadingCircle();
-    spawnLoginRequestThread().detach();
+    // spawnLoginRequestThread().detach();
+    auto req = web::WebRequest();
+    req.bodyJSON(reqJson);
+    loginListener.setFilter(req.post(loginEndpoint));
 }
 
 // left here because once geode 4.0.0 comes out raw curl won't be needed
@@ -110,9 +113,29 @@ void GDDLLoginLayer::prepareSearchListener() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                saveLoginData("gddl.sid", "gddl.sid.sig");
-                RatingsManager::clearSubmissionCache();
-                closeLoginPanel();
+                std::optional<std::vector<std::string>> cookies = res->headersWithName("set-cookie");
+                if (cookies.has_value()) {
+                    std::map<std::string, std::string> cookiesMap;
+                    for (const auto& cookie : cookies.value()) {
+                        const auto [name, value] = getCookieValue(cookie.c_str());
+                        cookiesMap[name] = value;
+                    }
+                    if (!cookiesMap.contains("gddl.sid") || !cookiesMap.contains("gddl.sid.sig")) {
+                        hideLoadingCircle();
+                        Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+                        return;
+                    }
+                    saveLoginData(cookiesMap["gddl.sid"], cookiesMap["gddl.sid.sig"]);
+                    // continue the login process by requesting uid
+                    std::string requestURL = GDDLRatingSubmissionLayer::userSearchEndpoint;
+                    const auto requestedUsername = Mod::get()->getSavedValue<std::string>("login-username", "");
+                    requestURL += "?name=" + requestedUsername + "&chunk=25";
+                    auto req = web::WebRequest();
+                    userIDListener.setFilter(req.get(requestURL));
+                } else {
+                    hideLoadingCircle();
+                    Notification::create("An error occurred!", NotificationIcon::Error, 2)->show();
+                }
             } else {
                 // not success!
                 std::string error = "Unknown error";
