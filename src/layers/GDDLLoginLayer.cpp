@@ -110,7 +110,7 @@ void GDDLLoginLayer::prepareSearchListener() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                saveLoginData("gddl.sid", "gddl.sid.sig");
+                saveLoginData("gddl.sid", "gddl.sid.sig", 0);
                 RatingsManager::clearSubmissionCache();
                 closeLoginPanel();
             } else {
@@ -127,32 +127,13 @@ void GDDLLoginLayer::prepareSearchListener() {
             Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
         }
     });
-    userIDListener.bind([this](web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
-            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
-                const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
-                if (id > -1) {
-                    Mod::get()->setSavedValue("login-userid", id);
-                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                    closeLoginPanel();
-                } else {
-                    Notification::create(id == -1 ? "Your player ID wasn't found, try relogging later" : "An error occurred", NotificationIcon::Error, 2)->show();
-                }
-            } else {
-                Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
-            }
-        }
-        else if (e->isCancelled()) {
-            Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
-        }
-    });
 }
 
-void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig) {
+void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig, const int uid) {
     Mod::get()->setSavedValue("login-username", std::string(usernameTextField->getString()));
     Mod::get()->setSavedValue("login-sid", sid);
     Mod::get()->setSavedValue("login-sig", sig);
+    Mod::get()->setSavedValue("login-userid", uid);
 }
 
 void GDDLLoginLayer::closeLoginPanel() {
@@ -247,15 +228,23 @@ std::thread GDDLLoginLayer::spawnLoginRequestThread() {
                     cookies[cookieNameValuePair.first] = cookieNameValuePair.second;
                     ++i;
                 }
-                saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
-                Loader::get()->queueInMainThread([this]() {
-                    // get the uid
-                    std::string requestURL = GDDLRatingSubmissionLayer::userSearchEndpoint;
-                    const std::string requestedUsername = Mod::get()->getSavedValue<std::string>("login-username", "");
-                    requestURL += "?name=" + requestedUsername + "&chunk=25";
-                    auto req = web::WebRequest();
-                    userIDListener.setFilter(req.get(requestURL));
-                });
+                std::string decodedCookie = ZipUtils::base64URLDecode(cookies["gddl.sid"]);
+                const auto decodedJson = matjson::parse(decodedCookie);
+                if (decodedJson.isOk() && decodedJson.unwrap().contains("userID")) {
+                    // super awkward but it doesn't matter for now, geode 4.0.0 will save me
+                    const int uid = decodedJson.unwrap()["userID"].asInt().unwrap();
+                    saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"], uid);
+                    Loader::get()->queueInMainThread([this]() {
+                        Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                        closeLoginPanel();
+                    });
+                } else {
+                    hideLoadingCircle();
+                    Loader::get()->queueInMainThread([]() {
+                        Notification::create("Failed to obtain the user id!", NotificationIcon::Error, 2)->show();
+                    });
+                    return;
+                }
             } else {
                 // something went wrong - get the error
                 std::string error = "Unknown error", parseError;

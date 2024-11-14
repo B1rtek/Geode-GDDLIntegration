@@ -16,7 +16,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
     matjson::Value reqJson;
-    EventListener<web::WebTask> loginListener, userIDListener;
+    EventListener<web::WebTask> loginListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
@@ -24,7 +24,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onLoginClicked(cocos2d::CCObject *sender);
 
     void prepareSearchListener();
-    void saveLoginData(const std::string& sid, const std::string& sig);
+    void saveLoginData(const std::string& sid, const std::string& sig, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();
