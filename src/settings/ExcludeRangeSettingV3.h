@@ -16,8 +16,8 @@ public:
     static constexpr bool defaultInclude = false;
     static constexpr int highestTier = 35;
 
-    static Result<std::shared_ptr<ExcludeRangeSettingV3>> parse(std::string const& key, std::string const& modID,
-                                                                matjson::Value const& json);
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID,
+                                                    matjson::Value const& json);
     bool load(const matjson::Value& json) override;
     bool save(matjson::Value& json) const override;
     SettingNodeV3* createNode(float width) override;

@@ -1,3 +1,17 @@
+# v1.2.0
+- Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
+  - This requires you to log in to your GDDL account, you can log in on the mod settings page, but if you forget to do that you will be prompted to do so when you try submitting a rating
+  - You will be warned if you have already submitted a rating for the level, don't worry about that
+- Completely overhauled the popup with rating and enjoyment information that appears after clicking the GDDL button on the level info page
+  - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
+  - In case you don't like it, you can always turn it off and still use the old one in the mod settings
+- Settings have been split into categories, so they aren't as cluttered anymore
+- Some popups were replaced with toast messages instead, loading indicators have been added in multiple places
+- Fixed the bug that caused sorting in GDDL search to malfunction
+- Fixed a bug that caused the GDDL tier button to be placed far away from the level name in certain cases when using the "to the left/right of the level title" setting
+
+MASSIVE THANKS to [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/)) for help with this update! <3
+
 # v1.1.13
 - Added difficulty tiers to RobTop's demons
 - Ported settings to SettingsV3, making GDDL Integration one of the first mods to use the new standard (yaaaaay!)

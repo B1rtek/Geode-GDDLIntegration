@@ -1,5 +1,6 @@
 #ifndef GDDL_UTILS_H
 #define GDDL_UTILS_H
+
 #include <chrono>
 #include <string>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
@@ -13,6 +14,8 @@
 
 class Utils {
 public:
+    const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
+
     static std::string floatToString(float number, int precision) {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(precision) << number;
@@ -27,13 +30,12 @@ public:
     // I love stack overflow <3
     // https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
     static bool fileExists(const std::string &name) {
-        struct stat buffer {};
+        struct stat buffer{};
         return stat(name.c_str(), &buffer) == 0;
     }
 
     // https://stackoverflow.com/questions/2390912/checking-for-an-empty-file-in-c
-    static bool fileIsEmpty(std::ifstream& pFile)
-    {
+    static bool fileIsEmpty(std::ifstream &pFile) {
         return pFile.peek() == std::ifstream::traits_type::eof();
     }
 
@@ -56,8 +58,8 @@ public:
     }
 
     static void createTextInputNode(CCNode *parent, CCTextInputNode *&textfield, const std::string &font,
-                                          const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
-                                          const CCPoint &position, int zOrder = 1) {
+                                    const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                    const CCPoint &position, int zOrder = 1) {
         const auto bg = CCScale9Sprite::create("square02_small.png");
         parent->addChild(bg, zOrder);
         bg->setContentSize(bgSize);
@@ -75,8 +77,9 @@ public:
         textfield->setMaxLabelScale(0.7f);
     }
 
-    static void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, CCObject *callbackObject, SEL_MenuHandler leftCallback,
-                                      SEL_MenuHandler rightCallback, int zOrder = 1) {
+    static void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, CCObject *callbackObject,
+                                             SEL_MenuHandler leftCallback,
+                                             SEL_MenuHandler rightCallback, int zOrder = 1) {
         // left
         const CCPoint positionLeft =
                 object->getPosition() -
@@ -89,7 +92,7 @@ public:
         leftButton->setContentSize(size);
         // right
         const CCPoint positionRight = positionLeft + CCPoint(object->getContentSize().width * object->getScale() +
-                                                                     leftButton->getContentSize().width + 2.5f,
+                                                             leftButton->getContentSize().width + 2.5f,
                                                              0.0f); // why is this not symmetrical wtf
         const auto rightButtonSprite = CCSprite::createWithSpriteFrameName("edit_rightBtn_001.png");
         rightButtonSprite->setScale(0.8f);
@@ -99,7 +102,9 @@ public:
         rightButton->setContentSize(size);
     }
 
-    static void createCheckbox(CCNode *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset, float scale, const CCPoint &position, CCObject* callbackObject, SEL_MenuHandler callback, int zOrder = 1) {
+    static void createCheckbox(CCNode *parent, CCMenuItemToggler *&toggler, const std::string &label, float labelOffset,
+                               float scale, const CCPoint &position, CCObject *callbackObject, SEL_MenuHandler callback,
+                               int zOrder = 1) {
         toggler = CCMenuItemToggler::createWithStandardSprites(callbackObject, callback, scale);
         parent->addChild(toggler, zOrder);
         toggler->setPosition(position);
@@ -108,28 +113,36 @@ public:
         toggleLabel->setPosition({toggler->getPositionX(), toggler->getPositionY() - labelOffset});
         const float maxWidth = toggler->getContentSize().width * scale * 2.0f;
         const float labelScale = 0.3f * toggleLabel->getContentSize().width > maxWidth
-                                         ? maxWidth / toggleLabel->getContentSize().width
-                                         : 0.3f;
+                                 ? maxWidth / toggleLabel->getContentSize().width
+                                 : 0.3f;
         toggleLabel->setScale(labelScale);
     }
 
     static int getNumberTextfieldValue(CCTextInputNode *&textfield) {
+        return getNumberWithGivenDefaultTextfieldValue(textfield, 0);
+    }
+
+    static int getNumberWithGivenDefaultTextfieldValue(CCTextInputNode *&textfield, int defaultValue) {
         if (textfield->getString().empty())
-            return 0;
+            return defaultValue;
         // instead of try/catch because of android
-        int returnValue = 0;
+        int returnValue = defaultValue;
         auto returnValueResult = numFromString<int>(textfield->getString());
         if (returnValueResult.isOk()) {
-            returnValue = returnValueResult.value();
+            returnValue = returnValueResult.unwrap();
         }
         return returnValue;
     }
 
     static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield) {
-        if (value != 0) {
+        setNumberWithGivenDefaultValueTextfield(value, textfield, 0);
+    }
+
+    static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue, std::string emptyPlaceholder = "") {
+        if (value != defaultValue) {
             textfield->setString(std::to_string(value).c_str());
         } else {
-            textfield->setString("");
+            textfield->setString(emptyPlaceholder);
         }
     }
 
@@ -148,8 +161,8 @@ public:
     }
 
     static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
-                                         const std::string &placeholder, float maxWidth, const CCPoint &position,
-                                         const CCPoint &bgSize, int zOrder = 1) {
+                                                const std::string &placeholder, float maxWidth, const CCPoint &position,
+                                                const CCPoint &bgSize, int zOrder = 1) {
         label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
         parent->addChild(label, zOrder);
         label->setPosition(position);
@@ -165,23 +178,23 @@ public:
     }
 
     static void bindCacheDownloadCallback(EventListener<web::WebTask> &cacheEventListener, bool notifySuccess = false) {
-        cacheEventListener.bind([notifySuccess] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
+        cacheEventListener.bind([notifySuccess](web::WebTask::Event *e) {
+            if (web::WebResponse * res = e->getValue()) {
                 const std::string response = res->string().unwrapOr("");
                 if (response.empty()) {
-                    FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                    Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
                 } else {
                     RatingsManager::cacheRatings(response);
-                    if(!RatingsManager::cacheNotEmpty()) {
-                        FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                    if (!RatingsManager::cacheNotEmpty()) {
+                        Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
                         // populate the cache from the save anyway, there could be something in there
                         RatingsManager::populateFromSave();
                     } else if (notifySuccess) {
-                        FLAlertLayer::create("Reset GDDL cache", "Cache refresh succeeded", "OK")->show();
+                        Notification::create("GDDL Cache refresh succeded", NotificationIcon::Success, 2)->show();
                     }
                 }
             } else if (e->isCancelled()) {
-                FLAlertLayer::create("GDDL Integration", "Failed to cache ratings from gdladder.com, check your internet connection.", "OK")->show();
+                Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
             }
         });
     }
@@ -203,15 +216,68 @@ public:
     }
 
     static bool notExcluded(int levelID) {
-        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSettingV3("exclude-range"));
+        const auto setting = static_pointer_cast<ExcludeRangeSettingV3>(Mod::get()->getSetting("exclude-range"));
         if (setting->getRangeBegin() == 0 && setting->getRangeEnd() == 0) return true;
         const int cachedTier = RatingsManager::getCachedTier(levelID);
-        const int effectiveRangeEnd = setting->getRangeEnd() == 0 ? ExcludeRangeSettingV3::highestTier + 1 : setting->getRangeEnd();
+        const int effectiveRangeEnd =
+                setting->getRangeEnd() == 0 ? ExcludeRangeSettingV3::highestTier + 1 : setting->getRangeEnd();
         if (setting->isInclude()) {
             return cachedTier >= setting->getRangeBegin() && cachedTier <= effectiveRangeEnd;
         }
         return cachedTier < setting->getRangeBegin() || cachedTier > effectiveRangeEnd;
     }
 
+    static ccColor4F hexColorTo4F(int hexColor) {
+        const float r = ((hexColor >> 16) & 0xFF) / 255.0;
+        const float g = ((hexColor >> 8) & 0xFF) / 255.0;
+        const float b = ((hexColor) & 0xFF) / 255.0;
+        return ccc4f(r, g, b, 1.0f);
+    }
+
+    static ccColor3B hexColorTo3B(int hexColor) {
+        const int r = (hexColor >> (8 * 2)) & 0xff;
+        const int g = (hexColor >> (8 * 1)) & 0xff;
+        const int b = (hexColor >> (8*0)) & 0xff;
+        return ccc3(r, g, b);
+    }
+
+    static void recolorTextInLabel(CCLabelBMFont *label, std::string textToRecolor, int color, int searchOffset = 0) {
+        const std::string labelText = label->getString();
+        const int beginIndex = labelText.find(textToRecolor, searchOffset);
+        if (beginIndex == std::string::npos) return;
+        // calculate length without spaces
+        int fontSpriteLength = 0;
+        std::for_each(textToRecolor.begin(), textToRecolor.end(),
+                      [&fontSpriteLength](char letter) { if (letter != ' ') ++fontSpriteLength; });
+        // recolor
+        for (int i = beginIndex; i < beginIndex + fontSpriteLength; i++) {
+            typeinfo_cast<CCNodeRGBA*>(label->getChildren()->objectAtIndex(i))->setColor(hexColorTo3B(color));
+        }
+    }
+
+    static int getFPS() {
+        return std::round(1.0f / CCDirector::get()->getDeltaTime());
+    }
+
+    static int getCorrectedFPS() {
+        std::vector<int> commonFPSValues = {60, 75, 90, 120, 144, 165, 180, 240, 288, 300, 360};
+        int readFPS = getFPS();
+        for (const auto value: commonFPSValues) {
+            if (std::abs(readFPS - value) <= 2) {
+                readFPS = value;
+                break;
+            }
+        }
+        return readFPS;
+    }
+
+    static bool isMobile() {
+#ifdef GEODE_IS_ANDROID
+        return true;
+#else
+        return false;
+#endif
+    }
 };
+
 #endif // GDDL_UTILS_H

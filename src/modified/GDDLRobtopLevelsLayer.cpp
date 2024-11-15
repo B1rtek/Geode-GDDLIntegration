@@ -1,6 +1,6 @@
 #include "GDDLRobtopLevelsLayer.h"
 
-#include <GDDLBoomScrollLayer.h>
+#include "GDDLBoomScrollLayer.h"
 
 bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
@@ -22,6 +22,9 @@ bool GDDLRobtopLevelsLayer::init(int page) {
                     tierAfterFetch = RatingsManager::getDemonTier(levelID);
                 }
                 updateButton(tierAfterFetch);
+                if (m_fields->advancedLevelInfoPopup != nullptr) {
+                    m_fields->advancedLevelInfoPopup->addRatingInfo();
+                }
             }
         }
         else if (e->isCancelled()) {
@@ -202,7 +205,13 @@ CCNode* GDDLRobtopLevelsLayer::getLevelButton(int pageID) {
 
 void GDDLRobtopLevelsLayer::onGDDLInfo(CCObject *sender) {
     const int levelID = convertPageToLevel(m_fields->currentPage);
-    GDDLLevelInfoPopup::create(levelID)->show();
+    if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
+        GDDLLevelInfoPopup::create(levelID)->show();
+    } else {
+        GJGameLevel* levelObject = GameLevelManager::get()->getMainLevel(m_fields->currentPage+1, true);
+        m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(levelObject, levelID);
+        m_fields->advancedLevelInfoPopup->show();
+    }
 }
 
 void GDDLRobtopLevelsLayer::updateButton(const int tier) {

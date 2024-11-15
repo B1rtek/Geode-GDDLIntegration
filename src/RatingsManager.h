@@ -3,26 +3,28 @@
 
 #include <map>
 #include <Geode/Geode.hpp>
+#include <objects/RatingsSpread.h>
+#include <objects/Skillsets.h>
 
-#include "GDDLRating.h"
+#include "objects/GDDLRating.h"
+#include "objects/Submission.h"
 
 using namespace geode::prelude;
 
 class RatingsManager {
     static std::map<int, GDDLRating> demonMap;
-    static std::vector<int> tierColors;
     static std::map<int, int> ratingsCache;
+    inline static std::map<int, RatingsSpread> spreadsCache{};
+    inline static std::map<int, Skillsets> skillsetsCache{};
+    inline static std::map<int, Submission> submissionsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
 
     static GDDLRating parseJson(const std::string& response);
-
-    static cocos2d::ccColor3B convertToColor(int hexColor);
-
 public:
     inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
-
     inline static bool triedToCache = false;
+    static std::vector<int> tierColors;
 
     static void populateFromSave();
 
@@ -51,6 +53,26 @@ public:
     static void cacheList(bool onQuit);
 
     static void clearCache();
+
+    static void cacheSpread(const int levelID, const RatingsSpread& spread);
+
+    static bool hasSpread(const int levelID);
+
+    static RatingsSpread getSpread(const int levelID);
+
+    static void cacheSkillsets(const int levelID, const Skillsets& skillsets);
+
+    static bool hasSkillsets(const int levelID);
+
+    static Skillsets getSkillsets(const int levelID);
+
+    static void cacheSubmission(const int levelID, const Submission& submission);
+
+    static bool hasSubmission(const int levelID);
+
+    static Submission getSubmission(const int levelID);
+
+    static void clearSubmissionCache();
 };
 
 

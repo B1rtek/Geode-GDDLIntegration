@@ -2,15 +2,16 @@
 // ReSharper disable CppHidingFunction
 #include <Geode/Geode.hpp>
 #include <Geode/Bindings.hpp>
-#include <Geode/modify/LevelInfoLayer.hpp>
+#include "Geode/modify/LevelInfoLayer.hpp"
 #include <Geode/utils/web.hpp>
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "GDDLLevelInfoPopup.h"
+#include "layers/GDDLLevelInfoPopup.h"
 #include "settings/ButtonPositionSettingV3.h"
 #include "settings/UseOldTierLabelSettingV3.h"
 #include "settings/ExcludeRangeSettingV3.h"
+#include "layers/GDDLAdvancedLevelInfoPopup.h"
 
 using namespace geode::prelude;
 
@@ -18,6 +19,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     struct Fields {
         EventListener<web::WebTask> infoLayerGetRatingListener;
         bool gddlTierUpdated = false;
+        GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
     };
 
     // ReSharper disable once CppParameterMayBeConst
@@ -38,6 +40,9 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                         tierAfterFetch = RatingsManager::getDemonTier(levelID);
                     }
                     updateButton(tierAfterFetch);
+                    if (m_fields->advancedLevelInfoPopup != nullptr) {
+                        m_fields->advancedLevelInfoPopup->addRatingInfo();
+                    }
                 }
             } else if (e->isCancelled()) {
                 updateButton(-1);
@@ -48,22 +53,22 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
         if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
+                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
                 if (buttonPositionSetting != DEFAULT) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
-                    const auto levelNameSize = levelNameLabel->getContentSize();
+                    const auto levelNameSize = levelNameLabel->getScaledContentSize();
                     if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
-                        menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.5f,
-                                               levelNamePosition.y - levelNameSize.height / 2.25f};
+                        menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.0f,
+                                               levelNamePosition.y - 14.5f};
                     } else { // left
-                        menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.5f - 25.0f,
-                                               levelNamePosition.y - levelNameSize.height / 2.25f};
+                        menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.0f - 25.0f,
+                                               levelNamePosition.y - 14.0f};
                     }
                     menuSize = CCSize{25, 25};
                     buttonPosition = CCPoint{12.5f, 12.5f};
@@ -84,7 +89,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->getPositionOffset();
+                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -147,7 +152,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)
@@ -170,6 +175,11 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     // ReSharper disable once CppMemberFunctionMayBeConst
     void onGDDLInfo(CCObject *sender) {
-        GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        if (Mod::get()->getSettingValue<bool>("use-old-info-popup")) {
+            GDDLLevelInfoPopup::create(m_level->m_levelID)->show();
+        } else {
+            m_fields->advancedLevelInfoPopup = GDDLAdvancedLevelInfoPopup::create(m_level, m_level->m_levelID);
+            m_fields->advancedLevelInfoPopup->show();
+        }
     }
 };

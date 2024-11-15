@@ -2,8 +2,8 @@
 
 #include "UseOldTierLabelSettingNodeV3.h"
 
-Result<std::shared_ptr<UseOldTierLabelSettingV3>>
-UseOldTierLabelSettingV3::parse(const std::string &key, const std::string &modID, const matjson::Value &json) {
+Result<std::shared_ptr<SettingV3>>
+UseOldTierLabelSettingV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<UseOldTierLabelSettingV3>();
     auto root = checkJson(json, "UseOldTierLabelSettingV3");
 
@@ -11,25 +11,23 @@ UseOldTierLabelSettingV3::parse(const std::string &key, const std::string &modID
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool UseOldTierLabelSettingV3::load(const matjson::Value &json) {
     if(!json.contains("enabled") || !json.contains("position-offset")) {
         return false;
     }
-    enabled = json["enabled"].is_bool() ? json["enabled"].as_bool() : false;
-    positionOffset = json["position-offset"].is_number() ? json["position-offset"].as_int() : 0;
+    enabled = json["enabled"].isBool() ? json["enabled"].asBool().unwrap() : false;
+    positionOffset = json["position-offset"].isNumber() ? json["position-offset"].asInt().unwrap() : 0;
     // in case the value are set to something stupid
     positionOffset = std::min(maxOffset, std::max(minOffset, positionOffset));
     return true;
 }
 
 bool UseOldTierLabelSettingV3::save(matjson::Value &json) const {
-    json = matjson::Object {
-            {"enabled", enabled},
-            {"position-offset", positionOffset}
-    };
+    json["enabled"] = enabled;
+    json["position-offset"] = positionOffset;
     return true;
 }
 

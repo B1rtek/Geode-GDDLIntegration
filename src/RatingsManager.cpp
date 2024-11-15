@@ -51,19 +51,11 @@ std::vector<int> RatingsManager::tierColors = {
 std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
-    try {
-        const matjson::Value levelData = matjson::parse(response);
+    if (const auto maybeLevelData = matjson::parse(response); maybeLevelData.isOk()) {
+        const matjson::Value& levelData = maybeLevelData.unwrap();
         return GDDLRating(levelData);
-    } catch (std::runtime_error &error) {
-        return GDDLRating::createInvalid();
     }
-}
-
-cocos2d::ccColor3B RatingsManager::convertToColor(const int hexColor) {
-    const int r = (hexColor >> (8 * 2)) & 0xff;
-    const int g = (hexColor >> (8 * 1)) & 0xff;
-    const int b = (hexColor >> (8*0)) & 0xff;
-    return ccc3(r, g, b);
+    return GDDLRating::createInvalid();
 }
 
 /**
@@ -85,21 +77,20 @@ void RatingsManager::populateFromSave() {
     }
     std::stringstream content;
     content << f.rdbuf();
-    try {
-        matjson::Value data = matjson::parse(content.str());
-        cacheTimestamp = data["cached"].as_int();
+    if (const auto maybeData = matjson::parse(content.str()); maybeData.isOk()) {
+        matjson::Value data = maybeData.unwrap();
+        cacheTimestamp = data["cached"].asInt().unwrap();
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
         if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
-            for (auto idRatingPair: data["list"].as_array()) {
-                const int id = idRatingPair["ID"].as_int();
-                const int rating = idRatingPair["Rating"].as_int();
+            for (auto idRatingPair: data["list"].asArray().unwrap()) {
+                const int id = idRatingPair["ID"].asInt().unwrap();
+                const int rating = idRatingPair["Rating"].asInt().unwrap();
                 ratingsCache[id] = rating;
             }
         }
-    } catch (std::runtime_error &error) {
-        // just do nothing, the user will be notified that stuff happened
     }
+    // if not - do nothing, the user will be notified that stuff happened
 }
 
 void RatingsManager::cacheList(bool onQuit) {
@@ -133,7 +124,7 @@ cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
         return ccc3(255, 255, 255);
     }
     const int hexColor = tierColors[tier];
-    return convertToColor(hexColor);
+    return Utils::hexColorTo3B(hexColor);
 }
 
 std::optional<GDDLRating> RatingsManager::getRating(const int id) {
@@ -194,11 +185,11 @@ void RatingsManager::cacheRatings(const std::string &response) {
             const int roundedRating = static_cast<int>(round(rating));
             ratingsCache[id] = roundedRating;
         }
-        // old code in case /theList comes back
+        // old code in case /theList comes back (it never will, there's no point in editing this for the new version of matjson but whatever)
         // matjson::Value ratingsData = matjson::parse(response);
-        // for (auto element: ratingsData.as_array()) {
-        //     const int id = element["ID"].as_int();
-        //     const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
+        // for (auto element: ratingsData.asArray().unwrap()) {
+        //     const int id = element["ID"].asInt().unwrap();
+        //     const float rating = element["Rating"].isNull() ? -1.0f : element["Rating"].asDouble().unwrap();
         //     const int roundedRating = static_cast<int>(round(rating));
         //     ratingsCache[id] = roundedRating;
         // }
@@ -258,4 +249,44 @@ int RatingsManager::getCachedTier(const int levelID) {
 void RatingsManager::clearCache() {
     // clears the cache in-memory, leaving the file intact in case the refresh fails for some reason
     ratingsCache.clear();
+}
+
+void RatingsManager::cacheSpread(const int levelID, const RatingsSpread& spread) {
+    spreadsCache[levelID] = spread;
+}
+
+bool RatingsManager::hasSpread(const int levelID) {
+    return spreadsCache.contains(levelID);
+}
+
+RatingsSpread RatingsManager::getSpread(const int levelID) {
+    return spreadsCache[levelID];
+}
+
+void RatingsManager::cacheSkillsets(const int levelID, const Skillsets& skillsets) {
+    skillsetsCache[levelID] = skillsets;
+}
+
+bool RatingsManager::hasSkillsets(const int levelID) {
+    return skillsetsCache.contains(levelID);
+}
+
+Skillsets RatingsManager::getSkillsets(const int levelID) {
+    return skillsetsCache[levelID];
+}
+
+void RatingsManager::cacheSubmission(const int levelID, const Submission &submission) {
+    submissionsCache[levelID] = submission;
+}
+
+bool RatingsManager::hasSubmission(const int levelID) {
+    return submissionsCache.contains(levelID);
+}
+
+Submission RatingsManager::getSubmission(const int levelID) {
+    return submissionsCache[levelID];
+}
+
+void RatingsManager::clearSubmissionCache() {
+    submissionsCache.clear();
 }

@@ -1,11 +1,11 @@
-#ifndef GDDLINTEGRATION_DUMMYSETTINGV3_H
-#define GDDLINTEGRATION_DUMMYSETTINGV3_H
+#ifndef GDDLINTEGRATION_DUMMYSETTINGLOGINV3_H
+#define GDDLINTEGRATION_DUMMYSETTINGLOGINV3_H
 
 #include <Geode/loader/SettingV3.hpp>
 
 using namespace geode::prelude;
 
-class DummySettingV3 final : public SettingV3 {
+class DummySettingLoginV3 : public SettingV3 {
 public:
     static Result<std::shared_ptr<SettingV3>>
     parse(std::string const& key, std::string const& modID, matjson::Value const& json);
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //GDDLINTEGRATION_DUMMYSETTINGV3_H
+#endif //GDDLINTEGRATION_DUMMYSETTINGLOGINV3_H
