@@ -15,7 +15,6 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
-    matjson::Value reqJson;
     EventListener<web::WebTask> loginListener;
     LoginSettingNodeV3* settingNode;
 
@@ -32,7 +31,6 @@ class GDDLLoginLayer final : public FLAlertLayer {
     // getting around geode::web limitations
     std::pair<std::string, std::string> getCookieValue(const char* content);
     static size_t writeCallback(char *contents, size_t size, size_t nmemb, void *userp);
-    std::thread spawnLoginRequestThread();
 
 public:
     static GDDLLoginLayer* create();

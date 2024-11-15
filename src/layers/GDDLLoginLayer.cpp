@@ -86,7 +86,7 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
-    reqJson = matjson::Value();
+    matjson::Value reqJson = matjson::Value();
     std::string username = std::string(usernameTextField->getString());
     if (username.empty()) {
         Notification::create("Missing username", NotificationIcon::Warning, 2)->show();
@@ -99,8 +99,10 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     }
     reqJson["username"] = username;
     reqJson["password"] = password;
+    auto req = web::WebRequest();
+    req.bodyJSON(reqJson);
     showLoadingCircle();
-    spawnLoginRequestThread().detach();
+    loginListener.setFilter(req.post(loginEndpoint));
 }
 
 // left here because once geode 4.0.0 comes out raw curl won't be needed
@@ -111,8 +113,35 @@ void GDDLLoginLayer::prepareSearchListener() {
             if (res->code() == 200) {
                 Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                 saveLoginData("gddl.sid", "gddl.sid.sig", 0);
-                RatingsManager::clearSubmissionCache();
-                closeLoginPanel();
+                std::optional<std::vector<std::string>> cookies = res->getAllHeadersNamed("set-cookie");
+                if (cookies.has_value()) {
+                    std::map<std::string, std::string> cookiesMap;
+                    for (const auto& cookie : cookies.value()) {
+                        const auto [name, value] = getCookieValue(cookie.c_str());
+                        cookiesMap[name] = value;
+                    }
+                    if (cookiesMap.contains("gddl.sid") && cookiesMap.contains("gddl.sid.sig")) {
+                        // get uid
+                        std::string decodedCookie = ZipUtils::base64URLDecode(cookiesMap["gddl.sid"]);
+                        const auto decodedJson = matjson::parse(decodedCookie);
+                        if (decodedJson.isOk() && decodedJson.unwrap().contains("userID")) {
+                            const int uid = decodedJson.unwrap()["userID"].asInt().unwrap();
+                            saveLoginData(cookiesMap["gddl.sid"], cookiesMap["gddl.sid.sig"], uid);
+                            RatingsManager::clearSubmissionCache();
+                            Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                            closeLoginPanel();
+                        } else {
+                            hideLoadingCircle();
+                            Notification::create("Failed to obtain the user id!", NotificationIcon::Error, 2)->show();
+                        }
+                    } else {
+                        hideLoadingCircle();
+                        Notification::create("Server returned invalid response", NotificationIcon::Error, 2)->show();
+                    }
+                } else {
+                    hideLoadingCircle();
+                    Notification::create("An error occurred!", NotificationIcon::Error, 2)->show();
+                }
             } else {
                 // not success!
                 std::string error = "Unknown error";
@@ -168,103 +197,6 @@ std::pair<std::string, std::string> GDDLLoginLayer::getCookieValue(const char *c
     std::string cookieName = cookie.substr(0, equalsPos);
     std::string cookieValue = cookie.substr(equalsPos + 1, cookie.find(';', equalsPos) - equalsPos - 1);
     return {cookieName, cookieValue};
-}
-
-std::thread GDDLLoginLayer::spawnLoginRequestThread() {
-    return std::thread([this]() {
-        CURL* curl = curl_easy_init();
-        CURLcode res;
-        struct curl_header *type;
-        if (curl) {
-            struct curl_slist *list = nullptr;
-            std::string readBuffer;
-            // set up the post request
-            curl_easy_setopt(curl, CURLOPT_URL, loginEndpoint.c_str());
-            curl_easy_setopt(curl, CURLOPT_POST, 1L);
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, "GDDLIntegration");
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2);
-            // thank you dank once again <3 go support Globed!
-            // https://github.com/GlobedGD/globed2/
-            curl_blob cbb = {};
-            cbb.data = const_cast<void*>(reinterpret_cast<const void*>(CA_BUNDLE_CONTENT));
-            cbb.len = sizeof(CA_BUNDLE_CONTENT);
-            cbb.flags = CURL_BLOB_COPY;
-            curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &cbb);
-            // prepare data
-            std::string strData = reqJson.dump();
-            const char *data = strData.c_str();
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(data));
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
-            list = curl_slist_append(list, "Content-Type: application/json");
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GDDLLoginLayer::writeCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-            // dew it
-            res = curl_easy_perform(curl);
-
-            /* Check for errors */
-            if(res != CURLE_OK) {
-                hideLoadingCircle();
-                Loader::get()->queueInMainThread([]() {
-                    Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
-                });
-                return;
-            }
-
-            long httpCode = 0;
-            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpCode);
-            if (httpCode == 200) {
-                // extract the cookies and log in
-                CURLHcode h;
-                int i = 0;
-                std::map<std::string, std::string> cookies;
-                while (true) {
-                    h = curl_easy_header(curl, "Set-Cookie", i, CURLH_HEADER, -1, &type);
-                    if (h != CURLHE_OK) {
-                        break;
-                    }
-                    const auto cookieNameValuePair = getCookieValue(type->value);
-                    cookies[cookieNameValuePair.first] = cookieNameValuePair.second;
-                    ++i;
-                }
-                std::string decodedCookie = ZipUtils::base64URLDecode(cookies["gddl.sid"]);
-                const auto decodedJson = matjson::parse(decodedCookie);
-                if (decodedJson.isOk() && decodedJson.unwrap().contains("userID")) {
-                    // super awkward but it doesn't matter for now, geode 4.0.0 will save me
-                    const int uid = decodedJson.unwrap()["userID"].asInt().unwrap();
-                    saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"], uid);
-                    Loader::get()->queueInMainThread([this]() {
-                        Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                        closeLoginPanel();
-                    });
-                } else {
-                    hideLoadingCircle();
-                    Loader::get()->queueInMainThread([]() {
-                        Notification::create("Failed to obtain the user id!", NotificationIcon::Error, 2)->show();
-                    });
-                    return;
-                }
-            } else {
-                // something went wrong - get the error
-                std::string error = "Unknown error", parseError;
-                if (const auto maybeJsonResponse = matjson::parse(readBuffer); maybeJsonResponse.isOk()) {
-                    const auto& jsonResponse = maybeJsonResponse.unwrap();
-                    if (jsonResponse.contains("error")) {
-                        error = jsonResponse["error"].asString().unwrap();
-                    }
-                } else {
-                    error = "Server returned an invalid response";
-                }
-                hideLoadingCircle();
-                Loader::get()->queueInMainThread([error]() {
-                    Notification::create(error, NotificationIcon::Error, 2)->show();
-                });
-            }
-
-            curl_easy_cleanup(curl);
-        }
-    });
 }
 
 GDDLLoginLayer *GDDLLoginLayer::create() {
