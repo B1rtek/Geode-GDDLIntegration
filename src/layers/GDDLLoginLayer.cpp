@@ -1,10 +1,8 @@
 #include "GDDLLoginLayer.h"
 
 #include "Utils.h"
-#include "external/ca_bundle.h"
 #include "GDDLRatingSubmissionLayer.h"
 #include <Geode/Loader.hpp>
-#include <curl/curl.h>
 #include <Geode/ui/LoadingSpinner.hpp>
 
 bool GDDLLoginLayer::init() {
