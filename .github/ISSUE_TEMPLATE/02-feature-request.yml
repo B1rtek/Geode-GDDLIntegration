@@ -44,5 +44,5 @@ body:
       label: I am running the latest version of the mod
       description: Make sure to check that! If you aren't add information about that in Additional context below
       options:
-        - label: Yes
+        - label: Yes, I am
           required: false
