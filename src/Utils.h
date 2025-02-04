@@ -278,6 +278,10 @@ public:
         return false;
 #endif
     }
+
+    static std::string getUserAgent() {
+        return Mod::get()->getID() + "/" + Mod::get()->getVersion().toVString() + "; Geometry Dash/" + GEODE_GD_VERSION_STRING + "; Geode/" + Loader::get()->getVersion().toVString() + "; " + GEODE_PLATFORM_NAME;
+    }
 };
 
 #endif // GDDL_UTILS_H

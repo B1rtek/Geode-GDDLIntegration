@@ -671,7 +671,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                         // recurse
                         const std::string anotherRequest = formSearchRequest();
                         auto req = web::WebRequest();
-                        req.header("User-Agent", "gddlint uwu owo");
+                        req.header("User-Agent", Utils::getUserAgent());
                         searchListener.setFilter(req.get(anotherRequest));
                     } else {
                         GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
@@ -1110,7 +1110,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     requestRequestedPage = requestedPage;
     searchCallbackObject = callbackObject;
     auto req = web::WebRequest();
-    req.header("User-Agent", "gddlint uwu owo");
+    req.header("User-Agent", Utils::getUserAgent());
     searchListener.setFilter(req.get(request));
 }
 

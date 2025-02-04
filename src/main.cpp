@@ -53,7 +53,7 @@ class $modify(MenuLayer) {
             RatingsManager::triedToCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
-            req.header("User-Agent", "gddlint uwu owo");
+            req.header("User-Agent", Utils::getUserAgent());
             // if you're reading this because you treat this as an example of how to use the gddl api
             // cache
             // for the love of god

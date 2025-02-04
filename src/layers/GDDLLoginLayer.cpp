@@ -98,7 +98,7 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     reqJson["username"] = username;
     reqJson["password"] = password;
     auto req = web::WebRequest();
-    req.header("User-Agent", "gddlint uwu owo");
+    req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(reqJson);
     showLoadingCircle();
     loginListener.setFilter(req.post(loginEndpoint));
