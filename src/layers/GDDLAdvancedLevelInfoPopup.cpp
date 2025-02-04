@@ -98,6 +98,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", "gddlint uwu owo");
         spreadListener.setFilter(req.get(getSpreadEndpointUrl(this->gddlLevelID)));
     }
 

@@ -130,6 +130,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (tier == -1) {
             // web request 2.0 yaaay
             auto req = web::WebRequest();
+            req.header("User-Agent", "gddlint uwu owo");
             m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
         }
     }

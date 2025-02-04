@@ -182,6 +182,7 @@ void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
     const int tier = RatingsManager::getDemonTier(levelID);
     if (tier == -1) {
         auto req = web::WebRequest();
+        req.header("User-Agent", "gddlint uwu owo");
         m_fields->robtopLevelsLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
     }
 }

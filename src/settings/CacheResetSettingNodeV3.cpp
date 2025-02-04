@@ -28,6 +28,7 @@ void CacheResetSettingNodeV3::onCacheResetButtonClicked(CCObject *sender) {
     RatingsManager::clearCache();
     Utils::bindCacheDownloadCallback(cacheEventListener, true);
     auto req = web::WebRequest();
+    req.header("User-Agent", "gddlint uwu owo");
     cacheEventListener.setFilter(req.get(RatingsManager::gddlSheetUrl));
 }
 
