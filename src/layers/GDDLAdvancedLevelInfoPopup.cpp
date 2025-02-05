@@ -19,7 +19,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-advanced-level-info-bg"_spr);
@@ -32,8 +32,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLAdvancedLevelInfoPopup::onClose));
     m_buttonMenu->addChild(m_closeBtn);
