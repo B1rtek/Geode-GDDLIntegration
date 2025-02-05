@@ -242,3 +242,21 @@ bool Utils::isMobile() {
 std::string Utils::getUserAgent() {
     return Mod::get()->getID() + "/" + Mod::get()->getVersion().toVString() + "; Geometry Dash/" + GEODE_GD_VERSION_STRING + "; Geode/" + Loader::get()->getVersion().toVString() + "; " + GEODE_PLATFORM_NAME;
 }
+
+std::string Utils::getGrayPopupBG() {
+    const auto bgSetting = Mod::get()->getSettingValue<std::string>("popup-color");
+    int color = 5; // gray
+    if (bgSetting == "Blue") color = 2;
+    else if (bgSetting == "Green") color = 3;
+    else if (bgSetting == "Purple") color = 4;
+    return "GJ_square0" + std::to_string(color) + ".png";
+}
+
+CircleButtonSprite* Utils::getGrayPopupCloseButton(const float scale) {
+    const auto bgSetting = Mod::get()->getSettingValue<std::string>("popup-color");
+    auto color = CircleBaseColor::Gray;
+    if (bgSetting == "Blue") color = CircleBaseColor::Blue;
+    else if (bgSetting == "Green") color = CircleBaseColor::Green;
+    else if (bgSetting == "Purple") color = CircleBaseColor::DarkPurple;
+    return CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", scale, color);
+}

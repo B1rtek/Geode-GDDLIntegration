@@ -13,6 +13,9 @@
 #include "settings/ExcludeRangeSettingV3.h"
 
 class Utils {
+    const inline static std::vector<std::string> bgOptions = {
+        "Brown", "Blue", "Green", "Purple", "Gray", "White", "Transparent???"
+    };
 public:
     const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
 
@@ -59,6 +62,8 @@ public:
     static int getCorrectedFPS();
     static bool isMobile();
     static std::string getUserAgent();
+    static std::string getGrayPopupBG();
+    static CircleButtonSprite* getGrayPopupCloseButton(float scale = .85f);
 };
 
 template <typename T>
