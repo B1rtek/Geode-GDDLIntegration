@@ -87,7 +87,7 @@
 			"description": "<cy>Changes</c> the <cb>background color</c> of the gray backgrounds in <cr>this mod's</c> popups",
 			"type": "string",
 			"default": "Gray",
-			"one-of": ["Brown", "Blue", "Green", "Purple", "Gray", "White", "Transparent???"]
+			"one-of": ["Blue", "Green", "Purple", "Gray"]
 		},
 		"cache-reset-v3": {
 			"name": "Reset GDDL cache",
