@@ -63,7 +63,7 @@ public:
     static bool isMobile();
     static std::string getUserAgent();
     static std::string getGrayPopupBG();
-    static CircleButtonSprite* getGrayPopupCloseButton(float scale = .85f);
+    static CCSprite* getGrayPopupCloseButton(float scale = .85f);
 };
 
 template <typename T>

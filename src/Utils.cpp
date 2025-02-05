@@ -246,14 +246,20 @@ std::string Utils::getUserAgent() {
 std::string Utils::getGrayPopupBG() {
     const auto bgSetting = Mod::get()->getSettingValue<std::string>("popup-color");
     int color = 5; // gray
-    if (bgSetting == "Blue") color = 2;
+    if (bgSetting == "Brown") color = 1;
+    else if (bgSetting == "Blue") color = 2;
     else if (bgSetting == "Green") color = 3;
     else if (bgSetting == "Purple") color = 4;
     return "GJ_square0" + std::to_string(color) + ".png";
 }
 
-CircleButtonSprite* Utils::getGrayPopupCloseButton(const float scale) {
+CCSprite* Utils::getGrayPopupCloseButton(const float scale) {
     const auto bgSetting = Mod::get()->getSettingValue<std::string>("popup-color");
+    if (bgSetting == "Brown") {
+        const auto sprite = CCSprite::createWithSpriteFrameName("GJ_closeBtn_001.png");
+        sprite->setScale(scale / 0.85f);
+        return sprite;
+    }
     auto color = CircleBaseColor::Gray;
     if (bgSetting == "Blue") color = CircleBaseColor::Blue;
     else if (bgSetting == "Green") color = CircleBaseColor::Green;
