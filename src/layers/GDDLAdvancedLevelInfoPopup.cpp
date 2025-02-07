@@ -302,6 +302,10 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
+    if (!gddlRating) {
+        Notification::create("There was an error while loading the rating", NotificationIcon::Error)->show();
+        return;
+    }
     const auto &info = gddlRating.value();
     std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
     if (info.rating != -1) {
