@@ -1,0 +1,59 @@
+name: Bug Report
+description: Create a bug report
+title: "Bug: "
+labels: ["bug"]
+projects: ["B1rtek/Geode-GDDLIntegration"]
+assignees:
+  - B1rtek
+body:
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: The mod doesn't work!!!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: '1. Launch the game\n
+        2. The game crashes :('
+    validations:
+      required: true
+  - type: textarea
+    id: crashlog
+    attributes:
+      label: Crash log (from `Geometry Dash/geode/crashlogs`)
+      description: Paste either the full content or the relevant part
+      placeholder: 'Should begin like this:\n
+        2024-11-12T23:51:06+0100
+        Whoopsies! An unhandled exception has occurred.
+        
+        == Geode Information ==
+        Loader Version: v4.0.0-alpha.1
+        Loader Commit: 2036528
+        Bindings Commit: 1c05110
+        Installed mods: 62
+        Outdated mods: 58
+        Problems: 0'
+    validations:
+      required: true
+  - type: checkboxes
+    id: latest-version-check
+    attributes:
+      label: I am running the latest version of the mod
+      description: Make sure to check that! If you aren't add information about that in Additional context below
+      options:
+        - label: Yes, I am
+          required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+      placeholder: 'So I was cooking soup at the time I launched the game when GD decided to crash! I tried to investigate it myself, reinstalling Windows to check if that wasn''t the issue, tried replacing the CPU and my gaming chair but nothing helped, and then I realized that I burned my soup. Oops.'
+    validations:
+      required: false

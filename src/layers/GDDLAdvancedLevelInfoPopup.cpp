@@ -19,7 +19,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-advanced-level-info-bg"_spr);
@@ -32,8 +32,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLAdvancedLevelInfoPopup::onClose));
     m_buttonMenu->addChild(m_closeBtn);
@@ -98,6 +97,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         spreadListener.setFilter(req.get(getSpreadEndpointUrl(this->gddlLevelID)));
     }
 
@@ -302,6 +302,10 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
+    if (!gddlRating) {
+        Notification::create("There was an error while loading the rating", NotificationIcon::Error)->show();
+        return;
+    }
     const auto &info = gddlRating.value();
     std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
     if (info.rating != -1) {

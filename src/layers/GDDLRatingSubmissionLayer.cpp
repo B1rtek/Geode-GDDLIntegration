@@ -240,6 +240,7 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
             requestedUsername = secondPlayerTextfield->getString();
             requestURL += "?name=" + requestedUsername + "&chunk=25";
             auto req = web::WebRequest();
+            req.header("User-Agent", Utils::getUserAgent());
             userSearchListener.setFilter(req.get(requestURL));
         } else {
             makeSubmissionRequest();
@@ -484,6 +485,7 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
         return;
     }
     auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(submissionJson);
     req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
                                      Mod::get()->getSavedValue<std::string>("login-sig", ""),
@@ -515,6 +517,7 @@ void GDDLRatingSubmissionLayer::show() {
         } else {
             int userID = Mod::get()->getSavedValue<int>("login-userid", 0);
             auto req = web::WebRequest();
+            req.header("User-Agent", Utils::getUserAgent());
             userSubmissionCheckListener.setFilter(req.get(getUserSubmissionCheckEndpoint(userID, this->gddlLevelID)));
         }
     } else {

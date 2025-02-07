@@ -15,8 +15,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
-    matjson::Value reqJson;
-    EventListener<web::WebTask> loginListener, userIDListener;
+    EventListener<web::WebTask> loginListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
@@ -24,7 +23,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onLoginClicked(cocos2d::CCObject *sender);
 
     void prepareSearchListener();
-    void saveLoginData(const std::string& sid, const std::string& sig);
+    void saveLoginData(const std::string& sid, const std::string& sig, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();
@@ -32,7 +31,6 @@ class GDDLLoginLayer final : public FLAlertLayer {
     // getting around geode::web limitations
     std::pair<std::string, std::string> getCookieValue(const char* content);
     static size_t writeCallback(char *contents, size_t size, size_t nmemb, void *userp);
-    std::thread spawnLoginRequestThread();
 
 public:
     static GDDLLoginLayer* create();
