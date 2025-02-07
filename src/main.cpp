@@ -12,6 +12,7 @@
 #include "layers/GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "modified/GDDLRobtopLevelsLayer.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -49,6 +50,10 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
+        // keyBackClicked() being broken on android workaround
+#ifdef GEODE_IS_ANDROID
+        GDDLRobtopLevelsLayer::backActions();
+#endif
         if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
             RatingsManager::triedToCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);

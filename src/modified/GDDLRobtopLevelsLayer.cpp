@@ -68,13 +68,16 @@ void GDDLRobtopLevelsLayer::onBack(CCObject* sender) {
     backActions();
 }
 
+// keyBackClicked() being broken on android workaround
+#ifndef GEODE_IS_ANDROID
 void GDDLRobtopLevelsLayer::keyBackClicked() {
     LevelSelectLayer::keyBackClicked();
     backActions();
 }
+#endif
 
 void GDDLRobtopLevelsLayer::backActions() {
-    m_fields->beingBrowsed = false;
+    Fields::beingBrowsed = false;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }
 
