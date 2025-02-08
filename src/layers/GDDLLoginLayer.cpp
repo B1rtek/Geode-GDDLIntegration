@@ -12,7 +12,7 @@ bool GDDLLoginLayer::init() {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-login-bg"_spr);
@@ -30,8 +30,7 @@ bool GDDLLoginLayer::init() {
     title->setPosition({popupSize.x / 2, popupSize.y - 20.0f});
     m_buttonMenu->addChild(title);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLLoginLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
@@ -98,6 +97,7 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     reqJson["username"] = username;
     reqJson["password"] = password;
     auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(reqJson);
     showLoadingCircle();
     loginListener.setFilter(req.post(loginEndpoint));

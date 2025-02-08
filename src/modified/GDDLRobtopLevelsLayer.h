@@ -42,9 +42,10 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
 
     void onBack(CCObject *sender);
 
+    // keyBackClicked() being broken on android workaround
+#ifndef GEODE_IS_ANDROID
     virtual void keyBackClicked();
-
-    void backActions();
+#endif
 
     void pageChanged(int previousPage);
 
@@ -59,6 +60,9 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
     void onGDDLInfo(CCObject *sender);
 
     void updateButton(const int tier);
+
+public:
+    static void backActions();
 };
 
 #endif //GDDLROBTOPLEVELSLAYER_H

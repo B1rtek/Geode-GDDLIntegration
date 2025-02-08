@@ -68,13 +68,16 @@ void GDDLRobtopLevelsLayer::onBack(CCObject* sender) {
     backActions();
 }
 
+// keyBackClicked() being broken on android workaround
+#ifndef GEODE_IS_ANDROID
 void GDDLRobtopLevelsLayer::keyBackClicked() {
     LevelSelectLayer::keyBackClicked();
     backActions();
 }
+#endif
 
 void GDDLRobtopLevelsLayer::backActions() {
-    m_fields->beingBrowsed = false;
+    Fields::beingBrowsed = false;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }
 
@@ -182,6 +185,7 @@ void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
     const int tier = RatingsManager::getDemonTier(levelID);
     if (tier == -1) {
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         m_fields->robtopLevelsLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
     }
 }

@@ -1,6 +1,6 @@
 {
-	"geode": "4.0.0-beta.1",
-	"version": "v1.2.0",
+	"geode": "4.2.0",
+	"version": "v1.2.1",
 	"gd": {
 		"android": "2.2074",
 		"win": "2.2074"
@@ -34,7 +34,8 @@
 		"sprites": [
 			"resources/search.png",
 			"resources/gddlpopup.png",
-			"resources/tiers/*.png"
+			"resources/tiers/*.png",
+			"resources/skillsets/*.png"
 		]
 	},
 	"settings": {
@@ -81,6 +82,13 @@
 			"name": "Include/Exclude range",
 			"description": "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.",
 			"type": "custom:exclude-range-v3"
+		},
+		"popup-color": {
+			"name": "GDDL Popups color",
+			"description": "<cy>Changes</c> the <cb>background color</c> of the gray backgrounds in <cr>this mod's</c> popups",
+			"type": "string",
+			"default": "Gray",
+			"one-of": ["Brown", "Blue", "Green", "Purple", "Gray"]
 		},
 		"cache-reset-v3": {
 			"name": "Reset GDDL cache",
