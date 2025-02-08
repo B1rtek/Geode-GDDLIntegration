@@ -16,7 +16,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2 - 9.0f});
     bg->setID("gddl-rating-submit-bg"_spr);
@@ -35,8 +35,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     title->setPosition({popupSize.x / 2, popupSize.y - 20.0f});
     m_buttonMenu->addChild(title);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-        CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLRatingSubmissionLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
