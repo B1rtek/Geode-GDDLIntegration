@@ -34,7 +34,8 @@
 		"sprites": [
 			"resources/search.png",
 			"resources/gddlpopup.png",
-			"resources/tiers/*.png"
+			"resources/tiers/*.png",
+			"resources/skillsets/*.png"
 		]
 	},
 	"settings": {
