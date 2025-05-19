@@ -1,3 +1,8 @@
+# v1.2.2
+- Fixed a bug where the GDDL button was placed under the weekly/event demon label
+- Added iOS compatibility (I have no way to test this btw so I can't really help you if anything goes wrong)
+- "Fixed" a major bug in the ratings cache response parsing
+
 # v1.2.1
 - [Replaced the "crappy" skillset icons](https://github.com/B1rtek/Geode-GDDLIntegration/issues/72) with a pack created by Hubercioch (thank you so much!!!)
 - [Added an option to change the color of the gray backgrounds](https://github.com/B1rtek/Geode-GDDLIntegration/issues/74) in the login, submission and advanced level info popups

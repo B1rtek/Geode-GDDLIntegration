@@ -66,6 +66,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.0f,
                                                levelNamePosition.y - 14.5f};
+                        // move the weekly/event label
+                        if (m_level->m_dailyID > 100000) { // weekly: 100001 - 200000, event: 200000+, thanks prevter <3
+                            const auto weeklyLabelNode = getChildByID("daily-label");
+                            if (weeklyLabelNode != nullptr) {
+                                const auto weeklyLabel = typeinfo_cast<CCLabelBMFont*>(weeklyLabelNode);
+                                const auto weeklyLabelX = weeklyLabel->getPosition().x;
+                                weeklyLabel->setPosition({weeklyLabelX + 23.0f, weeklyLabel->getPosition().y});
+                            }
+                        }
                     } else { // left
                         menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.0f - 25.0f,
                                                levelNamePosition.y - 14.0f};
