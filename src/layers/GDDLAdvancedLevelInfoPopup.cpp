@@ -129,7 +129,8 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
     const std::string senderID = dynamic_cast<CCMenuItemSpriteExtra *>(sender)->getID();
     const int start = senderID.find("gddl-advanced-level-info-skillset-") + 34;
     const int end = senderID.size();
-    const int skillsetID = std::stoi(senderID.substr(start, end - start));
+    const std::string senderIDStr = senderID.substr(start, end - start);
+    const int skillsetID = numFromString<int>(senderIDStr).unwrapOr(0);
     FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(),
                          Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
 }

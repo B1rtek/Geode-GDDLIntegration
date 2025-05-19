@@ -40,7 +40,7 @@ class Skillsets {
 public:
     // thank you Hubercioch for the icons!
     const static inline std::vector<Skillset> skillsetsList = {
-            Skillset(), // just to align them with the IDs that start with 1
+            Skillset("skillset_cube.png", "Oops", "If you're seeing this, it's a sign that something went wrong."), // just to align them with the IDs that start with 1
             Skillset("skillset_cube.png", "Cube", "This level has cube sections that make up a large portion of its difficulty."),
             Skillset("skillset_ship.png", "Ship", "This level has ship sections that make up a large portion of its difficulty."),
             Skillset("skillset_ball.png", "Ball", "This level has ball sections that make up a large portion of its difficulty."),

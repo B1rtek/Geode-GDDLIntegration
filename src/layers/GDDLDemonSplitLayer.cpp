@@ -96,10 +96,17 @@ void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) { // NOLINT(*-conver
 void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
-    GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber, this);
-    // the list should display itself hopefully
-    showLoadingCircle();
+    const int start = tierStr.find("button-tier-") + 12;
+    const int end = tierStr.size();
+    const std::string tierNumberStr = tierStr.substr(start, end - start);
+    const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
+    if (maybeTierNumber.isOk()) {
+        GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
+        // the list should display itself hopefully
+        showLoadingCircle();
+    } else {
+        FLAlertLayer::create("Error", "Invalid tier number", "OK")->show();
+    }
 }
 
 void GDDLDemonSplitLayer::onEnter() {
