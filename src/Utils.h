@@ -18,6 +18,7 @@ class Utils {
     };
 public:
     const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
+    static constexpr int API_SWITCH_TIME = 1748167200;
 
     static std::string floatToString(float number, int precision);
     static unsigned int getCurrentTimestamp();

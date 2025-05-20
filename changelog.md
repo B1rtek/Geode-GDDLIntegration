@@ -1,7 +1,8 @@
-# v1.2.2
+# v1.2.3
 - Fixed a bug where the GDDL button was placed under the weekly/event demon label
-- Added iOS compatibility (I have no way to test this btw so I can't really help you if anything goes wrong)
-- "Fixed" a major bug in the ratings cache response parsing
+- Added iOS compatibility (I have no way to test this btw, so I can't really help you if anything goes wrong)
+- Fixed a major bug in the ratings cache response parsing
+- Added compatibility with GDDL API v2 (which will hopefully work correctly, we'll see
 
 # v1.2.1
 - [Replaced the "crappy" skillset icons](https://github.com/B1rtek/Geode-GDDLIntegration/issues/72) with a pack created by Hubercioch (thank you so much!!!)

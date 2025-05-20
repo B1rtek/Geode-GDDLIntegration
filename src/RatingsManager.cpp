@@ -178,13 +178,15 @@ void RatingsManager::cacheRatings(const std::string &response) {
                 ++linePos;
             }
             // values are in the vector now, we're only interested in the ID and the Rating
-            if (values.size() >= 6 && values[0].size() > 2 && values[5].size() > 2) {
-                const int id = std::stoi(values[0].substr(1, values[0].size() - 2));
-                std::string strRating = values[5].substr(1, values[5].size() - 2);
-                if (strRating.empty()) strRating = "-1.0";
-                const float rating = std::stof(strRating);
-                const int roundedRating = static_cast<int>(round(rating));
-                ratingsCache[id] = roundedRating;
+            if (values.size() >= 6 && values[4].size() > 2 && values[5].size() > 2) {
+                const std::string strID = values[4].substr(1, values[4].size() - 2);
+                if (const Result<int> maybeID = numFromString<int>(strID); maybeID.isOk()) {
+                    const int id = maybeID.unwrap();
+                    std::string strRating = values[5].substr(1, values[5].size() - 2);
+                    const float rating = numFromString<float>(strRating).unwrapOr(-1.0f);
+                    const int roundedRating = static_cast<int>(round(rating));
+                    ratingsCache[id] = roundedRating;
+                }
             }
         }
         // old code in case /theList comes back (it never will, there's no point in editing this for the new version of matjson but whatever)

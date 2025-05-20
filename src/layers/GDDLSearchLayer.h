@@ -1,6 +1,7 @@
 #ifndef GDDLSEARCHLAYER_H
 #define GDDLSEARCHLAYER_H
 
+#include <Utils.h>
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include "GDDLDemonSplitLayer.h"
@@ -47,8 +48,15 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {
             "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
-    const inline static std::vector<std::string> sort = {"ID",          "Name",           "Rating", "Enjoyment",
-                                                         "RatingCount", "EnjoymentCount", "Random"};
+    const inline static std::vector<std::string> sort = {
+        "ID",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "Name" : "name",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "Rating" : "rating",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "Enjoyment" : "enjoyment",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "RatingCount" : "ratingCount",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "EnjoymentCount" : "enjoymentCount",
+        time(nullptr) < Utils::API_SWITCH_TIME ? "Random" : "random"
+    };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
