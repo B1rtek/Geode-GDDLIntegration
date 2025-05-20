@@ -1,5 +1,7 @@
 #include "Submission.h"
 
+#include <Utils.h>
+
 /**
  * request
  * {
@@ -37,7 +39,7 @@ Submission::Submission(matjson::Value json, bool request) {
         this->rating = json.contains("rating") ? json["rating"].asInt().unwrap() : 0;
         this->enjoyment = json.contains("enjoyment") ? json["enjoyment"].asInt().unwrap() : -1;
         this->refreshRate = json.contains("refreshRate") ? json["refreshRate"].asInt().unwrap() : -1;
-        this->device = json["device"].asInt().unwrap();
+        this->device = json.contains("device") ? (time(nullptr) < Utils::API_SWITCH_TIME ? json["device"].asInt().unwrap() : json["device"].asString().unwrap() == "pc" ? 1 : 2) : 1;
         this->proof = json.contains("proof") ? json["proof"].asString().unwrap() : "";
         this->progress = json["progress"].asInt().unwrap();
         this->attempts = json.contains("attempts") ? json["attempts"].asInt().unwrap() : -1;
@@ -48,7 +50,7 @@ Submission::Submission(matjson::Value json, bool request) {
         this->rating = !json["Rating"].isNull() ? json["Rating"].asInt().unwrap() : 0;
         this->enjoyment = !json["Enjoyment"].isNull() ? json["Enjoyment"].asInt().unwrap() : -1;
         this->refreshRate = !json["RefreshRate"].isNull() ? json["RefreshRate"].asInt().unwrap() : -1;
-        this->device = !json["Device"].isNull() ? (json["Device"].asString().unwrap() == "PC" ? 1 : 2) : 1;
+        this->device = !json["Device"].isNull() ? (json["Device"].asString().unwrap() == "pc" ? 1 : 2) : 1;
         this->proof = !json["Proof"].isNull() ? json["Proof"].asString().unwrap() : "";
         this->isSolo = !json["IsSolo"].isNull() ? json["IsSolo"].asBool().unwrap() : true;
         this->secondPlayerID = !json["SecondPlayerID"].isNull() ? json["SecondPlayerID"].asInt().unwrap() : -1;

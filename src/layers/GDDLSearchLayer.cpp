@@ -481,27 +481,29 @@ std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, cons
 
 std::string GDDLSearchLayer::formSearchRequest() {
     std::string request = searchEndpoint;
-    request += "?page=" + std::to_string(onlinePagesFetched + 1) + "&chunk=50";
+    request += "?page=" + std::to_string(onlinePagesFetched + 1) + (time(nullptr) < Utils::API_SWITCH_TIME ? "&chunk=50" : "&limit=25");
     request += addStringToRequest("name", name);
-    request += addValueToRequest("lowTier", lowTier, 0);
-    request += addValueToRequest("highTier", highTier, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "lowTier" : "minRating", lowTier, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "highTier" : "maxRating", highTier, 0);
     request += addValueToRequest("difficulty", difficulty+1, 6); // API 1.9.0 - diffs 1-5
     request += addStringToRequest("creator", creator);
     request += addStringToRequest("song", song);
-    request += addBoolToRequest("exactName", exactName);
-    request += addBoolToRequest("removeUnrated", removeUnrated);
-    request += addBoolToRequest("removeUnratedEnj", removeUnratedEnj);
-    request += addBoolToRequest("removeRated", removeRated);
-    request += addBoolToRequest("removeRatedEnj", removeRatedEnj);
-    request += addValueToRequest("subLowCount", subLowCount, 0);
-    request += addValueToRequest("subHighCount", subHighCount, 0);
-    request += addValueToRequest("enjLowCount", enjLowCount, 0);
-    request += addValueToRequest("enjHighCount", enjHighCount, 0);
-    request += addValueToRequest("enjLow", enjLow, 0.0f);
-    request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
+    if (time(nullptr) < Utils::API_SWITCH_TIME) {
+        request += addBoolToRequest("exactName", exactName);
+    }
+    request += addBoolToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "removeUnrated" : "excludeUnrated", removeUnrated);
+    request += addBoolToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "removeUnratedEnj" : "excludeUnratedEnjoyment", removeUnratedEnj);
+    request += addBoolToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "removeRated" : "excludeRated", removeRated);
+    request += addBoolToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "removeRatedEnj" : "excludeRatedEnjoyment", removeRatedEnj);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "subLowCount" : "minSubmissionCount", subLowCount, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "subHighCount" : "maxSubmissionCount", subHighCount, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "enjLowCount" : "minEnjoymentCount", enjLowCount, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "enjHighCount" : "maxEnjoymentCount", enjHighCount, 0);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "enjLow" : "minEnjoyment", enjLow, 0.0f);
+    request += addValueToRequest(time(nullptr) < Utils::API_SWITCH_TIME ? "enjHigh" : "maxEnjoyment", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
-    log::debug("Search request: {}", request);
+    log::info("Search request: {}", request);
     return request;
 }
 
@@ -594,8 +596,9 @@ int GDDLSearchLayer::getMaxPotentialPages() {
 }
 
 int GDDLSearchLayer::getOnlinePagesCount() {
-    const int correction = totalOnlineResults % 50 == 0 ? 0 : 1;
-    return totalOnlineResults / 50 + correction;
+    const int chunk = time(nullptr) < Utils::API_SWITCH_TIME ? 50 : 25;
+    const int correction = totalOnlineResults % chunk == 0 ? 0 : 1;
+    return totalOnlineResults / chunk + correction;
 }
 
 GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, const int lastIndex) {
