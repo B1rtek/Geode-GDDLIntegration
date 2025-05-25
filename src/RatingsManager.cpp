@@ -178,8 +178,8 @@ void RatingsManager::cacheRatings(const std::string &response) {
                 ++linePos;
             }
             // values are in the vector now, we're only interested in the ID and the Rating
-            if (values.size() >= 6 && values[4].size() > 2 && values[5].size() > 2) {
-                const std::string strID = values[4].substr(1, values[4].size() - 2);
+            if (values.size() >= 6 && values[0].size() > 2 && values[5].size() > 2) {
+                const std::string strID = values[0].substr(1, values[0].size() - 2);
                 if (const Result<int> maybeID = numFromString<int>(strID); maybeID.isOk()) {
                     const int id = maybeID.unwrap();
                     std::string strRating = values[5].substr(1, values[5].size() - 2);
