@@ -149,6 +149,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static GJSearchObject *makeASearchObjectFrom(int firstIndex, int lastIndex);
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
+    static void hideAnyLoadingCircle();
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     static void prepareSearchListener();
     // utility (that and Utils.h)

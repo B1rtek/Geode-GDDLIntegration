@@ -639,19 +639,23 @@ std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
     return {firstIndex, lastIndex};
 }
 
+void GDDLSearchLayer::hideAnyLoadingCircle() {
+    if (demonSplitLayer != nullptr) {
+        demonSplitLayer->hideLoadingCircle();
+        demonSplitLayer = nullptr;
+    }
+    if (searchLayer != nullptr) {
+        searchLayer->hideLoadingCircle();
+    }
+}
+
 void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
                                          const int resultsCount) {
     if(callbackObject != nullptr) { // search continues
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         // remove any loading circles
-        if (demonSplitLayer != nullptr) {
-            demonSplitLayer->hideLoadingCircle();
-            demonSplitLayer = nullptr;
-        }
-        if (searchLayer != nullptr) {
-            searchLayer->hideLoadingCircle();
-        }
+        hideAnyLoadingCircle();
         // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
@@ -664,24 +668,38 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
 void GDDLSearchLayer::prepareSearchListener() {
     searchListener.bind([] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
-                const std::string response = res->string().unwrapOrDefault();
-                if (response.empty()) {
-                    Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
-                } else {
-                    appendFetchedResults(response);
-                    auto [fst, snd] = getReadyRange(requestRequestedPage);
-                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                        // recurse
-                        const std::string anotherRequest = formSearchRequest();
-                        auto req = web::WebRequest();
-                        req.header("User-Agent", Utils::getUserAgent());
-                        searchListener.setFilter(req.get(anotherRequest));
+                if (res->code() == 200) {
+                    const std::string response = res->string().unwrapOrDefault();
+                    if (response.empty()) {
+                        Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
                     } else {
-                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
-                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                        appendFetchedResults(response);
+                        auto [fst, snd] = getReadyRange(requestRequestedPage);
+                        if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                            // recurse
+                            const std::string anotherRequest = formSearchRequest();
+                            auto req = web::WebRequest();
+                            req.header("User-Agent", Utils::getUserAgent());
+                            searchListener.setFilter(req.get(anotherRequest));
+                        } else {
+                            GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                            handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                        }
                     }
+                } else {
+                    // not success!
+                    const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+                    std::string error = "Unknown error";
+                    if (jsonResponse.contains("message")) {
+                        error = jsonResponse["message"].asString().unwrap();
+                    }
+                    stopSearch();
+                    hideAnyLoadingCircle();
+                    Notification::create(error, NotificationIcon::Error, 2)->show();
                 }
             } else if (e->isCancelled()) {
+                stopSearch();
+                hideAnyLoadingCircle();
                 Notification::create("Search failed - check your internet connection!", NotificationIcon::Error, 2)->show();
             }
         });
