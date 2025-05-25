@@ -142,10 +142,7 @@ void GDDLLoginLayer::prepareSearchListener() {
                 }
             } else {
                 // not success!
-                std::string error = "Unknown error";
-                if (jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
                 hideLoadingCircle();
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
@@ -180,12 +177,6 @@ void GDDLLoginLayer::showLoadingCircle() {
 
 void GDDLLoginLayer::hideLoadingCircle() {
     m_buttonMenu->removeChildByID("gddl-login-loading-spinner"_spr);
-}
-
-size_t GDDLLoginLayer::writeCallback(char *contents, size_t size, size_t nmemb, void *userp) {
-    // stack overflow yay https://stackoverflow.com/questions/44994203/how-to-get-the-http-response-string-using-curl-in-c
-    ((std::string *) userp)->append((char *) contents, size * nmemb);
-    return size * nmemb;
 }
 
 std::pair<std::string, std::string> GDDLLoginLayer::getCookieValue(const char *content) {

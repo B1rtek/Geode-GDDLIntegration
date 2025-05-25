@@ -31,7 +31,6 @@ class GDDLLoginLayer final : public FLAlertLayer {
 
     // getting around geode::web limitations
     std::pair<std::string, std::string> getCookieValue(const char* content);
-    static size_t writeCallback(char *contents, size_t size, size_t nmemb, void *userp);
 
 public:
     static GDDLLoginLayer* create();

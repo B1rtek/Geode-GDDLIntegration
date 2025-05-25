@@ -212,7 +212,7 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject* sender) {
  *  "rating":2,
  *  "enjoyment":6,
  *  "refreshRate":60,
- *  "device":1, - 1 for pc, 2 for mobile
+ *  "device": "pc" or "mobile" - api V2 change
  *  "proof":"https://youtu.be/3-BUEoH9WBs",
  *  "progress":100,
  *  "attempts":403,
@@ -340,7 +340,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 std::string message = "Rating submitted!";
-                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].asBool().unwrap()) {
+                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].isBool() && jsonResponse["wasAuto"].asBool().unwrap()) {
                     message = "Submission accepted!";
                 }
                 // cache submitted submission
@@ -349,15 +349,12 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 Notification::create(message, NotificationIcon::Success, 2)->show();
                 onClose(nullptr);
             } else {
-                std::string error = "Unknown error";
-                if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                    if (error == "Authentication failed!") {
-                        LoginSettingNodeV3::logOut();
-                        GDDLLoginLayer::create()->show();
-                        Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
-                        return;
-                    }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                if (error == "Authentication failed!" || error == "Unauthorized") {
+                    LoginSettingNodeV3::logOut();
+                    GDDLLoginLayer::create()->show();
+                    Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
+                    return;
                 }
                 // cache that no submission was made
                 RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
@@ -382,10 +379,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     Notification::create(id == -1 ? "Second player not found!" : "An error occurred", NotificationIcon::Error, 2)->show();
                 }
             } else {
-                std::string error = "Unknown error";
-                if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         }
@@ -402,9 +396,9 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
             } else {
-                if (!jsonResponse.contains("error") || jsonResponse["error"].asString().unwrap() != "Submission not found!") {
-                    Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
-                } else {
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                Notification::create(error, NotificationIcon::Warning, 2)->show();
+                if (error == "Submission not found!") {
                     // save an empty one
                     RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 }

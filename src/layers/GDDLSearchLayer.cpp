@@ -614,7 +614,6 @@ int GDDLSearchLayer::getOnlinePagesCount() {
 GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, const int lastIndex) {
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
-        const int id = cachedResults[i];
         requestString += std::to_string(cachedResults[i]) + ',';
     }
     if (!requestString.empty()) {
@@ -699,10 +698,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                 } else {
                     // not success!
                     const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                    std::string error = "Unknown error";
-                    if (jsonResponse.contains("message")) {
-                        error = jsonResponse["message"].asString().unwrap();
-                    }
+                    const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
                     stopSearch();
                     hideAnyLoadingCircle();
                     Notification::create(error, NotificationIcon::Error, 2)->show();
