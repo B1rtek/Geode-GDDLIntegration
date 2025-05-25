@@ -269,7 +269,7 @@ void GDDLSearchLayer::showPage() {
 
 void GDDLSearchLayer::loadValues() {
     if(!simplified) {
-        page = 1;
+        page = 0;
         nameTextfield->setString(name.c_str());
         Utils::setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
         Utils::setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
@@ -326,7 +326,7 @@ void GDDLSearchLayer::saveValues() {
 
 // ReSharper disable once CppDFAUnreachableFunctionCall
 void GDDLSearchLayer::resetValues() {
-    page = 1;
+    page = 0;
     nameTextfield->setString("");
     Utils::setNumberWithDefZeroTextfield(0, tierLowTextfield);
     Utils::setNumberWithDefZeroTextfield(0, tierHighTextfield);
@@ -481,7 +481,7 @@ std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, cons
 
 std::string GDDLSearchLayer::formSearchRequest() {
     std::string request = searchEndpoint;
-    request += "?page=" + std::to_string(onlinePagesFetched + 1) + "&limit=25";
+    request += "?page=" + std::to_string(onlinePagesFetched) + "&limit=25";
     request += addStringToRequest("name", name);
     request += addValueToRequest("minRating", lowTier, 0);
     request += addValueToRequest("maxRating", highTier, 0);
@@ -640,7 +640,7 @@ void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
 }
 
 std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
-    const int firstIndex = (requestedPage - 1) * 10;
+    const int firstIndex = requestedPage * 10;
     const int lastIndex = std::min(firstIndex + 10, static_cast<int>(cachedResults.size())); // last index + 1
     return {firstIndex, lastIndex};
 }
@@ -956,7 +956,7 @@ void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
     onlinePagesFetched = 0;
     searching = true;
     showLoadingCircle();
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 void GDDLSearchLayer::onResetClicked(CCObject *sender) { resetValues(); }
@@ -1000,7 +1000,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     onlinePagesFetched = 0;
     searching = true;
     showLoadingCircle();
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 void GDDLSearchLayer::setNumberFloatTextfield(const float value, CCTextInputNode *&textfield) {
@@ -1119,8 +1119,8 @@ void GDDLSearchLayer::saveSettings() {
 
 void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject) {
     // check whether the cache already contains results for this query
-    if (requestedPage < 1) {
-        requestedPage = 1;
+    if (requestedPage < 0) {
+        requestedPage = 0;
     }
     if (!cachedResults.empty()) {
         const int maxPotentialPages = getMaxPotentialPages();
@@ -1168,7 +1168,7 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplit
     prepareSearchListener();
     // save the layer to remove the loading circle later
     demonSplitLayer = layer;
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 int GDDLSearchLayer::getSearchResultsPageCount() { return getMaxPotentialPages(); }
