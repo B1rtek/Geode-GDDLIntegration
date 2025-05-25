@@ -224,10 +224,10 @@ int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, con
     const auto resultsList = jsonResponse.asArray().unwrap();
     int id = -1;
     for (const auto& result : resultsList) {
-        if (!result.contains("Name") || !result.contains("ID")) {
+        if (!result.contains("ID") || !result["ID"].isNumber()) {
             continue;
         }
-        if (result["Name"] == requestedUsername) {
+        if (result["Name"].asString().unwrapOr("") == requestedUsername) {
             id = result["ID"].asInt().unwrap();
             break;
         }
