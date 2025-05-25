@@ -533,13 +533,23 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     const auto maybeResponseJson = matjson::parse(response);
     if (maybeResponseJson.isOk()) {
         const matjson::Value& responseJson = maybeResponseJson.unwrap();
-        const int total = responseJson["total"].asInt().unwrap();
+        if (!responseJson.contains("levels")) {
+            // well, the json is probably wrong
+            const std::string error = responseJson["message"].asString().unwrapOr("Server returned invalid response (no error message)");
+            Notification::create(error, NotificationIcon::Error, 2)->show();
+            return results;
+        }
+        const int total = responseJson["total"].asInt().unwrapOr(-1);
+        if (total == -1) {
+            Notification::create("Server returned invalid response (no total)", NotificationIcon::Error, 2)->show();
+            return results;
+        }
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
         matjson::Value levelList = responseJson["levels"];
         for (auto element: levelList.asArray().unwrap()) {
-            const int levelID = element["ID"].asInt().unwrap();
+            const int levelID = element["ID"].asInt().unwrapOr(0); // this way a missing ID won't matter
             if (levelID > 3) { // to avoid official demons
-                results.push_back(element["ID"].asInt().unwrap());
+                results.push_back(levelID);
                 if(!element["Rating"].isNull()) {
                     const float rating = element["Rating"].asDouble().unwrap();
                     RatingsManager::updateCacheFromSearch(levelID, rating);
