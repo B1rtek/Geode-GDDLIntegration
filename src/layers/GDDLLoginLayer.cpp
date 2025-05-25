@@ -109,7 +109,6 @@ void GDDLLoginLayer::prepareSearchListener() {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                 saveLoginData("gddl.sid", "gddl.sid.sig", 0);
                 std::optional<std::vector<std::string>> cookies = res->getAllHeadersNamed("set-cookie");
                 if (cookies.has_value()) {
@@ -130,25 +129,25 @@ void GDDLLoginLayer::prepareSearchListener() {
                             closeLoginPanel();
                         } else {
                             hideLoadingCircle();
-                            Notification::create("Failed to obtain the user id!", NotificationIcon::Error, 2)->show();
+                            Notification::create("Error during login - failed to obtain the user id", NotificationIcon::Error, 2)->show();
                         }
                     } else {
                         hideLoadingCircle();
-                        Notification::create("Server returned invalid response", NotificationIcon::Error, 2)->show();
+                        Notification::create("Error during login - server returned invalid response", NotificationIcon::Error, 2)->show();
                     }
                 } else {
                     hideLoadingCircle();
-                    Notification::create("An error occurred!", NotificationIcon::Error, 2)->show();
+                    Notification::create("Error during login - no session cookie received", NotificationIcon::Error, 2)->show();
                 }
             } else {
                 // not success!
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during login - unknown error");
                 hideLoadingCircle();
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            Notification::create("Error during login - requrest cancelled", NotificationIcon::Error, 2)->show();
         }
     });
 }

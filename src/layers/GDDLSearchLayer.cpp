@@ -532,13 +532,13 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
         const matjson::Value& responseJson = maybeResponseJson.unwrap();
         if (!responseJson.contains("levels")) {
             // well, the json is probably wrong
-            const std::string error = responseJson["message"].asString().unwrapOr("Server returned invalid response (no error message)");
+            const std::string error = responseJson["message"].asString().unwrapOr("Server returned invalid response - unknown error");
             Notification::create(error, NotificationIcon::Error, 2)->show();
             return results;
         }
         const int total = responseJson["total"].asInt().unwrapOr(-1);
         if (total == -1) {
-            Notification::create("Server returned invalid response (no total)", NotificationIcon::Error, 2)->show();
+            Notification::create("Server returned invalid response - no total results amount", NotificationIcon::Error, 2)->show();
             return results;
         }
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
@@ -677,7 +677,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                 if (res->code() == 200) {
                     const std::string response = res->string().unwrapOrDefault();
                     if (response.empty()) {
-                        Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
+                        Notification::create("Search failed - received empty response", NotificationIcon::Error, 2)->show();
                     } else {
                         appendFetchedResults(response);
                         auto [fst, snd] = getReadyRange(requestRequestedPage);
@@ -695,7 +695,7 @@ void GDDLSearchLayer::prepareSearchListener() {
                 } else {
                     // not success!
                     const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                    const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                    const std::string error = jsonResponse["message"].asString().unwrapOr("Search failed - unknown error");
                     stopSearch();
                     hideAnyLoadingCircle();
                     Notification::create(error, NotificationIcon::Error, 2)->show();
@@ -703,7 +703,7 @@ void GDDLSearchLayer::prepareSearchListener() {
             } else if (e->isCancelled()) {
                 stopSearch();
                 hideAnyLoadingCircle();
-                Notification::create("Search failed - check your internet connection!", NotificationIcon::Error, 2)->show();
+                Notification::create("Search failed - request cancelled", NotificationIcon::Error, 2)->show();
             }
         });
 }

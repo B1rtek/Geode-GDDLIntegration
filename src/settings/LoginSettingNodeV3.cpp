@@ -54,11 +54,11 @@ void LoginSettingNodeV3::prepareLogoutListener() {
             } else {
                 // hmmm
                 const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                const std::string error = jsonResponse["message"].asString().unwrapOr("An error occurred while logging out (server did not return 201)");
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during logout - unknown error");
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         } else if (e->isCancelled()) {
-            Notification::create("An error occurred while logging out", NotificationIcon::Error, 2)->show();
+            Notification::create("Error during logout - request cancelled", NotificationIcon::Error, 2)->show();
         }
     });
 }

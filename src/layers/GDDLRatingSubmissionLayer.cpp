@@ -349,7 +349,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 Notification::create(message, NotificationIcon::Success, 2)->show();
                 onClose(nullptr);
             } else {
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while submitting rating - unknown error");
                 if (error == "Authentication failed!" || error == "Unauthorized") {
                     LoginSettingNodeV3::logOut();
                     GDDLLoginLayer::create()->show();
@@ -360,11 +360,10 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
-        }
-        else if (e->isCancelled()) {
+        } else if (e->isCancelled()) {
             // cache that no submission was made
             RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            Notification::create("Error while submitting rating - request cancelled", NotificationIcon::Error, 2)->show();
         }
     });
     userSearchListener.bind([this](web::WebTask::Event* e) {
@@ -376,15 +375,15 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     submissionJson["secondPlayerID"] = id;
                     makeSubmissionRequest();
                 } else {
-                    Notification::create(id == -1 ? "Second player not found!" : "An error occurred", NotificationIcon::Error, 2)->show();
+                    Notification::create(id == -1 ? "Second player not found!" : "Error while finding second player - server returned invalid response", NotificationIcon::Error, 2)->show();
                 }
             } else {
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while finding second player - unknown error");
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            Notification::create("Error while finding second player - request cancelled", NotificationIcon::Error, 2)->show();
         }
     });
     userSubmissionCheckListener.bind([this](web::WebTask::Event* e) {
@@ -396,7 +395,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
             } else {
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Unknown error");
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while checking for existing submission - unknown error");
                 Notification::create(error, NotificationIcon::Warning, 2)->show();
                 if (error == "Submission not found!") {
                     // save an empty one
@@ -405,7 +404,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
+            Notification::create("Error while checking for existing submission - request cancelled", NotificationIcon::Warning, 2)->show();
         }
     });
 }
