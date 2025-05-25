@@ -237,7 +237,7 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
             // a request to retrieve the userid has to be made first before making the submission request
             std::string requestURL = userSearchEndpoint;
             requestedUsername = secondPlayerTextfield->getString();
-            requestURL += "?name=" + requestedUsername + (time(nullptr) < Utils::API_SWITCH_TIME ? "&chunk=25" : "&limit=25");
+            requestURL += "?name=" + requestedUsername + "&limit=25";
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());
             userSearchListener.setFilter(req.get(requestURL));
@@ -419,11 +419,7 @@ bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
 
 std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
     submissionJson["levelID"] = this->gddlLevelID;
-    if (time(nullptr) < Utils::API_SWITCH_TIME) {
-        submissionJson["device"] = mobile ? 2 : 1;
-    } else {
-        submissionJson["device"] = mobile ? "mobile" : "pc";
-    }
+    submissionJson["device"] = mobile ? "mobile" : "pc";
     const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
     if (correctedRating != 0) {
         submissionJson["rating"] = correctedRating;

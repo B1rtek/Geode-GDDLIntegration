@@ -65,18 +65,13 @@ void LoginSettingNodeV3::prepareLogoutListener() {
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
     if (loggedIn()) {
-        if (time(nullptr) < Utils::API_SWITCH_TIME) {
-            logOut();
-            this->markChanged(nullptr);
-        } else {
-            // logout request
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
-                                     Mod::get()->getSavedValue<std::string>("login-sig", ""),
-                                     Mod::get()->getSavedValue<std::string>("login-sid", "")));
-            logoutListener.setFilter(req.post(logoutEndpoint));
-        }
+        // logout request
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
+                                 Mod::get()->getSavedValue<std::string>("login-sig", ""),
+                                 Mod::get()->getSavedValue<std::string>("login-sid", "")));
+        logoutListener.setFilter(req.post(logoutEndpoint));
     } else {
         const auto loginLayer = GDDLLoginLayer::create();
         loginLayer->setSettingNode(this);

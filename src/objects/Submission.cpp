@@ -44,7 +44,7 @@ Submission::Submission(matjson::Value json, bool request) {
         this->progress = json["progress"].asInt().unwrapOr(-1);
         this->attempts = json["attempts"].asInt().unwrapOr(-1);
         this->isSolo = json["isSolo"].asBool().unwrapOr(true);
-        this->secondPlayerID = !this->isSolo ? json["secondPlayerID"].asInt().unwrapOr(-1);
+        this->secondPlayerID = !this->isSolo ? json["secondPlayerID"].asInt().unwrapOr(-1) : -1;
     } else {
         this->levelID = json["LevelID"].asInt().unwrapOr(-1);
         this->rating = json["Rating"].asInt().unwrapOr(0);

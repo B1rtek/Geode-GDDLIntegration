@@ -49,13 +49,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     const inline static std::vector<std::string> sortBy = {
             "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
     const inline static std::vector<std::string> sort = {
-        "ID",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "Name" : "name",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "Rating" : "rating",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "Enjoyment" : "enjoyment",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "RatingCount" : "ratingCount",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "EnjoymentCount" : "enjoymentCount",
-        time(nullptr) < Utils::API_SWITCH_TIME ? "Random" : "random"
+        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "random"
     };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;

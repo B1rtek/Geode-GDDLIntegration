@@ -15,7 +15,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCTextInputNode* passwordTextField = nullptr;
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
-    const inline static std::string loginEndpoint = time(nullptr) < Utils::API_SWITCH_TIME ? "https://gdladder.com/api/login" : "https://gdladder.com/api/account/login";
+    const inline static std::string loginEndpoint = "https://gdladder.com/api/account/login";
     EventListener<web::WebTask> loginListener;
     LoginSettingNodeV3* settingNode;
 

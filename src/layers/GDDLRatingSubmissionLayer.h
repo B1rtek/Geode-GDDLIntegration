@@ -20,7 +20,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCLabelBMFont* deviceLabel = nullptr;
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
-    const inline static std::string submissionEndpoint = time(nullptr) < Utils::API_SWITCH_TIME ? "https://gdladder.com/api/submit" : "https://gdladder.com/api/submissions";
+    const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
     EventListener<web::WebTask> submissionListener, userSearchListener, userSubmissionCheckListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
