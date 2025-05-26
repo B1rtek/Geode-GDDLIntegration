@@ -221,7 +221,7 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject* sender) {
  *  }
  *
  *  headers:
- *  Cookie: gddl.sid.sig=<sid.sig>; gddl.sid=<sid>
+ *  Cookie: gddl.sid=<sid>
  */
 
 void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
@@ -338,7 +338,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
     submissionListener.bind([this](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
+            if (res->code() == 201) {
                 std::string message = "Rating submitted!";
                 if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].isBool() && jsonResponse["wasAuto"].asBool().unwrap()) {
                     message = "Submission accepted!";
@@ -396,10 +396,11 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 showAlreadySubmittedWarning();
             } else {
                 const std::string error = jsonResponse["message"].asString().unwrapOr("Error while checking for existing submission - unknown error");
-                Notification::create(error, NotificationIcon::Warning, 2)->show();
-                if (error == "Submission not found!") {
+                if (error == "Submission not found") {
                     // save an empty one
                     RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
+                } else {
+                    Notification::create(error, NotificationIcon::Warning, 2)->show();
                 }
             }
         }
@@ -479,8 +480,7 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(submissionJson);
-    req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
-                                     Mod::get()->getSavedValue<std::string>("login-sig", ""),
+    req.header("Cookie", fmt::format("gddl.sid={}",
                                      Mod::get()->getSavedValue<std::string>("login-sid", "")));
     submissionListener.setFilter(req.post(submissionEndpoint));
 }

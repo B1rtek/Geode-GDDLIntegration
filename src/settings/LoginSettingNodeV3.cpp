@@ -47,7 +47,7 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
 void LoginSettingNodeV3::prepareLogoutListener() {
     logoutListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
-            if (res->code() == 200 || res->code() == 201) {
+            if (res->code() == 201) {
                 Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
                 logOut();
                 this->markChanged(nullptr);
@@ -68,8 +68,7 @@ void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
         // logout request
         auto req = web::WebRequest();
         req.header("User-Agent", Utils::getUserAgent());
-        req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
-                                 Mod::get()->getSavedValue<std::string>("login-sig", ""),
+        req.header("Cookie", fmt::format("gddl.sid={}",
                                  Mod::get()->getSavedValue<std::string>("login-sid", "")));
         logoutListener.setFilter(req.post(logoutEndpoint));
     } else {
@@ -80,13 +79,12 @@ void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
 }
 
 bool LoginSettingNodeV3::loggedIn() {
-    return !Mod::get()->getSavedValue<std::string>("login-sig", "").empty();
+    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty();
 }
 
 void LoginSettingNodeV3::logOut() {
     const std::string emptyString;
     Mod::get()->setSavedValue("login-sid", emptyString);
-    Mod::get()->setSavedValue("login-sig", emptyString);
     RatingsManager::clearSubmissionCache();
 }
 

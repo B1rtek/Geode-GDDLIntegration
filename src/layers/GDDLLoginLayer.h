@@ -16,7 +16,8 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/account/login";
-    EventListener<web::WebTask> loginListener;
+    const inline static std::string meEndpoint = "https://gdladder.com/api/user/me";
+    EventListener<web::WebTask> loginListener, meListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
@@ -24,7 +25,8 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onLoginClicked(cocos2d::CCObject *sender);
 
     void prepareSearchListener();
-    void saveLoginData(const std::string& sid, const std::string& sig, int uid);
+    void prepareMeListener();
+    void saveLoginData(const std::string& sid, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();
