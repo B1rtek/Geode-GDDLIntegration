@@ -73,6 +73,7 @@ bool GDDLLoginLayer::init() {
     m_buttonMenu->reorderChild(loginButton, 10);
 
     prepareSearchListener();
+    prepareMeListener();
 
     return true;
 }
@@ -109,8 +110,7 @@ void GDDLLoginLayer::prepareSearchListener() {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                saveLoginData("gddl.sid", "gddl.sid.sig", 0);
+                saveLoginData("gddl.sid", 0);
                 std::optional<std::vector<std::string>> cookies = res->getAllHeadersNamed("set-cookie");
                 if (cookies.has_value()) {
                     std::map<std::string, std::string> cookiesMap;
@@ -118,48 +118,61 @@ void GDDLLoginLayer::prepareSearchListener() {
                         const auto [name, value] = getCookieValue(cookie.c_str());
                         cookiesMap[name] = value;
                     }
-                    if (cookiesMap.contains("gddl.sid") && cookiesMap.contains("gddl.sid.sig")) {
+                    if (cookiesMap.contains("gddl.sid")) {
                         // get uid
-                        std::string decodedCookie = ZipUtils::base64URLDecode(cookiesMap["gddl.sid"]);
-                        const auto decodedJson = matjson::parse(decodedCookie);
-                        if (decodedJson.isOk() && decodedJson.unwrap().contains("userID")) {
-                            const int uid = decodedJson.unwrap()["userID"].asInt().unwrap();
-                            saveLoginData(cookiesMap["gddl.sid"], cookiesMap["gddl.sid.sig"], uid);
-                            RatingsManager::clearSubmissionCache();
-                            Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                            closeLoginPanel();
-                        } else {
-                            hideLoadingCircle();
-                            Notification::create("Failed to obtain the user id!", NotificationIcon::Error, 2)->show();
-                        }
+                        saveLoginData(cookiesMap["gddl.sid"], 0);
+                        auto req = web::WebRequest();
+                        req.header("User-Agent", Utils::getUserAgent());
+                        req.header("Cookie", fmt::format("gddl.sid={}", cookiesMap["gddl.sid"]));
+                        showLoadingCircle();
+                        meListener.setFilter(req.get(meEndpoint));
                     } else {
                         hideLoadingCircle();
-                        Notification::create("Server returned invalid response", NotificationIcon::Error, 2)->show();
+                        Notification::create("Error during login - no session cookie received", NotificationIcon::Error, 2)->show();
                     }
                 } else {
                     hideLoadingCircle();
-                    Notification::create("An error occurred!", NotificationIcon::Error, 2)->show();
+                    Notification::create("Error during login - missing cookies", NotificationIcon::Error, 2)->show();
                 }
             } else {
                 // not success!
-                std::string error = "Unknown error";
-                if (jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during login - unknown error");
                 hideLoadingCircle();
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            Notification::create("Error during login - request cancelled", NotificationIcon::Error, 2)->show();
         }
     });
 }
 
-void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig, const int uid) {
+void GDDLLoginLayer::prepareMeListener() {
+    meListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse *res = e->getValue()) {
+            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+            if (res->code() == 200) {
+                const int uid = jsonResponse["ID"].asInt().unwrapOr(-1);
+                if (uid == -1) {
+                    hideLoadingCircle();
+                    Notification::create("Error during login - failed to obtain the user id", NotificationIcon::Error, 2)->show();
+                } else {
+                    saveLoginData(Mod::get()->getSavedValue<std::string>("login-sid", ""), uid);
+                    RatingsManager::clearSubmissionCache();
+                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                    closeLoginPanel();
+                }
+            }
+        } else if (e->isCancelled()) {
+            hideLoadingCircle();
+            Notification::create("Error during login - user id request cancelled", NotificationIcon::Error, 2)->show();
+        }
+    });
+}
+
+void GDDLLoginLayer::saveLoginData(const std::string &sid, const int uid) {
     Mod::get()->setSavedValue("login-username", std::string(usernameTextField->getString()));
     Mod::get()->setSavedValue("login-sid", sid);
-    Mod::get()->setSavedValue("login-sig", sig);
     Mod::get()->setSavedValue("login-userid", uid);
 }
 
@@ -180,12 +193,6 @@ void GDDLLoginLayer::showLoadingCircle() {
 
 void GDDLLoginLayer::hideLoadingCircle() {
     m_buttonMenu->removeChildByID("gddl-login-loading-spinner"_spr);
-}
-
-size_t GDDLLoginLayer::writeCallback(char *contents, size_t size, size_t nmemb, void *userp) {
-    // stack overflow yay https://stackoverflow.com/questions/44994203/how-to-get-the-http-response-string-using-curl-in-c
-    ((std::string *) userp)->append((char *) contents, size * nmemb);
-    return size * nmemb;
 }
 
 std::pair<std::string, std::string> GDDLLoginLayer::getCookieValue(const char *content) {
@@ -224,10 +231,10 @@ int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, con
     const auto resultsList = jsonResponse.asArray().unwrap();
     int id = -1;
     for (const auto& result : resultsList) {
-        if (!result.contains("Name") || !result.contains("ID")) {
+        if (!result.contains("ID") || !result["ID"].isNumber()) {
             continue;
         }
-        if (result["Name"] == requestedUsername) {
+        if (result["Name"].asString().unwrapOr("") == requestedUsername) {
             id = result["ID"].asInt().unwrap();
             break;
         }

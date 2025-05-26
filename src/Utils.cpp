@@ -142,19 +142,19 @@ void Utils::bindCacheDownloadCallback(EventListener<web::WebTask>& cacheEventLis
         if (web::WebResponse * res = e->getValue()) {
             const std::string response = res->string().unwrapOr("");
             if (response.empty()) {
-                Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+                Notification::create("GDDL Cache refresh failed - received empty response", NotificationIcon::Error, 3)->show();
             } else {
                 RatingsManager::cacheRatings(response);
                 if (!RatingsManager::cacheNotEmpty()) {
-                    Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+                    Notification::create("GDDL Cache refresh failed - received no ratings", NotificationIcon::Error, 3)->show();
                     // populate the cache from the save anyway, there could be something in there
                     RatingsManager::populateFromSave();
                 } else if (notifySuccess) {
-                    Notification::create("GDDL Cache refresh succeded", NotificationIcon::Success, 2)->show();
+                    Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
                 }
             }
         } else if (e->isCancelled()) {
-            Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+            Notification::create("GDDL Cache refresh failed - request cancelled", NotificationIcon::Error, 3)->show();
         }
     });
 }

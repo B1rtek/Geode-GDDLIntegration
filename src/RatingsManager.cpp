@@ -79,14 +79,16 @@ void RatingsManager::populateFromSave() {
     content << f.rdbuf();
     if (const auto maybeData = matjson::parse(content.str()); maybeData.isOk()) {
         matjson::Value data = maybeData.unwrap();
-        cacheTimestamp = data["cached"].asInt().unwrap();
+        cacheTimestamp = data["cached"].asInt().unwrapOr(0);
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
         if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
-            for (auto idRatingPair: data["list"].asArray().unwrap()) {
-                const int id = idRatingPair["ID"].asInt().unwrap();
-                const int rating = idRatingPair["Rating"].asInt().unwrap();
-                ratingsCache[id] = rating;
+            if (data.contains("list") && data["list"].isArray()) {
+                for (auto idRatingPair: data["list"].asArray().unwrap()) {
+                    const int id = idRatingPair["ID"].asInt().unwrapOr(-1);
+                    const int rating = idRatingPair["Rating"].asInt().unwrapOr(-1);
+                    ratingsCache[id] = rating;
+                }
             }
         }
     }
@@ -150,61 +152,47 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
 }
 
 void RatingsManager::cacheRatings(const std::string &response) {
-    // ReSharper disable once CppTooWideScopeInitStatement
-    // try {
-        // now we need to parse csv
-        std::stringstream ss;
-        std::string value, line;
-        ss << response;
-        // skip the headers
-        std::getline(ss, value);
-        // get the data
-        while(std::getline(ss, line)) {
-            line += ',';
-            int linePos = 0, currentQuoteCount = 0;
-            std::vector<std::string> values;
-            value = "";
-            while (linePos < line.size()) {
-                if (line[linePos] == '"') {
-                    ++currentQuoteCount;
-                    value.push_back(line[linePos]);
-                } else if (line[linePos] == ',' && currentQuoteCount % 2 == 0) {
-                    values.push_back(value);
-                    value = "";
-                    currentQuoteCount = 0;
-                } else {
-                    value.push_back(line[linePos]);
-                }
-                ++linePos;
+    // epic csv parser by b1rtek v1.2 (now it doesn't crash the game!!) (i think)
+    std::stringstream ss;
+    std::string value, line;
+    ss << response;
+    // skip the headers
+    std::getline(ss, value);
+    // get the data
+    while(std::getline(ss, line)) {
+        line += ',';
+        int linePos = 0, currentQuoteCount = 0;
+        std::vector<std::string> values;
+        value = "";
+        while (linePos < line.size()) {
+            if (line[linePos] == '"') {
+                ++currentQuoteCount;
+                value.push_back(line[linePos]);
+            } else if (line[linePos] == ',' && currentQuoteCount % 2 == 0) {
+                values.push_back(value);
+                value = "";
+                currentQuoteCount = 0;
+            } else {
+                value.push_back(line[linePos]);
             }
-            // values are in the vector now, we're only interested in the ID and the Rating
-            if (values.size() >= 6 && values[4].size() > 2 && values[5].size() > 2) {
-                const std::string strID = values[4].substr(1, values[4].size() - 2);
-                if (const Result<int> maybeID = numFromString<int>(strID); maybeID.isOk()) {
-                    const int id = maybeID.unwrap();
-                    std::string strRating = values[5].substr(1, values[5].size() - 2);
-                    const float rating = numFromString<float>(strRating).unwrapOr(-1.0f);
-                    const int roundedRating = static_cast<int>(round(rating));
-                    ratingsCache[id] = roundedRating;
-                }
+            ++linePos;
+        }
+        // values are in the vector now, we're only interested in the ID and the Rating
+        if (values.size() >= 6 && values[0].size() > 2 && values[5].size() > 2) {
+            const std::string strID = values[0].substr(1, values[0].size() - 2);
+            if (const Result<int> maybeID = numFromString<int>(strID); maybeID.isOk()) {
+                const int id = maybeID.unwrap();
+                std::string strRating = values[5].substr(1, values[5].size() - 2);
+                const float rating = numFromString<float>(strRating).unwrapOr(-1.0f);
+                const int roundedRating = static_cast<int>(round(rating));
+                ratingsCache[id] = roundedRating;
             }
         }
-        // old code in case /theList comes back (it never will, there's no point in editing this for the new version of matjson but whatever)
-        // matjson::Value ratingsData = matjson::parse(response);
-        // for (auto element: ratingsData.asArray().unwrap()) {
-        //     const int id = element["ID"].asInt().unwrap();
-        //     const float rating = element["Rating"].isNull() ? -1.0f : element["Rating"].asDouble().unwrap();
-        //     const int roundedRating = static_cast<int>(round(rating));
-        //     ratingsCache[id] = roundedRating;
-        // }
-        if (!ratingsCache.empty()) {
-            // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
-            cacheList(false);
-        }
-
-    // } catch (std::runtime_error &error) {
-    //     // just do nothing, the user will be notified that stuff happened
-    // }
+    }
+    if (!ratingsCache.empty()) {
+        // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
+        cacheList(false);
+    }
 }
 
 std::map<int, int> RatingsManager::getTierStats() {

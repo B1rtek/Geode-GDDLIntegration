@@ -47,34 +47,30 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
 void LoginSettingNodeV3::prepareLogoutListener() {
     logoutListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
-            if (res->code() == 200 || res->code() == 201) {
+            if (res->code() == 201) {
                 Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
                 logOut();
                 this->markChanged(nullptr);
             } else {
                 // hmmm
-                Notification::create("An error occurred while logging out (server did not return 201)", NotificationIcon::Error, 2)->show();
+                const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during logout - unknown error");
+                Notification::create(error, NotificationIcon::Error, 2)->show();
             }
         } else if (e->isCancelled()) {
-            Notification::create("An error occurred while logging out", NotificationIcon::Error, 2)->show();
+            Notification::create("Error during logout - request cancelled", NotificationIcon::Error, 2)->show();
         }
     });
 }
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
     if (loggedIn()) {
-        if (time(nullptr) < Utils::API_SWITCH_TIME) {
-            logOut();
-            this->markChanged(nullptr);
-        } else {
-            // logout request
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
-                                     Mod::get()->getSavedValue<std::string>("login-sig", ""),
-                                     Mod::get()->getSavedValue<std::string>("login-sid", "")));
-            logoutListener.setFilter(req.post(logoutEndpoint));
-        }
+        // logout request
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        req.header("Cookie", fmt::format("gddl.sid={}",
+                                 Mod::get()->getSavedValue<std::string>("login-sid", "")));
+        logoutListener.setFilter(req.post(logoutEndpoint));
     } else {
         const auto loginLayer = GDDLLoginLayer::create();
         loginLayer->setSettingNode(this);
@@ -83,13 +79,12 @@ void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
 }
 
 bool LoginSettingNodeV3::loggedIn() {
-    return !Mod::get()->getSavedValue<std::string>("login-sig", "").empty();
+    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty();
 }
 
 void LoginSettingNodeV3::logOut() {
     const std::string emptyString;
     Mod::get()->setSavedValue("login-sid", emptyString);
-    Mod::get()->setSavedValue("login-sig", emptyString);
     RatingsManager::clearSubmissionCache();
 }
 

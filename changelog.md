@@ -1,3 +1,9 @@
+# v1.2.4
+- Fixed bugs in the API v2 code
+- Fixed a bug with the loading circle remaining on the screen after a failed search
+- Fixed even more data validation bugs
+- Updated error messages to make them more meaningful
+
 # v1.2.3
 - Fixed a bug where the GDDL button was placed under the weekly/event demon label
 - Added iOS compatibility (I have no way to test this btw, so I can't really help you if anything goes wrong)
