@@ -111,6 +111,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(this->gddlLevelID)));
     }
 
