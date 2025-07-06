@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Update LLVM Windows
-        run: choco update llvm
+        run: choco upgrade llvm
         if: matrix.config.os == 'windows-latest'
 
       - name: Build the mod
