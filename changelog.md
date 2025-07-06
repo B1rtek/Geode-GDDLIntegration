@@ -1,3 +1,6 @@
+# v1.2.5
+- [Fixed a bug which made skillsets disappear](https://github.com/B1rtek/Geode-GDDLIntegration/pull/88) (thank you Diversion!)
+
 # v1.2.4
 - Fixed bugs in the API v2 code
 - Fixed a bug with the loading circle remaining on the screen after a failed search
