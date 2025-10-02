@@ -279,7 +279,7 @@ void GDDLRatingSubmissionLayer::onPercentInfo(CCObject* sender) {
 
 void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject* sender) {
     FLAlertLayer::create(
-        "Percent",
+        "Attempts",
         "Autofilled according to <cb>your current progress</c>, optional - if you don't want to share it, just <cr>remove it</c>",
         "OK")->show();
 }
