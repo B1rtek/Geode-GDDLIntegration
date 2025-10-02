@@ -16,7 +16,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2 - 9.0f});
     bg->setID("gddl-rating-submit-bg"_spr);
@@ -35,8 +35,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     title->setPosition({popupSize.x / 2, popupSize.y - 20.0f});
     m_buttonMenu->addChild(title);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-        CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLRatingSubmissionLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
@@ -103,18 +102,20 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     proofTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
     addInfoButtonAndCenterLabel(proofLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onProofInfo), popupSize.x / 2);
     if (twoPlayer) {
-        addLabel("Solo completion", {popupSize.x / 4, popupSize.y - 220.0f}, 0.6f);
+        // extra spacing needed for low and medium font
+        const float extraLabelSpacing = CCDirector::get()->getLoadedTextureQuality() == kTextureQualityHigh ? 0.0f : 5.0f;
+        addLabel("Solo completion", {popupSize.x / 4 - extraLabelSpacing, popupSize.y - 220.0f}, 0.6f);
         soloCompletionToggler = CCMenuItemToggler::createWithStandardSprites(
             this, menu_selector(GDDLRatingSubmissionLayer::onToggleSoloCompletion), 0.9f);
-        soloCompletionToggler->setPosition({popupSize.x / 4, popupSize.y - 240.0f});
+        soloCompletionToggler->setPosition({popupSize.x / 4 - extraLabelSpacing, popupSize.y - 240.0f});
         soloCompletionToggler->toggle(soloCompletion);
         m_buttonMenu->addChild(soloCompletionToggler);
-        const auto secondPlayerLabel = addLabel("Second player", {3 * popupSize.x / 4 - 35.0f, popupSize.y - 220.0f});
+        const auto secondPlayerLabel = addLabel("Second player", {3 * popupSize.x / 4 - 35.0f + extraLabelSpacing, popupSize.y - 220.0f});
         Utils::createTextInputNode(m_buttonMenu, secondPlayerTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f},
-                                   {3 * popupSize.x / 4 - 35.0f, popupSize.y - 240.0f});
+                                   {3 * popupSize.x / 4 - 35.0f + extraLabelSpacing, popupSize.y - 240.0f});
         secondPlayerTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
         addInfoButtonAndCenterLabel(secondPlayerLabel, infoButtonSprite,
-                                    menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo), 3 * popupSize.x / 4 - 35.0f);
+                                    menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo), 3 * popupSize.x / 4 - 35.0f + extraLabelSpacing);
     }
     // submit button
     const auto submitButtonSprite = ButtonSprite::create("Submit", "bigFont.fnt", "GJ_button_01.png");
@@ -213,7 +214,7 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject* sender) {
  *  "rating":2,
  *  "enjoyment":6,
  *  "refreshRate":60,
- *  "device":1, - 1 for pc, 2 for mobile
+ *  "device": "pc" or "mobile" - api V2 change
  *  "proof":"https://youtu.be/3-BUEoH9WBs",
  *  "progress":100,
  *  "attempts":403,
@@ -222,7 +223,7 @@ void GDDLRatingSubmissionLayer::onToggleSoloCompletion(CCObject* sender) {
  *  }
  *
  *  headers:
- *  Cookie: gddl.sid.sig=<sid.sig>; gddl.sid=<sid>
+ *  Cookie: gddl.sid=<sid>
  */
 
 void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
@@ -238,7 +239,7 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
             // a request to retrieve the userid has to be made first before making the submission request
             std::string requestURL = userSearchEndpoint;
             requestedUsername = secondPlayerTextfield->getString();
-            requestURL += "?name=" + requestedUsername + "&chunk=25";
+            requestURL += "?name=" + requestedUsername + "&limit=25";
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());
             userSearchListener.setFilter(req.get(requestURL));
@@ -280,7 +281,7 @@ void GDDLRatingSubmissionLayer::onPercentInfo(CCObject* sender) {
 
 void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject* sender) {
     FLAlertLayer::create(
-        "Percent",
+        "Attempts",
         "Autofilled according to <cb>your current progress</c>, optional - if you don't want to share it, just <cr>remove it</c>",
         "OK")->show();
 }
@@ -339,36 +340,38 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
     submissionListener.bind([this](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
+            if (res->code() == 201) {
                 std::string message = "Rating submitted!";
-                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].asBool().unwrap()) {
+                if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].isBool() && jsonResponse["wasAuto"].asBool().unwrap()) {
                     message = "Submission accepted!";
                 }
+                log::info("GDDLRatingSubmissionLayer::submissionListener: {} for level {}", message, this->gddlLevelID);
                 // cache submitted submission
                 Submission submitted = Submission(submissionJson, true);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submitted);
                 Notification::create(message, NotificationIcon::Success, 2)->show();
                 onClose(nullptr);
             } else {
-                std::string error = "Unknown error";
-                if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                    if (error == "Authentication failed!") {
-                        LoginSettingNodeV3::logOut();
-                        GDDLLoginLayer::create()->show();
-                        Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
-                        return;
-                    }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while submitting rating - unknown error");
+                if (error == "Authentication failed!" || error == "Unauthorized") {
+                    LoginSettingNodeV3::logOut();
+                    GDDLLoginLayer::create()->show();
+                    Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
+                    log::error("GDDLRatingSubmissionLayer::submissionListener: Submission failed ({}) for level {}", error, this->gddlLevelID);
+                    return;
                 }
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLRatingSubmissionLayer::submissionListener: Submission failed for level {}, raw response: {}", this->gddlLevelID, rawResponse);
                 // cache that no submission was made
                 RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 Notification::create(error, NotificationIcon::Error, 2)->show();
             }
-        }
-        else if (e->isCancelled()) {
+        } else if (e->isCancelled()) {
             // cache that no submission was made
             RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error while submitting rating - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::submissionListener: {}", errorMessage);
         }
     });
     userSearchListener.bind([this](web::WebTask::Event* e) {
@@ -378,20 +381,27 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, requestedUsername);
                 if (id > -1) {
                     submissionJson["secondPlayerID"] = id;
+                    log::info("GDDLRatingSubmissionLayer::userSearchListener: second player {} found with id {}", requestedUsername, id);
                     makeSubmissionRequest();
                 } else {
-                    Notification::create(id == -1 ? "Second player not found!" : "An error occurred", NotificationIcon::Error, 2)->show();
+                    const std::string errorMessage = id == -1 ? "Second player not found!" : "Error while finding second player - server returned invalid response";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLRatingSubmissionLayer::userSearchListener: {}", errorMessage);
+                    if (id < -1) {
+                        log::error("GDDLRatingSubmissionLayer::userSearchListener: raw response: {}", res->string().unwrapOr("Response was not a valid string"));
+                    }
                 }
             } else {
-                std::string error = "Unknown error";
-                if(jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].asString().unwrap();
-                }
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while finding second player - unknown error");
                 Notification::create(error, NotificationIcon::Error, 2)->show();
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLRatingSubmissionLayer::userSearchListener: {}, raw response: {}", error, rawResponse);
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error while finding second player - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::userSearchListener: {}", errorMessage);
         }
     });
     userSubmissionCheckListener.bind([this](web::WebTask::Event* e) {
@@ -399,20 +409,27 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 // submission found, cache it
+                log::info("GDDLRatingSubmissionLayer::userSubmissionCheckListener: submission found for level {}", this->gddlLevelID);
                 const Submission submission = Submission(jsonResponse, false);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
             } else {
-                if (!jsonResponse.contains("error") || jsonResponse["error"].asString().unwrap() != "Submission not found!") {
-                    Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
-                } else {
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Error while checking for existing submission - unknown error");
+                if (error == "Submission not found") {
                     // save an empty one
+                    log::info("GDDLRatingSubmissionLayer::userSubmissionCheckListener: no submission found for level {}", this->gddlLevelID);
                     RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
+                } else {
+                    Notification::create(error, NotificationIcon::Warning, 2)->show();
+                    const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                    log::error("GDDLRatingSubmissionLayer::userSubmissionCheckListener: {} while checking existing submission for level {}, raw response: {}", error, this->gddlLevelID, rawResponse);
                 }
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("Check if already submitted failed", NotificationIcon::Warning, 2)->show();
+            const std::string errorMessage = "Error while checking for existing submission - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Warning, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::userSubmissionCheckListener: {}", errorMessage);
         }
     });
 }
@@ -426,7 +443,7 @@ bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
 
 std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
     submissionJson["levelID"] = this->gddlLevelID;
-    submissionJson["device"] = mobile ? 2 : 1;
+    submissionJson["device"] = mobile ? "mobile" : "pc";
     const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
     if (correctedRating != 0) {
         submissionJson["rating"] = correctedRating;
@@ -487,8 +504,7 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(submissionJson);
-    req.header("Cookie", fmt::format("gddl.sid.sig={}; gddl.sid={}",
-                                     Mod::get()->getSavedValue<std::string>("login-sig", ""),
+    req.header("Cookie", fmt::format("gddl.sid={}",
                                      Mod::get()->getSavedValue<std::string>("login-sid", "")));
     submissionListener.setFilter(req.post(submissionEndpoint));
 }

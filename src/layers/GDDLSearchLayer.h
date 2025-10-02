@@ -1,6 +1,7 @@
 #ifndef GDDLSEARCHLAYER_H
 #define GDDLSEARCHLAYER_H
 
+#include <Utils.h>
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include "GDDLDemonSplitLayer.h"
@@ -47,8 +48,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {
             "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
-    const inline static std::vector<std::string> sort = {"ID",          "Name",           "Rating", "Enjoyment",
-                                                         "RatingCount", "EnjoymentCount", "Random"};
+    const inline static std::vector<std::string> sort = {
+        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "random"
+    };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
@@ -141,6 +143,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static GJSearchObject *makeASearchObjectFrom(int firstIndex, int lastIndex);
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
+    static void hideAnyLoadingCircle();
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     static void prepareSearchListener();
     // utility (that and Utils.h)

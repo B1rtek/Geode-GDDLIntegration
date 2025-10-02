@@ -49,9 +49,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             }
         });
 
-        const auto starsLabel = m_starsLabel;
-        const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
+        const bool isDemon = m_level->m_stars == 10;
+        if (isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
             const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
@@ -66,6 +65,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.0f,
                                                levelNamePosition.y - 14.5f};
+                        // move the weekly/event label
+                        if (m_level->m_dailyID > 100000) { // weekly: 100001 - 200000, event: 200000+, thanks prevter <3
+                            const auto weeklyLabelNode = getChildByID("daily-label");
+                            if (weeklyLabelNode != nullptr) {
+                                const auto weeklyLabel = typeinfo_cast<CCLabelBMFont*>(weeklyLabelNode);
+                                const auto weeklyLabelX = weeklyLabel->getPosition().x;
+                                weeklyLabel->setPosition({weeklyLabelX + 23.0f, weeklyLabel->getPosition().y});
+                            }
+                        }
                     } else { // left
                         menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.0f - 25.0f,
                                                levelNamePosition.y - 14.0f};
@@ -98,6 +106,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 const auto tierLabel =
                         CCMenuItemSpriteExtra::create(tierLabelSprite, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
                 tierLabelSprite->setScale(0.4f);
+                const auto starsLabel = m_starsLabel;
                 const auto tierLabelMenu = CCMenu::create();
                 tierLabelMenu->setPosition(
                         {starsLabel->getPositionX(), starsLabel->getPositionY() - labelShiftRows * 15.5f});
@@ -119,9 +128,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     void updateLabelValues() {
         LevelInfoLayer::updateLabelValues();
-        const auto starsLabel = m_starsLabel;
-        const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
+        const bool isDemon = m_level->m_stars == 10;
+        if (!isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
         const int levelID = m_level->m_levelID;

@@ -142,19 +142,27 @@ void Utils::bindCacheDownloadCallback(EventListener<web::WebTask>& cacheEventLis
         if (web::WebResponse * res = e->getValue()) {
             const std::string response = res->string().unwrapOr("");
             if (response.empty()) {
-                Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+                const std::string errorMessage = "GDDL Cache refresh failed - received empty response";
+                Notification::create("GDDL Cache refresh failed - received empty response", NotificationIcon::Error, 3)->show();
+                log::error("Utils::bindCacheDownloadCallback: {}", errorMessage);
             } else {
                 RatingsManager::cacheRatings(response);
                 if (!RatingsManager::cacheNotEmpty()) {
-                    Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+                    const std::string errorMessage = "GDDL Cache refresh failed - received no ratings";
+                    Notification::create(errorMessage, NotificationIcon::Error, 3)->show();
+                    log::error("Utils::bindCacheDownloadCallback: {}, raw response: {}", errorMessage, response);
                     // populate the cache from the save anyway, there could be something in there
                     RatingsManager::populateFromSave();
+                    log::warn("Utils::bindCacheDownloadCallback: Reusing old cache...");
                 } else if (notifySuccess) {
-                    Notification::create("GDDL Cache refresh succeded", NotificationIcon::Success, 2)->show();
+                    Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
+                    log::info("Utils::bindCacheDownloadCallback: GDDL Cache refresh succeded");
                 }
             }
         } else if (e->isCancelled()) {
-            Notification::create("Failed to cache ratings from gdladder.com!", NotificationIcon::Error, 3)->show();
+            const std::string errorMessage = "GDDL Cache refresh failed - request cancelled";
+            Notification::create("GDDL Cache refresh failed - request cancelled", NotificationIcon::Error, 3)->show();
+            log::error("Utils::bindCacheDownloadCallback: {}", errorMessage);
         }
     });
 }

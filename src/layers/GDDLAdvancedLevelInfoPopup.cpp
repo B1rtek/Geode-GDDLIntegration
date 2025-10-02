@@ -111,6 +111,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(this->gddlLevelID)));
     }
 
@@ -129,7 +130,8 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
     const std::string senderID = dynamic_cast<CCMenuItemSpriteExtra *>(sender)->getID();
     const int start = senderID.find("gddl-advanced-level-info-skillset-") + 34;
     const int end = senderID.size();
-    const int skillsetID = std::stoi(senderID.substr(start, end - start));
+    const std::string senderIDStr = senderID.substr(start, end - start);
+    const int skillsetID = numFromString<int>(senderIDStr).unwrapOr(0);
     FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(),
                          Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
 }
@@ -303,7 +305,9 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (!gddlRating) {
-        Notification::create("There was an error while loading the rating", NotificationIcon::Error)->show();
+        const std::string errorMessage = "Error - rating was not returned by the server";
+        Notification::create(errorMessage, NotificationIcon::Error)->show();
+        log::error("GDDLAdvancedLevelInfoPopup::addRatingInfo: {}, requested ID: {}", errorMessage, this->gddlLevelID);
         return;
     }
     const auto &info = gddlRating.value();

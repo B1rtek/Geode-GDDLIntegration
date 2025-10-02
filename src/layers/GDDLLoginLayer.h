@@ -1,6 +1,7 @@
 #ifndef GDDLINTEGRATION_GDDLLOGINLAYER_H
 #define GDDLINTEGRATION_GDDLLOGINLAYER_H
 
+#include <Utils.h>
 #include <Geode/Geode.hpp>
 #include <Geode/utils/web.hpp>
 #include "settings/LoginSettingNodeV3.h"
@@ -14,23 +15,25 @@ class GDDLLoginLayer final : public FLAlertLayer {
     CCTextInputNode* passwordTextField = nullptr;
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
-    const inline static std::string loginEndpoint = "https://gdladder.com/api/login";
-    EventListener<web::WebTask> loginListener;
+    const inline static std::string loginEndpoint = "https://gdladder.com/api/account/login";
+    const inline static std::string meEndpoint = "https://gdladder.com/api/user/me";
+    EventListener<web::WebTask> loginListener, meListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
     void onClose(cocos2d::CCObject* sender);
     void onLoginClicked(cocos2d::CCObject *sender);
 
+    std::string getAllHeaders(web::WebResponse* response);
     void prepareSearchListener();
-    void saveLoginData(const std::string& sid, const std::string& sig, int uid);
+    void prepareMeListener();
+    void saveLoginData(const std::string& sid, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();
 
     // getting around geode::web limitations
     std::pair<std::string, std::string> getCookieValue(const char* content);
-    static size_t writeCallback(char *contents, size_t size, size_t nmemb, void *userp);
 
 public:
     static GDDLLoginLayer* create();

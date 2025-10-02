@@ -1,3 +1,25 @@
+# v1.2.5
+- [Fixed a bug which made skillsets disappear](https://github.com/B1rtek/Geode-GDDLIntegration/pull/88) (thank you Diversion!)
+
+# v1.2.4
+- Fixed bugs in the API v2 code
+- Fixed a bug with the loading circle remaining on the screen after a failed search
+- Fixed even more data validation bugs
+- Updated error messages to make them more meaningful
+
+# v1.2.3
+- Fixed a bug where the GDDL button was placed under the weekly/event demon label
+- Added iOS compatibility (I have no way to test this btw, so I can't really help you if anything goes wrong)
+- Fixed a major bug in the ratings cache response parsing
+- Added compatibility with GDDL API v2 (which will hopefully work correctly, we'll see
+
+# v1.2.1
+- [Replaced the "crappy" skillset icons](https://github.com/B1rtek/Geode-GDDLIntegration/issues/72) with a pack created by Hubercioch (thank you so much!!!)
+- [Added an option to change the color of the gray backgrounds](https://github.com/B1rtek/Geode-GDDLIntegration/issues/74) in the login, submission and advanced level info popups
+- [Fixed a bug that caused crashes on android](https://github.com/B1rtek/Geode-GDDLIntegration/issues/75) if you used the navigation buttons on your phone or a gesture to exit the main levels list
+- Fixed a bug that caused a crash sometimes when the rating inside the advanced popup was being updated (thank you @hiimjasmine00!)
+- The Mac version is back, enjoy it while it lasts
+
 # v1.2.0
 - Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
   - This requires you to log in to your GDDL account, you can log in on the mod settings page, but if you forget to do that you will be prompted to do so when you try submitting a rating

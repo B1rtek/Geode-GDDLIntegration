@@ -1,9 +1,11 @@
 {
-	"geode": "4.2.0",
-	"version": "v1.2.1-alpha.1",
+	"geode": "4.9.0",
+	"version": "v1.2.5",
 	"gd": {
 		"android": "2.2074",
-		"win": "2.2074"
+		"win": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
 	},
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
@@ -34,7 +36,8 @@
 		"sprites": [
 			"resources/search.png",
 			"resources/gddlpopup.png",
-			"resources/tiers/*.png"
+			"resources/tiers/*.png",
+			"resources/skillsets/*.png"
 		]
 	},
 	"settings": {
