@@ -345,6 +345,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 if (jsonResponse.contains("wasAuto") && jsonResponse["wasAuto"].isBool() && jsonResponse["wasAuto"].asBool().unwrap()) {
                     message = "Submission accepted!";
                 }
+                log::info("GDDLRatingSubmissionLayer::submissionListener: {} for level {}", message, this->gddlLevelID);
                 // cache submitted submission
                 Submission submitted = Submission(submissionJson, true);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submitted);
@@ -356,8 +357,11 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                     LoginSettingNodeV3::logOut();
                     GDDLLoginLayer::create()->show();
                     Notification::create("Your session expired, log in again", NotificationIcon::Warning, 2)->show();
+                    log::error("GDDLRatingSubmissionLayer::submissionListener: Submission failed ({}) for level {}", error, this->gddlLevelID);
                     return;
                 }
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLRatingSubmissionLayer::submissionListener: Submission failed for level {}, raw response: {}", this->gddlLevelID, rawResponse);
                 // cache that no submission was made
                 RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 Notification::create(error, NotificationIcon::Error, 2)->show();
@@ -365,7 +369,9 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
         } else if (e->isCancelled()) {
             // cache that no submission was made
             RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
-            Notification::create("Error while submitting rating - request cancelled", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error while submitting rating - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::submissionListener: {}", errorMessage);
         }
     });
     userSearchListener.bind([this](web::WebTask::Event* e) {
@@ -375,17 +381,27 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, requestedUsername);
                 if (id > -1) {
                     submissionJson["secondPlayerID"] = id;
+                    log::info("GDDLRatingSubmissionLayer::userSearchListener: second player {} found with id {}", requestedUsername, id);
                     makeSubmissionRequest();
                 } else {
-                    Notification::create(id == -1 ? "Second player not found!" : "Error while finding second player - server returned invalid response", NotificationIcon::Error, 2)->show();
+                    const std::string errorMessage = id == -1 ? "Second player not found!" : "Error while finding second player - server returned invalid response";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLRatingSubmissionLayer::userSearchListener: {}", errorMessage);
+                    if (id < -1) {
+                        log::error("GDDLRatingSubmissionLayer::userSearchListener: raw response: {}", res->string().unwrapOr("Response was not a valid string"));
+                    }
                 }
             } else {
                 const std::string error = jsonResponse["message"].asString().unwrapOr("Error while finding second player - unknown error");
                 Notification::create(error, NotificationIcon::Error, 2)->show();
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLRatingSubmissionLayer::userSearchListener: {}, raw response: {}", error, rawResponse);
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("Error while finding second player - request cancelled", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error while finding second player - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::userSearchListener: {}", errorMessage);
         }
     });
     userSubmissionCheckListener.bind([this](web::WebTask::Event* e) {
@@ -393,6 +409,7 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 // submission found, cache it
+                log::info("GDDLRatingSubmissionLayer::userSubmissionCheckListener: submission found for level {}", this->gddlLevelID);
                 const Submission submission = Submission(jsonResponse, false);
                 RatingsManager::cacheSubmission(this->gddlLevelID, submission);
                 showAlreadySubmittedWarning();
@@ -400,14 +417,19 @@ void GDDLRatingSubmissionLayer::prepareSubmissionListeners() {
                 const std::string error = jsonResponse["message"].asString().unwrapOr("Error while checking for existing submission - unknown error");
                 if (error == "Submission not found") {
                     // save an empty one
+                    log::info("GDDLRatingSubmissionLayer::userSubmissionCheckListener: no submission found for level {}", this->gddlLevelID);
                     RatingsManager::cacheSubmission(this->gddlLevelID, Submission());
                 } else {
                     Notification::create(error, NotificationIcon::Warning, 2)->show();
+                    const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                    log::error("GDDLRatingSubmissionLayer::userSubmissionCheckListener: {} while checking existing submission for level {}, raw response: {}", error, this->gddlLevelID, rawResponse);
                 }
             }
         }
         else if (e->isCancelled()) {
-            Notification::create("Error while checking for existing submission - request cancelled", NotificationIcon::Warning, 2)->show();
+            const std::string errorMessage = "Error while checking for existing submission - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Warning, 2)->show();
+            log::error("GDDLRatingSubmissionLayer::userSubmissionCheckListener: {}", errorMessage);
         }
     });
 }

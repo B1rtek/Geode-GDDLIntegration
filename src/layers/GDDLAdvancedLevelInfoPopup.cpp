@@ -305,7 +305,9 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (!gddlRating) {
-        Notification::create("Error - rating was not returned by the server", NotificationIcon::Error)->show();
+        const std::string errorMessage = "Error - rating was not returned by the server";
+        Notification::create(errorMessage, NotificationIcon::Error)->show();
+        log::error("GDDLAdvancedLevelInfoPopup::addRatingInfo: {}, requested ID: {}", errorMessage, this->gddlLevelID);
         return;
     }
     const auto &info = gddlRating.value();

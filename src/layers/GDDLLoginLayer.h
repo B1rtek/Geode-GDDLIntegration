@@ -24,6 +24,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onClose(cocos2d::CCObject* sender);
     void onLoginClicked(cocos2d::CCObject *sender);
 
+    std::string getAllHeaders(web::WebResponse* response);
     void prepareSearchListener();
     void prepareMeListener();
     void saveLoginData(const std::string& sid, int uid);
