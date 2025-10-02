@@ -102,18 +102,20 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     proofTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
     addInfoButtonAndCenterLabel(proofLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onProofInfo), popupSize.x / 2);
     if (twoPlayer) {
-        addLabel("Solo completion", {popupSize.x / 4, popupSize.y - 220.0f}, 0.6f);
+        // extra spacing needed for low and medium font
+        const float extraLabelSpacing = CCDirector::get()->getLoadedTextureQuality() == kTextureQualityHigh ? 0.0f : 5.0f;
+        addLabel("Solo completion", {popupSize.x / 4 - extraLabelSpacing, popupSize.y - 220.0f}, 0.6f);
         soloCompletionToggler = CCMenuItemToggler::createWithStandardSprites(
             this, menu_selector(GDDLRatingSubmissionLayer::onToggleSoloCompletion), 0.9f);
-        soloCompletionToggler->setPosition({popupSize.x / 4, popupSize.y - 240.0f});
+        soloCompletionToggler->setPosition({popupSize.x / 4 - extraLabelSpacing, popupSize.y - 240.0f});
         soloCompletionToggler->toggle(soloCompletion);
         m_buttonMenu->addChild(soloCompletionToggler);
-        const auto secondPlayerLabel = addLabel("Second player", {3 * popupSize.x / 4 - 35.0f, popupSize.y - 220.0f});
+        const auto secondPlayerLabel = addLabel("Second player", {3 * popupSize.x / 4 - 35.0f + extraLabelSpacing, popupSize.y - 220.0f});
         Utils::createTextInputNode(m_buttonMenu, secondPlayerTextfield, "bigFont.fnt", "", 32, {110.0f, 25.0f},
-                                   {3 * popupSize.x / 4 - 35.0f, popupSize.y - 240.0f});
+                                   {3 * popupSize.x / 4 - 35.0f + extraLabelSpacing, popupSize.y - 240.0f});
         secondPlayerTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
         addInfoButtonAndCenterLabel(secondPlayerLabel, infoButtonSprite,
-                                    menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo), 3 * popupSize.x / 4 - 35.0f);
+                                    menu_selector(GDDLRatingSubmissionLayer::onSecondPlayerInfo), 3 * popupSize.x / 4 - 35.0f + extraLabelSpacing);
     }
     // submit button
     const auto submitButtonSprite = ButtonSprite::create("Submit", "bigFont.fnt", "GJ_button_01.png");
