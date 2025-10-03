@@ -47,18 +47,30 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
 void LoginSettingNodeV3::prepareLogoutListener() {
     logoutListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
-            if (res->code() == 201) {
+            if (res->code() == 200) {
                 Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
+                log::info("LoginSettingNodeV3::logoutListener: logged out");
                 logOut();
                 this->markChanged(nullptr);
             } else {
-                // hmmm
-                const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during logout - unknown error");
-                Notification::create(error, NotificationIcon::Error, 2)->show();
+                if (res->code() == 401) {
+                    Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
+                    log::info("LoginSettingNodeV3::logoutListener: logged out by 401 Unauthorized");
+                    logOut();
+                    this->markChanged(nullptr);
+                } else {
+                    // hmmm
+                    const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+                    const std::string error = jsonResponse["message"].asString().unwrapOr("Error during logout - unknown error");
+                    Notification::create(error, NotificationIcon::Error, 2)->show();
+                    const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                    log::error("LoginSettingNodeV3::logoutListener: {}, raw response: {}", error, rawResponse);
+                }
             }
         } else if (e->isCancelled()) {
-            Notification::create("Error during logout - request cancelled", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error during logout - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("LoginSettingNodeV3::logoutListener: {}", errorMessage);
         }
     });
 }

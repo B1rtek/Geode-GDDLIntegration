@@ -534,11 +534,14 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
             // well, the json is probably wrong
             const std::string error = responseJson["message"].asString().unwrapOr("Server returned invalid response - unknown error");
             Notification::create(error, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::parseResponse: {}, raw response: {}", error, responseJson.dump(0));
             return results;
         }
         const int total = responseJson["total"].asInt().unwrapOr(-1);
         if (total == -1) {
-            Notification::create("Server returned invalid response - no total results amount", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Server returned invalid response - no total results amount";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::parseResponse: {}, raw response: {}", errorMessage, responseJson.dump(0));
             return results;
         }
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
@@ -555,6 +558,7 @@ std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
         }
     } else {
         // well, nothing can really be done here
+        log::error("GDDLSearchLayer::parseResponse: server returned invalid JSON: {}", response);
     }
     return results;
 }
@@ -673,39 +677,45 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
 
 void GDDLSearchLayer::prepareSearchListener() {
     searchListener.bind([] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
-                if (res->code() == 200) {
-                    const std::string response = res->string().unwrapOrDefault();
-                    if (response.empty()) {
-                        Notification::create("Search failed - received empty response", NotificationIcon::Error, 2)->show();
-                    } else {
-                        appendFetchedResults(response);
-                        auto [fst, snd] = getReadyRange(requestRequestedPage);
-                        if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                            // recurse
-                            const std::string anotherRequest = formSearchRequest();
-                            auto req = web::WebRequest();
-                            req.header("User-Agent", Utils::getUserAgent());
-                            searchListener.setFilter(req.get(anotherRequest));
-                        } else {
-                            GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
-                            handleSearchObject(searchObject, searchCallbackObject, snd - fst);
-                        }
-                    }
+        if (web::WebResponse* res = e->getValue()) {
+            if (res->code() == 200) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (response.empty()) {
+                    const std::string errorMessage = "Search failed - received empty response";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
                 } else {
-                    // not success!
-                    const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                    const std::string error = jsonResponse["message"].asString().unwrapOr("Search failed - unknown error");
-                    stopSearch();
-                    hideAnyLoadingCircle();
-                    Notification::create(error, NotificationIcon::Error, 2)->show();
+                    appendFetchedResults(response);
+                    auto [fst, snd] = getReadyRange(requestRequestedPage);
+                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                        // recurse
+                        const std::string anotherRequest = formSearchRequest();
+                        auto req = web::WebRequest();
+                        req.header("User-Agent", Utils::getUserAgent());
+                        searchListener.setFilter(req.get(anotherRequest));
+                    } else {
+                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                    }
                 }
-            } else if (e->isCancelled()) {
+            } else {
+                // not success!
+                const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+                const std::string error = jsonResponse["message"].asString().unwrapOr("Search failed - unknown error");
                 stopSearch();
                 hideAnyLoadingCircle();
-                Notification::create("Search failed - request cancelled", NotificationIcon::Error, 2)->show();
+                Notification::create(error, NotificationIcon::Error, 2)->show();
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLSearchLayer::searchListener: {}, raw response: {}", error, rawResponse);
             }
-        });
+        } else if (e->isCancelled()) {
+            stopSearch();
+            hideAnyLoadingCircle();
+            const std::string errorMessage = "Search failed - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
+        }
+    });
 }
 
 
