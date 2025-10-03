@@ -1,3 +1,9 @@
+# v1.2.6
+- [Fixed the login bug]() (thank you Aproxia-dev!)
+- Fixed incorrect popup title for "Attempts" in the rating submission menu
+- Added extra spacing for two player specific labels on medium and low graphics to prevent text overlapping
+- Added a lot more logging
+
 # v1.2.5
 - [Fixed a bug which made skillsets disappear](https://github.com/B1rtek/Geode-GDDLIntegration/pull/88) (thank you Diversion!)
 
