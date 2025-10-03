@@ -122,8 +122,11 @@ void GDDLLoginLayer::prepareSearchListener() {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                saveLoginData("gddl.sid", 0);
+                saveLoginData("", 0);
                 std::optional<std::vector<std::string>> cookies = res->getAllHeadersNamed("Set-Cookie");
+                if (!cookies.has_value()) {
+                    cookies = res->getAllHeadersNamed("set-cookie");
+                }
                 if (cookies.has_value()) {
                     std::map<std::string, std::string> cookiesMap;
                     for (const auto& cookie : cookies.value()) {
