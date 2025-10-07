@@ -73,9 +73,9 @@ body:
     attributes:
       label: How often does the issue occur?
       options:
-        - label: Always
-        - label: Sometimes
-        - label: Happened only once
+        - Always
+        - Sometimes
+        - Happened only once (isolated instance)
       default: 0
     validations:
       required: true
