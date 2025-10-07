@@ -6,7 +6,7 @@ bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
         return false;
     }
-    m_fields->beingBrowsed = true;
+    Fields::beingBrowsed = true;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
     // setup potential web req
     m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
@@ -63,20 +63,7 @@ void GDDLRobtopLevelsLayer::swiped(const int newPage) {
     pageChanged(previousPage);
 }
 
-void GDDLRobtopLevelsLayer::onBack(CCObject* sender) {
-    LevelSelectLayer::onBack(sender);
-    backActions();
-}
-
-// keyBackClicked() being broken on android workaround
-#ifndef GEODE_IS_ANDROID
-void GDDLRobtopLevelsLayer::keyBackClicked() {
-    LevelSelectLayer::keyBackClicked();
-    backActions();
-}
-#endif
-
-void GDDLRobtopLevelsLayer::backActions() {
+GDDLRobtopLevelsLayer::Fields::~Fields() {
     Fields::beingBrowsed = false;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }

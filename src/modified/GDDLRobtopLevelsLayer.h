@@ -30,6 +30,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         bool changedBySwiping = false;
         EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
+        ~Fields();
     };
 
     bool init(int page);
@@ -39,13 +40,6 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
     void onPrev(CCObject *sender);
 
     void swiped(const int newPage);
-
-    void onBack(CCObject *sender);
-
-    // keyBackClicked() being broken on android workaround
-#ifndef GEODE_IS_ANDROID
-    virtual void keyBackClicked();
-#endif
 
     void pageChanged(int previousPage);
 
@@ -60,9 +54,6 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
     void onGDDLInfo(CCObject *sender);
 
     void updateButton(const int tier);
-
-public:
-    static void backActions();
 };
 
 #endif //GDDLROBTOPLEVELSLAYER_H
