@@ -117,6 +117,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
             const int levelID = m_level->m_levelID;
             const int tier = RatingsManager::getDemonTier(levelID);
+            log::info("init at the end thinks this level is tier {}", tier);
             if(tier != -1) {
                 updateButton(tier);
                 m_fields->gddlTierUpdated = true;
@@ -128,14 +129,17 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     void updateLabelValues() {
         LevelInfoLayer::updateLabelValues();
+        log::info("updateLabelValues called");
         const bool isDemon = m_level->m_stars == 10;
         if (!isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
         const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
+        log::info("updateLabelValues thinks this level is tier {}", tier);
 
         if (tier == -1) {
+            log::info("making a request");
             // web request 2.0 yaaay
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());
@@ -161,6 +165,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
+        log::info("updateButton called with tier {}", tier);
         const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));

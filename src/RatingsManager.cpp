@@ -119,7 +119,12 @@ void RatingsManager::cacheList(bool onQuit) {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult (it's not true!)
-int RatingsManager::getDemonTier(const int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
+int RatingsManager::getDemonTier(const int id) {
+    if (!demonMap.contains(id)) {
+        return getCachedTier(id);
+    }
+    return demonMap[id].roundedRating;
+}
 
 cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
     if (tier > tierColors.size() || tier < 0) {
@@ -148,6 +153,7 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
         return false;
     }
     demonMap[id] = rating;
+    ratingsCache[id] = rating.roundedRating;
     return true;
 }
 
