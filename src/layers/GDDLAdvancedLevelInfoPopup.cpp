@@ -69,6 +69,8 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     openInBrowserButton->setPosition({popupSize.x / 2 + 136.0f, 22.0f});
     m_buttonMenu->addChild(openInBrowserButton);
 
+    prepareSearchListeners();
+
     // average ratings and ratings counts
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (gddlRating) {
@@ -83,10 +85,11 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         // add gray showcase button
         addShowcaseButton(false);
         // add a ? tier sprite
-        addTierSprite(-1);
+        addTierSprite(RatingsManager::getDemonTier(this->gddlLevelID));
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        ratingListener.setFilter(req.get(RatingsManager::getRequestUrl(this->gddlLevelID)));
     }
-
-    prepareSearchListeners();
 
     // bar charts
     if (RatingsManager::hasSpread(this->gddlLevelID)) {
@@ -168,6 +171,27 @@ void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
+    ratingListener.bind([this](web::WebTask::Event *e) {
+        // no updateButton() for now
+        if (web::WebResponse* res = e->getValue()) {
+            const std::string response = res->string().unwrapOrDefault();
+            // if (response.empty()) {
+            //     updateButton(-1);
+            // }
+            // else {
+                int tierAfterFetch = -1;
+                if (RatingsManager::addRatingFromResponse(this->gddlLevelID, response)) {
+                    tierAfterFetch = RatingsManager::getDemonTier(this->gddlLevelID);
+                }
+                //updateButton(tierAfterFetch);
+                this->addRatingInfo();
+            // }
+        }
+        else if (e->isCancelled()) {
+            //updateButton(-1);
+        }
+    });
+
     spreadListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
@@ -175,7 +199,7 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
             RatingsManager::cacheSpread(this->gddlLevelID, spread);
             addBarCharts();
         } else if (e->isCancelled()) {
-            // :(
+            // TODO error logging
         }
     });
 
@@ -186,7 +210,7 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
             RatingsManager::cacheSkillsets(this->gddlLevelID, spread);
             addSkillsets();
         } else if (e->isCancelled()) {
-            // :(
+            // TODO error logging
         }
     });
 }
