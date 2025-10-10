@@ -1,11 +1,14 @@
 #include "GDDLRobtopLevelsLayer.h"
 
+#include <layers/GDDLLevelInfoPopup.h>
+
 #include "GDDLBoomScrollLayer.h"
 
 bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
         return false;
     }
+    m_fields->m_this = this;
     m_fields->beingBrowsed = true;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
     // setup potential web req
@@ -13,7 +16,7 @@ bool GDDLRobtopLevelsLayer::init(int page) {
         if (web::WebResponse* res = e->getValue()) {
             const std::string response = res->string().unwrapOrDefault();
             if (response.empty()) {
-                updateButton(-1);
+                updateButton();
             }
             else {
                 const int levelID = convertPageToLevel(m_fields->currentPage);
@@ -21,14 +24,14 @@ bool GDDLRobtopLevelsLayer::init(int page) {
                 if (RatingsManager::addRatingFromResponse(levelID, response)) {
                     tierAfterFetch = RatingsManager::getDemonTier(levelID);
                 }
-                updateButton(tierAfterFetch);
+                updateButton();
                 if (m_fields->advancedLevelInfoPopup != nullptr) {
                     m_fields->advancedLevelInfoPopup->addRatingInfo();
                 }
             }
         }
         else if (e->isCancelled()) {
-            updateButton(-1);
+            updateButton();
         }
     });
 
@@ -218,7 +221,7 @@ void GDDLRobtopLevelsLayer::onGDDLInfo(CCObject *sender) {
     }
 }
 
-void GDDLRobtopLevelsLayer::updateButton(const int tier) {
+void GDDLRobtopLevelsLayer::updateButton() {
     // get the menu
     auto gddlButtonMenu = getLevelButton(m_fields->currentPage % 3 + 1)->getChildByID("gddl-button-menu"_spr);
     if (gddlButtonMenu == nullptr) return; // the user most likely scrolled past quicker than it loaded

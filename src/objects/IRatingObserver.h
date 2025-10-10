@@ -5,6 +5,6 @@ class IRatingObserver {
 public:
     virtual ~IRatingObserver() = default;
     virtual void updateRating() = 0;
-}
+};
 
 #endif //IRATINGOBSERVER_H
