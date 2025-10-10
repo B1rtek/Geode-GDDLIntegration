@@ -118,7 +118,7 @@ void GDDLLevelInfoPopup::prepareSearchListener() {
 void GDDLLevelInfoPopup::addLevelInfo() {
     const auto gddlRating = RatingsManager::getRating(levelID);
     m_buttonMenu->removeChildByID("gddl-level-info-label"_spr);
-    std::string levelInfoText = "Still loading...";
+    std::string levelInfoText = "Loading rating details...";
     if(gddlRating) {
         const auto info = gddlRating.value();
         const std::string rating = "<cr>Tier:</c> " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2)) + '\n';

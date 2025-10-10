@@ -76,7 +76,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     if (gddlRating) {
         addRatingInfo();
     } else {
-        const auto stillLoadingLabel = CCLabelBMFont::create("Rating details still loading...", "chatFont.fnt");
+        const auto stillLoadingLabel = CCLabelBMFont::create("Rating details loading...", "chatFont.fnt");
         stillLoadingLabel->setAnchorPoint({0.5f, 0.0f});
         stillLoadingLabel->setPosition({popupSize.x / 2, 215.0f});
         stillLoadingLabel->setScale(0.7f);
