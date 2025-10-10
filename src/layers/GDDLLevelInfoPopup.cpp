@@ -32,8 +32,17 @@ bool GDDLLevelInfoPopup::init()
     m_buttonMenu->addChild(title, 1);
     title->setPosition({0.0f, popupSize.y/2-27.5f}); // or basically the standard position below the top border for a title
 
+    prepareSearchListener();
+
     // content
     addLevelInfo();
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    if (!gddlRating) {
+        // make a request to get it
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        ratingListener.setFilter(req.get(RatingsManager::getRequestUrl(this->levelID)));
+    }
 
     // open in browser button
     const auto browserButtonSprite = CCSprite::createWithSpriteFrameName("GJ_redoBtn_001.png");
@@ -83,8 +92,32 @@ void GDDLLevelInfoPopup::show() {
 
 GDDLLevelInfoPopup::GDDLLevelInfoPopup(int levelId) : levelID(levelId) {}
 
+void GDDLLevelInfoPopup::prepareSearchListener() {
+    ratingListener.bind([this](web::WebTask::Event *e) {
+        // no updateButton() for now
+        if (web::WebResponse* res = e->getValue()) {
+            const std::string response = res->string().unwrapOrDefault();
+            // if (response.empty()) {
+            //     updateButton(-1);
+            // }
+            // else {
+                int tierAfterFetch = -1;
+                if (RatingsManager::addRatingFromResponse(this->levelID, response)) {
+                    tierAfterFetch = RatingsManager::getDemonTier(this->levelID);
+                }
+                //updateButton(tierAfterFetch);
+                this->addLevelInfo();
+            // }
+        }
+        else if (e->isCancelled()) {
+            //updateButton(-1);
+        }
+    });
+}
+
 void GDDLLevelInfoPopup::addLevelInfo() {
     const auto gddlRating = RatingsManager::getRating(levelID);
+    m_buttonMenu->removeChildByID("gddl-level-info-label"_spr);
     std::string levelInfoText = "Still loading...";
     if(gddlRating) {
         const auto info = gddlRating.value();
@@ -94,6 +127,7 @@ void GDDLLevelInfoPopup::addLevelInfo() {
         levelInfoText = " \n" + rating + enjoyment + submissionCount + " \n"; // uhhh this is a good workaround right?
     }
     const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false);
+    levelInfoLabels->setID("gddl-level-info-label"_spr);
     m_buttonMenu->addChild(levelInfoLabels, 2);
     levelInfoLabels->setPosition({0.0f, 5.0f});
 }
