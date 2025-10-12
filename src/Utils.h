@@ -64,6 +64,7 @@ public:
     static std::string getUserAgent();
     static std::string getGrayPopupBG();
     static CCSprite* getGrayPopupCloseButton(float scale = .85f);
+    static std::optional<std::string> getErrorMessageFromErrorCode(int errorCode);
 };
 
 template <typename T>
