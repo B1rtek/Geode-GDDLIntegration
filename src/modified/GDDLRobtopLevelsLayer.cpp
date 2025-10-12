@@ -8,32 +8,12 @@ bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
         return false;
     }
+    // for handling rating updates from the info popup
     m_fields->m_this = this;
+
     m_fields->beingBrowsed = true;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
-    // setup potential web req
-    m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
-            const std::string response = res->string().unwrapOrDefault();
-            if (response.empty()) {
-                updateButton();
-            }
-            else {
-                const int levelID = convertPageToLevel(m_fields->currentPage);
-                int tierAfterFetch = -1;
-                if (RatingsManager::addRatingFromResponse(levelID, response)) {
-                    tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                }
-                updateButton();
-                if (m_fields->advancedLevelInfoPopup != nullptr) {
-                    m_fields->advancedLevelInfoPopup->addRatingInfo();
-                }
-            }
-        }
-        else if (e->isCancelled()) {
-            updateButton();
-        }
-    });
+
 
     m_fields->currentPage = page;
     pageChanged(-1);
@@ -184,13 +164,6 @@ void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
     button->setPosition(12.5, 12.5);
     levelButton->addChild(buttonMenu);
     buttonMenu->setPosition(5, 69);
-    // after placing the button fetch the full level info
-    const int tier = RatingsManager::getDemonTier(levelID);
-    if (tier == -1) {
-        auto req = web::WebRequest();
-        req.header("User-Agent", Utils::getUserAgent());
-        m_fields->robtopLevelsLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
-    }
 }
 
 int GDDLRobtopLevelsLayer::convertPageToLevel(int page) {
