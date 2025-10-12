@@ -39,9 +39,8 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
             m_this->updateButton();
         }
 
-        ~Fields() override {
-            RatingsManager::unsubscribeFromObservers(this);
-        }
+        // in .cpp
+        ~Fields() override;
     };
 
     bool init(int page);
@@ -51,13 +50,6 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
     void onPrev(CCObject *sender);
 
     void swiped(const int newPage);
-
-    void onBack(CCObject *sender);
-
-    // keyBackClicked() being broken on android workaround
-#ifndef GEODE_IS_ANDROID
-    virtual void keyBackClicked();
-#endif
 
     void pageChanged(int previousPage);
 
@@ -72,9 +64,6 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
     void onGDDLInfo(CCObject *sender);
 
     void updateButton();
-
-public:
-    static void backActions();
 };
 
 #endif //GDDLROBTOPLEVELSLAYER_H

@@ -10,8 +10,7 @@ bool GDDLRobtopLevelsLayer::init(int page) {
     }
     // for handling rating updates from the info popup
     m_fields->m_this = this;
-
-    m_fields->beingBrowsed = true;
+    Fields::beingBrowsed = true;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
 
 
@@ -46,20 +45,8 @@ void GDDLRobtopLevelsLayer::swiped(const int newPage) {
     pageChanged(previousPage);
 }
 
-void GDDLRobtopLevelsLayer::onBack(CCObject* sender) {
-    LevelSelectLayer::onBack(sender);
-    backActions();
-}
-
-// keyBackClicked() being broken on android workaround
-#ifndef GEODE_IS_ANDROID
-void GDDLRobtopLevelsLayer::keyBackClicked() {
-    LevelSelectLayer::keyBackClicked();
-    backActions();
-}
-#endif
-
-void GDDLRobtopLevelsLayer::backActions() {
+GDDLRobtopLevelsLayer::Fields::~Fields() {
+    RatingsManager::unsubscribeFromObservers(this);
     Fields::beingBrowsed = false;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }

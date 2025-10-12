@@ -50,10 +50,6 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        // keyBackClicked() being broken on android workaround
-#ifdef GEODE_IS_ANDROID
-        GDDLRobtopLevelsLayer::backActions();
-#endif
         if (!RatingsManager::readCache) {
             // populate from save
             RatingsManager::readCache = true;
