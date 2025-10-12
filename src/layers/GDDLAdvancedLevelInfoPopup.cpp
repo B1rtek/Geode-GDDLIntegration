@@ -172,23 +172,20 @@ void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
     ratingListener.bind([this](web::WebTask::Event *e) {
-        // no updateButton() for now
         if (web::WebResponse* res = e->getValue()) {
             const std::string response = res->string().unwrapOrDefault();
-            // if (response.empty()) {
-            //     updateButton(-1);
-            // }
-            // else {
-                int tierAfterFetch = -1;
-                if (RatingsManager::addRatingFromResponse(this->gddlLevelID, response)) {
-                    tierAfterFetch = RatingsManager::getDemonTier(this->gddlLevelID);
-                }
-                //updateButton(tierAfterFetch);
-                this->addRatingInfo();
-            // }
+            if (!RatingsManager::addRatingFromResponse(this->gddlLevelID, response)) {
+                const std::string errorMessage = "Error while fetching rating - invalid rating returned";
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLAdvancedLevelInfoPopup::ratingListener: {}, ID {}", errorMessage, this->gddlLevelID);
+            }
+            this->addRatingInfo();
         }
+        // TODO add 429 handling maybe?
         else if (e->isCancelled()) {
-            //updateButton(-1);
+            const std::string errorMessage = "Error while fetching rating - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::ratingListener: {}, ID: {}", errorMessage, this->gddlLevelID);
         }
     });
 
