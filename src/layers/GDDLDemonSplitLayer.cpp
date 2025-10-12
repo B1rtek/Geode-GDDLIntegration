@@ -161,8 +161,10 @@ void GDDLDemonSplitLayer::showLoadingCircle() {
 }
 
 void GDDLDemonSplitLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    }
 }
 
 GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {

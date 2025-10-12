@@ -1237,5 +1237,7 @@ void GDDLSearchLayer::clickOffTextfields() {
 }
 
 void GDDLSearchLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    }
 }

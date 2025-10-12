@@ -77,7 +77,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static EventListener<web::WebTask> searchListener;
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
     inline static GDDLBrowserLayer* searchCallbackObject;
-    inline static GDDLDemonSplitLayer* demonSplitLayer = nullptr;
+    inline static Ref<GDDLDemonSplitLayer> demonSplitLayer = nullptr;
     inline static GDDLSearchLayer* searchLayer = nullptr;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
