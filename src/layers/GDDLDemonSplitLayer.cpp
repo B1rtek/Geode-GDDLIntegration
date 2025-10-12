@@ -72,6 +72,16 @@ bool GDDLDemonSplitLayer::init() {
 }
 
 void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
+    backActions();
+}
+
+void GDDLDemonSplitLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLDemonSplitLayer::backActions() {
+    this->wasClosed = true;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }

@@ -421,6 +421,15 @@ void GDDLSearchLayer::restoreValues() {
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
+    backActions();
+}
+
+void GDDLSearchLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLSearchLayer::backActions() {
     saveValues();
     saveSettings();
     simplifiedLoaded = false;
@@ -428,11 +437,6 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     searchLayer = nullptr;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
-}
-
-void GDDLSearchLayer::keyBackClicked() {
-    saveValues();
-    FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -649,14 +653,20 @@ std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
     return {firstIndex, lastIndex};
 }
 
-void GDDLSearchLayer::hideAnyLoadingCircle() {
+/**
+ * Hides all loading circles, also checks if the demonSplitLayer has been closed (if it has, do not open the browser later)
+ */
+bool GDDLSearchLayer::hideAnyLoadingCircle() {
     if (demonSplitLayer != nullptr) {
         demonSplitLayer->hideLoadingCircle();
+        const bool wasClosed = demonSplitLayer->wasClosed;
         demonSplitLayer = nullptr;
+        return wasClosed;
     }
     if (searchLayer != nullptr) {
         searchLayer->hideLoadingCircle();
     }
+    return false;
 }
 
 void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
@@ -665,7 +675,8 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         // remove any loading circles
-        hideAnyLoadingCircle();
+        // if the demon split has been closed already, do not open the browser
+        if (hideAnyLoadingCircle()) return;
         // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
