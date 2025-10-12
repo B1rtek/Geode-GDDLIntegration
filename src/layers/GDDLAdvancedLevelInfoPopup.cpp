@@ -196,7 +196,9 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
             RatingsManager::cacheSpread(this->gddlLevelID, spread);
             addBarCharts();
         } else if (e->isCancelled()) {
-            // TODO error logging
+            const std::string errorMessage = "Error while fetching spreads - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::spreadListener: {}, ID: {}", errorMessage, this->gddlLevelID);
         }
     });
 
@@ -207,7 +209,9 @@ void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
             RatingsManager::cacheSkillsets(this->gddlLevelID, spread);
             addSkillsets();
         } else if (e->isCancelled()) {
-            // TODO error logging
+            const std::string errorMessage = "Error while fetching skillsets - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::skillsetsListener: {}, ID: {}", errorMessage, this->gddlLevelID);
         }
     });
 }
