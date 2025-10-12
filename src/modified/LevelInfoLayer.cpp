@@ -16,16 +16,32 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
-    struct Fields {
+    struct Fields : public IRatingObserver {
         EventListener<web::WebTask> infoLayerGetRatingListener;
         bool gddlTierUpdated = false;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
+        GDDLInfoLayer* m_this;
+
+        Fields() {
+            RatingsManager::subscribeToObservers(this);
+        }
+
+        void updateRating() override {
+            log::debug("GDDLInfoLayer::Fields::updateRating: {} received updateRating(), sending to {}", fmt::ptr(this), fmt::ptr(m_this));
+            m_this->updateButton(RatingsManager::getDemonTier(m_this->m_level->m_levelID));
+        }
+
+        ~Fields() override {
+            RatingsManager::unsubscribeFromObservers(this);
+        }
     };
 
     // ReSharper disable once CppParameterMayBeConst
     bool init(GJGameLevel *p0, bool p1) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
+
+        m_fields->m_this = this;
 
         // setup web req
         m_fields->infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
@@ -161,6 +177,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
+        log::debug("GDDLInfoLayer::updateButton: called in {} with tier {}", fmt::ptr(this), tier);
         const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
@@ -180,6 +197,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             tierLabelSprite->setString(newLabelContent.c_str());
             tierLabelSprite->setColor(RatingsManager::getTierColor(tier));
         }
+        log::debug("GDDLInfoLayer::updateButton: {} successfully updated", fmt::ptr(this));
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst
