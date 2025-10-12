@@ -223,6 +223,7 @@ void GDDLRobtopLevelsLayer::onGDDLInfo(CCObject *sender) {
 
 void GDDLRobtopLevelsLayer::updateButton() {
     // get the menu
+    log::debug("GDDLRobtopLevelsLayer::updateButton: {} updating button", fmt::ptr(this));
     auto gddlButtonMenu = getLevelButton(m_fields->currentPage % 3 + 1)->getChildByID("gddl-button-menu"_spr);
     if (gddlButtonMenu == nullptr) return; // the user most likely scrolled past quicker than it loaded
     // remove the old button
@@ -235,4 +236,5 @@ void GDDLRobtopLevelsLayer::updateButton() {
     button->setID("gddl-button"_spr);
     gddlButtonMenu->addChild(button);
     button->setPosition(12.5, 12.5);
+    log::debug("GDDLRobtopLevelsLayer::updateButton: {} updated", fmt::ptr(this));
 }
