@@ -25,7 +25,8 @@ class RatingsManager {
     static GDDLRating parseJson(const std::string& response);
 public:
     inline static std::string gddlSheetUrl = "https://docs.google.com/spreadsheets/d/1qKlWKpDkOpU1ZF6V6xGfutDY2NvcA8MNPnsv6GBkKPQ/gviz/tq?tqx=out:csv&sheet=GDDL";
-    inline static bool triedToCache = false;
+    inline static bool readCache = false;
+    inline static bool triedToDownloadCache = false;
     static std::vector<int> tierColors;
 
     static void populateFromSave();
@@ -44,9 +45,7 @@ public:
 
     static std::map<int, int> getTierStats();
 
-    static bool alreadyCached();
-
-    static bool cacheNotEmpty();
+    static bool cacheEmpty();
 
     static void updateCacheFromSearch(int levelID, const float rating);
 

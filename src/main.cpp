@@ -54,8 +54,13 @@ class $modify(MenuLayer) {
 #ifdef GEODE_IS_ANDROID
         GDDLRobtopLevelsLayer::backActions();
 #endif
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
-            RatingsManager::triedToCache = true;
+        if (!RatingsManager::readCache) {
+            // populate from save
+            RatingsManager::readCache = true;
+            RatingsManager::populateFromSave();
+        }
+        if (RatingsManager::readCache && RatingsManager::cacheEmpty() && !RatingsManager::triedToDownloadCache) {
+            RatingsManager::triedToDownloadCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());

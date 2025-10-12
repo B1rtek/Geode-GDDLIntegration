@@ -226,18 +226,10 @@ std::map<int, int> RatingsManager::getTierStats() {
 }
 
 /**
- * Populates the in-memory cache from file and then checks if that actually populated it
+ * Checks if cache is empty
  */
-bool RatingsManager::alreadyCached() {
-    populateFromSave();
-    return !ratingsCache.empty();
-}
-
-/**
- * Checks if cache is empty WIHTOUT trying to populate it
- */
-bool RatingsManager::cacheNotEmpty() {
-    return !ratingsCache.empty();
+bool RatingsManager::cacheEmpty() {
+    return ratingsCache.empty();
 }
 
 void RatingsManager::updateCacheFromSearch(const int levelID, const float rating) {

@@ -147,15 +147,17 @@ void Utils::bindCacheDownloadCallback(EventListener<web::WebTask>& cacheEventLis
                 log::error("Utils::bindCacheDownloadCallback: {}", errorMessage);
             } else {
                 RatingsManager::cacheRatings(response);
-                if (!RatingsManager::cacheNotEmpty()) {
+                if (RatingsManager::cacheEmpty()) {
                     const std::string errorMessage = "GDDL Cache refresh failed - received no ratings";
                     Notification::create(errorMessage, NotificationIcon::Error, 3)->show();
                     log::error("Utils::bindCacheDownloadCallback: {}, raw response: {}", errorMessage, response);
                     // populate the cache from the save anyway, there could be something in there
                     RatingsManager::populateFromSave();
                     log::warn("Utils::bindCacheDownloadCallback: Reusing old cache...");
-                } else if (notifySuccess) {
-                    Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
+                } else  {
+                    if (notifySuccess) {
+                        Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
+                    }
                     log::info("Utils::bindCacheDownloadCallback: GDDL Cache refresh succeded");
                 }
             }
