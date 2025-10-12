@@ -54,7 +54,7 @@ class $modify(MenuLayer) {
 #ifdef GEODE_IS_ANDROID
         GDDLRobtopLevelsLayer::backActions();
 #endif
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
+        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) {
             RatingsManager::triedToCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
