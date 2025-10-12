@@ -146,19 +146,25 @@ void Utils::bindCacheDownloadCallback(EventListener<web::WebTask>& cacheEventLis
                 Notification::create("GDDL Cache refresh failed - received empty response", NotificationIcon::Error, 3)->show();
                 log::error("Utils::bindCacheDownloadCallback: {}", errorMessage);
             } else {
-                RatingsManager::cacheRatings(response);
-                if (RatingsManager::cacheEmpty()) {
-                    const std::string errorMessage = "GDDL Cache refresh failed - received no ratings";
-                    Notification::create(errorMessage, NotificationIcon::Error, 3)->show();
-                    log::error("Utils::bindCacheDownloadCallback: {}, raw response: {}", errorMessage, response);
-                    // populate the cache from the save anyway, there could be something in there
-                    RatingsManager::populateFromSave();
-                    log::warn("Utils::bindCacheDownloadCallback: Reusing old cache...");
-                } else  {
-                    if (notifySuccess) {
-                        Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
+                if (res->code() == 200) {
+                    RatingsManager::cacheRatings(response);
+                    if (RatingsManager::cacheEmpty()) {
+                        const std::string errorMessage = "GDDL Cache refresh failed - received no ratings";
+                        Notification::create(errorMessage, NotificationIcon::Error, 3)->show();
+                        log::error("Utils::bindCacheDownloadCallback: {}, raw response: {}", errorMessage, response);
+                        // populate the cache from the save anyway, there could be something in there
+                        RatingsManager::populateFromSave();
+                        log::warn("Utils::bindCacheDownloadCallback: Reusing old cache...");
+                    } else  {
+                        if (notifySuccess) {
+                            Notification::create("GDDL Cache refresh succeded!", NotificationIcon::Success, 2)->show();
+                        }
+                        log::info("Utils::bindCacheDownloadCallback: GDDL Cache refresh succeded");
                     }
-                    log::info("Utils::bindCacheDownloadCallback: GDDL Cache refresh succeded");
+                } else {
+                    const std::string errorMessage = "GDDL Cache refresh failed - " + getErrorMessageFromErrorCode(res->code()).value_or(res->string().unwrapOr("Response was not a valid string"));
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("Utils::bindCacheDownloadCallback: [{}] {}", res->code(), errorMessage);
                 }
             }
         } else if (e->isCancelled()) {
@@ -321,4 +327,16 @@ std::optional<std::string> Utils::getErrorMessageFromErrorCode(int errorCode) {
         return "Gateway timeout";
     }
     return std::nullopt;
+}
+
+std::string Utils::getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse* res) {
+    std::string errorMessage = getErrorMessageFromErrorCode(res->code()).value_or(res->string().unwrapOr(std::to_string(res->code())));
+    if (jsonResponse.contains("message")) {
+        if (jsonResponse["message"].isArray()) {
+            errorMessage = jsonResponse["message"].asArray().unwrap()[0].asString().unwrapOr("Response was not a valid string");
+        } else if (jsonResponse["message"].isString()) {
+            errorMessage = jsonResponse["message"].asString().unwrapOr("Response was not a valid string");
+        }
+    }
+    return errorMessage;
 }

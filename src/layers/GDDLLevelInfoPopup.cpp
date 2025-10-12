@@ -95,17 +95,22 @@ GDDLLevelInfoPopup::GDDLLevelInfoPopup(int levelId) : levelID(levelId) {}
 void GDDLLevelInfoPopup::prepareSearchListener() {
     ratingListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse* res = e->getValue()) {
-            const std::string response = res->string().unwrapOrDefault();
-            if (!RatingsManager::addRatingFromResponse(this->levelID, response)) {
-                const std::string errorMessage = "Error while fetching rating - invalid rating returned";
+            if (res->code() == 200) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (!RatingsManager::addRatingFromResponse(this->levelID, response)) {
+                    const std::string errorMessage = "GDDL: Error while fetching rating - invalid rating returned";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLLevelInfoPopup::ratingListener: {}, ID {}", errorMessage, this->levelID);
+                }
+                this->addLevelInfo();
+            } else {
+                const std::string errorMessage = "GDDL: Error while fetching rating" + Utils::getErrorMessageFromErrorCode(res->code()).value_or(res->string().unwrapOr("Response was not a valid string"));
                 Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                log::error("GDDLLevelInfoPopup::ratingListener: {}, ID {}", errorMessage, this->levelID);
+                log::error("GDDLLevelInfoPopup::ratingListener: [{}] {}, ID: {}", res->code(), errorMessage, this->levelID);
             }
-            this->addLevelInfo();
         }
-        // TODO add 429 handling maybe?
         else if (e->isCancelled()) {
-            const std::string errorMessage = "Error while fetching rating - request cancelled";
+            const std::string errorMessage = "GDDL: Error while fetching rating - request cancelled";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             log::error("GDDLLevelInfoPopup::ratingListener: {}, ID: {}", errorMessage, this->levelID);
         }

@@ -61,10 +61,10 @@ void LoginSettingNodeV3::prepareLogoutListener() {
                 } else {
                     // hmmm
                     const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                    const std::string error = jsonResponse["message"].asString().unwrapOr("Error during logout - unknown error");
-                    Notification::create(error, NotificationIcon::Error, 2)->show();
+                    const std::string errorMessage = "Error during logout - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                     const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                    log::error("LoginSettingNodeV3::logoutListener: {}, raw response: {}", error, rawResponse);
+                    log::error("LoginSettingNodeV3::logoutListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
                 }
             }
         } else if (e->isCancelled()) {

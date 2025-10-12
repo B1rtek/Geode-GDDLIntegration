@@ -692,7 +692,7 @@ void GDDLSearchLayer::prepareSearchListener() {
             if (res->code() == 200) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
-                    const std::string errorMessage = "Search failed - received empty response";
+                    const std::string errorMessage = "GDDL: Search failed - received empty response";
                     Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                     log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
                 } else {
@@ -712,17 +712,17 @@ void GDDLSearchLayer::prepareSearchListener() {
             } else {
                 // not success!
                 const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Search failed - unknown error");
+                const std::string errorMessage = "GDDL Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
                 stopSearch();
                 hideAnyLoadingCircle();
-                Notification::create(error, NotificationIcon::Error, 2)->show();
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                 const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                log::error("GDDLSearchLayer::searchListener: {}, raw response: {}", error, rawResponse);
+                log::error("GDDLSearchLayer::searchListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
             }
         } else if (e->isCancelled()) {
             stopSearch();
             hideAnyLoadingCircle();
-            const std::string errorMessage = "Search failed - request cancelled";
+            const std::string errorMessage = "GDDL: Search failed - request cancelled";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
         }
