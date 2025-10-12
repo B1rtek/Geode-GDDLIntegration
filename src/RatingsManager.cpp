@@ -157,7 +157,6 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
     // the requests for ratings are being made inside the rating popups, so the rest of the interface has to "subscribe" to changes
     // this is the place where we can notify them about the update that happened to the ratings list
     for (const auto observer: ratingObservers) {
-        log::debug("RatingsManager::addRatingFromResponse: sending updateRating() to {}", fmt::ptr(observer));
         observer->updateRating();
     }
     return true;
@@ -296,11 +295,9 @@ void RatingsManager::clearSubmissionCache() {
 }
 
 void RatingsManager::subscribeToObservers(IRatingObserver* newSubscriber) {
-    log::debug("RatingsManager::subscribeToObservers: {} subscribed", fmt::ptr(newSubscriber));
     ratingObservers.insert(newSubscriber);
 }
 
 void RatingsManager::unsubscribeFromObservers(IRatingObserver* unsubscribing) {
-    log::debug("RatingsManager::unsubscribeFromObservers: {} unsubscribed", fmt::ptr(unsubscribing));
     ratingObservers.erase(unsubscribing);
 }

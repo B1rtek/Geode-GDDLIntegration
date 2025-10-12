@@ -36,7 +36,6 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         }
 
         void updateRating() override {
-            log::debug("GDDLRobtopLevelsLayer::Fields::updateRating: {} received updateRating(), sending to {}", fmt::ptr(this), fmt::ptr(m_this));
             m_this->updateButton();
         }
 
