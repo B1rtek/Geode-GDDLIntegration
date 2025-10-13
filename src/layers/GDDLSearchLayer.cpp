@@ -421,6 +421,15 @@ void GDDLSearchLayer::restoreValues() {
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
+    backActions();
+}
+
+void GDDLSearchLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLSearchLayer::backActions() {
     saveValues();
     saveSettings();
     simplifiedLoaded = false;
@@ -428,11 +437,6 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     searchLayer = nullptr;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
-}
-
-void GDDLSearchLayer::keyBackClicked() {
-    saveValues();
-    FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -649,14 +653,20 @@ std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
     return {firstIndex, lastIndex};
 }
 
-void GDDLSearchLayer::hideAnyLoadingCircle() {
+/**
+ * Hides all loading circles, also checks if the demonSplitLayer has been closed (if it has, do not open the browser later)
+ */
+bool GDDLSearchLayer::hideAnyLoadingCircle() {
     if (demonSplitLayer != nullptr) {
         demonSplitLayer->hideLoadingCircle();
+        const bool wasClosed = demonSplitLayer->wasClosed;
         demonSplitLayer = nullptr;
+        return wasClosed;
     }
     if (searchLayer != nullptr) {
         searchLayer->hideLoadingCircle();
     }
+    return false;
 }
 
 void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
@@ -665,7 +675,8 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         // remove any loading circles
-        hideAnyLoadingCircle();
+        // if the demon split has been closed already, do not open the browser
+        if (hideAnyLoadingCircle()) return;
         // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
@@ -681,7 +692,7 @@ void GDDLSearchLayer::prepareSearchListener() {
             if (res->code() == 200) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
-                    const std::string errorMessage = "Search failed - received empty response";
+                    const std::string errorMessage = "GDDL: Search failed - received empty response";
                     Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                     log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
                 } else {
@@ -701,17 +712,17 @@ void GDDLSearchLayer::prepareSearchListener() {
             } else {
                 // not success!
                 const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Search failed - unknown error");
+                const std::string errorMessage = "GDDL Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
                 stopSearch();
                 hideAnyLoadingCircle();
-                Notification::create(error, NotificationIcon::Error, 2)->show();
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                 const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                log::error("GDDLSearchLayer::searchListener: {}, raw response: {}", error, rawResponse);
+                log::error("GDDLSearchLayer::searchListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
             }
         } else if (e->isCancelled()) {
             stopSearch();
             hideAnyLoadingCircle();
-            const std::string errorMessage = "Search failed - request cancelled";
+            const std::string errorMessage = "GDDL: Search failed - request cancelled";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
         }
@@ -1237,5 +1248,7 @@ void GDDLSearchLayer::clickOffTextfields() {
 }
 
 void GDDLSearchLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    }
 }

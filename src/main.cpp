@@ -50,8 +50,13 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
-            RatingsManager::triedToCache = true;
+        if (!RatingsManager::readCache) {
+            // populate from save
+            RatingsManager::readCache = true;
+            RatingsManager::populateFromSave();
+        }
+        if (RatingsManager::readCache && RatingsManager::cacheEmpty() && !RatingsManager::triedToDownloadCache) {
+            RatingsManager::triedToDownloadCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());

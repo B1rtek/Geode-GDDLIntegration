@@ -1,5 +1,13 @@
+# v1.2.7
+- (Fix by [hiimjasmine00](https://github.com/hiimjasmine00)) [Fixed LevelSelectLayer tower exit crash](https://github.com/B1rtek/Geode-GDDLIntegration/pull/93) (thank you!!)
+- Fixed a bug which crashed the game after clicking on a tier and exiting the GDDL Demon Split (thank you robloxplayer0552 and gdexploits!)
+- Fixed a bug which prevented the updates to internal cache from being saved
+- Fixed a visual bug which stacked extra loading circles on top of each other in the GDDL Demon Split (thank you gdexploits!)
+- Optimized the amount of ratings the mod performs (thank you gdexploits, _rfmx, robloxplayer0552, somewhatconsistent and kimichii_s for testing!)
+- Added even more logging than last time and extra error messages
+
 # v1.2.6
-- [Fixed the login bug]() (thank you Aproxia-dev!)
+- [Fixed the login bug](https://github.com/B1rtek/Geode-GDDLIntegration/issues/87) (thank you Aproxia-dev!)
 - Fixed incorrect popup title for "Attempts" in the rating submission menu
 - Added extra spacing for two player specific labels on medium and low graphics to prevent text overlapping
 - Added a lot more logging

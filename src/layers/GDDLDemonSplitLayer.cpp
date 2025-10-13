@@ -72,6 +72,16 @@ bool GDDLDemonSplitLayer::init() {
 }
 
 void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
+    backActions();
+}
+
+void GDDLDemonSplitLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLDemonSplitLayer::backActions() {
+    this->wasClosed = true;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
@@ -101,11 +111,15 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     const std::string tierNumberStr = tierStr.substr(start, end - start);
     const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
     if (maybeTierNumber.isOk()) {
-        GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
-        // the list should display itself hopefully
-        showLoadingCircle();
+        if (!GDDLSearchLayer::isSearching()) {
+            GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
+            // the list should display itself hopefully
+            showLoadingCircle();
+        } else {
+            Notification::create("Already searching...", NotificationIcon::Info, 1)->show();
+        }
     } else {
-        FLAlertLayer::create("Error", "Invalid tier number", "OK")->show();
+        Notification::create("Invalid tier number", NotificationIcon::Warning, 2)->show();
     }
 }
 
@@ -161,8 +175,10 @@ void GDDLDemonSplitLayer::showLoadingCircle() {
 }
 
 void GDDLDemonSplitLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    }
 }
 
 GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {

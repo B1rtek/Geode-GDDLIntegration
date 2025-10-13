@@ -160,11 +160,11 @@ void GDDLLoginLayer::prepareSearchListener() {
                 }
             } else {
                 // not success!
-                const std::string error = jsonResponse["message"].asString().unwrapOr("Error during login - unknown error");
                 hideLoadingCircle();
-                Notification::create(error, NotificationIcon::Error, 2)->show();
+                std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                 const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                log::error("GDDLLoginLayer::loginListener: {}, raw response: {}", error, rawResponse);
+                log::error("GDDLLoginLayer::loginListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();
@@ -194,6 +194,10 @@ void GDDLLoginLayer::prepareMeListener() {
                     log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
                     closeLoginPanel();
                 }
+            } else {
+                const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::skillsetsListener: [{}] {}", res->code(), errorMessage);
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();

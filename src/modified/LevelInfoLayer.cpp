@@ -16,10 +16,22 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
-    struct Fields {
-        EventListener<web::WebTask> infoLayerGetRatingListener;
+    struct Fields : public IRatingObserver {
         bool gddlTierUpdated = false;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
+        GDDLInfoLayer* m_this;
+
+        Fields() {
+            RatingsManager::subscribeToObservers(this);
+        }
+
+        void updateRating() override {
+            m_this->updateButton(RatingsManager::getDemonTier(m_this->m_level->m_levelID));
+        }
+
+        ~Fields() override {
+            RatingsManager::unsubscribeFromObservers(this);
+        }
     };
 
     // ReSharper disable once CppParameterMayBeConst
@@ -27,27 +39,8 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
 
-        // setup web req
-        m_fields->infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
-                const std::string response = res->string().unwrapOrDefault();
-                if (response.empty()) {
-                    updateButton(-1);
-                } else {
-                    const int levelID = m_level->m_levelID;
-                    int tierAfterFetch = -1;
-                    if(RatingsManager::addRatingFromResponse(levelID, response)) {
-                        tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                    }
-                    updateButton(tierAfterFetch);
-                    if (m_fields->advancedLevelInfoPopup != nullptr) {
-                        m_fields->advancedLevelInfoPopup->addRatingInfo();
-                    }
-                }
-            } else if (e->isCancelled()) {
-                updateButton(-1);
-            }
-        });
+        // for handling rating updates from the info popup
+        m_fields->m_this = this;
 
         const bool isDemon = m_level->m_stars == 10;
         if (isDemon && Utils::notExcluded(m_level->m_levelID)) {
@@ -134,13 +127,6 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         // fetch information
         const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
-
-        if (tier == -1) {
-            // web request 2.0 yaaay
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
-        }
     }
 
     void placeGDDLButton(const CCPoint& menuPosition, const CCSize& menuSize, const CCPoint& buttonPosition,

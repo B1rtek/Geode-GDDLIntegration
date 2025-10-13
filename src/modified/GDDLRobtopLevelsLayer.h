@@ -5,7 +5,7 @@
 #include "Geode/modify/LevelSelectLayer.hpp"
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "layers/GDDLLevelInfoPopup.h"
+#include "objects/IRatingObserver.h"
 
 struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, LevelSelectLayer> {
     enum Level {
@@ -22,15 +22,25 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         DASH = 21,
     };
 
-    struct Fields {
+    struct Fields : public IRatingObserver {
         int currentPage = 0;
         static constexpr int pageCount = 24;
         static inline bool beingBrowsed = false;
         bool buttonsAdded[3] = {false, false, false};
         bool changedBySwiping = false;
-        EventListener<web::WebTask> robtopLevelsLayerGetRatingListener;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
-        ~Fields();
+        GDDLRobtopLevelsLayer* m_this;
+
+        Fields() {
+            RatingsManager::subscribeToObservers(this);
+        }
+
+        void updateRating() override {
+            m_this->updateButton();
+        }
+
+        // in .cpp
+        ~Fields() override;
     };
 
     bool init(int page);
@@ -53,7 +63,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
 
     void onGDDLInfo(CCObject *sender);
 
-    void updateButton(const int tier);
+    void updateButton();
 };
 
 #endif //GDDLROBTOPLEVELSLAYER_H

@@ -1,36 +1,18 @@
 #include "GDDLRobtopLevelsLayer.h"
 
+#include <layers/GDDLLevelInfoPopup.h>
+
 #include "GDDLBoomScrollLayer.h"
 
 bool GDDLRobtopLevelsLayer::init(int page) {
     if (!LevelSelectLayer::init(page)) {
         return false;
     }
+    // for handling rating updates from the info popup
+    m_fields->m_this = this;
     Fields::beingBrowsed = true;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = this;
-    // setup potential web req
-    m_fields->robtopLevelsLayerGetRatingListener.bind([this](web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
-            const std::string response = res->string().unwrapOrDefault();
-            if (response.empty()) {
-                updateButton(-1);
-            }
-            else {
-                const int levelID = convertPageToLevel(m_fields->currentPage);
-                int tierAfterFetch = -1;
-                if (RatingsManager::addRatingFromResponse(levelID, response)) {
-                    tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                }
-                updateButton(tierAfterFetch);
-                if (m_fields->advancedLevelInfoPopup != nullptr) {
-                    m_fields->advancedLevelInfoPopup->addRatingInfo();
-                }
-            }
-        }
-        else if (e->isCancelled()) {
-            updateButton(-1);
-        }
-    });
+
 
     m_fields->currentPage = page;
     pageChanged(-1);
@@ -64,6 +46,7 @@ void GDDLRobtopLevelsLayer::swiped(const int newPage) {
 }
 
 GDDLRobtopLevelsLayer::Fields::~Fields() {
+    RatingsManager::unsubscribeFromObservers(this);
     Fields::beingBrowsed = false;
     GDDLBoomScrollLayer::Fields::robtopLevelsLayer = nullptr;
 }
@@ -168,13 +151,6 @@ void GDDLRobtopLevelsLayer::addTo(int scrollLayerPage, int levelID) {
     button->setPosition(12.5, 12.5);
     levelButton->addChild(buttonMenu);
     buttonMenu->setPosition(5, 69);
-    // after placing the button fetch the full level info
-    const int tier = RatingsManager::getDemonTier(levelID);
-    if (tier == -1) {
-        auto req = web::WebRequest();
-        req.header("User-Agent", Utils::getUserAgent());
-        m_fields->robtopLevelsLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
-    }
 }
 
 int GDDLRobtopLevelsLayer::convertPageToLevel(int page) {
@@ -205,7 +181,7 @@ void GDDLRobtopLevelsLayer::onGDDLInfo(CCObject *sender) {
     }
 }
 
-void GDDLRobtopLevelsLayer::updateButton(const int tier) {
+void GDDLRobtopLevelsLayer::updateButton() {
     // get the menu
     auto gddlButtonMenu = getLevelButton(m_fields->currentPage % 3 + 1)->getChildByID("gddl-button-menu"_spr);
     if (gddlButtonMenu == nullptr) return; // the user most likely scrolled past quicker than it loaded

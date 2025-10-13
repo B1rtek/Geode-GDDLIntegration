@@ -32,8 +32,17 @@ bool GDDLLevelInfoPopup::init()
     m_buttonMenu->addChild(title, 1);
     title->setPosition({0.0f, popupSize.y/2-27.5f}); // or basically the standard position below the top border for a title
 
+    prepareSearchListener();
+
     // content
     addLevelInfo();
+    const auto gddlRating = RatingsManager::getRating(levelID);
+    if (!gddlRating) {
+        // make a request to get it
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        ratingListener.setFilter(req.get(RatingsManager::getRequestUrl(this->levelID)));
+    }
 
     // open in browser button
     const auto browserButtonSprite = CCSprite::createWithSpriteFrameName("GJ_redoBtn_001.png");
@@ -83,9 +92,35 @@ void GDDLLevelInfoPopup::show() {
 
 GDDLLevelInfoPopup::GDDLLevelInfoPopup(int levelId) : levelID(levelId) {}
 
+void GDDLLevelInfoPopup::prepareSearchListener() {
+    ratingListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse* res = e->getValue()) {
+            if (res->code() == 200) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (!RatingsManager::addRatingFromResponse(this->levelID, response)) {
+                    const std::string errorMessage = "GDDL: Error while fetching rating - invalid rating returned";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLLevelInfoPopup::ratingListener: {}, ID {}", errorMessage, this->levelID);
+                }
+                this->addLevelInfo();
+            } else {
+                const std::string errorMessage = "GDDL: Error while fetching rating" + Utils::getErrorMessageFromErrorCode(res->code()).value_or(res->string().unwrapOr("Response was not a valid string"));
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::ratingListener: [{}] {}, ID: {}", res->code(), errorMessage, this->levelID);
+            }
+        }
+        else if (e->isCancelled()) {
+            const std::string errorMessage = "GDDL: Error while fetching rating - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLLevelInfoPopup::ratingListener: {}, ID: {}", errorMessage, this->levelID);
+        }
+    });
+}
+
 void GDDLLevelInfoPopup::addLevelInfo() {
     const auto gddlRating = RatingsManager::getRating(levelID);
-    std::string levelInfoText = "Still loading...";
+    m_buttonMenu->removeChildByID("gddl-level-info-label"_spr);
+    std::string levelInfoText = "Loading rating details...";
     if(gddlRating) {
         const auto info = gddlRating.value();
         const std::string rating = "<cr>Tier:</c> " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2)) + '\n';
@@ -94,6 +129,7 @@ void GDDLLevelInfoPopup::addLevelInfo() {
         levelInfoText = " \n" + rating + enjoyment + submissionCount + " \n"; // uhhh this is a good workaround right?
     }
     const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false);
+    levelInfoLabels->setID("gddl-level-info-label"_spr);
     m_buttonMenu->addChild(levelInfoLabels, 2);
     levelInfoLabels->setPosition({0.0f, 5.0f});
 }

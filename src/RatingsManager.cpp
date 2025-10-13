@@ -119,7 +119,12 @@ void RatingsManager::cacheList(bool onQuit) {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult (it's not true!)
-int RatingsManager::getDemonTier(const int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
+int RatingsManager::getDemonTier(const int id) {
+    if (!demonMap.contains(id)) {
+        return getCachedTier(id);
+    }
+    return demonMap[id].roundedRating;
+}
 
 cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
     if (tier > tierColors.size() || tier < 0) {
@@ -148,6 +153,12 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
         return false;
     }
     demonMap[id] = rating;
+    ratingsCache[id] = rating.roundedRating;
+    // the requests for ratings are being made inside the rating popups, so the rest of the interface has to "subscribe" to changes
+    // this is the place where we can notify them about the update that happened to the ratings list
+    for (const auto observer: ratingObservers) {
+        observer->updateRating();
+    }
     return true;
 }
 
@@ -215,18 +226,10 @@ std::map<int, int> RatingsManager::getTierStats() {
 }
 
 /**
- * Populates the in-memory cache from file and then checks if that actually populated it
+ * Checks if cache is empty
  */
-bool RatingsManager::alreadyCached() {
-    populateFromSave();
-    return !ratingsCache.empty();
-}
-
-/**
- * Checks if cache is empty WIHTOUT trying to populate it
- */
-bool RatingsManager::cacheNotEmpty() {
-    return !ratingsCache.empty();
+bool RatingsManager::cacheEmpty() {
+    return ratingsCache.empty();
 }
 
 void RatingsManager::updateCacheFromSearch(const int levelID, const float rating) {
@@ -281,4 +284,12 @@ Submission RatingsManager::getSubmission(const int levelID) {
 
 void RatingsManager::clearSubmissionCache() {
     submissionsCache.clear();
+}
+
+void RatingsManager::subscribeToObservers(IRatingObserver* newSubscriber) {
+    ratingObservers.insert(newSubscriber);
+}
+
+void RatingsManager::unsubscribeFromObservers(IRatingObserver* unsubscribing) {
+    ratingObservers.erase(unsubscribing);
 }

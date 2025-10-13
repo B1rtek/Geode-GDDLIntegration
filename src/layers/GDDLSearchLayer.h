@@ -77,7 +77,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static EventListener<web::WebTask> searchListener;
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
     inline static GDDLBrowserLayer* searchCallbackObject;
-    inline static GDDLDemonSplitLayer* demonSplitLayer = nullptr;
+    inline static Ref<GDDLDemonSplitLayer> demonSplitLayer = nullptr;
     inline static GDDLSearchLayer* searchLayer = nullptr;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
@@ -128,6 +128,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void restoreValues();
     void onClose(CCObject *sender);
     void keyBackClicked() override;
+    void backActions();
     void onInfo(CCObject *sender);
     // request related
     static std::string urlEncodeString(std::string toEncode);
@@ -143,7 +144,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static GJSearchObject *makeASearchObjectFrom(int firstIndex, int lastIndex);
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
-    static void hideAnyLoadingCircle();
+    static bool hideAnyLoadingCircle();
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     static void prepareSearchListener();
     // utility (that and Utils.h)
