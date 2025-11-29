@@ -39,14 +39,34 @@ std::vector<int> RatingsManager::tierColors = {
     0x6c1e04,
     0x601a02,
     0x5a1802,
-    0x511700,
-    0x491900,
-    0x3f1a00,
-    0x331700,
-    0x231300,
-    0x110a00,
+    0x521700,
+    0x4f0a01,
+    0x4a0207,
+    0x470313,
+    0x42041e,
+    0x400427,
+    0x3d0630,
+    0x380635,
+    0x300636,
+    0x250630,
+    0x1C072E,
     0x000000
 };
+
+/*
+ * HSV values for tiers 30-40 after the reform
+17 100 32
+7 99 31
+356 97 29
+346 96 28
+335 94 26
+325 93 25
+314 91 24
+304 90 22
+293 88 21
+283 87 19
+272 85 18
+ */
 
 std::map<int, int> RatingsManager::ratingsCache;
 
