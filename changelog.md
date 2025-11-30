@@ -1,3 +1,8 @@
+# v1.2.8
+- Updated the mod for the Extreme Demon Reform
+  - Tiers go up to 39 now!
+  - Updated the layout in the simplified level search menu and the GDDL demon split
+
 # v1.2.7
 - (Fix by [hiimjasmine00](https://github.com/hiimjasmine00)) [Fixed LevelSelectLayer tower exit crash](https://github.com/B1rtek/Geode-GDDLIntegration/pull/93) (thank you!!)
 - Fixed a bug which crashed the game after clicking on a tier and exiting the GDDL Demon Split (thank you robloxplayer0552 and gdexploits!)
