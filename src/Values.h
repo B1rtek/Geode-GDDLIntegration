@@ -3,7 +3,7 @@
 
 class Values {
 public:
-    static constexpr int highestTier = 35;
+    static constexpr int highestTier = 39;
 };
 
 #endif //GDDLINTEGRATION_VALUES_H
