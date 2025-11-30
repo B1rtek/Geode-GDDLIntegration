@@ -243,7 +243,7 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
             // if the user has been specified
             requestedUsername = secondPlayerTextfield->getString();
             if (requestedUsername.empty()) {
-                // assume that no user was specified because the second player does not have an account and just move on
+                submissionJson["secondPlayerID"] = nullptr;
                 makeSubmissionRequest();
             } else {
                 std::string requestURL = userSearchEndpoint;
