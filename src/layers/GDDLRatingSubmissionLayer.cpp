@@ -240,12 +240,18 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
         submissionJson["isSolo"] = soloCompletion;
         if (!soloCompletion) {
             // a request to retrieve the userid has to be made first before making the submission request
-            std::string requestURL = userSearchEndpoint;
+            // if the user has been specified
             requestedUsername = secondPlayerTextfield->getString();
-            requestURL += "?name=" + requestedUsername + "&limit=25";
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            userSearchListener.setFilter(req.get(requestURL));
+            if (requestedUsername.empty()) {
+                // assume that no user was specified because the second player does not have an account and just move on
+                makeSubmissionRequest();
+            } else {
+                std::string requestURL = userSearchEndpoint;
+                requestURL += "?name=" + requestedUsername + "&limit=25";
+                auto req = web::WebRequest();
+                req.header("User-Agent", Utils::getUserAgent());
+                userSearchListener.setFilter(req.get(requestURL));
+            }
         } else {
             makeSubmissionRequest();
         }
