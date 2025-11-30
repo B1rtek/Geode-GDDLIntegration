@@ -9,7 +9,7 @@
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
 
-    const CCPoint popupSize = {360.0f, 225.0f};
+    const CCPoint popupSize = {400.0f, 200.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // background
     const auto bg = CCScale9Sprite::create("GJ_square02.png", {0.0f, 0.0f, 80.0f, 80.0f});
@@ -44,18 +44,21 @@ bool GDDLDemonSplitLayer::init() {
     for (int row = 0; row < 5; row++) {
         const auto rowNode = CCNode::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
-        rowNode->setContentSize({350.0f, 20.0f});
-        for (int column = 0; column < 7; column++) {
-            const auto tierNode = createTierNode(row+1+column*5);
-            rowNode->addChild(tierNode);
+        rowNode->setContentSize({390.0f, 20.0f});
+        for (int column = 0; column < 8; column++) {
+            const int targetTier = row+1+column*5;
+            if (targetTier != 40) {
+                const auto tierNode = createTierNode(row+1+column*5);
+                rowNode->addChild(tierNode);
+            } else {
+                const auto tierNode = createTierNode(-1);
+                rowNode->addChild(tierNode);
+            }
         }
         rowNode->updateLayout();
         m_buttonMenu->addChild(rowNode);
         m_buttonMenu->reorderChild(rowNode, row+1);
     }
-    // unrated tier
-    const auto unratedTierNode = createTierNode(-1);
-    m_buttonMenu->addChild(unratedTierNode, 7);
 
     // ok button
     const auto spr = ButtonSprite::create("OK");
