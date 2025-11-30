@@ -2,6 +2,7 @@
 - Updated the mod for the Extreme Demon Reform
   - Tiers go up to 39 now!
   - Updated the layout in the simplified level search menu and the GDDL demon split
+- Fixed a bug which prevented submitting 2p levels as two player completions with the second player not specified (thanks mang0w0rks!)
 
 # v1.2.7
 - (Fix by [hiimjasmine00](https://github.com/hiimjasmine00)) [Fixed LevelSelectLayer tower exit crash](https://github.com/B1rtek/Geode-GDDLIntegration/pull/93) (thank you!!)
