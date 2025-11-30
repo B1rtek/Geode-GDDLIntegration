@@ -1,4 +1,7 @@
 #include "GDDLRatingSubmissionLayer.h"
+
+#include <Values.h>
+
 #include "Utils.h"
 #include "settings/LoginSettingNodeV3.h"
 #include "GDDLLoginLayer.h"
@@ -445,7 +448,7 @@ bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
 std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
     submissionJson["levelID"] = this->gddlLevelID;
     submissionJson["device"] = mobile ? "mobile" : "pc";
-    const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
+    const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), Values::highestTier);
     if (correctedRating != 0) {
         submissionJson["rating"] = correctedRating;
     }

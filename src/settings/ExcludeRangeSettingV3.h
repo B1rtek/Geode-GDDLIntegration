@@ -2,6 +2,7 @@
 #define EXCLUDERANGESETTINGV3_H
 
 #include <Geode/loader/SettingV3.hpp>
+#include "Utils.h"
 
 using namespace geode::prelude;
 

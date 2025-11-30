@@ -1,7 +1,7 @@
 #ifndef GDDLSEARCHLAYER_H
 #define GDDLSEARCHLAYER_H
 
-#include <Utils.h>
+#include <Values.h>
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include "GDDLDemonSplitLayer.h"
@@ -14,7 +14,7 @@ enum LevelCompleteness { ANY, UNCOMPLETED, COMPLETED };
 class GDDLSearchLayer final : public FLAlertLayer {
     // endpoint args, ignoring chunk (always set to 10) and stddev args
     // value limits
-    static constexpr int highestTier = 35;
+    static constexpr int highestTier = Values::highestTier;
     static constexpr float highestEnjoyment = 10.0f;
     static constexpr int maxSubmissions = 9999;
     // 0 defaults treated as null (not passed to the query) (well, it depends)
