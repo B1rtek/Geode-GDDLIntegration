@@ -1,4 +1,7 @@
 #include "GDDLRatingSubmissionLayer.h"
+
+#include <Values.h>
+
 #include "Utils.h"
 #include "settings/LoginSettingNodeV3.h"
 #include "GDDLLoginLayer.h"
@@ -237,12 +240,18 @@ void GDDLRatingSubmissionLayer::onSubmitClicked(CCObject* sender) {
         submissionJson["isSolo"] = soloCompletion;
         if (!soloCompletion) {
             // a request to retrieve the userid has to be made first before making the submission request
-            std::string requestURL = userSearchEndpoint;
+            // if the user has been specified
             requestedUsername = secondPlayerTextfield->getString();
-            requestURL += "?name=" + requestedUsername + "&limit=25";
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            userSearchListener.setFilter(req.get(requestURL));
+            if (requestedUsername.empty()) {
+                submissionJson["secondPlayerID"] = nullptr;
+                makeSubmissionRequest();
+            } else {
+                std::string requestURL = userSearchEndpoint;
+                requestURL += "?name=" + requestedUsername + "&limit=25";
+                auto req = web::WebRequest();
+                req.header("User-Agent", Utils::getUserAgent());
+                userSearchListener.setFilter(req.get(requestURL));
+            }
         } else {
             makeSubmissionRequest();
         }
@@ -445,7 +454,7 @@ bool GDDLRatingSubmissionLayer::isValidProof(const std::string& proofURL) {
 std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
     submissionJson["levelID"] = this->gddlLevelID;
     submissionJson["device"] = mobile ? "mobile" : "pc";
-    const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), 35);
+    const int correctedRating = std::min(std::max(0, Utils::getNumberTextfieldValue(ratingTextfield)), Values::highestTier);
     if (correctedRating != 0) {
         submissionJson["rating"] = correctedRating;
     }

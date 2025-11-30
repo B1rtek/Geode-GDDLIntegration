@@ -199,10 +199,17 @@ void GDDLSearchLayer::loadPageSimple() {
         const auto rowNode = CCMenu::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
         rowNode->setContentSize({popupSize.x-10.0f, 20.0f});
-        for (int column = 0; column < 7; column++) {
-            const auto tierNode = createTierNode(row+1+column*5);
-            rowNode->addChild(tierNode);
-            tierButtons.push_back(tierNode);
+        for (int column = 0; column < 8; column++) {
+            const int targetTier = row+1+column*5;
+            if (targetTier <= Values::highestTier) {
+                const auto tierNode = createTierNode(row+1+column*5);
+                rowNode->addChild(tierNode);
+                tierButtons.push_back(tierNode);
+            } else {
+                const auto unknownButton = createTierNode(-1);
+                rowNode->addChild(unknownButton);
+                tierButtons.push_back(unknownButton);
+            }
         }
         rowNode->updateLayout();
         simplifiedMenu->addChild(rowNode);
@@ -212,10 +219,6 @@ void GDDLSearchLayer::loadPageSimple() {
     const auto rowNode = CCMenu::create();
     rowNode->setLayout(RowLayout::create()->setGap(5.0f));
     rowNode->setContentSize({popupSize.x-10.0f, 35.0f});
-    // unknown tier
-    const auto unknownButton = createTierNode(-1);
-    rowNode->addChild(unknownButton);
-    tierButtons.push_back(unknownButton);
     // togglers - checkboxes
     const std::string ids[2] = {"completed", "uncompleted"};
     const std::string labels[2] = {"Completed", "Uncompleted"};
