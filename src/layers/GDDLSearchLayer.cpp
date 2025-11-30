@@ -201,7 +201,7 @@ void GDDLSearchLayer::loadPageSimple() {
         rowNode->setContentSize({popupSize.x-10.0f, 20.0f});
         for (int column = 0; column < 8; column++) {
             const int targetTier = row+1+column*5;
-            if (targetTier != 40) {
+            if (targetTier <= Values::highestTier) {
                 const auto tierNode = createTierNode(row+1+column*5);
                 rowNode->addChild(tierNode);
                 tierButtons.push_back(tierNode);
