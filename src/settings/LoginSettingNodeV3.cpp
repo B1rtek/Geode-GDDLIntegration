@@ -97,6 +97,7 @@ bool LoginSettingNodeV3::loggedIn() {
 void LoginSettingNodeV3::logOut() {
     const std::string emptyString;
     Mod::get()->setSavedValue("login-sid", emptyString);
+    Mod::get()->setSavedValue("api-key", emptyString);
     RatingsManager::clearSubmissionCache();
 }
 
