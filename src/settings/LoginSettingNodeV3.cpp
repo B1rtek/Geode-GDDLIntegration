@@ -91,7 +91,8 @@ void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
 }
 
 bool LoginSettingNodeV3::loggedIn() {
-    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty();
+    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty() ||
+        !Mod::get()->getSavedValue<std::string>("api-key", "").empty();
 }
 
 void LoginSettingNodeV3::logOut() {
