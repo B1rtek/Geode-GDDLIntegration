@@ -24,53 +24,88 @@ bool GDDLLoginLayer::init() {
     m_buttonMenu->setContentSize(popupSize);
     m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
+
     // title
-    const auto title = CCLabelBMFont::create("GDDL Login", "goldFont.fnt");
+    const auto titleContent = LoginSettingNodeV3::loggedIn() ? "Manage API key" : "Log in with API key";
+    const auto title = CCLabelBMFont::create(titleContent, "goldFont.fnt");
+    title->setScale(LoginSettingNodeV3::loggedIn() ? 1.0f : 0.9f);
     title->setID("gddl-login-title"_spr);
     title->setPosition({popupSize.x / 2, popupSize.y - 20.0f});
     m_buttonMenu->addChild(title);
+
     // close button
     const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLLoginLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
 
-    // content
-    // status text
-    statusLabel = CCLabelBMFont::create("", "chatFont.fnt");
-    statusLabel->setID("gddl-login-status-label"_spr);
-    statusLabel->setPosition({popupSize.x / 2, popupSize.y - 38.0f});
-    statusLabel->setScale(0.7f);
-    m_buttonMenu->addChild(statusLabel);
-    // username text + textfield
-    const auto usernameLabel = CCLabelBMFont::create("Username", "bigFont.fnt");
-    usernameLabel->setScale(0.5f);
-    usernameLabel->setID("gddl-login-username-label"_spr);
-    usernameLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 50.0f});
-    m_buttonMenu->addChild(usernameLabel);
-    Utils::createTextInputNode(m_buttonMenu, usernameTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
-                               {popupSize.x / 2, popupSize.y - 75.0f});
-    usernameTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-    usernameTextField->setString(Mod::get()->getSavedValue<std::string>("login-username", ""));
-    // password text + textfield
-    const auto passwordLabel = CCLabelBMFont::create("Password", "bigFont.fnt");
-    passwordLabel->setScale(0.5f);
-    passwordLabel->setID("gddl-login-password-label"_spr);
-    passwordLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 100.0f});
-    m_buttonMenu->addChild(passwordLabel);
-    Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
-                               {popupSize.x / 2, popupSize.y - 125.0f});
-    passwordTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-    passwordTextField->m_usePasswordChar = true;
-    // login button
-    const auto loginButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_02.png");
-    loginButtonSprite->setScale(0.6f);
-    loginButton = CCMenuItemSpriteExtra::create(loginButtonSprite, this,
-                                                           menu_selector(GDDLLoginLayer::onLoginClicked));
-    loginButton->setID("gddl-login-login-button"_spr);
-    loginButton->setPosition({popupSize.x / 2, popupSize.y - 160.0f});
-    m_buttonMenu->addChild(loginButton);
-    m_buttonMenu->reorderChild(loginButton, 10);
+    // content of the popup depends on whether the user is logged in or not
+    if (LoginSettingNodeV3::loggedIn()) {
+        // logged in label
+        const std::string username = Mod::get()->getSavedValue<std::string>("login-username", "");
+        const auto loggedInLabel = CCLabelBMFont::create(("Logged in as " + username).c_str(), "bigFont.fnt");
+        loggedInLabel->setScale(0.5f);
+        loggedInLabel->setID("gddl-login-logged-in-label"_spr);
+        loggedInLabel->setPosition({popupSize.x / 2, popupSize.y - 50.0f});
+        m_buttonMenu->addChild(loggedInLabel);
+
+        // copy key button
+        const auto copyKeyButtonSprite = ButtonSprite::create("Copy key", "bigFont.fnt", "GJ_button_02.png");
+        copyKeyButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(copyKeyButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onCopyAPIKeyClicked));
+        loginButton->setID("gddl-login-copy-key-button"_spr);
+        loginButton->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 80.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // log out button
+        const auto logOutButtonSprite = ButtonSprite::create("Log out", "bigFont.fnt", "GJ_button_06.png");
+        logOutButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(logOutButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onLogOutClicked));
+        loginButton->setID("gddl-login-log-out-button"_spr);
+        loginButton->setPosition({popupSize.x / 2 + 60.0f, popupSize.y - 80.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // disclaimer about logging out
+        const std::string disclaimerMessage = "<cr>Logging out</c> will <cy>deactivate</c> the <cb>API key</c> in use,\nlogging out <cy>all devices using this key</c>.";
+        const auto disclaimerTextArea = TextArea::create(disclaimerMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
+        disclaimerTextArea->setID("gddl-login-disclaimer"_spr);
+        disclaimerTextArea->setPosition({popupSize.x / 2 + 30.0f, popupSize.y - 110.0f}); // why does this thing not place itself in the middle ugh
+        m_buttonMenu->addChild(disclaimerTextArea);
+    } else {
+        // api key input field
+        Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
+                               {popupSize.x / 2, popupSize.y - 60.0f});
+        passwordTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
+        passwordTextField->m_usePasswordChar = true;
+
+        // log in button
+        const auto copyKeyButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_01.png");
+        copyKeyButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(copyKeyButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onLoginClicked));
+        loginButton->setID("gddl-login-log-in-button"_spr);
+        loginButton->setPosition({popupSize.x / 2, popupSize.y - 90.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // instructions
+        const std::string apiKeyInstructions = "To obtain your <cb>API key</c>, log into your <cr>GDDL account</c>\nin the browser and go to <cg>Settings</c> > <cp>Developer</c>.";
+        const auto apiKeyTextArea = TextArea::create(apiKeyInstructions, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
+        apiKeyTextArea->setID("gddl-login-api-key-instructions"_spr);
+        apiKeyTextArea->setPosition({popupSize.x / 2 + 35.0f, popupSize.y - 120.0f}); // why does this thing not place itself in the middle ugh
+        m_buttonMenu->addChild(apiKeyTextArea);
+    }
+
+    // never share this key with anyone label
+    std::string neverShareMessage = "<cr>Never</c> share your <cb>API key</c> with anyone.\n<co>Anyone</c> in the possession of your <cb>API key</c>\nhas <cy>full access to your account</c>.";
+    const auto disclaimerTextArea = TextArea::create(neverShareMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
+    disclaimerTextArea->setID("gddl-login-never-share"_spr);
+    disclaimerTextArea->setPosition({popupSize.x / 2 + 25.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
+    m_buttonMenu->addChild(disclaimerTextArea);
 
     prepareSearchListener();
     prepareMeListener();
@@ -102,6 +137,14 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     req.bodyJSON(reqJson);
     showLoadingCircle();
     loginListener.setFilter(req.post(loginEndpoint));
+}
+
+void GDDLLoginLayer::onCopyAPIKeyClicked(cocos2d::CCObject* sender) {
+
+}
+
+void GDDLLoginLayer::onLogOutClicked(cocos2d::CCObject* sender) {
+
 }
 
 std::string GDDLLoginLayer::getAllHeaders(web::WebResponse* response) {

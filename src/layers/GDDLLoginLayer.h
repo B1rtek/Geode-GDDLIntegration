@@ -23,6 +23,8 @@ class GDDLLoginLayer final : public FLAlertLayer {
     bool init() override;
     void onClose(cocos2d::CCObject* sender);
     void onLoginClicked(cocos2d::CCObject *sender);
+    void onCopyAPIKeyClicked(cocos2d::CCObject *sender);
+    void onLogOutClicked(cocos2d::CCObject *sender);
 
     std::string getAllHeaders(web::WebResponse* response);
     void prepareSearchListener();
