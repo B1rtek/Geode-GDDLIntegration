@@ -11,8 +11,7 @@ using namespace geode::prelude;
 class GDDLLoginLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
     CCLabelBMFont* statusLabel = nullptr;
-    CCTextInputNode* usernameTextField = nullptr;
-    CCTextInputNode* passwordTextField = nullptr;
+    CCTextInputNode* apiKeyTextField = nullptr;
     CCMenuItemSpriteExtra* loginButton = nullptr;
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/account/login";
@@ -27,9 +26,8 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onLogOutClicked(cocos2d::CCObject *sender);
 
     std::string getAllHeaders(web::WebResponse* response);
-    void prepareSearchListener();
     void prepareMeListener();
-    void saveLoginData(const std::string& sid, int uid);
+    void saveLoginData(const std::string& username, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();

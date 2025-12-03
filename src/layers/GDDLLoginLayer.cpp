@@ -77,10 +77,10 @@ bool GDDLLoginLayer::init() {
         m_buttonMenu->addChild(disclaimerTextArea);
     } else {
         // api key input field
-        Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
+        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 60.0f});
-        passwordTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-        passwordTextField->m_usePasswordChar = true;
+        apiKeyTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
+        apiKeyTextField->m_usePasswordChar = true;
 
         // log in button
         const auto copyKeyButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_01.png");
@@ -107,7 +107,6 @@ bool GDDLLoginLayer::init() {
     disclaimerTextArea->setPosition({popupSize.x / 2 + 25.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
     m_buttonMenu->addChild(disclaimerTextArea);
 
-    prepareSearchListener();
     prepareMeListener();
 
     return true;
@@ -119,24 +118,14 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
-    matjson::Value reqJson = matjson::Value();
-    std::string username = std::string(usernameTextField->getString());
-    if (username.empty()) {
-        Notification::create("Missing username", NotificationIcon::Warning, 2)->show();
-        return;
-    }
-    std::string password = std::string(passwordTextField->getString());
-    if (password.empty()) {
-        Notification::create("Missing password", NotificationIcon::Warning, 2)->show();
-        return;
-    }
-    reqJson["username"] = username;
-    reqJson["password"] = password;
+    const std::string authHeader = "Bearer " + apiKeyTextField->getString();
     auto req = web::WebRequest();
+    req.header("Authorization", authHeader);
     req.header("User-Agent", Utils::getUserAgent());
-    req.bodyJSON(reqJson);
     showLoadingCircle();
-    loginListener.setFilter(req.post(loginEndpoint));
+    // if /api/user/me returns 200/201, the key is valid for the fetched user
+    saveLoginData("", 0);
+    meListener.setFilter(req.get(meEndpoint));
 }
 
 void GDDLLoginLayer::onCopyAPIKeyClicked(cocos2d::CCObject* sender) {
@@ -159,101 +148,44 @@ std::string GDDLLoginLayer::getAllHeaders(web::WebResponse* response) {
     return headersList;
 }
 
-// left here because once geode 4.0.0 comes out raw curl won't be needed
-void GDDLLoginLayer::prepareSearchListener() {
-    loginListener.bind([this](web::WebTask::Event *e) {
-        if (web::WebResponse *res = e->getValue()) {
-            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
-                saveLoginData("", 0);
-                std::optional<std::vector<std::string>> cookies = res->getAllHeadersNamed("Set-Cookie");
-                if (!cookies.has_value()) {
-                    cookies = res->getAllHeadersNamed("set-cookie");
-                }
-                if (cookies.has_value()) {
-                    std::map<std::string, std::string> cookiesMap;
-                    for (const auto& cookie : cookies.value()) {
-                        const auto [name, value] = getCookieValue(cookie.c_str());
-                        cookiesMap[name] = value;
-                    }
-                    if (cookiesMap.contains("gddl.sid")) {
-                        // get uid
-                        saveLoginData(cookiesMap["gddl.sid"], 0);
-                        auto req = web::WebRequest();
-                        req.header("User-Agent", Utils::getUserAgent());
-                        req.header("Cookie", fmt::format("gddl.sid={}", cookiesMap["gddl.sid"]));
-                        showLoadingCircle();
-                        log::info("GDDLLoginLayer::loginListener: obtained session cookie");
-                        meListener.setFilter(req.get(meEndpoint));
-                    } else {
-                        hideLoadingCircle();
-                        const std::string errorMessage = "Error during login - no session cookie received";
-                        Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                        const std::string headersList = getAllHeaders(res);
-                        const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                        log::error("GDDLLoginLayer::loginListener: {}, received headers: {}, raw response: {}", errorMessage, headersList, rawResponse);
-                    }
-                } else {
-                    hideLoadingCircle();
-                    const std::string errorMessage = "Error during login - missing cookies";
-                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                    const std::string headersList = getAllHeaders(res);
-                    const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                    log::error("GDDLLoginLayer::loginListener: {}, received headers: {}, raw response: {}", errorMessage, headersList, rawResponse);
-                }
-            } else {
-                // not success!
-                hideLoadingCircle();
-                std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
-                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                log::error("GDDLLoginLayer::loginListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
-            }
-        } else if (e->isCancelled()) {
-            hideLoadingCircle();
-            const std::string errorMessage = "Error during login - request cancelled";
-            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-            log::error("GDDLLoginLayer::loginListener: {}", errorMessage);
-        }
-    });
-}
-
 void GDDLLoginLayer::prepareMeListener() {
     meListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
                 const int uid = jsonResponse["ID"].asInt().unwrapOr(-1);
-                if (uid == -1) {
+                const std::string username = jsonResponse["Name"].asString().unwrapOr("");
+                if (uid == -1 || username == "") {
                     hideLoadingCircle();
-                    const std::string errorMessage = "Error during login - failed to obtain the user id";
+                    const std::string errorMessage = "Error during login - failed to obtain the user id or username";
                     Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
                     const std::string rawResponse = res->string().unwrapOr("Response was not a valid string");
                     log::error("GDDLLoginLayer::meListener: {}, raw response: {}", errorMessage, rawResponse);
                 } else {
-                    saveLoginData(Mod::get()->getSavedValue<std::string>("login-sid", ""), uid);
+                    saveLoginData(username, uid);
                     RatingsManager::clearSubmissionCache();
                     Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
                     log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
                     closeLoginPanel();
                 }
             } else {
+                hideLoadingCircle();
                 const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
                 Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                log::error("GDDLLevelInfoPopup::skillsetsListener: [{}] {}", res->code(), errorMessage);
+                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();
-            const std::string errorMessage = "Error during login - user id request cancelled";
+            const std::string errorMessage = "Error during login - request cancelled";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             log::error("GDDLLoginLayer::meListener: {}", errorMessage);
         }
     });
 }
 
-void GDDLLoginLayer::saveLoginData(const std::string &sid, const int uid) {
-    Mod::get()->setSavedValue("login-username", std::string(usernameTextField->getString()));
-    Mod::get()->setSavedValue("login-sid", sid);
+void GDDLLoginLayer::saveLoginData(const std::string &username, const int uid) {
+    Mod::get()->setSavedValue("api-key", username.empty() ? "" : std::string(apiKeyTextField->getString()));
+    Mod::get()->setSavedValue("login-username", username);
     Mod::get()->setSavedValue("login-userid", uid);
 }
 
