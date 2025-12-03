@@ -168,6 +168,11 @@ void GDDLLoginLayer::prepareMeListener() {
                     log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
                     closeLoginPanel();
                 }
+            } else if (res->code() == 401) {
+                hideLoadingCircle();
+                const std::string errorMessage = "Error during login - invalid API key";
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
             } else {
                 hideLoadingCircle();
                 const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
