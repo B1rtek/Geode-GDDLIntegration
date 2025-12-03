@@ -66,6 +66,7 @@ public:
     static CCSprite* getGrayPopupCloseButton(float scale = .85f);
     static std::optional<std::string> getErrorMessageFromErrorCode(int errorCode);
     static std::string getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse* res);
+    static void addAuthHeader(web::WebRequest &req);
 };
 
 template <typename T>
