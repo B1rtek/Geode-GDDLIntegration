@@ -70,7 +70,7 @@ bool GDDLLoginLayer::init() {
         m_buttonMenu->reorderChild(loginButton, 10);
 
         // disclaimer about logging out
-        const std::string disclaimerMessage = "<cr>Logging out</c> will <cy>deactivate</c> the <cb>API key</c> in use,\nlogging out <cy>all devices using this key</c>.";
+        const std::string disclaimerMessage = "<cr>Logging out</c> will <cy>only delete</c> the <cj>API key</c> from\n<co>this device</c>, to log out <cy>all devices</c> go to\ngdladder.com > <cg>Settings</c> > <cp>Developer</c>.";
         const auto disclaimerTextArea = TextArea::create(disclaimerMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
         disclaimerTextArea->setID("gddl-login-disclaimer"_spr);
         disclaimerTextArea->setPosition({popupSize.x / 2 + 30.0f, popupSize.y - 110.0f}); // why does this thing not place itself in the middle ugh
@@ -93,7 +93,7 @@ bool GDDLLoginLayer::init() {
         m_buttonMenu->reorderChild(loginButton, 10);
 
         // instructions
-        const std::string apiKeyInstructions = "To obtain your <cb>API key</c>, log into your <cr>GDDL account</c>\nin the browser and go to <cg>Settings</c> > <cp>Developer</c>.";
+        const std::string apiKeyInstructions = "To obtain your <cj>API key</c>, log into your <cr>GDDL account</c>\nin the browser and go to <cg>Settings</c> > <cp>Developer</c>.";
         const auto apiKeyTextArea = TextArea::create(apiKeyInstructions, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
         apiKeyTextArea->setID("gddl-login-api-key-instructions"_spr);
         apiKeyTextArea->setPosition({popupSize.x / 2 + 35.0f, popupSize.y - 120.0f}); // why does this thing not place itself in the middle ugh
@@ -101,7 +101,7 @@ bool GDDLLoginLayer::init() {
     }
 
     // never share this key with anyone label
-    std::string neverShareMessage = "<cr>Never</c> share your <cb>API key</c> with anyone.\n<co>Anyone</c> in the possession of your <cb>API key</c>\nhas <cy>full access to your account</c>.";
+    std::string neverShareMessage = "<cr>Never</c> share your <cj>API key</c> with anyone.\n<co>Anyone</c> in the possession of your <cj>API key</c>\nhas <cy>full access to your account</c>.";
     const auto disclaimerTextArea = TextArea::create(neverShareMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, 12, false);
     disclaimerTextArea->setID("gddl-login-never-share"_spr);
     disclaimerTextArea->setPosition({popupSize.x / 2 + 25.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
@@ -129,11 +129,14 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
 }
 
 void GDDLLoginLayer::onCopyAPIKeyClicked(cocos2d::CCObject* sender) {
-
+    PlatformToolbox::copyToClipboard(Mod::get()->getSavedValue<std::string>("api-key", ""));
+    Notification::create("API key copied to clipboard!", NotificationIcon::Success, 2)->show();
 }
 
 void GDDLLoginLayer::onLogOutClicked(cocos2d::CCObject* sender) {
-
+    LoginSettingNodeV3::logOut();
+    Notification::create("Logged out", NotificationIcon::Success, 2)->show();
+    closeLoginPanel();
 }
 
 std::string GDDLLoginLayer::getAllHeaders(web::WebResponse* response) {
