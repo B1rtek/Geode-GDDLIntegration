@@ -120,7 +120,7 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
-    const std::string authHeader = "Bearer " + apiKeyTextField->getString();
+    const std::string authHeader = "Bearer " + std::string(apiKeyTextField->getString());
     auto req = web::WebRequest();
     req.header("Authorization", authHeader);
     req.header("User-Agent", Utils::getUserAgent());
