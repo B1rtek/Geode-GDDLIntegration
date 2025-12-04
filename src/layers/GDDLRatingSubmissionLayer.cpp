@@ -514,8 +514,7 @@ void GDDLRatingSubmissionLayer::makeSubmissionRequest() {
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
     req.bodyJSON(submissionJson);
-    req.header("Cookie", fmt::format("gddl.sid={}",
-                                     Mod::get()->getSavedValue<std::string>("login-sid", "")));
+    Utils::addAuthHeader(req);
     submissionListener.setFilter(req.post(submissionEndpoint));
 }
 

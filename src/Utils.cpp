@@ -340,3 +340,11 @@ std::string Utils::getErrorFromMessageAndResponse(matjson::Value jsonResponse, w
     }
     return errorMessage;
 }
+
+void Utils::addAuthHeader(web::WebRequest &req) {
+    if (const std::string sid = Mod::get()->getSavedValue<std::string>("login-sid", ""); !sid.empty()) {
+        req.header("Cookie", fmt::format("gddl.sid={}", sid));
+    } else {
+        req.header("Authorization", fmt::format("Bearer {}", Mod::get()->getSavedValue<std::string>("api-key", "")));
+    }
+}

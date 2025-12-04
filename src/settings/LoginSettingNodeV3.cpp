@@ -76,27 +76,20 @@ void LoginSettingNodeV3::prepareLogoutListener() {
 }
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {
-    if (loggedIn()) {
-        // logout request
-        auto req = web::WebRequest();
-        req.header("User-Agent", Utils::getUserAgent());
-        req.header("Cookie", fmt::format("gddl.sid={}",
-                                 Mod::get()->getSavedValue<std::string>("login-sid", "")));
-        logoutListener.setFilter(req.post(logoutEndpoint));
-    } else {
-        const auto loginLayer = GDDLLoginLayer::create();
-        loginLayer->setSettingNode(this);
-        loginLayer->show();
-    }
+    const auto loginLayer = GDDLLoginLayer::create();
+    loginLayer->setSettingNode(this);
+    loginLayer->show();
 }
 
 bool LoginSettingNodeV3::loggedIn() {
-    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty();
+    return !Mod::get()->getSavedValue<std::string>("login-sid", "").empty() ||
+        !Mod::get()->getSavedValue<std::string>("api-key", "").empty();
 }
 
 void LoginSettingNodeV3::logOut() {
     const std::string emptyString;
     Mod::get()->setSavedValue("login-sid", emptyString);
+    Mod::get()->setSavedValue("api-key", emptyString);
     RatingsManager::clearSubmissionCache();
 }
 
@@ -131,7 +124,7 @@ void LoginSettingNodeV3::updateFromOutside() {
 }
 
 ButtonSprite *LoginSettingNodeV3::getLoginLogoutButtonSprite(bool login) {
-    ButtonSprite* loginButtonSprite = ButtonSprite::create(login ? "Log in" : "Log out", "bigFont.fnt", login ? "GJ_button_01.png" : "GJ_button_06.png");
+    ButtonSprite* loginButtonSprite = ButtonSprite::create(login ? "Log in" : "Manage", "bigFont.fnt", login ? "GJ_button_01.png" : "GJ_button_02.png");
     loginButtonSprite->setScale(0.6f);
     return loginButtonSprite;
 }
