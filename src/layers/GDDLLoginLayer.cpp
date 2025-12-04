@@ -139,18 +139,6 @@ void GDDLLoginLayer::onLogOutClicked(cocos2d::CCObject* sender) {
     closeLoginPanel();
 }
 
-std::string GDDLLoginLayer::getAllHeaders(web::WebResponse* response) {
-    const auto headers = response->headers();
-    std::string headersList = "";
-    for (int i = 0; i < headers.size(); ++i) {
-        headersList += headers[i];
-        if (i != headers.size() - 1) {
-            headersList += ", ";
-        }
-    }
-    return headersList;
-}
-
 void GDDLLoginLayer::prepareMeListener() {
     meListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
@@ -214,15 +202,6 @@ void GDDLLoginLayer::showLoadingCircle() {
 
 void GDDLLoginLayer::hideLoadingCircle() {
     m_buttonMenu->removeChildByID("gddl-login-loading-spinner"_spr);
-}
-
-std::pair<std::string, std::string> GDDLLoginLayer::getCookieValue(const char *content) {
-    std::string cookie = content;
-    // get cookie name
-    int equalsPos = cookie.find('=');
-    std::string cookieName = cookie.substr(0, equalsPos);
-    std::string cookieValue = cookie.substr(equalsPos + 1, cookie.find(';', equalsPos) - equalsPos - 1);
-    return {cookieName, cookieValue};
 }
 
 GDDLLoginLayer *GDDLLoginLayer::create() {

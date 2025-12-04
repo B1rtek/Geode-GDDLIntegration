@@ -25,15 +25,11 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onCopyAPIKeyClicked(cocos2d::CCObject *sender);
     void onLogOutClicked(cocos2d::CCObject *sender);
 
-    std::string getAllHeaders(web::WebResponse* response);
     void prepareMeListener();
     void saveLoginData(const std::string& username, int uid);
     void closeLoginPanel();
     void showLoadingCircle();
     void hideLoadingCircle();
-
-    // getting around geode::web limitations
-    std::pair<std::string, std::string> getCookieValue(const char* content);
 
 public:
     static GDDLLoginLayer* create();
