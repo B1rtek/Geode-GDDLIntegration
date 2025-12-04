@@ -1,3 +1,8 @@
+# v1.2.9
+- Replaces tier 1-29 icons with new, refreshed versions
+- Fixed a [bug preventing users from logging into their account](https://github.com/B1rtek/Geode-GDDLIntegration/issues/99) in game
+  - Logging in requires obtaining a GDDL API key - in order to obtain yours, head to https://gdladder.com/settings/developer
+
 # v1.2.8
 - Updated the mod for the Extreme Demon Reform
   - Tiers go up to 39 now!
