@@ -296,9 +296,10 @@ void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject* sender) {
 }
 
 void GDDLRatingSubmissionLayer::onProofInfo(CCObject* sender) {
+    const std::string content = "Proof is <cy>required</c> for <cr>tier " + std::to_string(Values::proofTier) + " or higher</c> levels. Clicks <cy>must be included</c> if the level is <cr>tier 31 or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.";
     FLAlertLayer::create(
         "Proof",
-        "Proof is <cy>required</c> for <cr>extreme demons</c>. Clicks <cy>must be included</c> if the level is <cr>tier 31 or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.",
+        content,
         "OK")->show();
 }
 
@@ -484,8 +485,8 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
         }
         submissionJson["proof"] = correctedProof;
     }
-    else if (correctedRating >= 21) {
-        return "Tier 21 and above submissions require proof";
+    else if (correctedRating >= Values::proofTier) {
+        return "Tier " + std::to_string(Values::proofTier) + " and above submissions require proof";
     }
     const int correctedProgress = std::min(
         std::max(0, Utils::getNumberWithGivenDefaultTextfieldValue(percentTextfield, 100)), 100);
