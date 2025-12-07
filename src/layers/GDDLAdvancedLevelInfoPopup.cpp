@@ -383,5 +383,6 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-showcase-button"_spr);
     addShowcaseButton(!info.showcaseVideoID.empty());
     // correct the "tier button"
-    addTierSprite(info.roundedRating);
+    const int correctedRating = info.roundedRating != -1 ? info.roundedRating : info.defaultRating;
+    addTierSprite(correctedRating);
 }

@@ -143,7 +143,7 @@ int RatingsManager::getDemonTier(const int id) {
     if (!demonMap.contains(id)) {
         return getCachedTier(id);
     }
-    return demonMap[id].roundedRating;
+    return demonMap[id].roundedRating != -1 ? demonMap[id].roundedRating : demonMap[id].defaultRating;
 }
 
 cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
