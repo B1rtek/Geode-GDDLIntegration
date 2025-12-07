@@ -1,6 +1,6 @@
 {
 	"geode": "4.10.0",
-	"version": "v1.2.9",
+	"version": "v1.2.10",
 	"gd": {
 		"android": "2.2074",
 		"win": "2.2074",
@@ -75,6 +75,12 @@
 			"description": "Makes the bars in <cr>rating</c> and <cg>enjoyment</c> spread charts thinner, when deactivated will leave <cb>no spacing between</c> bars in the charts",
 			"type": "bool",
 			"default": true
+		},
+		"suggest-ratings": {
+			"name": "Autofill tier and enjoyment rating",
+			"description": "Automatically assigns the <cr>tier</c> and <cg>enjoyment</c> rating of the level in the rating submission form to the <cj>current average</c> rating.",
+			"type": "bool",
+			"default": false
 		},
 		"title-misc-settings": {
 			"name": "Misc",
