@@ -334,9 +334,10 @@ void GDDLRatingSubmissionLayer::addInfoButtonAndCenterLabel(CCLabelBMFont* label
 }
 
 void GDDLRatingSubmissionLayer::setInitialValues() {
+    const auto suggestRatings = Mod::get()->getSettingValue<bool>("suggest-ratings");
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
-    rating = gddlRating ? gddlRating.value().roundedRating : -1;
-    enjoyment = gddlRating ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
+    rating = gddlRating && suggestRatings ? gddlRating.value().roundedRating : 0;
+    enjoyment = gddlRating && suggestRatings ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
     fps = Utils::getCorrectedFPS();
     mobile = Utils::isMobile();
 }
