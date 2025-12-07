@@ -1,3 +1,9 @@
+# 1.2.10
+- Added extra description to the tier field on the rating submission page explaining how demon difficulties correspond to the tier ranges (thanks for the suggestion kenny744!)
+- Added a setting that controls whether the tier and enjoyment ratings are autofilled on the rating submission page (by default set to off) (thanks for the suggestion kenny744!)
+- Fixed a bug that prevented users from submitting completions of levels in tiers 21-24 without proof per new guidelines
+- Fixed a bug which incorrectly updated ratings of the levels with forced ratings to [?] in the UI (thanks zpowers!)
+
 # v1.2.9
 - Replaces tier 1-29 icons with new, refreshed versions
 - Fixed a [bug preventing users from logging into their account](https://github.com/B1rtek/Geode-GDDLIntegration/issues/99) in game
