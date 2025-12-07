@@ -11,6 +11,7 @@ public:
 
     float rating;
     int roundedRating;
+    int defaultRating;
     float enjoyment;
     double deviation;
     int ratingCount;

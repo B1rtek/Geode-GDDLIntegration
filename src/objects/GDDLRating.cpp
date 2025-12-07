@@ -2,6 +2,7 @@
 
 GDDLRating::GDDLRating(matjson::Value levelData) {
     this->rating = levelData.contains("Rating") && !levelData["Rating"].isNull() ? levelData["Rating"].asDouble().unwrap() : -1.0f;
+    this->defaultRating = levelData.contains("DefaultRating") && !levelData["DefaultRating"].isNull() ? levelData["DefaultRating"].asInt().unwrap() : -1;
     this->enjoyment = levelData.contains("Enjoyment") && !levelData["Enjoyment"].isNull() ? levelData["Enjoyment"].asDouble().unwrap() : -1.0f;
     this->deviation = levelData.contains("Deviation") && !levelData["Deviation"].isNull() ? levelData["Deviation"].asDouble().unwrap() : 0.0;
     this->ratingCount = levelData.contains("RatingCount") && !levelData["RatingCount"].isNull() ? levelData["RatingCount"].asInt().unwrap() : 0;
@@ -10,6 +11,7 @@ GDDLRating::GDDLRating(matjson::Value levelData) {
     this->showcaseVideoID = levelData.contains("Showcase") && !levelData["Showcase"].isNull() ? levelData["Showcase"].asString().unwrap() : "";
 
     this->roundedRating = static_cast<int>(round(this->rating));
+
 }
 
 GDDLRating GDDLRating::createInvalid() {
