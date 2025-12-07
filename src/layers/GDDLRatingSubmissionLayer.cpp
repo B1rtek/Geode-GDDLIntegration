@@ -265,10 +265,13 @@ void GDDLRatingSubmissionLayer::onGuidelinesClicked(CCObject* sender) {
 }
 
 void GDDLRatingSubmissionLayer::onRatingInfo(CCObject* sender) {
-    FLAlertLayer::create(
-        "Rating",
-        "Must be from <cr>1</c> to <cr>" + std::to_string(ExcludeRangeSettingV3::highestTier) +
-        "</c>, enter '-' if you don't want to submit the tier rating", "OK")->show();
+    const std::string description = "Must be from <cr>1</c> to <cr>" + std::to_string(Values::highestTier) +
+        "</c>, enter '-' if you don't want to submit the tier rating. <cj>Easy demons</c> range from tier <cj>" + std::to_string(Values::easyDemonStartTier) +
+            " to " + std::to_string(Values::mediumDemonStartTier - 1) + "</c>, <cg>medium demons</c> from <cg>" + std::to_string(Values::mediumDemonStartTier) +
+                " to " + std::to_string(Values::hardDemonStartTier - 1) + "</c>, <cy>hard demons</c> from <cy>" + std::to_string(Values::hardDemonStartTier) +
+                    " to " + std::to_string(Values::insaneDemonStartTier - 1) + "</c>, <co>insane demons</c> from <co>" + std::to_string(Values::insaneDemonStartTier) +
+                        " to " + std::to_string(Values::extremeDemonStartTier - 1) + "</c>, <cr>extreme demons</c> start from tier <cr>" + std::to_string(Values::extremeDemonStartTier) + "</c>.";
+    FLAlertLayer::create("Rating", description, "OK")->show();
 }
 
 void GDDLRatingSubmissionLayer::onEnjoymentInfo(CCObject* sender) {
@@ -296,7 +299,7 @@ void GDDLRatingSubmissionLayer::onAttemptsInfo(CCObject* sender) {
 }
 
 void GDDLRatingSubmissionLayer::onProofInfo(CCObject* sender) {
-    const std::string content = "Proof is <cy>required</c> for <cr>tier " + std::to_string(Values::proofTier) + " or higher</c> levels. Clicks <cy>must be included</c> if the level is <cr>tier 31 or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.";
+    const std::string content = "Proof is <cy>required</c> for <cr>tier " + std::to_string(Values::proofTier) + " or higher</c> levels. Clicks <cy>must be included</c> if the level is <cr>tier " + std::to_string(Values::clicksTier) + " or higher</c>, proof <co>must contain the endscreen</c>. Accepted sites include: <cb>Youtube, Twitch, Google drive and BiliBili</c>. Submitting <cy>joke proof</c> will result in a <cr>temporary ban</c>.";
     FLAlertLayer::create(
         "Proof",
         content,
