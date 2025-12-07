@@ -173,7 +173,8 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
         return false;
     }
     demonMap[id] = rating;
-    ratingsCache[id] = rating.roundedRating;
+    const int correctedRating = rating.roundedRating != -1 ? rating.roundedRating : rating.defaultRating;
+    ratingsCache[id] = correctedRating;
     // the requests for ratings are being made inside the rating popups, so the rest of the interface has to "subscribe" to changes
     // this is the place where we can notify them about the update that happened to the ratings list
     for (const auto observer: ratingObservers) {
