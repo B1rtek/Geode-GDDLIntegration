@@ -576,9 +576,8 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const Leve
     if (completionStatus != ANY) {
         std::set<int> allCompleted;
         GameLevelManager *levelManager = GameLevelManager::sharedState();
-        const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
-        CCObject *obj;
-        CCARRAY_FOREACH(completedLevels, obj) {
+        cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
+        for(auto obj : CCArrayExt<cocos2d::CCArray*>(completedLevels)) {
             const auto level = dynamic_cast<GJGameLevel *>(obj);
             // ReSharper disable once CppTooWideScopeInitStatement
             const bool levelCompleted = level->m_normalPercent == 100;
