@@ -1,3 +1,8 @@
+# 1.2.11-beta.1
+- Compatibility with Geode v5.0.0-alpha.1
+- Fixed the [bug that prevented people from logging in with the API key](https://github.com/B1rtek/Geode-GDDLIntegration/issues/98) (finally, thank you for reporting the bug realshizai and bananaman4141
+   and thank you so much qia_a_a for cooperating while troubleshooting!)
+
 # 1.2.10
 - Added extra description to the tier field on the rating submission page explaining how demon difficulties correspond to the tier ranges (thanks for the suggestion kenny744!)
 - Added a setting that controls whether the tier and enjoyment ratings are autofilled on the rating submission page (by default set to off) (thanks for the suggestion kenny744!)
