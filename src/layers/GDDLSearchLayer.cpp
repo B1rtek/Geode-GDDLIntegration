@@ -199,10 +199,17 @@ void GDDLSearchLayer::loadPageSimple() {
         const auto rowNode = CCMenu::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
         rowNode->setContentSize({popupSize.x-10.0f, 20.0f});
-        for (int column = 0; column < 7; column++) {
-            const auto tierNode = createTierNode(row+1+column*5);
-            rowNode->addChild(tierNode);
-            tierButtons.push_back(tierNode);
+        for (int column = 0; column < 8; column++) {
+            const int targetTier = row+1+column*5;
+            if (targetTier <= Values::highestTier) {
+                const auto tierNode = createTierNode(row+1+column*5);
+                rowNode->addChild(tierNode);
+                tierButtons.push_back(tierNode);
+            } else {
+                const auto unknownButton = createTierNode(-1);
+                rowNode->addChild(unknownButton);
+                tierButtons.push_back(unknownButton);
+            }
         }
         rowNode->updateLayout();
         simplifiedMenu->addChild(rowNode);
@@ -212,10 +219,6 @@ void GDDLSearchLayer::loadPageSimple() {
     const auto rowNode = CCMenu::create();
     rowNode->setLayout(RowLayout::create()->setGap(5.0f));
     rowNode->setContentSize({popupSize.x-10.0f, 35.0f});
-    // unknown tier
-    const auto unknownButton = createTierNode(-1);
-    rowNode->addChild(unknownButton);
-    tierButtons.push_back(unknownButton);
     // togglers - checkboxes
     const std::string ids[2] = {"completed", "uncompleted"};
     const std::string labels[2] = {"Completed", "Uncompleted"};
@@ -269,7 +272,7 @@ void GDDLSearchLayer::showPage() {
 
 void GDDLSearchLayer::loadValues() {
     if(!simplified) {
-        page = 1;
+        page = 0;
         nameTextfield->setString(name.c_str());
         Utils::setNumberWithDefZeroTextfield(lowTier, tierLowTextfield);
         Utils::setNumberWithDefZeroTextfield(highTier, tierHighTextfield);
@@ -326,7 +329,7 @@ void GDDLSearchLayer::saveValues() {
 
 // ReSharper disable once CppDFAUnreachableFunctionCall
 void GDDLSearchLayer::resetValues() {
-    page = 1;
+    page = 0;
     nameTextfield->setString("");
     Utils::setNumberWithDefZeroTextfield(0, tierLowTextfield);
     Utils::setNumberWithDefZeroTextfield(0, tierHighTextfield);
@@ -421,6 +424,15 @@ void GDDLSearchLayer::restoreValues() {
 }
 
 void GDDLSearchLayer::onClose(CCObject *sender) {
+    backActions();
+}
+
+void GDDLSearchLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLSearchLayer::backActions() {
     saveValues();
     saveSettings();
     simplifiedLoaded = false;
@@ -428,11 +440,6 @@ void GDDLSearchLayer::onClose(CCObject *sender) {
     searchLayer = nullptr;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
-}
-
-void GDDLSearchLayer::keyBackClicked() {
-    saveValues();
-    FLAlertLayer::keyBackClicked(); // calls onClose I think
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -481,27 +488,26 @@ std::string GDDLSearchLayer::addBoolToRequest(const std::string &paramName, cons
 
 std::string GDDLSearchLayer::formSearchRequest() {
     std::string request = searchEndpoint;
-    request += "?page=" + std::to_string(onlinePagesFetched + 1) + "&chunk=50";
+    request += "?page=" + std::to_string(onlinePagesFetched) + "&limit=25";
     request += addStringToRequest("name", name);
-    request += addValueToRequest("lowTier", lowTier, 0);
-    request += addValueToRequest("highTier", highTier, 0);
+    request += addValueToRequest("minRating", lowTier, 0);
+    request += addValueToRequest("maxRating", highTier, 0);
     request += addValueToRequest("difficulty", difficulty+1, 6); // API 1.9.0 - diffs 1-5
     request += addStringToRequest("creator", creator);
     request += addStringToRequest("song", song);
-    request += addBoolToRequest("exactName", exactName);
-    request += addBoolToRequest("removeUnrated", removeUnrated);
-    request += addBoolToRequest("removeUnratedEnj", removeUnratedEnj);
-    request += addBoolToRequest("removeRated", removeRated);
-    request += addBoolToRequest("removeRatedEnj", removeRatedEnj);
-    request += addValueToRequest("subLowCount", subLowCount, 0);
-    request += addValueToRequest("subHighCount", subHighCount, 0);
-    request += addValueToRequest("enjLowCount", enjLowCount, 0);
-    request += addValueToRequest("enjHighCount", enjHighCount, 0);
-    request += addValueToRequest("enjLow", enjLow, 0.0f);
-    request += addValueToRequest("enjHigh", enjHigh, highestEnjoyment);
+    request += addBoolToRequest("excludeUnrated", removeUnrated);
+    request += addBoolToRequest("excludeUnratedEnjoyment", removeUnratedEnj);
+    request += addBoolToRequest("excludeRated", removeRated);
+    request += addBoolToRequest("excludeRatedEnjoyment", removeRatedEnj);
+    request += addValueToRequest("minSubmissionCount", subLowCount, 0);
+    request += addValueToRequest("maxSubmissionCount", subHighCount, 0);
+    request += addValueToRequest("minEnjoymentCount", enjLowCount, 0);
+    request += addValueToRequest("maxEnjoymentCount", enjHighCount, 0);
+    request += addValueToRequest("minEnjoyment", enjLow, 0.0f);
+    request += addValueToRequest("maxEnjoyment", enjHigh, highestEnjoyment);
     request += addStringToRequest("sort", sort[sortOptionIndex]);
     request += addStringToRequest("sortDirection", sortDirection[sortDirectionIndex]);
-    log::debug("Search request: {}", request);
+    log::info("Search request: {}", request);
     return request;
 }
 
@@ -528,23 +534,38 @@ std::string GDDLSearchLayer::formSearchRequest() {
 
 std::vector<int> GDDLSearchLayer::parseResponse(const std::string& response) {
     std::vector<int> results;
-    try {
-        matjson::Value responseJson = matjson::parse(response);
-        const int total = responseJson["total"].as_int();
+    const auto maybeResponseJson = matjson::parse(response);
+    if (maybeResponseJson.isOk()) {
+        const matjson::Value& responseJson = maybeResponseJson.unwrap();
+        if (!responseJson.contains("levels")) {
+            // well, the json is probably wrong
+            const std::string error = responseJson["message"].asString().unwrapOr("Server returned invalid response - unknown error");
+            Notification::create(error, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::parseResponse: {}, raw response: {}", error, responseJson.dump(0));
+            return results;
+        }
+        const int total = responseJson["total"].asInt().unwrapOr(-1);
+        if (total == -1) {
+            const std::string errorMessage = "Server returned invalid response - no total results amount";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::parseResponse: {}, raw response: {}", errorMessage, responseJson.dump(0));
+            return results;
+        }
         totalOnlineResults = std::max(totalOnlineResults, total); // so it never grabs 0 if a bad request is made
         matjson::Value levelList = responseJson["levels"];
-        for (auto element: levelList.as_array()) {
-            const int levelID = element["ID"].as_int();
+        for (auto element: levelList.asArray().unwrap()) {
+            const int levelID = element["ID"].asInt().unwrapOr(0); // this way a missing ID won't matter
             if (levelID > 3) { // to avoid official demons
-                results.push_back(element["ID"].as_int());
-                if(!element["Rating"].is_null()) {
-                    const float rating = element["Rating"].as_double();
+                results.push_back(levelID);
+                if(!element["Rating"].isNull()) {
+                    const float rating = element["Rating"].asDouble().unwrap();
                     RatingsManager::updateCacheFromSearch(levelID, rating);
                 }
             }
         }
-    } catch (std::runtime_error &error) {
-        // well nothing really can be done here
+    } else {
+        // well, nothing can really be done here
+        log::error("GDDLSearchLayer::parseResponse: server returned invalid JSON: {}", response);
     }
     return results;
 }
@@ -593,14 +614,14 @@ int GDDLSearchLayer::getMaxPotentialPages() {
 }
 
 int GDDLSearchLayer::getOnlinePagesCount() {
-    const int correction = totalOnlineResults % 50 == 0 ? 0 : 1;
-    return totalOnlineResults / 50 + correction;
+    constexpr int chunk = 25;
+    const int correction = totalOnlineResults % chunk == 0 ? 0 : 1;
+    return totalOnlineResults / chunk + correction;
 }
 
 GJSearchObject *GDDLSearchLayer::makeASearchObjectFrom(const int firstIndex, const int lastIndex) {
     std::string requestString;
     for (int i = firstIndex; i < lastIndex; i++) {
-        const int id = cachedResults[i];
         requestString += std::to_string(cachedResults[i]) + ',';
     }
     if (!requestString.empty()) {
@@ -630,9 +651,25 @@ void GDDLSearchLayer::appendFetchedResults(const std::string& response) {
 }
 
 std::pair<int, int> GDDLSearchLayer::getReadyRange(const int requestedPage) {
-    const int firstIndex = (requestedPage - 1) * 10;
+    const int firstIndex = requestedPage * 10;
     const int lastIndex = std::min(firstIndex + 10, static_cast<int>(cachedResults.size())); // last index + 1
     return {firstIndex, lastIndex};
+}
+
+/**
+ * Hides all loading circles, also checks if the demonSplitLayer has been closed (if it has, do not open the browser later)
+ */
+bool GDDLSearchLayer::hideAnyLoadingCircle() {
+    if (demonSplitLayer != nullptr) {
+        demonSplitLayer->hideLoadingCircle();
+        const bool wasClosed = demonSplitLayer->wasClosed;
+        demonSplitLayer = nullptr;
+        return wasClosed;
+    }
+    if (searchLayer != nullptr) {
+        searchLayer->hideLoadingCircle();
+    }
+    return false;
 }
 
 void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
@@ -641,13 +678,8 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
         callbackObject->handleSearchObject(searchObject, resultsCount);
     } else { // new search
         // remove any loading circles
-        if (demonSplitLayer != nullptr) {
-            demonSplitLayer->hideLoadingCircle();
-            demonSplitLayer = nullptr;
-        }
-        if (searchLayer != nullptr) {
-            searchLayer->hideLoadingCircle();
-        }
+        // if the demon split has been closed already, do not open the browser
+        if (hideAnyLoadingCircle()) return;
         // show the results
         const auto listLayer = LevelBrowserLayer::create(searchObject);
         const auto listLayerScene = CCScene::create();
@@ -659,10 +691,13 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
 
 void GDDLSearchLayer::prepareSearchListener() {
     searchListener.bind([] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
+        if (web::WebResponse* res = e->getValue()) {
+            if (res->code() == 200) {
                 const std::string response = res->string().unwrapOrDefault();
                 if (response.empty()) {
-                    Notification::create("Search failed - server error", NotificationIcon::Error, 2)->show();
+                    const std::string errorMessage = "GDDL: Search failed - received empty response";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
                 } else {
                     appendFetchedResults(response);
                     auto [fst, snd] = getReadyRange(requestRequestedPage);
@@ -670,16 +705,31 @@ void GDDLSearchLayer::prepareSearchListener() {
                         // recurse
                         const std::string anotherRequest = formSearchRequest();
                         auto req = web::WebRequest();
+                        req.header("User-Agent", Utils::getUserAgent());
                         searchListener.setFilter(req.get(anotherRequest));
                     } else {
                         GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
                         handleSearchObject(searchObject, searchCallbackObject, snd - fst);
                     }
                 }
-            } else if (e->isCancelled()) {
-                Notification::create("Search failed - check your internet connection!", NotificationIcon::Error, 2)->show();
+            } else {
+                // not success!
+                const auto jsonResponse = res->json().unwrapOr(matjson::Value());
+                const std::string errorMessage = "GDDL Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                stopSearch();
+                hideAnyLoadingCircle();
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
+                log::error("GDDLSearchLayer::searchListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
             }
-        });
+        } else if (e->isCancelled()) {
+            stopSearch();
+            hideAnyLoadingCircle();
+            const std::string errorMessage = "GDDL: Search failed - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
+        }
+    });
 }
 
 
@@ -930,7 +980,7 @@ void GDDLSearchLayer::onSearchClicked(CCObject *sender) {
     onlinePagesFetched = 0;
     searching = true;
     showLoadingCircle();
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 void GDDLSearchLayer::onResetClicked(CCObject *sender) { resetValues(); }
@@ -950,7 +1000,15 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     // and then
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10)); // always valid
+    const int start = tierStr.find("button-tier-") + 12;
+    const int end = tierStr.size();
+    const std::string tierNumberStr = tierStr.substr(start, end - start);
+    const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
+    if (!maybeTierNumber.isOk()) {
+        FLAlertLayer::create("Error", "Invalid tier number", "OK")->show();
+        return;
+    }
+    const int tierNumber = maybeTierNumber.unwrap();
     if(tierNumber != -1) {
         lowTier = tierNumber;
         highTier = tierNumber;
@@ -966,7 +1024,7 @@ void GDDLSearchLayer::onTierSearch(CCObject *sender) {
     onlinePagesFetched = 0;
     searching = true;
     showLoadingCircle();
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 void GDDLSearchLayer::setNumberFloatTextfield(const float value, CCTextInputNode *&textfield) {
@@ -1000,7 +1058,7 @@ float GDDLSearchLayer::getFloatTextfieldValue(CCTextInputNode *&textfield, float
     float returnValue = defaultValue;
     auto returnValueResult = numFromString<float>(textfield->getString());
     if (returnValueResult.isOk()) {
-        returnValue = returnValueResult.value();
+        returnValue = returnValueResult.unwrap();
     }
     return returnValue;
 }
@@ -1085,8 +1143,8 @@ void GDDLSearchLayer::saveSettings() {
 
 void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject) {
     // check whether the cache already contains results for this query
-    if (requestedPage < 1) {
-        requestedPage = 1;
+    if (requestedPage < 0) {
+        requestedPage = 0;
     }
     if (!cachedResults.empty()) {
         const int maxPotentialPages = getMaxPotentialPages();
@@ -1108,6 +1166,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     requestRequestedPage = requestedPage;
     searchCallbackObject = callbackObject;
     auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
     searchListener.setFilter(req.get(request));
 }
 
@@ -1133,7 +1192,7 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplit
     prepareSearchListener();
     // save the layer to remove the loading circle later
     demonSplitLayer = layer;
-    requestSearchPage(1, nullptr);
+    requestSearchPage(0, nullptr);
 }
 
 int GDDLSearchLayer::getSearchResultsPageCount() { return getMaxPotentialPages(); }
@@ -1192,5 +1251,7 @@ void GDDLSearchLayer::clickOffTextfields() {
 }
 
 void GDDLSearchLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-search-loading-spinner"_spr);
+    }
 }

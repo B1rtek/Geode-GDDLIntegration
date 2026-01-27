@@ -1,15 +1,17 @@
 #include "GDDLRating.h"
 
 GDDLRating::GDDLRating(matjson::Value levelData) {
-    this->rating = levelData.contains("Rating") && !levelData["Rating"].is_null() ? levelData["Rating"].as_double() : -1.0f;
-    this->enjoyment = levelData.contains("Enjoyment") && !levelData["Enjoyment"].is_null() ? levelData["Enjoyment"].as_double() : -1.0f;
-    this->deviation = levelData.contains("Deviation") && !levelData["Deviation"].is_null() ? levelData["Deviation"].as_double() : 0.0;
-    this->ratingCount = levelData.contains("RatingCount") && !levelData["RatingCount"].is_null() ? levelData["RatingCount"].as_int() : 0;
-    this->enjoymentCount = levelData.contains("EnjoymentCount") && !levelData["EnjoymentCount"].is_null() ? levelData["EnjoymentCount"].as_int() : 0;
-    this->submissionCount = levelData.contains("SubmissionCount") && !levelData["SubmissionCount"].is_null() ? levelData["SubmissionCount"].as_int() : 0;
-    this->showcaseVideoID = levelData.contains("Showcase") && !levelData["Showcase"].is_null() ? levelData["Showcase"].as_string() : "";
+    this->rating = levelData.contains("Rating") && !levelData["Rating"].isNull() ? levelData["Rating"].asDouble().unwrap() : -1.0f;
+    this->defaultRating = levelData.contains("DefaultRating") && !levelData["DefaultRating"].isNull() ? levelData["DefaultRating"].asInt().unwrap() : -1;
+    this->enjoyment = levelData.contains("Enjoyment") && !levelData["Enjoyment"].isNull() ? levelData["Enjoyment"].asDouble().unwrap() : -1.0f;
+    this->deviation = levelData.contains("Deviation") && !levelData["Deviation"].isNull() ? levelData["Deviation"].asDouble().unwrap() : 0.0;
+    this->ratingCount = levelData.contains("RatingCount") && !levelData["RatingCount"].isNull() ? levelData["RatingCount"].asInt().unwrap() : 0;
+    this->enjoymentCount = levelData.contains("EnjoymentCount") && !levelData["EnjoymentCount"].isNull() ? levelData["EnjoymentCount"].asInt().unwrap() : 0;
+    this->submissionCount = levelData.contains("SubmissionCount") && !levelData["SubmissionCount"].isNull() ? levelData["SubmissionCount"].asInt().unwrap() : 0;
+    this->showcaseVideoID = levelData.contains("Showcase") && !levelData["Showcase"].isNull() ? levelData["Showcase"].asString().unwrap() : "";
 
     this->roundedRating = static_cast<int>(round(this->rating));
+
 }
 
 GDDLRating GDDLRating::createInvalid() {

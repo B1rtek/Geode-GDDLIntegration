@@ -1,9 +1,57 @@
-# v1.2.0-beta.6
-- added the skillsets crash fix from the 2.2074 version
+# 1.2.10
+- Added extra description to the tier field on the rating submission page explaining how demon difficulties correspond to the tier ranges (thanks for the suggestion kenny744!)
+- Added a setting that controls whether the tier and enjoyment ratings are autofilled on the rating submission page (by default set to off) (thanks for the suggestion kenny744!)
+- Fixed a bug that prevented users from submitting completions of levels in tiers 21-24 without proof per new guidelines
+- Fixed a bug which incorrectly updated ratings of the levels with forced ratings to [?] in the UI (thanks zpowers!)
 
-# v1.2.0-beta.5
-This version is **considered ready**, but not released publicly due to Geode not being updated for 2.207x yet. This version will not receive any updates (most likely), but if you encounter bugs report them to me (@b1rtek on Discord)
-## v1.2.0 is the biggest update for GDDL Integration yet!
+# v1.2.9
+- Replaces tier 1-29 icons with new, refreshed versions
+- Fixed a [bug preventing users from logging into their account](https://github.com/B1rtek/Geode-GDDLIntegration/issues/99) in game
+  - Logging in requires obtaining a GDDL API key - in order to obtain yours, head to https://gdladder.com/settings/developer
+
+# v1.2.8
+- Updated the mod for the Extreme Demon Reform
+  - Tiers go up to 39 now!
+  - Updated the layout in the simplified level search menu and the GDDL demon split
+- Fixed a bug which prevented submitting 2p levels as two player completions with the second player not specified (thanks mang0w0rks!)
+
+# v1.2.7
+- (Fix by [hiimjasmine00](https://github.com/hiimjasmine00)) [Fixed LevelSelectLayer tower exit crash](https://github.com/B1rtek/Geode-GDDLIntegration/pull/93) (thank you!!)
+- Fixed a bug which crashed the game after clicking on a tier and exiting the GDDL Demon Split (thank you robloxplayer0552 and gdexploits!)
+- Fixed a bug which prevented the updates to internal cache from being saved
+- Fixed a visual bug which stacked extra loading circles on top of each other in the GDDL Demon Split (thank you gdexploits!)
+- Optimized the amount of ratings the mod performs (thank you gdexploits, _rfmx, robloxplayer0552, somewhatconsistent and kimichii_s for testing!)
+- Added even more logging than last time and extra error messages
+
+# v1.2.6
+- [Fixed the login bug](https://github.com/B1rtek/Geode-GDDLIntegration/issues/87) (thank you Aproxia-dev!)
+- Fixed incorrect popup title for "Attempts" in the rating submission menu
+- Added extra spacing for two player specific labels on medium and low graphics to prevent text overlapping
+- Added a lot more logging
+
+# v1.2.5
+- [Fixed a bug which made skillsets disappear](https://github.com/B1rtek/Geode-GDDLIntegration/pull/88) (thank you Diversion!)
+
+# v1.2.4
+- Fixed bugs in the API v2 code
+- Fixed a bug with the loading circle remaining on the screen after a failed search
+- Fixed even more data validation bugs
+- Updated error messages to make them more meaningful
+
+# v1.2.3
+- Fixed a bug where the GDDL button was placed under the weekly/event demon label
+- Added iOS compatibility (I have no way to test this btw, so I can't really help you if anything goes wrong)
+- Fixed a major bug in the ratings cache response parsing
+- Added compatibility with GDDL API v2 (which will hopefully work correctly, we'll see
+
+# v1.2.1
+- [Replaced the "crappy" skillset icons](https://github.com/B1rtek/Geode-GDDLIntegration/issues/72) with a pack created by Hubercioch (thank you so much!!!)
+- [Added an option to change the color of the gray backgrounds](https://github.com/B1rtek/Geode-GDDLIntegration/issues/74) in the login, submission and advanced level info popups
+- [Fixed a bug that caused crashes on android](https://github.com/B1rtek/Geode-GDDLIntegration/issues/75) if you used the navigation buttons on your phone or a gesture to exit the main levels list
+- Fixed a bug that caused a crash sometimes when the rating inside the advanced popup was being updated (thank you @hiimjasmine00!)
+- The Mac version is back, enjoy it while it lasts
+
+# v1.2.0
 - Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
   - This requires you to log in to your GDDL account, you can log in on the mod settings page, but if you forget to do that you will be prompted to do so when you try submitting a rating
   - You will be warned if you have already submitted a rating for the level, don't worry about that
@@ -16,34 +64,6 @@ This version is **considered ready**, but not released publicly due to Geode not
 - Fixed a bug that caused the GDDL tier button to be placed far away from the level name in certain cases when using the "to the left/right of the level title" setting
 
 MASSIVE THANKS to [dankmeme01](https://github.com/dankmeme01) (main developer of [Globed](https://globed.dev/)) for help with this update! <3
-
-Changes from the previous betas:
-- When the texture quality is not set to high (or you happen to be on Android) the labels no longer touch the bars in spread bar charts
-- Replaced FLAlertLayer dialog boxes with Notifications in GDDL cache refreshing, GDDLSearch and GDDLLogin layers
-- Added a loading circle to GDDLSplitLayer
-- Added new GDDLInfo popups to RobTop's levels
-- Fixed a bug that didn't allow submitting 2p levels without a second player
-- Added a prompt to relog if GDDL session expires
-- Labels no longer overlap in rating bar charts in levels with a wide spread like Multition and others
-- Fixed the wrong sorting order bug in search!!
-- Fixed a bug that caused the GDDL button next to level title get placed far away from it
-- Fixed a typo in "Spacing in spread charts" setting's description
-- Added a check that tells the user whether they already submitted a rating for a level or not
-
-# v1.2.0-beta.4
-- The login popup automatically closes upon a successful login
-- Attempts no longer default to 100 when submitting a rating without them
-- The LoginSettingNode updates itself after logging in now
-- Increased the characters cap for fields in the login form to 64 characters (Thanks @7w7y !)
-
-# v1.2.0-beta.1
-- Added an option to submit ratings from inside the game! Click the GDDL button on the level page to do that (and more!)
-  - This requires you to log in to your GDDL account, you can log in on the mod settings page (or the mod will prompt you to do so when you try to submit a rating while logged out)
-- Completely overhauled the popup with rating and enjoyment information that appears after clicking the GDDL button on the level info page
-  - Now it shows the top skillsets for the level, rating and enjoyment spreads, allows you to submit the rating for the level and watch its showcase
-  - In case you don't like it, you can always turn it off and still use the old one in the mod settings
-- Settings have been split into categories, so they aren't as cluttered anymore
-
 
 # v1.1.13
 - Added difficulty tiers to RobTop's demons

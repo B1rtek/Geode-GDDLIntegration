@@ -1,8 +1,8 @@
 #include "ButtonPositionSettingV3.h"
 #include "ButtonPositionSettingNodeV3.h"
 
-Result<std::shared_ptr<ButtonPositionSettingV3>> ButtonPositionSettingV3::parse(std::string const& key,
-    std::string const& modID, matjson::Value const& json) {
+Result<std::shared_ptr<SettingV3>> ButtonPositionSettingV3::parse(std::string const& key,
+                                                                  std::string const& modID, matjson::Value const& json) {
     const auto res = std::make_shared<ButtonPositionSettingV3>();
     auto root = checkJson(json, "ButtonPositionSettingV3");
 
@@ -10,14 +10,14 @@ Result<std::shared_ptr<ButtonPositionSettingV3>> ButtonPositionSettingV3::parse(
     res->parseNameAndDescription(root);
 
     root.checkUnknownKeys();
-    return root.ok(res);
+    return root.ok(std::static_pointer_cast<SettingV3>(res));
 }
 
 bool ButtonPositionSettingV3::load(const matjson::Value& json) {
     if (!json.contains("button-position")) {
         return false;
     }
-    int positionNumber = json["button-position"].is_number() ? json["button-position"].as_int() : 0;
+    int positionNumber = json["button-position"].isNumber() ? json["button-position"].asInt().unwrap() : 0;
     // in case it's set to something stupid
     positionNumber = std::min(static_cast<int>(ButtonPosition::NUM_VALUES - 1), std::max(0, positionNumber));
     position = static_cast<ButtonPosition>(positionNumber);
@@ -26,9 +26,7 @@ bool ButtonPositionSettingV3::load(const matjson::Value& json) {
 }
 
 bool ButtonPositionSettingV3::save(matjson::Value& json) const {
-    json = matjson::Object {
-            {"button-position", static_cast<int>(position)}
-    };
+    json["button-position"] = static_cast<int>(position);
     return true;
 }
 

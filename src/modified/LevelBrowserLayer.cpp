@@ -7,7 +7,7 @@
 
 class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
     struct Fields {
-        int currentPage = 1;
+        int currentPage = 0;
     };
 
     bool init(GJSearchObject * p0) {
@@ -21,7 +21,7 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
         if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;
-        m_leftArrow->setVisible(m_fields->currentPage > 1);
+        m_leftArrow->setVisible(m_fields->currentPage > 0);
         m_rightArrow->setVisible(m_fields->currentPage < GDDLSearchLayer::getSearchResultsPageCount());
         setCorrectLabelsText();
     }
@@ -38,7 +38,7 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
         LevelBrowserLayer::onPrevPage(sender);
         if (!GDDLSearchLayer::isSearching() || m_searchObject->m_searchType != SearchType::Type19)
             return;
-        m_fields->currentPage = std::max(1, m_fields->currentPage - 1);
+        m_fields->currentPage = std::max(0, m_fields->currentPage - 1);
         GDDLSearchLayer::requestSearchPage(m_fields->currentPage, this);
     }
 
@@ -52,7 +52,7 @@ class $modify(GDDLBrowserLayer, LevelBrowserLayer) {
     // }
 
     void setCorrectLabelsText() {
-        const int firstLevel = (m_fields->currentPage - 1) * 10 + 1;
+        const int firstLevel = m_fields->currentPage * 10 + 1;
         const int lastLevel = std::min(firstLevel + 9, GDDLSearchLayer::getSearchResultsCount());
         m_countText->setString(
                 fmt::format("{} to {} of max. {}", firstLevel, lastLevel, GDDLSearchLayer::getSearchResultsCount())

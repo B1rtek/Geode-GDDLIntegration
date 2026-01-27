@@ -2,11 +2,17 @@
 #define GDDLINTEGRATION_LOGINSETTINGNODEV3_H
 
 #include <Geode/loader/SettingV3.hpp>
+#include <Geode/utils/web.hpp>
+
 #include "DummySettingLoginV3.h"
 
 using namespace geode::prelude;
 
 class LoginSettingNodeV3 : public SettingNodeV3 {
+    const inline static std::string logoutEndpoint = "https://gdladder.com/api/account/logout";
+    EventListener<web::WebTask> logoutListener;
+
+    void prepareLogoutListener();
 protected:
     CCLabelBMFont* loginStatus = nullptr;
     CCMenuItemSpriteExtra* loginLogoutButton = nullptr;

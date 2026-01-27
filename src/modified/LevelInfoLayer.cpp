@@ -16,10 +16,22 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
-    struct Fields {
-        EventListener<web::WebTask> infoLayerGetRatingListener;
+    struct Fields : public IRatingObserver {
         bool gddlTierUpdated = false;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
+        GDDLInfoLayer* m_this;
+
+        Fields() {
+            RatingsManager::subscribeToObservers(this);
+        }
+
+        void updateRating() override {
+            m_this->updateButton(RatingsManager::getDemonTier(m_this->m_level->m_levelID));
+        }
+
+        ~Fields() override {
+            RatingsManager::unsubscribeFromObservers(this);
+        }
     };
 
     // ReSharper disable once CppParameterMayBeConst
@@ -27,35 +39,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         if (!LevelInfoLayer::init(p0, p1))
             return false;
 
-        // setup web req
-        m_fields->infoLayerGetRatingListener.bind([this] (web::WebTask::Event* e) {
-            if (web::WebResponse* res = e->getValue()) {
-                const std::string response = res->string().unwrapOrDefault();
-                if (response.empty()) {
-                    updateButton(-1);
-                } else {
-                    const int levelID = m_level->m_levelID;
-                    int tierAfterFetch = -1;
-                    if(RatingsManager::addRatingFromResponse(levelID, response)) {
-                        tierAfterFetch = RatingsManager::getDemonTier(levelID);
-                    }
-                    updateButton(tierAfterFetch);
-                    if (m_fields->advancedLevelInfoPopup != nullptr) {
-                        m_fields->advancedLevelInfoPopup->addRatingInfo();
-                    }
-                }
-            } else if (e->isCancelled()) {
-                updateButton(-1);
-            }
-        });
+        // for handling rating updates from the info popup
+        m_fields->m_this = this;
 
-        const auto starsLabel = m_starsLabel;
-        const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (starsLabel && isDemon && Utils::notExcluded(m_level->m_levelID)) {
+        const bool isDemon = m_level->m_stars == 10;
+        if (isDemon && Utils::notExcluded(m_level->m_levelID)) {
             m_fields->gddlTierUpdated = false;
-            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+            const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
             if (!displayAsLabel) {
-                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSettingV3("button-position"))->getPosition();
+                const auto buttonPositionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSetting("button-position"))->getPosition();
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
@@ -66,6 +58,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE) { // right
                         menuPosition = CCPoint{levelNamePosition.x + levelNameSize.width / 2.0f,
                                                levelNamePosition.y - 14.5f};
+                        // move the weekly/event label
+                        if (m_level->m_dailyID > 100000) { // weekly: 100001 - 200000, event: 200000+, thanks prevter <3
+                            const auto weeklyLabelNode = getChildByID("daily-label");
+                            if (weeklyLabelNode != nullptr) {
+                                const auto weeklyLabel = typeinfo_cast<CCLabelBMFont*>(weeklyLabelNode);
+                                const auto weeklyLabelX = weeklyLabel->getPosition().x;
+                                weeklyLabel->setPosition({weeklyLabelX + 23.0f, weeklyLabel->getPosition().y});
+                            }
+                        }
                     } else { // left
                         menuPosition = CCPoint{levelNamePosition.x - levelNameSize.width / 2.0f - 25.0f,
                                                levelNamePosition.y - 14.0f};
@@ -89,7 +90,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 if (m_level->m_coins > 0) {
                     labelShiftRows += 1.0f;
                 }
-                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->getPositionOffset();
+                const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {
                     labelShiftRows = -4.5f;
                 } else {
@@ -98,6 +99,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 const auto tierLabel =
                         CCMenuItemSpriteExtra::create(tierLabelSprite, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
                 tierLabelSprite->setScale(0.4f);
+                const auto starsLabel = m_starsLabel;
                 const auto tierLabelMenu = CCMenu::create();
                 tierLabelMenu->setPosition(
                         {starsLabel->getPositionX(), starsLabel->getPositionY() - labelShiftRows * 15.5f});
@@ -119,19 +121,12 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
 
     void updateLabelValues() {
         LevelInfoLayer::updateLabelValues();
-        const auto starsLabel = m_starsLabel;
-        const bool isDemon = std::stoi(m_starsLabel->getString()) == 10;
-        if (!starsLabel || !isDemon || m_fields->gddlTierUpdated) return;
+        const bool isDemon = m_level->m_stars == 10;
+        if (!isDemon || m_fields->gddlTierUpdated) return;
 
         // fetch information
         const int levelID = m_level->m_levelID;
         const int tier = RatingsManager::getDemonTier(levelID);
-
-        if (tier == -1) {
-            // web request 2.0 yaaay
-            auto req = web::WebRequest();
-            m_fields->infoLayerGetRatingListener.setFilter(req.get(RatingsManager::getRequestUrl(levelID)));
-        }
     }
 
     void placeGDDLButton(const CCPoint& menuPosition, const CCSize& menuSize, const CCPoint& buttonPosition,
@@ -152,7 +147,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
     }
 
     void updateButton(const int tier) {
-        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSettingV3("use-old-tier-label"))->isEnabled();
+        const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
             if (!menu)

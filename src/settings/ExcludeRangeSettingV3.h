@@ -2,6 +2,7 @@
 #define EXCLUDERANGESETTINGV3_H
 
 #include <Geode/loader/SettingV3.hpp>
+#include "Utils.h"
 
 using namespace geode::prelude;
 
@@ -14,10 +15,10 @@ public:
     static constexpr int defaultRangeBegin = 0;
     static constexpr int defaultRangeEnd = 0;
     static constexpr bool defaultInclude = false;
-    static constexpr int highestTier = 35;
+    static constexpr int highestTier = Values::highestTier;
 
-    static Result<std::shared_ptr<ExcludeRangeSettingV3>> parse(std::string const& key, std::string const& modID,
-                                                                matjson::Value const& json);
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID,
+                                                    matjson::Value const& json);
     bool load(const matjson::Value& json) override;
     bool save(matjson::Value& json) const override;
     SettingNodeV3* createNode(float width) override;

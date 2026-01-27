@@ -1,6 +1,7 @@
 #ifndef GDDLSEARCHLAYER_H
 #define GDDLSEARCHLAYER_H
 
+#include <Values.h>
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include "GDDLDemonSplitLayer.h"
@@ -13,7 +14,7 @@ enum LevelCompleteness { ANY, UNCOMPLETED, COMPLETED };
 class GDDLSearchLayer final : public FLAlertLayer {
     // endpoint args, ignoring chunk (always set to 10) and stddev args
     // value limits
-    static constexpr int highestTier = 35;
+    static constexpr int highestTier = Values::highestTier;
     static constexpr float highestEnjoyment = 10.0f;
     static constexpr int maxSubmissions = 9999;
     // 0 defaults treated as null (not passed to the query) (well, it depends)
@@ -47,8 +48,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {
             "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
-    const inline static std::vector<std::string> sort = {"ID",          "Name",           "Rating", "Enjoyment",
-                                                         "RatingCount", "EnjoymentCount", "Random"};
+    const inline static std::vector<std::string> sort = {
+        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "random"
+    };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;
     const inline static std::vector<std::string> orderDirection = {"Ascending", "Descending"};
@@ -75,7 +77,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static EventListener<web::WebTask> searchListener;
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
     inline static GDDLBrowserLayer* searchCallbackObject;
-    inline static GDDLDemonSplitLayer* demonSplitLayer = nullptr;
+    inline static Ref<GDDLDemonSplitLayer> demonSplitLayer = nullptr;
     inline static GDDLSearchLayer* searchLayer = nullptr;
 
     // some of the controls should probably be here so searching with getChildByIDRecursive() isn't needed
@@ -126,6 +128,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void restoreValues();
     void onClose(CCObject *sender);
     void keyBackClicked() override;
+    void backActions();
     void onInfo(CCObject *sender);
     // request related
     static std::string urlEncodeString(std::string toEncode);
@@ -141,6 +144,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static GJSearchObject *makeASearchObjectFrom(int firstIndex, int lastIndex);
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
+    static bool hideAnyLoadingCircle();
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
     static void prepareSearchListener();
     // utility (that and Utils.h)

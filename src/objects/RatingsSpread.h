@@ -4,11 +4,12 @@
 #include <map>
 #include <vector>
 #include "nodes/BarChartNode.h"
+#include "Values.h"
 
 class RatingsSpread {
     std::map<int, int> diffRatings{};
     std::map<int, int> enjRatings{};
-    int minRating = 36, maxRating = -1, minEnj = 11, maxEnj = -1;
+    int minRating = Values::highestTier+1, maxRating = -1, minEnj = 11, maxEnj = -1;
 
 public:
     const inline static int enjColors[] = {

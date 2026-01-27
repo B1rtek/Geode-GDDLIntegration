@@ -12,6 +12,7 @@
 #include "layers/GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
+#include "modified/GDDLRobtopLevelsLayer.h"
 
 /**
  * Brings cocos2d and all Geode namespaces
@@ -49,10 +50,16 @@ class $modify(MenuLayer) {
         GDDLSearchLayer::stopSearch();
         GDDLSearchLayer::restoreValuesAfterSplit();
         GDDLSearchLayer::saveSettings();
-        if (!RatingsManager::alreadyCached() && !RatingsManager::triedToCache) { // TODO triedToCache is never written to
-            RatingsManager::triedToCache = true;
+        if (!RatingsManager::readCache) {
+            // populate from save
+            RatingsManager::readCache = true;
+            RatingsManager::populateFromSave();
+        }
+        if (RatingsManager::readCache && RatingsManager::cacheEmpty() && !RatingsManager::triedToDownloadCache) {
+            RatingsManager::triedToDownloadCache = true;
             Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
+            req.header("User-Agent", Utils::getUserAgent());
             // if you're reading this because you treat this as an example of how to use the gddl api
             // cache
             // for the love of god

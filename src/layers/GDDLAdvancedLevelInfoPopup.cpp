@@ -19,7 +19,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-advanced-level-info-bg"_spr);
@@ -32,8 +32,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this,
                                                menu_selector(GDDLAdvancedLevelInfoPopup::onClose));
     m_buttonMenu->addChild(m_closeBtn);
@@ -70,12 +69,14 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
     openInBrowserButton->setPosition({popupSize.x / 2 + 136.0f, 22.0f});
     m_buttonMenu->addChild(openInBrowserButton);
 
+    prepareSearchListeners();
+
     // average ratings and ratings counts
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     if (gddlRating) {
         addRatingInfo();
     } else {
-        const auto stillLoadingLabel = CCLabelBMFont::create("Rating details still loading...", "chatFont.fnt");
+        const auto stillLoadingLabel = CCLabelBMFont::create("Rating details loading...", "chatFont.fnt");
         stillLoadingLabel->setAnchorPoint({0.5f, 0.0f});
         stillLoadingLabel->setPosition({popupSize.x / 2, 215.0f});
         stillLoadingLabel->setScale(0.7f);
@@ -84,10 +85,11 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         // add gray showcase button
         addShowcaseButton(false);
         // add a ? tier sprite
-        addTierSprite(-1);
+        addTierSprite(RatingsManager::getDemonTier(this->gddlLevelID));
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        ratingListener.setFilter(req.get(RatingsManager::getRequestUrl(this->gddlLevelID)));
     }
-
-    prepareSearchListeners();
 
     // bar charts
     if (RatingsManager::hasSpread(this->gddlLevelID)) {
@@ -98,6 +100,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-spreads-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         spreadListener.setFilter(req.get(getSpreadEndpointUrl(this->gddlLevelID)));
     }
 
@@ -111,6 +114,7 @@ bool GDDLAdvancedLevelInfoPopup::init(GJGameLevel* level, int gddlLevelID) {
         loadingSpinner->setID("gddl-advanced-level-info-skillsets-loading"_spr);
         m_buttonMenu->addChild(loadingSpinner);
         auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
         skillsetsListener.setFilter(req.get(getSkillsetsEndpointUrl(this->gddlLevelID)));
     }
 
@@ -129,7 +133,8 @@ void GDDLAdvancedLevelInfoPopup::onSkillsetClicked(CCObject *sender) {
     const std::string senderID = dynamic_cast<CCMenuItemSpriteExtra *>(sender)->getID();
     const int start = senderID.find("gddl-advanced-level-info-skillset-") + 34;
     const int end = senderID.size();
-    const int skillsetID = std::stoi(senderID.substr(start, end - start));
+    const std::string senderIDStr = senderID.substr(start, end - start);
+    const int skillsetID = numFromString<int>(senderIDStr).unwrapOr(0);
     FLAlertLayer::create(Skillsets::skillsetsList[skillsetID].getName().c_str(),
                          Skillsets::skillsetsList[skillsetID].getDescription().c_str(), "OK")->show();
 }
@@ -166,25 +171,64 @@ void GDDLAdvancedLevelInfoPopup::onOpenInBrowserClicked(CCObject *sender) {
 }
 
 void GDDLAdvancedLevelInfoPopup::prepareSearchListeners() {
+    ratingListener.bind([this](web::WebTask::Event *e) {
+        if (web::WebResponse* res = e->getValue()) {
+            if (res->code() == 200) {
+                const std::string response = res->string().unwrapOrDefault();
+                if (!RatingsManager::addRatingFromResponse(this->gddlLevelID, response)) {
+                    const std::string errorMessage = "GDDL: Error while fetching rating - invalid rating returned";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    log::error("GDDLAdvancedLevelInfoPopup::ratingListener: {}, ID {}", errorMessage, this->gddlLevelID);
+                }
+                this->addRatingInfo();
+            } else {
+                const std::string errorMessage = "GDDL: Error while fetching rating - " + Utils::getErrorMessageFromErrorCode(res->code()).value_or(res->string().unwrapOr("Response was not a valid string"));
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLAdvancedLevelInfoPopup::ratingListener: [{}] {}, ID: {}", res->code(), errorMessage, this->gddlLevelID);
+            }
+        }
+        else if (e->isCancelled()) {
+            const std::string errorMessage = "GDDL: Error while fetching rating - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::ratingListener: {}, ID: {}", errorMessage, this->gddlLevelID);
+        }
+    });
+
     spreadListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            const RatingsSpread spread = RatingsSpread(jsonResponse);
-            RatingsManager::cacheSpread(this->gddlLevelID, spread);
-            addBarCharts();
+            if (res->code() == 200) {
+                const RatingsSpread spread = RatingsSpread(jsonResponse);
+                RatingsManager::cacheSpread(this->gddlLevelID, spread);
+                addBarCharts();
+            } else {
+                const std::string errorMessage = "GDDL: Error while fetching spreads - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::spreadListener: [{}] {}, ID: {}", res->code(), errorMessage, this->gddlLevelID);
+            }
         } else if (e->isCancelled()) {
-            // :(
+            const std::string errorMessage = "GDDL: Error while fetching spreads - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::spreadListener: {}, ID: {}", errorMessage, this->gddlLevelID);
         }
     });
 
     skillsetsListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            const Skillsets spread = Skillsets(jsonResponse);
-            RatingsManager::cacheSkillsets(this->gddlLevelID, spread);
-            addSkillsets();
+            if (res->code() == 200) {
+                const Skillsets spread = Skillsets(jsonResponse);
+                RatingsManager::cacheSkillsets(this->gddlLevelID, spread);
+                addSkillsets();
+            } else {
+                const std::string errorMessage = "GDDL: error while fetching skillsets - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::skillsetsListener: [{}] {}, ID: {}", res->code(), errorMessage, this->gddlLevelID);
+            }
         } else if (e->isCancelled()) {
-            // :(
+            const std::string errorMessage = "GDDL: Error while fetching skillsets - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLAdvancedLevelInfoPopup::skillsetsListener: {}, ID: {}", errorMessage, this->gddlLevelID);
         }
     });
 }
@@ -302,6 +346,12 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-loading-text"_spr);
     // add the level info
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
+    if (!gddlRating) {
+        const std::string errorMessage = "Error - rating was not returned by the server";
+        Notification::create(errorMessage, NotificationIcon::Error)->show();
+        log::error("GDDLAdvancedLevelInfoPopup::addRatingInfo: {}, requested ID: {}", errorMessage, this->gddlLevelID);
+        return;
+    }
     const auto &info = gddlRating.value();
     std::string ratingText = "Rating: " + (info.rating == -1 ? "N/A" : Utils::floatToString(info.rating, 2));
     if (info.rating != -1) {
@@ -333,5 +383,6 @@ void GDDLAdvancedLevelInfoPopup::addRatingInfo() {
     m_buttonMenu->removeChildByID("gddl-advanced-level-info-showcase-button"_spr);
     addShowcaseButton(!info.showcaseVideoID.empty());
     // correct the "tier button"
-    addTierSprite(info.roundedRating);
+    const int correctedRating = info.roundedRating != -1 ? info.roundedRating : info.defaultRating;
+    addTierSprite(correctedRating);
 }

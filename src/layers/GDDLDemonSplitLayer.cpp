@@ -9,7 +9,7 @@
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
 
-    const CCPoint popupSize = {360.0f, 225.0f};
+    const CCPoint popupSize = {400.0f, 200.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // background
     const auto bg = CCScale9Sprite::create("GJ_square02.png", {0.0f, 0.0f, 80.0f, 80.0f});
@@ -44,18 +44,21 @@ bool GDDLDemonSplitLayer::init() {
     for (int row = 0; row < 5; row++) {
         const auto rowNode = CCNode::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
-        rowNode->setContentSize({350.0f, 20.0f});
-        for (int column = 0; column < 7; column++) {
-            const auto tierNode = createTierNode(row+1+column*5);
-            rowNode->addChild(tierNode);
+        rowNode->setContentSize({390.0f, 20.0f});
+        for (int column = 0; column < 8; column++) {
+            const int targetTier = row+1+column*5;
+            if (targetTier <= Values::highestTier) {
+                const auto tierNode = createTierNode(row+1+column*5);
+                rowNode->addChild(tierNode);
+            } else {
+                const auto tierNode = createTierNode(-1);
+                rowNode->addChild(tierNode);
+            }
         }
         rowNode->updateLayout();
         m_buttonMenu->addChild(rowNode);
         m_buttonMenu->reorderChild(rowNode, row+1);
     }
-    // unrated tier
-    const auto unratedTierNode = createTierNode(-1);
-    m_buttonMenu->addChild(unratedTierNode, 7);
 
     // ok button
     const auto spr = ButtonSprite::create("OK");
@@ -72,6 +75,16 @@ bool GDDLDemonSplitLayer::init() {
 }
 
 void GDDLDemonSplitLayer::onClose(cocos2d::CCObject *sender) {
+    backActions();
+}
+
+void GDDLDemonSplitLayer::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLDemonSplitLayer::backActions() {
+    this->wasClosed = true;
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }
@@ -96,10 +109,21 @@ void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) { // NOLINT(*-conver
 void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
     auto *senderNode = dynamic_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
-    const int tierNumber = std::stoi(tierStr.substr(12, tierStr.size()-10));
-    GDDLSearchLayer::requestSearchFromDemonSplit(tierNumber, this);
-    // the list should display itself hopefully
-    showLoadingCircle();
+    const int start = tierStr.find("button-tier-") + 12;
+    const int end = tierStr.size();
+    const std::string tierNumberStr = tierStr.substr(start, end - start);
+    const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
+    if (maybeTierNumber.isOk()) {
+        if (!GDDLSearchLayer::isSearching()) {
+            GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
+            // the list should display itself hopefully
+            showLoadingCircle();
+        } else {
+            Notification::create("Already searching...", NotificationIcon::Info, 1)->show();
+        }
+    } else {
+        Notification::create("Invalid tier number", NotificationIcon::Warning, 2)->show();
+    }
 }
 
 void GDDLDemonSplitLayer::onEnter() {
@@ -154,8 +178,10 @@ void GDDLDemonSplitLayer::showLoadingCircle() {
 }
 
 void GDDLDemonSplitLayer::hideLoadingCircle() {
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
-    m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    if (m_buttonMenu != nullptr) {
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
+        m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
+    }
 }
 
 GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {

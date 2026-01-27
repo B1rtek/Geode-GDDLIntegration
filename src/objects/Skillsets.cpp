@@ -4,17 +4,17 @@
 #include <iterator>
 
 Skillsets::Skillsets(const matjson::Value &tagsJson) {
-    if (!tagsJson.is_array()) {
+    if (!tagsJson.isArray()) {
         return;
     }
-    const auto &tags = tagsJson.as_array();
+    const auto &tags = tagsJson.asArray().unwrap();
     for (const auto &tag: tags) {
-        if (!tag.contains("ReactCount") || !tag["ReactCount"].is_number() || !tag.contains("TagID") || !tag["TagID"].
-                is_number()) {
+        if (!tag.contains("ReactCount") || !tag["ReactCount"].isNumber() || !tag.contains("TagID") || !tag["TagID"].
+                isNumber()) {
             continue;
         }
-        const int votes = tag["ReactCount"].as_int();
-        const int tagID = tag["TagID"].as_int();
+        const int votes = tag["ReactCount"].asInt().unwrap();
+        const int tagID = tag["TagID"].asInt().unwrap();
         skillsets.emplace_back(tagID, votes);
     }
     std::ranges::sort(skillsets,

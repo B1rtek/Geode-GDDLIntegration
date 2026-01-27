@@ -1,6 +1,7 @@
 #ifndef GDDLINTEGRATION_SUBMISSION_H
 #define GDDLINTEGRATION_SUBMISSION_H
 
+#include <matjson.hpp>
 #include <Geode/Bindings.hpp>
 
 using namespace geode::prelude;

@@ -1,6 +1,7 @@
 #ifndef GDDLINTEGRATION_GDDLRATINGSUBMISSIONLAYER_H
 #define GDDLINTEGRATION_GDDLRATINGSUBMISSIONLAYER_H
 
+#include <Utils.h>
 #include <Geode/Geode.hpp>
 #include <Geode/utils/web.hpp>
 
@@ -19,7 +20,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCLabelBMFont* deviceLabel = nullptr;
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
-    const inline static std::string submissionEndpoint = "https://gdladder.com/api/submit";
+    const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
     EventListener<web::WebTask> submissionListener, userSearchListener, userSubmissionCheckListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;

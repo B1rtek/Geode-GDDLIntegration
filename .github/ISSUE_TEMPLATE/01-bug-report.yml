@@ -1,0 +1,115 @@
+name: Bug Report
+description: Create a bug report
+title: "Bug: "
+labels: ["bug"]
+projects: ["B1rtek/Geode-GDDLIntegration"]
+assignees:
+  - B1rtek
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Before you submit the bug:
+        - Make sure that the issue you are reporting has not been reported already - if it has, comment under it with your platform (Windows, Android, etc) and the version of the mod you're running.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: The labels "Solo Completion" and "Second Player" overlap in the two player submission menu if the User sets the texture quality to medium or low.
+    validations:
+      required: true
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Area of the game affected by the bug
+      options:
+        - UI/Menus
+        - Account system
+        - Network/GDDL API
+        - Crash
+      default: 3
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Mod version
+      description: Mod version(s) on which the bug has occurred, displayed in the mods list
+      placeholder: v1.2.6
+    validations:
+      required: true
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Platforms
+      description: Platforms on which the issue occurs
+      options:
+        - label: Windows
+        - label: Linux
+        - label: Android32
+        - label: Android64
+        - label: MacOS
+        - label: iOS
+    validations:
+      required: true
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: Reproduction steps
+      description: Steps (from starting the game to the bug occurrence) on how to reproduce the bug
+      placeholder: |
+        1. Open Geometry Dash.
+        2. Open graphics settings and set the texture quality to medium or low.
+        3. Enter the create layer.
+        4. Enter the saved levels menu.
+        5. Enter the level info page for any two player demon.
+        6. Click the GDDL tier button.
+        7. Click the "Submit Rating" button.
+    validations:
+      required: true
+  - type: dropdown
+    id: repro-rate
+    attributes:
+      label: How often does the issue occur?
+      options:
+        - Always
+        - Sometimes
+        - Happened only once (isolated instance)
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs from the game
+      description: Content of the log file saved in `Geometry Dash/geode/logs` closest to when you closed the game after the bug occurred, you can use the button below to attach the file.
+      placeholder: |
+        11:46:40 INFO  [Main] [Geode]: Running Geode v4.9.0 in Geometry Dash v2.2074 on Windows
+        11:46:40 INFO  [Main] [Geode]: Setting up internal mod
+        11:46:40 INFO  [Main] [Geode]: Setting up loader
+        11:46:40 INFO  [Main] [Geode]:   Loading launch arguments
+        11:46:40 INFO  [Main] [Geode]:   Setting up crash handler
+    validations:
+      required: true
+  - type: textarea
+    id: crashlog
+    attributes:
+      label: Crashlog
+      description: If this is an issue about a crash, attach a crashlog from `Geometry Dash/geode/crashlogs` saved when the game crashed when the described issue occurred.
+      placeholder: |
+        2025-10-02T15:54:36+0200
+        Whoopsies! An unhandled exception has occurred.
+
+        == Geode Information ==
+        Loader Version: v4.9.0
+    validations:
+      required: false
+  - type: textarea
+    id: extra-info
+    attributes:
+      label: Additional information
+      description: If there is any additional information you feel might be relevant to the issue that didn't fit in any other input field, please put it here.
+      placeholder: I am running the game on Arch Linux via Steam Play using Proton 9.0-4.
+    validations:
+      required: false

@@ -39,24 +39,43 @@ std::vector<int> RatingsManager::tierColors = {
     0x6c1e04,
     0x601a02,
     0x5a1802,
-    0x511700,
-    0x491900,
-    0x3f1a00,
-    0x331700,
-    0x231300,
-    0x110a00,
+    0x521700,
+    0x4f0a01,
+    0x4a0207,
+    0x470313,
+    0x42041e,
+    0x400427,
+    0x3d0630,
+    0x380635,
+    0x300636,
+    0x250630,
+    0x1C072E,
     0x000000
 };
+
+/*
+ * HSV values for tiers 30-40 after the reform
+17 100 32
+7 99 31
+356 97 29
+346 96 28
+335 94 26
+325 93 25
+314 91 24
+304 90 22
+293 88 21
+283 87 19
+272 85 18
+ */
 
 std::map<int, int> RatingsManager::ratingsCache;
 
 GDDLRating RatingsManager::parseJson(const std::string& response) {
-    try {
-        const matjson::Value levelData = matjson::parse(response);
+    if (const auto maybeLevelData = matjson::parse(response); maybeLevelData.isOk()) {
+        const matjson::Value& levelData = maybeLevelData.unwrap();
         return GDDLRating(levelData);
-    } catch (std::runtime_error &error) {
-        return GDDLRating::createInvalid();
     }
+    return GDDLRating::createInvalid();
 }
 
 /**
@@ -78,21 +97,22 @@ void RatingsManager::populateFromSave() {
     }
     std::stringstream content;
     content << f.rdbuf();
-    try {
-        matjson::Value data = matjson::parse(content.str());
-        cacheTimestamp = data["cached"].as_int();
+    if (const auto maybeData = matjson::parse(content.str()); maybeData.isOk()) {
+        matjson::Value data = maybeData.unwrap();
+        cacheTimestamp = data["cached"].asInt().unwrapOr(0);
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
         if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
-            for (auto idRatingPair: data["list"].as_array()) {
-                const int id = idRatingPair["ID"].as_int();
-                const int rating = idRatingPair["Rating"].as_int();
-                ratingsCache[id] = rating;
+            if (data.contains("list") && data["list"].isArray()) {
+                for (auto idRatingPair: data["list"].asArray().unwrap()) {
+                    const int id = idRatingPair["ID"].asInt().unwrapOr(-1);
+                    const int rating = idRatingPair["Rating"].asInt().unwrapOr(-1);
+                    ratingsCache[id] = rating;
+                }
             }
         }
-    } catch (std::runtime_error &error) {
-        // just do nothing, the user will be notified that stuff happened
     }
+    // if not - do nothing, the user will be notified that stuff happened
 }
 
 void RatingsManager::cacheList(bool onQuit) {
@@ -119,7 +139,12 @@ void RatingsManager::cacheList(bool onQuit) {
 }
 
 // ReSharper disable once CppDFAConstantFunctionResult (it's not true!)
-int RatingsManager::getDemonTier(const int id) { return !demonMap.contains(id) ? -1 : demonMap[id].roundedRating; }
+int RatingsManager::getDemonTier(const int id) {
+    if (!demonMap.contains(id)) {
+        return getCachedTier(id);
+    }
+    return demonMap[id].roundedRating != -1 ? demonMap[id].roundedRating : demonMap[id].defaultRating;
+}
 
 cocos2d::ccColor3B RatingsManager::getTierColor(const int tier) {
     if (tier > tierColors.size() || tier < 0) {
@@ -148,61 +173,58 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
         return false;
     }
     demonMap[id] = rating;
+    const int correctedRating = rating.roundedRating != -1 ? rating.roundedRating : rating.defaultRating;
+    ratingsCache[id] = correctedRating;
+    // the requests for ratings are being made inside the rating popups, so the rest of the interface has to "subscribe" to changes
+    // this is the place where we can notify them about the update that happened to the ratings list
+    for (const auto observer: ratingObservers) {
+        observer->updateRating();
+    }
     return true;
 }
 
 void RatingsManager::cacheRatings(const std::string &response) {
-    // ReSharper disable once CppTooWideScopeInitStatement
-    // try {
-        // now we need to parse csv
-        std::stringstream ss;
-        std::string value, line;
-        ss << response;
-        // skip the headers
-        std::getline(ss, value);
-        // get the data
-        while(std::getline(ss, line)) {
-            line += ',';
-            int linePos = 0, currentQuoteCount = 0;
-            std::vector<std::string> values;
-            value = "";
-            while (linePos < line.size()) {
-                if (line[linePos] == '"') {
-                    ++currentQuoteCount;
-                    value.push_back(line[linePos]);
-                } else if (line[linePos] == ',' && currentQuoteCount % 2 == 0) {
-                    values.push_back(value);
-                    value = "";
-                    currentQuoteCount = 0;
-                } else {
-                    value.push_back(line[linePos]);
-                }
-                ++linePos;
+    // epic csv parser by b1rtek v1.2 (now it doesn't crash the game!!) (i think)
+    std::stringstream ss;
+    std::string value, line;
+    ss << response;
+    // skip the headers
+    std::getline(ss, value);
+    // get the data
+    while(std::getline(ss, line)) {
+        line += ',';
+        int linePos = 0, currentQuoteCount = 0;
+        std::vector<std::string> values;
+        value = "";
+        while (linePos < line.size()) {
+            if (line[linePos] == '"') {
+                ++currentQuoteCount;
+                value.push_back(line[linePos]);
+            } else if (line[linePos] == ',' && currentQuoteCount % 2 == 0) {
+                values.push_back(value);
+                value = "";
+                currentQuoteCount = 0;
+            } else {
+                value.push_back(line[linePos]);
             }
-            // values are in the vector now, we're only interested in the ID and the Rating
-            const int id = std::stoi(values[4].substr(1, values[4].size() - 2));
-            std::string strRating = values[5].substr(1, values[5].size() - 2);
-            if (strRating.empty()) strRating = "-1.0";
-            const float rating = std::stof(strRating);
-            const int roundedRating = static_cast<int>(round(rating));
-            ratingsCache[id] = roundedRating;
+            ++linePos;
         }
-        // old code in case /theList comes back
-        // matjson::Value ratingsData = matjson::parse(response);
-        // for (auto element: ratingsData.as_array()) {
-        //     const int id = element["ID"].as_int();
-        //     const float rating = element["Rating"].is_null() ? -1.0f : element["Rating"].as_double();
-        //     const int roundedRating = static_cast<int>(round(rating));
-        //     ratingsCache[id] = roundedRating;
-        // }
-        if (!ratingsCache.empty()) {
-            // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
-            cacheList(false);
+        // values are in the vector now, we're only interested in the ID and the Rating
+        if (values.size() >= 6 && values[0].size() > 2 && values[5].size() > 2) {
+            const std::string strID = values[0].substr(1, values[0].size() - 2);
+            if (const Result<int> maybeID = numFromString<int>(strID); maybeID.isOk()) {
+                const int id = maybeID.unwrap();
+                std::string strRating = values[5].substr(1, values[5].size() - 2);
+                const float rating = numFromString<float>(strRating).unwrapOr(-1.0f);
+                const int roundedRating = static_cast<int>(round(rating));
+                ratingsCache[id] = roundedRating;
+            }
         }
-
-    // } catch (std::runtime_error &error) {
-    //     // just do nothing, the user will be notified that stuff happened
-    // }
+    }
+    if (!ratingsCache.empty()) {
+        // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
+        cacheList(false);
+    }
 }
 
 std::map<int, int> RatingsManager::getTierStats() {
@@ -225,18 +247,10 @@ std::map<int, int> RatingsManager::getTierStats() {
 }
 
 /**
- * Populates the in-memory cache from file and then checks if that actually populated it
+ * Checks if cache is empty
  */
-bool RatingsManager::alreadyCached() {
-    populateFromSave();
-    return !ratingsCache.empty();
-}
-
-/**
- * Checks if cache is empty WIHTOUT trying to populate it
- */
-bool RatingsManager::cacheNotEmpty() {
-    return !ratingsCache.empty();
+bool RatingsManager::cacheEmpty() {
+    return ratingsCache.empty();
 }
 
 void RatingsManager::updateCacheFromSearch(const int levelID, const float rating) {
@@ -291,4 +305,12 @@ Submission RatingsManager::getSubmission(const int levelID) {
 
 void RatingsManager::clearSubmissionCache() {
     submissionsCache.clear();
+}
+
+void RatingsManager::subscribeToObservers(IRatingObserver* newSubscriber) {
+    ratingObservers.insert(newSubscriber);
+}
+
+void RatingsManager::unsubscribeFromObservers(IRatingObserver* unsubscribing) {
+    ratingObservers.erase(unsubscribing);
 }

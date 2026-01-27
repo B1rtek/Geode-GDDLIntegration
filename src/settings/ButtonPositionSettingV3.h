@@ -19,8 +19,8 @@ protected:
 public:
     static constexpr ButtonPosition defaultPosition = DEFAULT;
 
-    static Result<std::shared_ptr<ButtonPositionSettingV3>> parse(std::string const& key, std::string const& modID,
-                                                                  matjson::Value const& json);
+    static Result<std::shared_ptr<SettingV3>> parse(std::string const& key, std::string const& modID,
+                                                    matjson::Value const& json);
     bool load(const matjson::Value& json) override;
     bool save(matjson::Value& json) const override;
     SettingNodeV3* createNode(float width) override;

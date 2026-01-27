@@ -1,10 +1,8 @@
 #include "GDDLLoginLayer.h"
 
 #include "Utils.h"
-#include "external/ca_bundle.h"
 #include "GDDLRatingSubmissionLayer.h"
 #include <Geode/Loader.hpp>
-#include <curl/curl.h>
 #include <Geode/ui/LoadingSpinner.hpp>
 
 bool GDDLLoginLayer::init() {
@@ -14,7 +12,7 @@ bool GDDLLoginLayer::init() {
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
-    const auto bg = CCScale9Sprite::create("GJ_square05.png", {0.0f, 0.0f, 80.0f, 80.0f});
+    const auto bg = CCScale9Sprite::create(Utils::getGrayPopupBG().c_str(), {0.0f, 0.0f, 80.0f, 80.0f});
     bg->setContentSize(popupSize);
     bg->setPosition({winSize.width / 2, winSize.height / 2});
     bg->setID("gddl-login-bg"_spr);
@@ -26,56 +24,92 @@ bool GDDLLoginLayer::init() {
     m_buttonMenu->setContentSize(popupSize);
     m_buttonMenu->setPosition({winSize.width / 2 - popupSize.x / 2, winSize.height / 2 - popupSize.y / 2});
     m_mainLayer->addChild(m_buttonMenu, 10);
+
     // title
-    const auto title = CCLabelBMFont::create("GDDL Login", "goldFont.fnt");
+    const auto titleContent = LoginSettingNodeV3::loggedIn() ? "Manage API key" : "Log in with API key";
+    const auto title = CCLabelBMFont::create(titleContent, "goldFont.fnt");
+    title->setScale(LoginSettingNodeV3::loggedIn() ? 1.0f : 0.9f);
     title->setID("gddl-login-title"_spr);
     title->setPosition({popupSize.x / 2, popupSize.y - 20.0f});
     m_buttonMenu->addChild(title);
+
     // close button
-    const auto closeButtonSprite = CircleButtonSprite::createWithSpriteFrameName("geode.loader/close.png", .85f,
-                                                                                 CircleBaseColor::Gray);
+    const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     m_closeBtn = CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLLoginLayer::onClose));
     m_buttonMenu->addChild(m_closeBtn);
     m_closeBtn->setPosition({3.0f, popupSize.y - 3.0f});
 
-    // content
-    // status text
-    statusLabel = CCLabelBMFont::create("", "chatFont.fnt");
-    statusLabel->setID("gddl-login-status-label"_spr);
-    statusLabel->setPosition({popupSize.x / 2, popupSize.y - 38.0f});
-    statusLabel->setScale(0.7f);
-    m_buttonMenu->addChild(statusLabel);
-    // username text + textfield
-    const auto usernameLabel = CCLabelBMFont::create("Username", "bigFont.fnt");
-    usernameLabel->setScale(0.5f);
-    usernameLabel->setID("gddl-login-username-label"_spr);
-    usernameLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 50.0f});
-    m_buttonMenu->addChild(usernameLabel);
-    Utils::createTextInputNode(m_buttonMenu, usernameTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
-                               {popupSize.x / 2, popupSize.y - 75.0f});
-    usernameTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-    usernameTextField->setString(Mod::get()->getSavedValue<std::string>("login-username", ""));
-    // password text + textfield
-    const auto passwordLabel = CCLabelBMFont::create("Password", "bigFont.fnt");
-    passwordLabel->setScale(0.5f);
-    passwordLabel->setID("gddl-login-password-label"_spr);
-    passwordLabel->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 100.0f});
-    m_buttonMenu->addChild(passwordLabel);
-    Utils::createTextInputNode(m_buttonMenu, passwordTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
-                               {popupSize.x / 2, popupSize.y - 125.0f});
-    passwordTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
-    passwordTextField->m_usePasswordChar = true;
-    // login button
-    const auto loginButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_02.png");
-    loginButtonSprite->setScale(0.6f);
-    loginButton = CCMenuItemSpriteExtra::create(loginButtonSprite, this,
-                                                           menu_selector(GDDLLoginLayer::onLoginClicked));
-    loginButton->setID("gddl-login-login-button"_spr);
-    loginButton->setPosition({popupSize.x / 2, popupSize.y - 160.0f});
-    m_buttonMenu->addChild(loginButton);
-    m_buttonMenu->reorderChild(loginButton, 10);
+    const int lineHeight = CCDirector::get()->getLoadedTextureQuality() == kTextureQualityHigh ? 12 : 13;
+    const float mediumGraphics = CCDirector::get()->getLoadedTextureQuality() == kTextureQualityHigh ? 0.0f : 1.0f; // screw low quality I don't care
+    // content of the popup depends on whether the user is logged in or not
+    if (LoginSettingNodeV3::loggedIn()) {
+        // logged in label
+        const std::string username = Mod::get()->getSavedValue<std::string>("login-username", "");
+        const auto loggedInLabel = CCLabelBMFont::create(("Logged in as " + username).c_str(), "bigFont.fnt");
+        loggedInLabel->setScale(0.5f);
+        loggedInLabel->setID("gddl-login-logged-in-label"_spr);
+        loggedInLabel->setPosition({popupSize.x / 2, popupSize.y - 50.0f});
+        m_buttonMenu->addChild(loggedInLabel);
 
-    prepareSearchListener();
+        // copy key button
+        const auto copyKeyButtonSprite = ButtonSprite::create("Copy key", "bigFont.fnt", "GJ_button_02.png");
+        copyKeyButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(copyKeyButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onCopyAPIKeyClicked));
+        loginButton->setID("gddl-login-copy-key-button"_spr);
+        loginButton->setPosition({popupSize.x / 2 - 60.0f, popupSize.y - 80.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // log out button
+        const auto logOutButtonSprite = ButtonSprite::create("Log out", "bigFont.fnt", "GJ_button_06.png");
+        logOutButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(logOutButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onLogOutClicked));
+        loginButton->setID("gddl-login-log-out-button"_spr);
+        loginButton->setPosition({popupSize.x / 2 + 60.0f, popupSize.y - 80.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // disclaimer about logging out
+        const std::string disclaimerMessage = "<cr>Logging out</c> will <cy>only delete</c> the <cj>API key</c> from\n<co>this device</c>, to log out <cy>all devices</c> go to\ngdladder.com > <cg>Settings</c> > <cp>Developer</c>.";
+        const auto disclaimerTextArea = TextArea::create(disclaimerMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+        disclaimerTextArea->setID("gddl-login-disclaimer"_spr);
+        disclaimerTextArea->setPosition({popupSize.x / 2 + 30.0f + mediumGraphics * 5.0f, popupSize.y - 115.0f}); // why does this thing not place itself in the middle ugh
+        m_buttonMenu->addChild(disclaimerTextArea);
+    } else {
+        // api key input field
+        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 65, {200.0f, 25.0f},
+                               {popupSize.x / 2, popupSize.y - 50.0f});
+        apiKeyTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
+        apiKeyTextField->m_usePasswordChar = true;
+
+        // log in button
+        const auto copyKeyButtonSprite = ButtonSprite::create("Log in", "bigFont.fnt", "GJ_button_01.png");
+        copyKeyButtonSprite->setScale(0.6f);
+        loginButton = CCMenuItemSpriteExtra::create(copyKeyButtonSprite, this,
+                                                               menu_selector(GDDLLoginLayer::onLoginClicked));
+        loginButton->setID("gddl-login-log-in-button"_spr);
+        loginButton->setPosition({popupSize.x / 2, popupSize.y - 80.0f});
+        m_buttonMenu->addChild(loginButton);
+        m_buttonMenu->reorderChild(loginButton, 10);
+
+        // instructions
+        const std::string apiKeyInstructions = "To obtain your <cj>API key</c>, log into your\n<cr>GDDL account</c> in the browser and go\nto <cg>Settings</c> > <cp>Developer</c>.    "; // these spaces at the end are 100% intentional, screw you TextArea
+        const auto apiKeyTextArea = TextArea::create(apiKeyInstructions, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+        apiKeyTextArea->setID("gddl-login-api-key-instructions"_spr);
+        apiKeyTextArea->setPosition({popupSize.x / 2 + 25.0f + mediumGraphics * 4.0f, popupSize.y - 115.0f}); // why does this thing not place itself in the middle ugh
+        m_buttonMenu->addChild(apiKeyTextArea);
+    }
+
+    // never share this key with anyone label
+    std::string neverShareMessage = "<cr>Never</c> share your <cj>API key</c> with anyone.\n<co>Anyone</c> in the possession of your <cj>API key</c>\nhas <cy>full access to your account</c>.";
+    const auto disclaimerTextArea = TextArea::create(neverShareMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+    disclaimerTextArea->setID("gddl-login-never-share"_spr);
+    disclaimerTextArea->setPosition({popupSize.x / 2 + 27.5f + mediumGraphics * 4.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
+    m_buttonMenu->addChild(disclaimerTextArea);
+
+    prepareMeListener();
 
     return true;
 }
@@ -86,73 +120,71 @@ void GDDLLoginLayer::onClose(cocos2d::CCObject *sender) {
 }
 
 void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
-    reqJson = matjson::Value();
-    std::string username = std::string(usernameTextField->getString());
-    if (username.empty()) {
-        Notification::create("Missing username", NotificationIcon::Warning, 2)->show();
-        return;
-    }
-    std::string password = std::string(passwordTextField->getString());
-    if (password.empty()) {
-        Notification::create("Missing password", NotificationIcon::Warning, 2)->show();
-        return;
-    }
-    reqJson["username"] = username;
-    reqJson["password"] = password;
+    const std::string authHeader = "Bearer " + std::string(apiKeyTextField->getString());
+    auto req = web::WebRequest();
+    req.header("Authorization", authHeader);
+    req.header("User-Agent", Utils::getUserAgent());
     showLoadingCircle();
-    spawnLoginRequestThread().detach();
+    // if /api/user/me returns 200/201, the key is valid for the fetched user
+    saveLoginData("", 0);
+    meListener.setFilter(req.get(meEndpoint));
 }
 
-// left here because once geode 4.0.0 comes out raw curl won't be needed
-void GDDLLoginLayer::prepareSearchListener() {
-    loginListener.bind([this](web::WebTask::Event *e) {
+void GDDLLoginLayer::onCopyAPIKeyClicked(cocos2d::CCObject* sender) {
+    PlatformToolbox::copyToClipboard(Mod::get()->getSavedValue<std::string>("api-key", ""));
+    Notification::create("API key copied to clipboard!", NotificationIcon::Success, 2)->show();
+}
+
+void GDDLLoginLayer::onLogOutClicked(cocos2d::CCObject* sender) {
+    LoginSettingNodeV3::logOut();
+    Notification::create("Logged out", NotificationIcon::Success, 2)->show();
+    closeLoginPanel();
+}
+
+void GDDLLoginLayer::prepareMeListener() {
+    meListener.bind([this](web::WebTask::Event *e) {
         if (web::WebResponse *res = e->getValue()) {
             const auto jsonResponse = res->json().unwrapOr(matjson::Value());
             if (res->code() == 200) {
-                Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                saveLoginData("gddl.sid", "gddl.sid.sig");
-                RatingsManager::clearSubmissionCache();
-                closeLoginPanel();
-            } else {
-                // not success!
-                std::string error = "Unknown error";
-                if (jsonResponse.contains("error")) {
-                    error = jsonResponse["error"].as_string();
+                const int uid = jsonResponse["ID"].asInt().unwrapOr(-1);
+                const std::string username = jsonResponse["Name"].asString().unwrapOr("");
+                if (uid == -1 || username == "") {
+                    hideLoadingCircle();
+                    const std::string errorMessage = "Error during login - failed to obtain the user id or username";
+                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                    const std::string rawResponse = res->string().unwrapOr("Response was not a valid string");
+                    log::error("GDDLLoginLayer::meListener: {}, raw response: {}", errorMessage, rawResponse);
+                } else {
+                    saveLoginData(username, uid);
+                    RatingsManager::clearSubmissionCache();
+                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                    log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
+                    closeLoginPanel();
                 }
+            } else if (res->code() == 401) {
                 hideLoadingCircle();
-                Notification::create(error, NotificationIcon::Error, 2)->show();
+                const std::string errorMessage = "Error during login - invalid API key";
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
+            } else {
+                hideLoadingCircle();
+                const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
             }
         } else if (e->isCancelled()) {
             hideLoadingCircle();
-            Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
-        }
-    });
-    userIDListener.bind([this](web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
-            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
-                const int id = GDDLLoginLayer::getUserIDFromUserSearchJSON(jsonResponse, Mod::get()->getSavedValue<std::string>("login-username", ""));
-                if (id > -1) {
-                    Mod::get()->setSavedValue("login-userid", id);
-                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                    closeLoginPanel();
-                } else {
-                    Notification::create(id == -1 ? "Your player ID wasn't found, try relogging later" : "An error occurred", NotificationIcon::Error, 2)->show();
-                }
-            } else {
-                Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
-            }
-        }
-        else if (e->isCancelled()) {
-            Notification::create("Your player ID wasn't found, try relogging later", NotificationIcon::Error, 2)->show();
+            const std::string errorMessage = "Error during login - request cancelled";
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLLoginLayer::meListener: {}", errorMessage);
         }
     });
 }
 
-void GDDLLoginLayer::saveLoginData(const std::string &sid, const std::string &sig) {
-    Mod::get()->setSavedValue("login-username", std::string(usernameTextField->getString()));
-    Mod::get()->setSavedValue("login-sid", sid);
-    Mod::get()->setSavedValue("login-sig", sig);
+void GDDLLoginLayer::saveLoginData(const std::string &username, const int uid) {
+    Mod::get()->setSavedValue("api-key", username.empty() ? "" : std::string(apiKeyTextField->getString()));
+    Mod::get()->setSavedValue("login-username", username);
+    Mod::get()->setSavedValue("login-userid", uid);
 }
 
 void GDDLLoginLayer::closeLoginPanel() {
@@ -172,111 +204,6 @@ void GDDLLoginLayer::showLoadingCircle() {
 
 void GDDLLoginLayer::hideLoadingCircle() {
     m_buttonMenu->removeChildByID("gddl-login-loading-spinner"_spr);
-}
-
-size_t GDDLLoginLayer::writeCallback(char *contents, size_t size, size_t nmemb, void *userp) {
-    // stack overflow yay https://stackoverflow.com/questions/44994203/how-to-get-the-http-response-string-using-curl-in-c
-    ((std::string *) userp)->append((char *) contents, size * nmemb);
-    return size * nmemb;
-}
-
-std::pair<std::string, std::string> GDDLLoginLayer::getCookieValue(const char *content) {
-    std::string cookie = content;
-    // get cookie name
-    int equalsPos = cookie.find('=');
-    std::string cookieName = cookie.substr(0, equalsPos);
-    std::string cookieValue = cookie.substr(equalsPos + 1, cookie.find(';', equalsPos) - equalsPos - 1);
-    return {cookieName, cookieValue};
-}
-
-std::thread GDDLLoginLayer::spawnLoginRequestThread() {
-    return std::thread([this]() {
-        CURL* curl = curl_easy_init();
-        CURLcode res;
-        struct curl_header *type;
-        if (curl) {
-            struct curl_slist *list = nullptr;
-            std::string readBuffer;
-            // set up the post request
-            curl_easy_setopt(curl, CURLOPT_URL, loginEndpoint.c_str());
-            curl_easy_setopt(curl, CURLOPT_POST, 1L);
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, "GDDLIntegration");
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
-            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2);
-            // thank you dank once again <3 go support Globed!
-            // https://github.com/GlobedGD/globed2/
-            curl_blob cbb = {};
-            cbb.data = const_cast<void*>(reinterpret_cast<const void*>(CA_BUNDLE_CONTENT));
-            cbb.len = sizeof(CA_BUNDLE_CONTENT);
-            cbb.flags = CURL_BLOB_COPY;
-            curl_easy_setopt(curl, CURLOPT_CAINFO_BLOB, &cbb);
-            // prepare data
-            std::string strData = reqJson.dump();
-            const char *data = strData.c_str();
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(data));
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
-            list = curl_slist_append(list, "Content-Type: application/json");
-            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, GDDLLoginLayer::writeCallback);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-            // dew it
-            res = curl_easy_perform(curl);
-
-            /* Check for errors */
-            if(res != CURLE_OK) {
-                hideLoadingCircle();
-                Loader::get()->queueInMainThread([]() {
-                    Notification::create("An error occurred", NotificationIcon::Error, 2)->show();
-                });
-                return;
-            }
-
-            long httpCode = 0;
-            curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpCode);
-            if (httpCode == 200) {
-                // extract the cookies and log in
-                CURLHcode h;
-                int i = 0;
-                std::map<std::string, std::string> cookies;
-                while (true) {
-                    h = curl_easy_header(curl, "Set-Cookie", i, CURLH_HEADER, -1, &type);
-                    if (h != CURLHE_OK) {
-                        break;
-                    }
-                    const auto cookieNameValuePair = getCookieValue(type->value);
-                    cookies[cookieNameValuePair.first] = cookieNameValuePair.second;
-                    ++i;
-                }
-                saveLoginData(cookies["gddl.sid"], cookies["gddl.sid.sig"]);
-                Loader::get()->queueInMainThread([this]() {
-                    // get the uid
-                    std::string requestURL = GDDLRatingSubmissionLayer::userSearchEndpoint;
-                    const std::string requestedUsername = Mod::get()->getSavedValue<std::string>("login-username", "");
-                    requestURL += "?name=" + requestedUsername + "&chunk=25";
-                    auto req = web::WebRequest();
-                    userIDListener.setFilter(req.get(requestURL));
-                });
-            } else {
-                // something went wrong - get the error
-                std::string error = "Unknown error", parseError;
-                const std::optional<matjson::Value> maybeJsonResponse = matjson::parse(readBuffer, parseError);
-                if (maybeJsonResponse.has_value()) {
-                    const auto jsonResponse = maybeJsonResponse.value();
-                    if (jsonResponse.contains("error")) {
-                        error = jsonResponse["error"].as_string();
-                    }
-                } else {
-                    error = "Server returned an invalid response";
-                }
-                hideLoadingCircle();
-                Loader::get()->queueInMainThread([error]() {
-                    Notification::create(error, NotificationIcon::Error, 2)->show();
-                });
-            }
-
-            curl_easy_cleanup(curl);
-        }
-    });
 }
 
 GDDLLoginLayer *GDDLLoginLayer::create() {
@@ -300,17 +227,17 @@ void GDDLLoginLayer::setSettingNode(LoginSettingNodeV3 *settingNode) {
 
 // -2 = error, -1 = not found, >0 = uid
 int GDDLLoginLayer::getUserIDFromUserSearchJSON(matjson::Value jsonResponse, const std::string& requestedUsername) {
-    if (!jsonResponse.is_array()) {
+    if (!jsonResponse.isArray()) {
         return -2;
     }
-    const auto resultsList = jsonResponse.as_array();
+    const auto resultsList = jsonResponse.asArray().unwrap();
     int id = -1;
     for (const auto& result : resultsList) {
-        if (!result.contains("Name") || !result.contains("ID")) {
+        if (!result.contains("ID") || !result["ID"].isNumber()) {
             continue;
         }
-        if (result["Name"] == requestedUsername) {
-            id = result["ID"].as_int();
+        if (result["Name"].asString().unwrapOr("") == requestedUsername) {
+            id = result["ID"].asInt().unwrap();
             break;
         }
     }
