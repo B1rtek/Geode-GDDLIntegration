@@ -16,13 +16,9 @@
 		"source": "https://github.com/B1rtek/Geode-GDDLIntegration",
 		"community": "https://discord.gg/gddl"
 	},
-	"dependencies": [
-		{
-			"id": "geode.node-ids",
-			"version": ">=1.21.1",
-			"importance": "required"
-		}
-	],
+	"dependencies": {
+		"geode.node-ids": ">=1.21.1"
+	},
 	"tags": [
 		"utility",
 		"interface",
