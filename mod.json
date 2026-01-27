@@ -1,9 +1,9 @@
 {
-	"geode": "4.10.0",
-	"version": "v1.2.10",
+	"geode": "5.0.0-alpha.1",
+	"version": "v1.2.11-beta.1",
 	"gd": {
 		"android": "2.2074",
-		"win": "2.2074",
+		"win": "2.2081",
 		"mac": "2.2074",
 		"ios": "2.2074"
 	},
@@ -19,7 +19,7 @@
 	"dependencies": [
 		{
 			"id": "geode.node-ids",
-			"version": ">=1.13.2",
+			"version": ">=1.21.1",
 			"importance": "required"
 		}
 	],
