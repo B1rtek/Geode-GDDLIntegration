@@ -229,12 +229,10 @@ void RatingsManager::cacheRatings(const std::string &response) {
 
 std::map<int, int> RatingsManager::getTierStats() {
     GameLevelManager *levelManager = GameLevelManager::sharedState();
-    const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
+    cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
     std::map<int, int> tierStats;
-    CCObject *obj;
-    CCARRAY_FOREACH(completedLevels, obj) {
+    for(const auto level : CCArrayExt<GJGameLevel *>(completedLevels)) {
         // ReSharper disable once CppTooWideScopeInitStatement
-        const auto level = dynamic_cast<GJGameLevel *>(obj);
         if (level->m_normalPercent == 100 && level->m_stars == 10) {
             int cachedTier = -1;
             if (ratingsCache.contains(level->m_levelID)) {

@@ -47,9 +47,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // sort - displayed as sortBy, mapped to a value in the sort vector, default - ID
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {
-            "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
+            "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Deviation", "Popularity", "Random"};
     const inline static std::vector<std::string> sort = {
-        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "random"
+        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "deviation", "popularity", "random"
     };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;

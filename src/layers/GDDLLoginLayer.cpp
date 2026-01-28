@@ -79,7 +79,7 @@ bool GDDLLoginLayer::init() {
         m_buttonMenu->addChild(disclaimerTextArea);
     } else {
         // api key input field
-        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
+        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 65, {200.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 50.0f});
         apiKeyTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
         apiKeyTextField->m_usePasswordChar = true;
