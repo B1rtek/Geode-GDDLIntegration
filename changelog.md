@@ -1,4 +1,4 @@
-# 1.2.11-beta.1
+# 1.2.11-beta.2
 - Compatibility with Geode v5.0.0-alpha.1
 - Added the missing [sorting by deviation and popularity](https://github.com/B1rtek/Geode-GDDLIntegration/issues/102) options to the GDDL search menu
 - Fixed the [bug that prevented people from logging in with the API key](https://github.com/B1rtek/Geode-GDDLIntegration/issues/98) (finally, thank you for reporting the bug realshizai and bananaman4141
