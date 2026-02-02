@@ -51,7 +51,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 CCPoint menuPosition, buttonPosition;
                 CCSize menuSize;
                 float buttonScale = 1.0f;
-                if (buttonPositionSetting != DEFAULT) {
+                if (buttonPositionSetting == TO_THE_RIGHT_OF_THE_LEVEL_TITLE || buttonPositionSetting == TO_THE_LEFT_OF_THE_LEVEL_TITLE) {
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont *>(getChildByID("title-label"));
                     const auto levelNamePosition = levelNameLabel->getPosition();
                     const auto levelNameSize = levelNameLabel->getScaledContentSize();
@@ -75,11 +75,15 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                     buttonPosition = CCPoint{12.5f, 12.5f};
                     buttonScale = 0.5f;
                 } else {
+                    menuSize = CCSize{50, 50};
                     const auto diffPosition = m_difficultySprite->getPosition();
                     const auto diffSize = m_difficultySprite->getContentSize();
-                    menuPosition =
-                            CCPoint{diffPosition.x - 50 - diffSize.width / 2, diffPosition.y - diffSize.height / 3.2f};
-                    menuSize = CCSize{50, 50};
+                    if (buttonPositionSetting == DEMON_FACE) {
+                        menuPosition = CCPoint{diffPosition.x - menuSize.width / 2, diffPosition.y - menuSize.height / 2};
+                    } else {
+                        menuPosition =
+                        CCPoint{diffPosition.x - 50 - diffSize.width / 2, diffPosition.y - diffSize.height / 3.2f};
+                    }
                     buttonPosition = CCPoint{25, 25};
                 }
                 placeGDDLButton(menuPosition, menuSize, buttonPosition, buttonScale);
@@ -139,14 +143,25 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
         addChild(menu);
 
         const int levelID = m_level->m_levelID;
-        // just so it displays a bit earlier
-        const auto button = CCMenuItemSpriteExtra::create(Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID)), this, menu_selector(GDDLInfoLayer::onGDDLInfo));
+        const auto positionSetting = static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSetting("button-position"))->getPosition();
+        CCSprite* buttonSprite;
+        if (positionSetting == DEMON_FACE) {
+            const int correctedLevelDifficulty = this->m_level->m_demonDifficulty == 0 ? 6 : this->m_level->m_demonDifficulty + 4;
+            const auto difficultySpriteCopy = GJDifficultySprite::create(correctedLevelDifficulty, GJDifficultyName::Long);
+            difficultySpriteCopy->updateFeatureState(this->m_difficultySprite->m_featureState);
+            buttonSprite = difficultySpriteCopy;
+            m_difficultySprite->setVisible(false);
+        } else {
+            buttonSprite = Utils::getSpriteFromTier(RatingsManager::getCachedTier(levelID));
+        }
+        const auto button = CCMenuItemSpriteExtra::create(buttonSprite, this, menu_selector(GDDLInfoLayer::onGDDLInfo));
         button->setPosition(buttonPosition);
         button->setID("rating"_spr);
         menu->addChild(button);
     }
 
     void updateButton(const int tier) {
+        if (static_pointer_cast<ButtonPositionSettingV3>(Mod::get()->getSetting("button-position"))->getPosition() == DEMON_FACE) return;
         const bool displayAsLabel = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->isEnabled();
         if (!displayAsLabel) {
             const auto menu = typeinfo_cast<CCMenu*>(getChildByID("rating-menu"_spr));
