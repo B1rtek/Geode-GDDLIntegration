@@ -8,7 +8,7 @@
 class ButtonPositionSettingNodeV3 : public SettingNodeV3 {
 protected:
     ButtonPosition currentSetting = DEFAULT;
-    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "right of the level title"};
+    const inline static std::vector<std::string> toDisplay = {"Default", "Left of the level title", "Right of the level title", "Demon face as button"};
 
     CCLabelBMFont *positionSettingLabel = nullptr;
     static constexpr float labelWidth = 150.0f;
