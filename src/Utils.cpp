@@ -348,3 +348,25 @@ void Utils::addAuthHeader(web::WebRequest &req) {
         req.header("Authorization", fmt::format("Bearer {}", Mod::get()->getSavedValue<std::string>("api-key", "")));
     }
 }
+
+// thank you @undefined06855!
+Result<std::string_view> Utils::getSpriteNodeFrameName(CCSprite* sprite) {
+    std::string_view frameName = "";
+    // taken from devtools
+    if (auto texture = sprite->getTexture()) {
+        auto cachedFrames = CCSpriteFrameCache::sharedSpriteFrameCache()->m_pSpriteFrames;
+        auto rect = sprite->getTextureRect();
+        for (auto [key, frame] : geode::cocos::CCDictionaryExt<std::string_view, CCSpriteFrame*>(cachedFrames)) {
+            if (frame->getTexture() == texture && frame->getRect() == rect) {
+                frameName = key;
+                break;
+            }
+        }
+    }
+
+    if (frameName.empty()) {
+        return Err("Sprite does not have a frame name found in cache!");
+    }
+
+    return Ok(frameName);
+}
