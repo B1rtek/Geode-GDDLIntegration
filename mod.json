@@ -1,6 +1,6 @@
 {
 	"geode": "5.0.0-alpha.1",
-	"version": "v1.2.11-beta.3",
+	"version": "v1.2.11-beta.4",
 	"gd": {
 		"win": "2.2081"
 	},
@@ -14,7 +14,7 @@
 		"community": "https://discord.gg/gddl"
 	},
 	"dependencies": {
-		"geode.node-ids": ">=1.21.1"
+		"geode.node-ids": ">=1.22.0"
 	},
 	"tags": [
 		"utility",
