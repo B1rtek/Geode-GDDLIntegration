@@ -1,10 +1,10 @@
-name: Build Geode Mod (Nightly)
+name: Build Geode Mod (Beta with PDBs)
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - "beta-builds-v4"
+      - "beta-builds"
 
 jobs:
   build:
@@ -12,19 +12,23 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - name: Windows
-          os: windows-latest
+          - name: Windows
+            os: windows-latest
 
-        - name: macOS
-          os: macos-latest
+          - name: macOS
+            os: macos-latest
 
-        - name: Android32
-          os: ubuntu-latest
-          target: Android32
+          - name: iOS
+            os: macos-latest
+            target: iOS
 
-        - name: Android64
-          os: ubuntu-latest
-          target: Android64
+          - name: Android32
+            os: ubuntu-latest
+            target: Android32
+
+          - name: Android64
+            os: ubuntu-latest
+            target: Android64
 
     name: ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
@@ -32,9 +36,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Update LLVM Windows
+        run: choco upgrade llvm
+        if: matrix.config.os == 'windows-latest'
+
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
+          build-config: RelWithDebInfo
+          export-symbols: true
+          export-pdb: true
           combine: true
           sdk: nightly
           target: ${{ matrix.config.target }}
