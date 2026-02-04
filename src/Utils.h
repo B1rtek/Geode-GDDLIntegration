@@ -51,7 +51,7 @@ public:
     static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
                                                 const std::string &placeholder, float maxWidth, const CCPoint &position,
                                                 const CCPoint &bgSize, int zOrder = 1);
-    static void bindCacheDownloadCallback(EventListener<web::WebTask> &cacheEventListener, bool notifySuccess = false);
+    static std::function<void(web::WebResponse)> getCacheDownloadLambda(bool notifySuccess = false);
     static CCSprite *getTierSpriteFromName(const char *name);
     static CCSprite *getSpriteFromTier(const int tier);
     static bool notExcluded(int levelID);
@@ -65,8 +65,9 @@ public:
     static std::string getGrayPopupBG();
     static CCSprite* getGrayPopupCloseButton(float scale = .85f);
     static std::optional<std::string> getErrorMessageFromErrorCode(int errorCode);
-    static std::string getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse* res);
+    static std::string getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse& res);
     static void addAuthHeader(web::WebRequest &req);
+    static Result<std::string_view> getSpriteNodeFrameName(CCSprite* sprite);
 };
 
 template <typename T>

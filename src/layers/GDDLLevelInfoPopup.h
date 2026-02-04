@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 
 class GDDLLevelInfoPopup final : public FLAlertLayer {
-    EventListener<web::WebTask> ratingListener;
+    async::TaskHolder<web::WebResponse> ratingListener;
     int levelID;
     const inline static CCPoint popupSize = {300.0f, 160.0f};
 
@@ -16,7 +16,7 @@ class GDDLLevelInfoPopup final : public FLAlertLayer {
     void onClose(CCObject *sender);
     void onOpenInBrowser(CCObject *sender);
 
-    void prepareSearchListener();
+    std::function<void(web::WebResponse)> getSearchListenerLambda();
     void addLevelInfo();
 public:
     static GDDLLevelInfoPopup* create(int levelID);

@@ -66,7 +66,7 @@ bool GDDLSearchLayer::init() {
     showPage();
     loadValues();
     // prepare the search request fun
-    prepareSearchListener();
+    getSearchListenerLambda();
     searchLayer = this;
     return true;
 }
@@ -576,10 +576,8 @@ std::vector<int> GDDLSearchLayer::filterResults(std::vector<int> ids, const Leve
     if (completionStatus != ANY) {
         std::set<int> allCompleted;
         GameLevelManager *levelManager = GameLevelManager::sharedState();
-        const cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
-        CCObject *obj;
-        CCARRAY_FOREACH(completedLevels, obj) {
-            const auto level = dynamic_cast<GJGameLevel *>(obj);
+        cocos2d::CCArray *completedLevels = levelManager->getCompletedLevels(false);
+        for(const auto level : CCArrayExt<GJGameLevel *>(completedLevels)) {
             // ReSharper disable once CppTooWideScopeInitStatement
             const bool levelCompleted = level->m_normalPercent == 100;
             if (setOfIds.contains(level->m_levelID) && levelCompleted) {
@@ -689,47 +687,39 @@ void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrows
     }
 }
 
-void GDDLSearchLayer::prepareSearchListener() {
-    searchListener.bind([] (web::WebTask::Event* e) {
-        if (web::WebResponse* res = e->getValue()) {
-            if (res->code() == 200) {
-                const std::string response = res->string().unwrapOrDefault();
-                if (response.empty()) {
-                    const std::string errorMessage = "GDDL: Search failed - received empty response";
-                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                    log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
-                } else {
-                    appendFetchedResults(response);
-                    auto [fst, snd] = getReadyRange(requestRequestedPage);
-                    if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
-                        // recurse
-                        const std::string anotherRequest = formSearchRequest();
-                        auto req = web::WebRequest();
-                        req.header("User-Agent", Utils::getUserAgent());
-                        searchListener.setFilter(req.get(anotherRequest));
-                    } else {
-                        GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
-                        handleSearchObject(searchObject, searchCallbackObject, snd - fst);
-                    }
-                }
-            } else {
-                // not success!
-                const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                const std::string errorMessage = "GDDL Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
-                stopSearch();
-                hideAnyLoadingCircle();
+std::function<void(web::WebResponse)> GDDLSearchLayer::getSearchListenerLambda() {
+    return[](web::WebResponse res) {
+        if (res.code() == 200) {
+            const std::string response = res.string().unwrapOrDefault();
+            if (response.empty()) {
+                const std::string errorMessage = "GDDL: Search failed - received empty response";
                 Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                log::error("GDDLSearchLayer::searchListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
+                log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
+            } else {
+                appendFetchedResults(response);
+                auto [fst, snd] = getReadyRange(requestRequestedPage);
+                if (snd - fst < 10 && onlinePagesFetched < getOnlinePagesCount()) {
+                    // recurse
+                    const std::string anotherRequest = formSearchRequest();
+                    auto req = web::WebRequest();
+                    req.header("User-Agent", Utils::getUserAgent());
+                    searchListener.spawn(req.get(anotherRequest), getSearchListenerLambda());
+                } else {
+                    GJSearchObject *searchObject = makeASearchObjectFrom(fst, snd);
+                    handleSearchObject(searchObject, searchCallbackObject, snd - fst);
+                }
             }
-        } else if (e->isCancelled()) {
+        } else {
+            // not success!
+            const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+            const std::string errorMessage = "GDDL Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
             stopSearch();
             hideAnyLoadingCircle();
-            const std::string errorMessage = "GDDL: Search failed - request cancelled";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-            log::error("GDDLSearchLayer::searchListener: {}", errorMessage);
+            const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
+            log::error("GDDLSearchLayer::searchListener: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
         }
-    });
+    };
 }
 
 
@@ -1167,7 +1157,7 @@ void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *cal
     searchCallbackObject = callbackObject;
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
-    searchListener.setFilter(req.get(request));
+    searchListener.spawn(req.get(request), getSearchListenerLambda());
 }
 
 void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplitLayer* layer) {
@@ -1189,7 +1179,7 @@ void GDDLSearchLayer::requestSearchFromDemonSplit(const int tier, GDDLDemonSplit
     cachedResults.clear();
     onlinePagesFetched = 0;
     searching = true;
-    prepareSearchListener();
+    getSearchListenerLambda();
     // save the layer to remove the loading circle later
     demonSplitLayer = layer;
     requestSearchPage(0, nullptr);

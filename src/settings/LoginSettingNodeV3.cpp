@@ -22,7 +22,6 @@ bool LoginSettingNodeV3::init(std::shared_ptr<DummySettingLoginV3> setting, floa
 
     this->getButtonMenu()->setContentWidth(200);
     this->getButtonMenu()->updateLayout();
-    prepareLogoutListener();
 
     updateState(nullptr);
 
@@ -42,37 +41,6 @@ void LoginSettingNodeV3::updateState(CCNode *invoker) {
     }
     Utils::scaleLabelToWidth(loginStatus, 100.0f);
     this->getButtonMenu()->updateLayout();
-}
-
-void LoginSettingNodeV3::prepareLogoutListener() {
-    logoutListener.bind([this](web::WebTask::Event *e) {
-        if (web::WebResponse *res = e->getValue()) {
-            if (res->code() == 200) {
-                Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
-                log::info("LoginSettingNodeV3::logoutListener: logged out");
-                logOut();
-                this->markChanged(nullptr);
-            } else {
-                if (res->code() == 401) {
-                    Notification::create("Successfully logged out!", NotificationIcon::Success, 2)->show();
-                    log::info("LoginSettingNodeV3::logoutListener: logged out by 401 Unauthorized");
-                    logOut();
-                    this->markChanged(nullptr);
-                } else {
-                    // hmmm
-                    const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-                    const std::string errorMessage = "Error during logout - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
-                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                    const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res->string().unwrapOr("Response was not a valid string");
-                    log::error("LoginSettingNodeV3::logoutListener: [{}] {}, raw response: {}", res->code(), errorMessage, rawResponse);
-                }
-            }
-        } else if (e->isCancelled()) {
-            const std::string errorMessage = "Error during logout - request cancelled";
-            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-            log::error("LoginSettingNodeV3::logoutListener: {}", errorMessage);
-        }
-    });
 }
 
 void LoginSettingNodeV3::onLoginLogoutButtonClicked(CCObject *sender) {

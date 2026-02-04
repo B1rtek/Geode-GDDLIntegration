@@ -1,11 +1,11 @@
 {
-	"geode": "4.10.0",
-	"version": "v1.2.10",
+	"geode": "5.0.0-alpha.1",
+	"version": "v1.2.11-beta.4",
 	"gd": {
-		"android": "2.2074",
-		"win": "2.2074",
-		"mac": "2.2074",
-		"ios": "2.2074"
+		"android": "2.2081",
+		"win": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
 	},
 	"id": "b1rtek.gddlintegration",
 	"name": "GDDL Integration",
@@ -16,13 +16,9 @@
 		"source": "https://github.com/B1rtek/Geode-GDDLIntegration",
 		"community": "https://discord.gg/gddl"
 	},
-	"dependencies": [
-		{
-			"id": "geode.node-ids",
-			"version": ">=1.13.2",
-			"importance": "required"
-		}
-	],
+	"dependencies": {
+		"geode.node-ids": ">=1.22.0-beta.1"
+	},
 	"tags": [
 		"utility",
 		"interface",
