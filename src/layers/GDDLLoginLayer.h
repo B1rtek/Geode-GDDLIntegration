@@ -16,7 +16,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
 
     const inline static std::string loginEndpoint = "https://gdladder.com/api/account/login";
     const inline static std::string meEndpoint = "https://gdladder.com/api/user/me";
-    EventListener<web::WebTask> loginListener, meListener;
+    async::TaskHolder<web::WebResponse> meListener;
     LoginSettingNodeV3* settingNode;
 
     bool init() override;
@@ -25,7 +25,7 @@ class GDDLLoginLayer final : public FLAlertLayer {
     void onCopyAPIKeyClicked(cocos2d::CCObject *sender);
     void onLogOutClicked(cocos2d::CCObject *sender);
 
-    void prepareMeListener();
+    std::function<void(web::WebResponse)> getMeListenerLambda();
     void saveLoginData(const std::string& username, int uid);
     void closeLoginPanel();
     void showLoadingCircle();

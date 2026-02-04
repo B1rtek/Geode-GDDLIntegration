@@ -39,7 +39,7 @@ class $modify(MenuLayer) {
      */
 
     struct Fields {
-        EventListener<web::WebTask> cacheEventListener;
+        async::TaskHolder<web::WebResponse> cacheEventListener;
     };
 
 
@@ -57,14 +57,13 @@ class $modify(MenuLayer) {
         }
         if (RatingsManager::readCache && RatingsManager::cacheEmpty() && !RatingsManager::triedToDownloadCache) {
             RatingsManager::triedToDownloadCache = true;
-            Utils::bindCacheDownloadCallback(m_fields->cacheEventListener);
             auto req = web::WebRequest();
             req.header("User-Agent", Utils::getUserAgent());
             // if you're reading this because you treat this as an example of how to use the gddl api
             // cache
             // for the love of god
             // please
-            m_fields->cacheEventListener.setFilter(req.get(RatingsManager::gddlSheetUrl));
+            m_fields->cacheEventListener.spawn(req.get(RatingsManager::gddlSheetUrl), Utils::getCacheDownloadLambda());
         }
         return true;
     }

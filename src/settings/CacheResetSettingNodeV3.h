@@ -9,7 +9,7 @@ using namespace geode::prelude;
 
 class CacheResetSettingNodeV3 : public SettingNodeV3 {
 protected:
-    EventListener<web::WebTask> cacheEventListener;
+    async::TaskHolder<web::WebResponse> cacheEventListener;
 
     bool init(std::shared_ptr<DummySettingV3> setting, float width);
     void updateState(CCNode* invoker) override;

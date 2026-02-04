@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 
 class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
-    EventListener<web::WebTask> ratingListener, spreadListener, skillsetsListener;
+    async::TaskHolder<web::WebResponse> ratingListener, spreadListener, skillsetsListener;
     int gddlLevelID = 0;
     std::string levelName, creator;
     GJGameLevel* level = nullptr;
@@ -24,7 +24,9 @@ class GDDLAdvancedLevelInfoPopup final : public FLAlertLayer {
     void onShowcaseClicked(CCObject* sender);
     void onOpenInBrowserClicked(CCObject* sender);
 
-    void prepareSearchListeners();
+    std::function<void(web::WebResponse)> getRatingListenerLambda();
+    std::function<void(web::WebResponse)> getSpreadListenerLambda();
+    std::function<void(web::WebResponse)> getSkillsetsListenerLambda();
     void addBarCharts();
     void addSkillsets();
     void addShowcaseButton(bool active);

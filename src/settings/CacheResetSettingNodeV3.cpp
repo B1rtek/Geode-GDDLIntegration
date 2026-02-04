@@ -26,10 +26,9 @@ void CacheResetSettingNodeV3::updateState(CCNode *invoker) {
 
 void CacheResetSettingNodeV3::onCacheResetButtonClicked(CCObject *sender) {
     RatingsManager::clearCache();
-    Utils::bindCacheDownloadCallback(cacheEventListener, true);
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
-    cacheEventListener.setFilter(req.get(RatingsManager::gddlSheetUrl));
+    cacheEventListener.spawn(req.get(RatingsManager::gddlSheetUrl), Utils::getCacheDownloadLambda(true));
 }
 
 void CacheResetSettingNodeV3::onCommit() {
