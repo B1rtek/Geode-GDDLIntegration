@@ -22,6 +22,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
     async::TaskHolder<web::WebResponse> submissionListener, userSearchListener, userSubmissionCheckListener;
+    async::TaskHolder<> fpsMeasurementListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
 

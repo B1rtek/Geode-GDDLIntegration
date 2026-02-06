@@ -341,7 +341,7 @@ void GDDLRatingSubmissionLayer::setInitialValues() {
     mobile = Utils::isMobile();
     fps = -1;
     // delay fps measurement because opening the popup might cause a lagspike
-    async::spawn(
+    fpsMeasurementListener.spawn(
         arc::sleep(asp::Duration::fromMillis(100)),
         [this] {
             this->fps = Utils::getCorrectedFPS();
