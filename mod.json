@@ -1,6 +1,6 @@
 {
 	"geode": "5.0.0-alpha.1",
-	"version": "v1.2.11-beta.5",
+	"version": "v1.2.11-beta.6",
 	"gd": {
 		"android": "2.2081",
 		"win": "2.2081",
@@ -72,11 +72,33 @@
 			"type": "bool",
 			"default": true
 		},
+		"title-rating-submission-popup-settings": {
+			"name": "Rating submission popup",
+			"type": "title"
+		},
 		"suggest-ratings": {
 			"name": "Autofill tier and enjoyment rating",
 			"description": "Automatically assigns the <cr>tier</c> and <cg>enjoyment</c> rating of the level in the rating submission form to the <cj>current average</c> rating.",
 			"type": "bool",
 			"default": false
+		},
+		"enable-set-default-fps": {
+			"name": "Use defined default fps value",
+			"description": "Use the user-defined default <cb>fps value</c> when autofilling the <cr>submission information</c> instead of <cy>measuring fps automatically</c>.",
+			"type": "bool",
+			"default": false
+		},
+		"set-default-fps": {
+			"name": "Default fps value",
+			"description": "Value that will be set automatically in the fps field of the rating submission popup",
+			"type": "int",
+			"default": 60,
+			"min": 30,
+			"max": 960,
+			"control": {
+				"slider": false
+			},
+			"enable-if": "enable-set-default-fps"
 		},
 		"title-misc-settings": {
 			"name": "Misc",

@@ -339,15 +339,22 @@ void GDDLRatingSubmissionLayer::setInitialValues() {
     rating = gddlRating && suggestRatings ? gddlRating.value().roundedRating : 0;
     enjoyment = gddlRating && suggestRatings ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
     mobile = Utils::isMobile();
-    fps = -1;
-    // delay fps measurement because opening the popup might cause a lagspike
-    fpsMeasurementListener.spawn(
-        arc::sleep(asp::Duration::fromMillis(100)),
-        [this] {
-            this->fps = Utils::getCorrectedFPS();
-            this->updateTextfields();
-        }
-    );
+    const bool measureFps = !Mod::get()->getSettingValue<bool>("enable-set-default-fps");
+    if (measureFps) {
+        // measure fps using the new awesome method
+        fps = -1;
+        // delay fps measurement because opening the popup might cause a lagspike
+        fpsMeasurementListener.spawn(
+            arc::sleep(asp::Duration::fromMillis(100)),
+            [this] {
+                this->fps = Utils::getCorrectedFPS();
+                this->updateTextfields();
+            }
+        );
+    } else {
+        // read the user set value
+        fps = Mod::get()->getSettingValue<int>("set-default-fps");
+    }
 }
 
 void GDDLRatingSubmissionLayer::updateTextfields() {
