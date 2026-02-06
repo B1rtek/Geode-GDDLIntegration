@@ -72,15 +72,15 @@
 			"type": "bool",
 			"default": true
 		},
+		"title-rating-submission-popup-settings": {
+			"name": "Rating submission popup",
+			"type": "title"
+		},
 		"suggest-ratings": {
 			"name": "Autofill tier and enjoyment rating",
 			"description": "Automatically assigns the <cr>tier</c> and <cg>enjoyment</c> rating of the level in the rating submission form to the <cj>current average</c> rating.",
 			"type": "bool",
 			"default": false
-		},
-		"title-rating-submission-popup-settings": {
-			"name": "Rating submission popup",
-			"type": "title"
 		},
 		"enable-set-default-fps": {
 			"name": "Use set default fps value",
