@@ -1,6 +1,6 @@
 {
 	"geode": "5.0.0-alpha.1",
-	"version": "v1.2.11-beta.5",
+	"version": "v1.2.11-beta.6",
 	"gd": {
 		"android": "2.2081",
 		"win": "2.2081",
@@ -83,7 +83,7 @@
 			"default": false
 		},
 		"enable-set-default-fps": {
-			"name": "Use set default fps value",
+			"name": "Use defined default fps value",
 			"description": "Use the user-defined default <cb>fps value</c> when autofilling the <cr>submission information</c> instead of <cy>measuring fps automatically</c>.",
 			"type": "bool",
 			"default": false
