@@ -78,6 +78,28 @@
 			"type": "bool",
 			"default": false
 		},
+		"title-rating-submission-popup-settings": {
+			"name": "Rating submission popup",
+			"type": "title"
+		},
+		"enable-set-default-fps": {
+			"name": "Use set default fps value",
+			"description": "Use the user-defined default <cb>fps value</c> when autofilling the <cr>submission information</c> instead of <cy>measuring fps automatically</c>.",
+			"type": "bool",
+			"default": false
+		},
+		"set-default-fps": {
+			"name": "Default fps value",
+			"description": "Value that will be set automatically in the fps field of the rating submission popup",
+			"type": "int",
+			"default": 60,
+			"min": 30,
+			"max": 960,
+			"control": {
+				"slider": false
+			},
+			"enable-if": "enable-set-default-fps"
+		},
 		"title-misc-settings": {
 			"name": "Misc",
 			"type": "title"
