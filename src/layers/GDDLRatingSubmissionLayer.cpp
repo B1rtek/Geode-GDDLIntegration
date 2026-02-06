@@ -1,6 +1,7 @@
 #include "GDDLRatingSubmissionLayer.h"
 
 #include <Values.h>
+#include <arc/time/Sleep.hpp>
 
 #include "Utils.h"
 #include "settings/LoginSettingNodeV3.h"
@@ -337,14 +338,22 @@ void GDDLRatingSubmissionLayer::setInitialValues() {
     const auto gddlRating = RatingsManager::getRating(this->gddlLevelID);
     rating = gddlRating && suggestRatings ? gddlRating.value().roundedRating : 0;
     enjoyment = gddlRating && suggestRatings ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
-    fps = Utils::getCorrectedFPS();
     mobile = Utils::isMobile();
+    fps = -1;
+    // delay fps measurement because opening the popup might cause a lagspike
+    async::spawn(
+        arc::sleep(asp::Duration::fromMillis(100)),
+        [this] {
+            this->fps = Utils::getCorrectedFPS();
+            this->updateTextfields();
+        }
+    );
 }
 
 void GDDLRatingSubmissionLayer::updateTextfields() {
     Utils::setNumberWithGivenDefaultValueTextfield(rating, ratingTextfield, 0, "-");
     Utils::setNumberWithGivenDefaultValueTextfield(enjoyment, enjoymentTextfield, -1, "-");
-    Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1);
+    Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1, "-");
     percentTextfield->setString(std::to_string(this->percent));
     attemptsTextfield->setString(std::to_string(this->attempts));
 }
