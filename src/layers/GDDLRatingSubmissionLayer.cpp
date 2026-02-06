@@ -9,7 +9,6 @@
 
 bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
-    m_this = this;
 
     this->gddlLevelID = gddlLevelID;
     this->percent = level->m_normalPercent;
@@ -342,13 +341,11 @@ void GDDLRatingSubmissionLayer::setInitialValues() {
     mobile = Utils::isMobile();
     fps = -1;
     // delay fps measurement because opening the popup might cause a lagspike
-    async::spawn(
+    fpsMeasurementListener.spawn(
         arc::sleep(asp::Duration::fromMillis(100)),
         [this] {
-            if (m_this != nullptr) {
-                this->fps = Utils::getCorrectedFPS();
-                this->updateTextfields();
-            }
+            this->fps = Utils::getCorrectedFPS();
+            this->updateTextfields();
         }
     );
 }
@@ -562,8 +559,4 @@ void GDDLRatingSubmissionLayer::showAlreadySubmittedWarning() {
     std::string description = submission.describe();
     std::string text = "<co>You have already submitted a rating for this level</c>: " + description + " Submitting <cy>another rating</c> will <cr>overwrite</c> the previous one!";
     FLAlertLayer::create("Warning", text, "OK")->show();
-}
-
-GDDLRatingSubmissionLayer::~GDDLRatingSubmissionLayer() {
-    m_this = nullptr;
 }

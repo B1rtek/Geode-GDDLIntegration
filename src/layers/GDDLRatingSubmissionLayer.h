@@ -9,7 +9,6 @@ using namespace geode::prelude;
 
 class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCMenuItemSpriteExtra* m_closeBtn{};
-    static inline GDDLRatingSubmissionLayer* m_this = nullptr; // important for async fps measurement
 
     CCTextInputNode* ratingTextfield = nullptr;
     CCTextInputNode* enjoymentTextfield = nullptr;
@@ -23,6 +22,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
     async::TaskHolder<web::WebResponse> submissionListener, userSearchListener, userSubmissionCheckListener;
+    async::TaskHolder<> fpsMeasurementListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
 
@@ -77,7 +77,6 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     std::string fillOutSubmissionJson();
     void makeSubmissionRequest();
     void showAlreadySubmittedWarning();
-    ~GDDLRatingSubmissionLayer() override;
 
 public:
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
