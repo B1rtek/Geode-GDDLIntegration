@@ -4,9 +4,13 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 
-class GDDLSearchLayerV2 : public FLAlertLayer {
-    bool init() override;
+using namespace geode::prelude;
 
+class GDDLSearchLayerV2 : public FLAlertLayer {
+    const CCPoint popupSize = {440.0f, 290.0f};
+
+    bool init() override;
+    void onClose(CCObject *sender);
 public:
     static GDDLSearchLayerV2* create();
     void show() override;
