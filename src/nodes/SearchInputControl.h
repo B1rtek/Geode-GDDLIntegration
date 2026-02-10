@@ -1,0 +1,9 @@
+#ifndef GDDLINTEGRATION_SEARCHINPUTCONTROL_H
+#define GDDLINTEGRATION_SEARCHINPUTCONTROL_H
+
+#include <Geode/Geode.hpp>
+
+class SearchInputControl : public cocos2d::CCNode {};
+
+
+#endif //GDDLINTEGRATION_SEARCHINPUTCONTROL_H
