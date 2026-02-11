@@ -32,7 +32,7 @@ void Utils::createTextInputNode(CCNode* parent, CCTextInputNode*& textfield, con
     textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
     parent->addChild(textfield, zOrder + 1);
     textfield->setPosition(position);
-#ifdef GEODE_IS_ANDROID
+#ifdef GEODE_IS_MOBILE
         ++maxCharacters; // robert :)
 #endif
     textfield->setMaxLabelLength(maxCharacters);
@@ -242,7 +242,7 @@ int Utils::getCorrectedFPS() {
 }
 
 bool Utils::isMobile() {
-#ifdef GEODE_IS_ANDROID
+#ifdef GEODE_IS_MOBILE
         return true;
 #else
     return false;
