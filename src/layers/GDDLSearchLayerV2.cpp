@@ -2,12 +2,14 @@
 
 #include <Utils.h>
 #include <Geode/utils/cocos.hpp>
+#include <nodes/TextInputControl.h>
 
 bool GDDLSearchLayerV2::init() {
     if (!FLAlertLayer::init(150))
         return false;
 
     createBaseUI();
+    displayPage(currentPageNumber);
 
     return true;
 }
@@ -35,6 +37,28 @@ void GDDLSearchLayerV2::createBaseUI() {
             CCMenuItemSpriteExtra::create(closeButtonSprite, this, menu_selector(GDDLSearchLayerV2::onClose));
     m_buttonMenu->addChild(closeButton, 1);
     closeButton->setPosition({10.0f, 0.0f});
+    // page
+    currentPage = SearchLayerPage::create();
+    currentPage->setPosition({winSize.width / 2 - popupSize.x/2 + 2.5f, winSize.height / 2 - popupSize.y/2 + 40.0f});
+    m_mainLayer->addChild(currentPage);
+}
+
+void GDDLSearchLayerV2::displayPage(int pageNumber) {
+    currentPage->clearContent();
+    if (pageNumber == -1) {
+        // simplified search page
+    } else if (pageNumber == 0) {
+        // first page
+        currentPage->addControl(TextInputControl::create("Creator"));
+        currentPage->addControl(TextInputControl::create("Song"));
+        currentPage->addControl(TextInputControl::create("Skillset"));
+        currentPage->addControl(TextInputControl::create("Level name"));
+        currentPage->addControl(TextInputControl::create("whatever field #1"));
+        currentPage->addControl(TextInputControl::create("whatever field #2"));
+        currentPage->addControl(TextInputControl::create("im running out of ideas"));
+        currentPage->addControl(TextInputControl::create("uwu"));
+    }
+    cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
