@@ -3,7 +3,20 @@
 
 #include <Geode/Geode.hpp>
 
-class SearchInputControl : public cocos2d::CCNode {};
+using namespace geode::prelude;
+
+class SearchInputControl : public CCNode {
+protected:
+    static constexpr CCPoint controlSize = {145.0f, 60.0f};
+    static constexpr float standardComponentWidth = 110.0f;
+    static constexpr float standardComponentHeight = 25.0f;
+
+    CCMenu* controlMenu = nullptr;
+
+    bool init() override;
+public:
+    static SearchInputControl *create();
+};
 
 
 #endif //GDDLINTEGRATION_SEARCHINPUTCONTROL_H
