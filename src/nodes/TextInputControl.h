@@ -4,7 +4,13 @@
 #include "SearchInputControl.h"
 
 
-class TextInputControl : public SearchInputControl{};
+class TextInputControl : public SearchInputControl {
+    TextInput* textInputNode = nullptr;
+
+    bool init(const std::string& labelText);
+public:
+    static TextInputControl *create(const std::string& labelText);
+};
 
 
 #endif //GDDLINTEGRATION_TEXTINPUTCONTROL_H
