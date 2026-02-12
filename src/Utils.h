@@ -35,6 +35,9 @@ public:
     static void createTextInputNode(CCNode *parent, CCTextInputNode *&textfield, const std::string &font,
                                     const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
                                     const CCPoint &position, int zOrder = 1);
+    static void createGeodeTextInput(CCNode *parent, geode::TextInput *&textfield, const std::string &font,
+                                    const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                    const CCPoint &position, int zOrder = 1);
     static void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, CCObject *callbackObject,
                                              SEL_MenuHandler leftCallback,
                                              SEL_MenuHandler rightCallback, int zOrder = 1);

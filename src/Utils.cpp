@@ -39,6 +39,17 @@ void Utils::createTextInputNode(CCNode* parent, CCTextInputNode*& textfield, con
     textfield->setMaxLabelScale(0.7f);
 }
 
+void Utils::createGeodeTextInput(CCNode* parent, geode::TextInput*& textfield, const std::string& font,
+    const std::string& placeholder, int maxCharacters, const CCPoint& bgSize, const CCPoint& position, int zOrder) {
+    textfield = geode::TextInput::create(bgSize.x, placeholder.c_str(), font.c_str());
+    parent->addChild(textfield, zOrder + 1);
+    textfield->setPosition(position);
+#ifdef GEODE_IS_MOBILE
+    ++maxCharacters; // robert :)
+#endif
+    textfield->setMaxCharCount(maxCharacters);
+}
+
 void Utils::createLeftRightButtonsAround(CCNode* object, const CCPoint& size, CCObject* callbackObject,
     SEL_MenuHandler leftCallback, SEL_MenuHandler rightCallback, int zOrder) {
     // left
