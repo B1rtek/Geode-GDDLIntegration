@@ -3,8 +3,21 @@
 
 #include <Geode/Geode.hpp>
 
-class SearchLayerPage : public cocos2d::CCNode {
+#include "SearchInputControl.h"
 
+class SearchLayerPage : public cocos2d::CCNode {
+    static constexpr CCPoint pageSize = {435.0f, 180.0f};
+
+    std::vector<SearchInputControl*> controls;
+
+    bool init() override;
+public:
+    static SearchLayerPage *create();
+
+    void addControl(SearchInputControl* control);
+    void clearContent();
+
+    static CCPoint getControlPosition(unsigned index);
 };
 
 
