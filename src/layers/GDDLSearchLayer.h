@@ -47,9 +47,9 @@ class GDDLSearchLayer final : public FLAlertLayer {
     // sort - displayed as sortBy, mapped to a value in the sort vector, default - ID
     inline static int sortOptionIndex = 0;
     const inline static std::vector<std::string> sortBy = {
-            "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Random"};
+            "ID", "Name", "Rating", "Enjoyment", "Rating Count", "Enjoyment Count", "Deviation", "Popularity", "Random"};
     const inline static std::vector<std::string> sort = {
-        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "random"
+        "ID", "name", "rating", "enjoyment", "ratingCount", "enjoymentCount", "deviation", "popularity", "random"
     };
     // sortDirection - same as sort basically, default - asc
     inline static int sortDirectionIndex = 0;
@@ -74,7 +74,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static std::vector<int> cachedResults = {};
     inline static int onlinePagesFetched = 0;
     inline static bool searching = false;
-    inline static EventListener<web::WebTask> searchListener;
+    inline static async::TaskHolder<web::WebResponse> searchListener;
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
     inline static GDDLBrowserLayer* searchCallbackObject;
     inline static Ref<GDDLDemonSplitLayer> demonSplitLayer = nullptr;
@@ -146,7 +146,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static std::pair<int, int> getReadyRange(int requestedPage);
     static bool hideAnyLoadingCircle();
     static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
-    static void prepareSearchListener();
+    static std::function<void(web::WebResponse)> getSearchListenerLambda();
     // utility (that and Utils.h)
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
     CCMenuItemSpriteExtra *createTierNode(int tier);

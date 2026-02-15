@@ -79,7 +79,7 @@ bool GDDLLoginLayer::init() {
         m_buttonMenu->addChild(disclaimerTextArea);
     } else {
         // api key input field
-        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 64, {200.0f, 25.0f},
+        Utils::createTextInputNode(m_buttonMenu, apiKeyTextField, "bigFont.fnt", "", 65, {200.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 50.0f});
         apiKeyTextField->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
         apiKeyTextField->m_usePasswordChar = true;
@@ -109,7 +109,7 @@ bool GDDLLoginLayer::init() {
     disclaimerTextArea->setPosition({popupSize.x / 2 + 27.5f + mediumGraphics * 4.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
     m_buttonMenu->addChild(disclaimerTextArea);
 
-    prepareMeListener();
+    getMeListenerLambda();
 
     return true;
 }
@@ -127,7 +127,7 @@ void GDDLLoginLayer::onLoginClicked(cocos2d::CCObject *sender) {
     showLoadingCircle();
     // if /api/user/me returns 200/201, the key is valid for the fetched user
     saveLoginData("", 0);
-    meListener.setFilter(req.get(meEndpoint));
+    meListener.spawn(req.get(meEndpoint), getMeListenerLambda());
 }
 
 void GDDLLoginLayer::onCopyAPIKeyClicked(cocos2d::CCObject* sender) {
@@ -141,44 +141,37 @@ void GDDLLoginLayer::onLogOutClicked(cocos2d::CCObject* sender) {
     closeLoginPanel();
 }
 
-void GDDLLoginLayer::prepareMeListener() {
-    meListener.bind([this](web::WebTask::Event *e) {
-        if (web::WebResponse *res = e->getValue()) {
-            const auto jsonResponse = res->json().unwrapOr(matjson::Value());
-            if (res->code() == 200) {
-                const int uid = jsonResponse["ID"].asInt().unwrapOr(-1);
-                const std::string username = jsonResponse["Name"].asString().unwrapOr("");
-                if (uid == -1 || username == "") {
-                    hideLoadingCircle();
-                    const std::string errorMessage = "Error during login - failed to obtain the user id or username";
-                    Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                    const std::string rawResponse = res->string().unwrapOr("Response was not a valid string");
-                    log::error("GDDLLoginLayer::meListener: {}, raw response: {}", errorMessage, rawResponse);
-                } else {
-                    saveLoginData(username, uid);
-                    RatingsManager::clearSubmissionCache();
-                    Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
-                    log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
-                    closeLoginPanel();
-                }
-            } else if (res->code() == 401) {
+std::function<void(web::WebResponse)> GDDLLoginLayer::getMeListenerLambda() {
+    return [this](web::WebResponse res) {
+        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+        if (res.code() == 200) {
+            const int uid = jsonResponse["ID"].asInt().unwrapOr(-1);
+            const std::string username = jsonResponse["Name"].asString().unwrapOr("");
+            if (uid == -1 || username == "") {
                 hideLoadingCircle();
-                const std::string errorMessage = "Error during login - invalid API key";
+                const std::string errorMessage = "Error during login - failed to obtain the user id or username";
                 Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
+                const std::string rawResponse = res.string().unwrapOr("Response was not a valid string");
+                log::error("GDDLLoginLayer::meListener: {}, raw response: {}", errorMessage, rawResponse);
             } else {
-                hideLoadingCircle();
-                const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
-                Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-                log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res->code(), errorMessage);
+                saveLoginData(username, uid);
+                RatingsManager::clearSubmissionCache();
+                Notification::create("Logged in!", NotificationIcon::Success, 2)->show();
+                log::info("GDDLLoginLayer::meListener: successfully logged in, UID: {}", uid);
+                closeLoginPanel();
             }
-        } else if (e->isCancelled()) {
+        } else if (res.code() == 401) {
             hideLoadingCircle();
-            const std::string errorMessage = "Error during login - request cancelled";
+            const std::string errorMessage = "Error during login - invalid API key";
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-            log::error("GDDLLoginLayer::meListener: {}", errorMessage);
+            log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res.code(), errorMessage);
+        } else {
+            hideLoadingCircle();
+            const std::string errorMessage = "Error during login - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("GDDLLevelInfoPopup::meListener: [{}] {}", res.code(), errorMessage);
         }
-    });
+    };
 }
 
 void GDDLLoginLayer::saveLoginData(const std::string &username, const int uid) {

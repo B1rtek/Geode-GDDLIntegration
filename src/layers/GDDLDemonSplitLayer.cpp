@@ -41,6 +41,7 @@ bool GDDLDemonSplitLayer::init() {
     m_buttonMenu->reorderChild(titleContainer, 0);
 
     // this is where the tiers go
+    std::map<int, int> tierStats = RatingsManager::getTierStats();
     for (int row = 0; row < 5; row++) {
         const auto rowNode = CCNode::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
@@ -48,10 +49,10 @@ bool GDDLDemonSplitLayer::init() {
         for (int column = 0; column < 8; column++) {
             const int targetTier = row+1+column*5;
             if (targetTier <= Values::highestTier) {
-                const auto tierNode = createTierNode(row+1+column*5);
+                const auto tierNode = createTierNode(targetTier, tierStats[targetTier]);
                 rowNode->addChild(tierNode);
             } else {
-                const auto tierNode = createTierNode(-1);
+                const auto tierNode = createTierNode(-1, tierStats[targetTier]);
                 rowNode->addChild(tierNode);
             }
         }
@@ -133,7 +134,7 @@ void GDDLDemonSplitLayer::onEnter() {
     GDDLSearchLayer::stopSearch();
 }
 
-CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
+CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {
     const auto tierNode = CCMenu::create();
     tierNode->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     tierNode->setContentSize({50.0f, 20.0f});
@@ -148,7 +149,6 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier) {
     tierButton->setID("button-tier-"+std::to_string(tier));
     tierNode->addChild(tierButton);
     // tier count
-    const int count = RatingsManager::getTierStats()[tier];
     const auto countLabel = CCLabelBMFont::create(std::to_string(count).c_str(), "chatFont.fnt");
     countLabel->setContentSize({30.0f, 20.0f});
     tierNode->addChild(countLabel);

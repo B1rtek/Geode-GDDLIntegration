@@ -21,7 +21,8 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
-    EventListener<web::WebTask> submissionListener, userSearchListener, userSubmissionCheckListener;
+    async::TaskHolder<web::WebResponse> submissionListener, userSearchListener, userSubmissionCheckListener;
+    async::TaskHolder<> fpsMeasurementListener;
     matjson::Value submissionJson = matjson::Value();
     std::string requestedUsername;
 
@@ -69,7 +70,9 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void addInfoButtonAndCenterLabel(CCLabelBMFont* label, CCSprite* iButtonSprite, SEL_MenuHandler callback, const float centerAroundX);
     void setInitialValues();
     void updateTextfields();
-    void prepareSubmissionListeners();
+    std::function<void(web::WebResponse)> getSubmissionListenerLambda();
+    std::function<void(web::WebResponse)> getUserSearchListenerLambda();
+    std::function<void(web::WebResponse)> getUserSubmissionCheckListenerLambda();
     bool isValidProof(const std::string& proofURL);
     std::string fillOutSubmissionJson();
     void makeSubmissionRequest();

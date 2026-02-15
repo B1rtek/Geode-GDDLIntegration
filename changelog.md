@@ -1,3 +1,13 @@
+# 1.2.11
+- Compatibility with Geode 5.0.0/Geometry Dash 2.2081
+- Added the missing [sorting by deviation and popularity](https://github.com/B1rtek/Geode-GDDLIntegration/issues/102) options to the GDDL search menu
+- Improved automatic FPS measurement in the Rating Submission menu
+  - The user can also set the default fps value manually using the new "Default fps value" setting
+- Significantly improved the opening speed of the GDDL Demon Split popup
+- The [demon face on the level info page can function as the tier button](https://github.com/B1rtek/Geode-GDDLIntegration/issues/42) now (I'm sorry it took me that long Aktimoose)
+- Fixed the [bug that prevented people from logging in with the API key](https://github.com/B1rtek/Geode-GDDLIntegration/issues/98) (finally, thank you for reporting the bug realshizai and bananaman4141
+   and thank you so much qia_a_a for cooperating while troubleshooting!)
+
 # 1.2.10
 - Added extra description to the tier field on the rating submission page explaining how demon difficulties correspond to the tier ranges (thanks for the suggestion kenny744!)
 - Added a setting that controls whether the tier and enjoyment ratings are autofilled on the rating submission page (by default set to off) (thanks for the suggestion kenny744!)
