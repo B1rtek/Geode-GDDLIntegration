@@ -1,5 +1,5 @@
-# 1.2.11-beta.7
-- Compatibility with [Geode v5.0.0-alpha.2 public release](https://github.com/geode-sdk/geode/releases/tag/v5.0.0-alpha.2)
+# 1.2.11
+- Compatibility with Geode 5.0.0/Geometry Dash 2.2081
 - Added the missing [sorting by deviation and popularity](https://github.com/B1rtek/Geode-GDDLIntegration/issues/102) options to the GDDL search menu
 - Improved automatic FPS measurement in the Rating Submission menu
   - The user can also set the default fps value manually using the new "Default fps value" setting
