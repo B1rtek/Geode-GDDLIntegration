@@ -1,5 +1,8 @@
-//
-// Created by b1rtek on 10.02.2026.
-//
-
 #include "SearchObject.h"
+void SearchObject::saveToSaved() {
+    levelNameSetting->saveSetting();
+}
+
+std::shared_ptr<TextSearchSetting> SearchObject::getLevelNameSetting() {
+    return this->levelNameSetting;
+}

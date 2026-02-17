@@ -1,10 +1,13 @@
 #ifndef GDDLINTEGRATION_SEARCHOBJECT_H
 #define GDDLINTEGRATION_SEARCHOBJECT_H
 
+#include <memory>
 #include <string>
 
+#include "searchsettings/TextSearchSetting.h"
+
 class SearchObject {
-    std::string levelName = "";
+    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("search-name", 32);
 
 public:
     SearchObject() = default;
@@ -12,8 +15,7 @@ public:
     void readFromSaved();
     void saveToSaved();
 
-    std::string setLevelName(std::string input);
-    std::string getLevelName();
+    std::shared_ptr<TextSearchSetting> getLevelNameSetting();
 };
 
 
