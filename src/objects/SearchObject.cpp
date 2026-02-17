@@ -1,5 +1,9 @@
 #include "SearchObject.h"
-void SearchObject::saveToSaved() {
+void SearchObject::loadSettings() {
+    levelNameSetting->loadSetting();
+}
+
+void SearchObject::saveSettings() {
     levelNameSetting->saveSetting();
 }
 

@@ -1,8 +1,6 @@
 #include "TextSearchSetting.h"
 
-TextSearchSetting::TextSearchSetting(const std::string& settingKey, const unsigned maxLength): SearchSetting(settingKey), maxLength(maxLength) {
-    TextSearchSetting::getSavedSetting();
-}
+TextSearchSetting::TextSearchSetting(const std::string& settingKey, const unsigned maxLength): SearchSetting(settingKey), maxLength(maxLength) {}
 
 void TextSearchSetting::setSettingValue(const std::string value) {
     if (maxLength != -1) {
@@ -10,7 +8,7 @@ void TextSearchSetting::setSettingValue(const std::string value) {
     }
 }
 
-void TextSearchSetting::getSavedSetting() {
-    SearchSetting::getSavedSetting();
+void TextSearchSetting::loadSetting() {
+    SearchSetting::loadSetting();
     setSettingValue(value);
 }

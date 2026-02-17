@@ -2,7 +2,6 @@
 #define GDDLINTEGRATION_SEARCHOBJECT_H
 
 #include <memory>
-#include <string>
 
 #include "searchsettings/TextSearchSetting.h"
 
@@ -12,8 +11,8 @@ class SearchObject {
 public:
     SearchObject() = default;
 
-    void readFromSaved();
-    void saveToSaved();
+    void loadSettings();
+    void saveSettings();
 
     std::shared_ptr<TextSearchSetting> getLevelNameSetting();
 };

@@ -10,7 +10,7 @@ public:
     explicit TextSearchSetting(const std::string& settingKey, unsigned maxLength = -1);
 
     void setSettingValue(std::string value) override;
-    void getSavedSetting() override;
+    void loadSetting() override;
 };
 
 

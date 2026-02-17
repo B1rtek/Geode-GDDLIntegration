@@ -9,6 +9,7 @@ bool GDDLSearchLayerV2::init() {
         return false;
 
     createBaseUI();
+    searchObject.loadSettings();
     displayPage(currentPageNumber);
 
     return true;
@@ -56,7 +57,7 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
     currentPage->saveSettings();
-    searchObject.saveToSaved();
+    searchObject.saveSettings();
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }

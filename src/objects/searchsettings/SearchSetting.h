@@ -14,7 +14,6 @@ protected:
 public:
     explicit SearchSetting(const std::string& settingKey) {
         this->settingKey = settingKey;
-        SearchSetting::getSavedSetting();
     }
 
 	virtual ~SearchSetting() = default;
@@ -27,7 +26,7 @@ public:
 		this->value = value;
 	}
 
-	virtual void getSavedSetting() {
+	virtual void loadSetting() {
 		value = Mod::get()->getSavedValue<T>(settingKey, T{});
 	}
 
