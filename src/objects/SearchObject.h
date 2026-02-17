@@ -6,7 +6,7 @@
 #include "searchsettings/TextSearchSetting.h"
 
 class SearchObject {
-    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("search-name", 32);
+    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("search-name", "", 32);
 
 public:
     SearchObject() = default;

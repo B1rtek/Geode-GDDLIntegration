@@ -10,10 +10,12 @@ template<typename T>
 class SearchSetting {
 protected:
     T value;
+	T defaultValue;
     std::string settingKey;
 public:
-    explicit SearchSetting(const std::string& settingKey) {
+    explicit SearchSetting(const std::string& settingKey, T defaultValue = T{}) {
         this->settingKey = settingKey;
+    	this->defaultValue = defaultValue;
     }
 
 	virtual ~SearchSetting() = default;
@@ -27,7 +29,7 @@ public:
 	}
 
 	virtual void loadSetting() {
-		value = Mod::get()->getSavedValue<T>(settingKey, T{});
+		value = Mod::get()->getSavedValue<T>(settingKey, defaultValue);
 	}
 
 	virtual void saveSetting() {

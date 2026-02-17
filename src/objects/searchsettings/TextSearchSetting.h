@@ -7,7 +7,7 @@ class TextSearchSetting : public SearchSetting<std::string> {
 protected:
     const unsigned maxLength;
 public:
-    explicit TextSearchSetting(const std::string& settingKey, unsigned maxLength = -1);
+    explicit TextSearchSetting(const std::string& settingKey, const std::string& defaultValue = "", unsigned maxLength = -1);
 
     void setSettingValue(std::string value) override;
     void loadSetting() override;
