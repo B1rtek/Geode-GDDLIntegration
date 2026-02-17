@@ -16,6 +16,8 @@ protected:
     bool init() override;
 public:
     static SearchInputControl *create();
+
+    virtual void saveSetting() {};
 };
 
 
