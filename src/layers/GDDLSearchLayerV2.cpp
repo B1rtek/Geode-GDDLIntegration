@@ -49,19 +49,14 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         // simplified search page
     } else if (pageNumber == 0) {
         // first page
-        currentPage->addControl(TextInputControl::create("Creator"));
-        currentPage->addControl(TextInputControl::create("Song"));
-        currentPage->addControl(TextInputControl::create("Skillset"));
-        currentPage->addControl(TextInputControl::create("Level name"));
-        currentPage->addControl(TextInputControl::create("whatever field #1"));
-        currentPage->addControl(TextInputControl::create("whatever field #2"));
-        currentPage->addControl(TextInputControl::create("im running out of ideas"));
-        currentPage->addControl(TextInputControl::create("uwu"));
+        currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()));
     }
     cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
+    currentPage->saveSettings();
+    searchObject.saveToSaved();
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
 }

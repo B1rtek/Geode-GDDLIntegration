@@ -16,6 +16,7 @@ public:
 
     void addControl(SearchInputControl* control);
     void clearContent();
+    void saveSettings();
 
     static CCPoint getControlPosition(unsigned index);
 };

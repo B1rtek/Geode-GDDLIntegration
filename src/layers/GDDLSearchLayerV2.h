@@ -4,6 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include <nodes/SearchLayerPage.h>
+#include <objects/SearchObject.h>
 
 using namespace geode::prelude;
 
@@ -12,6 +13,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer {
 
     int currentPageNumber = 0;
     SearchLayerPage* currentPage = nullptr;
+    SearchObject searchObject = SearchObject();
 
     // normal popup stuff
     bool init() override;
