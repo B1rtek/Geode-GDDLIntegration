@@ -1,0 +1,17 @@
+#ifndef GDDLINTEGRATION_TEXTSEARCHSETTING_H
+#define GDDLINTEGRATION_TEXTSEARCHSETTING_H
+
+#include "SearchSetting.h"
+
+class TextSearchSetting : public SearchSetting<std::string> {
+protected:
+    const unsigned maxLength;
+public:
+    explicit TextSearchSetting(const std::string& settingKey, unsigned maxLength = -1);
+
+    void setSettingValue(std::string value) override;
+    void getSavedSetting() override;
+};
+
+
+#endif //GDDLINTEGRATION_TEXTSEARCHSETTING_H
