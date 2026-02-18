@@ -16,6 +16,7 @@ public:
     explicit SearchSetting(const std::string& settingKey, T defaultValue = T{}) {
         this->settingKey = settingKey;
     	this->defaultValue = defaultValue;
+    	this->value = defaultValue;
     }
 
 	virtual ~SearchSetting() = default;
