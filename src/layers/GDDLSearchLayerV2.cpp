@@ -2,7 +2,7 @@
 
 #include <Utils.h>
 #include <Geode/utils/cocos.hpp>
-#include <nodes/TextInputControl.h>
+#include <nodes/searchcontrols/TextInputControl.h>
 
 bool GDDLSearchLayerV2::init() {
     if (!FLAlertLayer::init(150))
