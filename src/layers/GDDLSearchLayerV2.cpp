@@ -2,6 +2,7 @@
 
 #include <Utils.h>
 #include <Geode/utils/cocos.hpp>
+#include <nodes/searchcontrols/EnumInputControl.h>
 #include <nodes/searchcontrols/TextInputControl.h>
 
 bool GDDLSearchLayerV2::init() {
@@ -51,6 +52,7 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
     } else if (pageNumber == 0) {
         // first page
         currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()));
+        currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()));
     }
     cocos::handleTouchPriority(this);
 }
