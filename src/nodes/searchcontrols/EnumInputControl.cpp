@@ -14,7 +14,6 @@ bool EnumInputControl::init(const std::string& labelText, const std::shared_ptr<
     this->relatedSetting = relatedSetting;
     this->enumLabel->setString(this->relatedSetting->getEnumValue().c_str());
     Utils::scaleLabelToWidth(this->enumLabel, standardComponentWidth);
-    handleTouchPriority(this, true);
     return true;
 }
 

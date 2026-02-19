@@ -51,10 +51,9 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         // simplified search page
     } else if (pageNumber == 0) {
         // first page
-        currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()));
-        currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()));
+        currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()), nullptr);
+        currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
     }
-    cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
