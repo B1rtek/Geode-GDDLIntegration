@@ -16,7 +16,8 @@ protected:
     bool init() override;
 public:
     static SearchInputControl *create();
-
+    void relocateToGlobalMenu(CCMenu* popupMainMenu);
+    
     virtual void saveSetting() {};
 };
 
