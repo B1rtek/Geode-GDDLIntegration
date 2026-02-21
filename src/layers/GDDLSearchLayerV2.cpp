@@ -4,6 +4,7 @@
 #include <Geode/utils/cocos.hpp>
 #include <nodes/searchcontrols/EnumInputControl.h>
 #include <nodes/searchcontrols/TextInputControl.h>
+#include <nodes/searchcontrols/RangeInputControl.h>
 
 bool GDDLSearchLayerV2::init() {
     if (!FLAlertLayer::init(150))
@@ -53,6 +54,8 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         // first page
         currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()), nullptr);
         currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
+        currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getTiersSetting(), true), m_buttonMenu);
+        currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()), m_buttonMenu);
     }
 }
 
