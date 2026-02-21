@@ -8,12 +8,12 @@ template <typename T>
 class RangeSearchSetting : public SearchSetting<std::vector<T>> {
 protected:
     T minValue, maxValue;
-    bool allowOverlap;
+    bool allowOverlap, wrapAround;
 
 public:
-    RangeSearchSetting(const std::string& settingKey, T minValue, T maxValue, const bool allowOverlap = true) :
+    RangeSearchSetting(const std::string& settingKey, T minValue, T maxValue, const bool allowOverlap = true, const bool wrapAround = true) :
         SearchSetting<std::vector<T>>(settingKey, std::vector<T>{minValue, maxValue}), minValue(minValue),
-        maxValue(maxValue), allowOverlap(allowOverlap) {}
+        maxValue(maxValue), allowOverlap(allowOverlap), wrapAround(wrapAround) {}
 
     void setSettingValue(std::vector<T> value) override {
         if (value.size() != 2) return;
@@ -27,7 +27,12 @@ public:
     }
 
     void setValueNumber(unsigned index, T value) {
-        T newValue = value < minValue ? maxValue : value > maxValue ? minValue : value;
+        T newValue;
+        if (wrapAround) {
+            newValue = value < minValue ? maxValue : value > maxValue ? minValue : value;
+        } else {
+            newValue = value < minValue ? minValue : value > maxValue ? maxValue : value;
+        }
         if (!allowOverlap && newValue > this->value[1 - index]) newValue = this->value[1 - index];
         this->value[index] = newValue;
     }
