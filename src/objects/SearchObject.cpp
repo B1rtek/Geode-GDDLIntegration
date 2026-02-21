@@ -3,12 +3,14 @@ void SearchObject::loadSettings() {
     levelNameSetting->loadSetting();
     difficultySetting->loadSetting();
     tiersSetting->loadSetting();
+    enjoymentsSetting->loadSetting();
 }
 
 void SearchObject::saveSettings() {
     levelNameSetting->saveSetting();
     difficultySetting->saveSetting();
     tiersSetting->saveSetting();
+    enjoymentsSetting->saveSetting();
 }
 
 std::shared_ptr<TextSearchSetting> SearchObject::getLevelNameSetting() {
