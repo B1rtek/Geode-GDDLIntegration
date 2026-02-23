@@ -5,6 +5,7 @@
 #include <nodes/searchcontrols/EnumInputControl.h>
 #include <nodes/searchcontrols/TextInputControl.h>
 #include <nodes/searchcontrols/RangeInputControl.h>
+#include <nodes/searchcontrols/CheckboxInputControl.h>
 
 bool GDDLSearchLayerV2::init() {
     if (!FLAlertLayer::init(150))
@@ -56,6 +57,8 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
         currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getTiersSetting(), true), m_buttonMenu);
         currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()), m_buttonMenu);
+        currentPage->addControl(CheckboxInputControl::create("No unrated", searchObject.getRemoveUnratedSetting(), "No rated", searchObject.getRemoveRatedSetting(), true), m_buttonMenu);
+        currentPage->addControl(CheckboxInputControl::create("Exact match", searchObject.getExactNameSetting()), m_buttonMenu);
     }
 }
 
