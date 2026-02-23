@@ -13,6 +13,9 @@ class SearchObject {
     std::shared_ptr<EnumSearchSetting> difficultySetting = std::make_shared<EnumSearchSetting>("search-difficulty", std::vector<std::string>{"Easy Demon", "Medium Demon", "Hard Demon", "Insane Demon", "Extreme Demon", "Any"}, 5);
     std::shared_ptr<RangeSearchSetting<int>> tiersSetting = std::make_shared<RangeSearchSetting<int>>("search-tiers", 0, Values::highestTier);
     std::shared_ptr<RangeSearchSetting<float>> enjoymentsSetting = std::make_shared<RangeSearchSetting<float>>("search-enjoyments", 0.0f, 10.0f);
+    std::shared_ptr<SearchSetting<bool>> exactNameSetting = std::make_shared<SearchSetting<bool>>("search-exactName", false);
+    std::shared_ptr<SearchSetting<bool>> removeUnratedSetting = std::make_shared<SearchSetting<bool>>("search-removeUnrated", false);
+    std::shared_ptr<SearchSetting<bool>> removeRatedSetting = std::make_shared<SearchSetting<bool>>("search-removeRated", false);
 
 public:
     SearchObject() = default;
@@ -24,6 +27,9 @@ public:
     std::shared_ptr<EnumSearchSetting> getDifficultySetting();
     std::shared_ptr<RangeSearchSetting<int>> getTiersSetting();
     std::shared_ptr<RangeSearchSetting<float>> getEnjoymentsSetting();
+    std::shared_ptr<SearchSetting<bool>> getExactNameSetting();
+    std::shared_ptr<SearchSetting<bool>> getRemoveUnratedSetting();
+    std::shared_ptr<SearchSetting<bool>> getRemoveRatedSetting();
 };
 
 
