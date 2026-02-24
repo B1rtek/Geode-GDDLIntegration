@@ -9,7 +9,7 @@ class SearchInputControl : public CCNode {
 protected:
     static constexpr CCPoint controlSize = {145.0f, 60.0f};
     static constexpr float standardComponentWidth = 110.0f;
-    static constexpr float standardComponentHeight = 25.0f;
+    static constexpr float standardComponentHeight = 30.0f;
 
     CCMenu* controlMenu = nullptr;
 
