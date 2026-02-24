@@ -138,13 +138,14 @@ CCScale9Sprite* Utils::createLabelForChoice(CCLayer* parent, CCLabelBMFont*& lab
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
-    const auto bg = CCScale9Sprite::create("square02_small.png");
+    const auto bg = CCScale9Sprite::create("square02b_001.png");
     parent->addChild(bg, zOrder + 1);
     bg->setContentSize(bgSize);
     bg->setScale(0.5f);
     bg->setContentSize(bg->getContentSize() / 0.5f);
     bg->setPosition(position);
-    bg->setOpacity(100);
+    bg->setOpacity(90);
+    bg->setColor({0, 0, 0});
     return bg;
 }
 
