@@ -42,6 +42,12 @@ void SearchLayerPage::saveSettings() {
     }
 }
 
+void SearchLayerPage::reloadSettings() {
+    for (const auto control : controls) {
+        control->loadSetting();
+    }
+}
+
 CCPoint SearchLayerPage::getControlPosition(const unsigned index) {
     const float xPos = pageSize.x/3 * static_cast<float>(index/3);
     const float yPos = 2*pageSize.y/3 - pageSize.y/3 * static_cast<float>(index%3);
