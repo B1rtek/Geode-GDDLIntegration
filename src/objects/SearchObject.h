@@ -16,12 +16,15 @@ class SearchObject {
     std::shared_ptr<SearchSetting<bool>> exactNameSetting = std::make_shared<SearchSetting<bool>>("search-exactName", false);
     std::shared_ptr<SearchSetting<bool>> removeUnratedSetting = std::make_shared<SearchSetting<bool>>("search-removeUnrated", false);
     std::shared_ptr<SearchSetting<bool>> removeRatedSetting = std::make_shared<SearchSetting<bool>>("search-removeRated", false);
+    std::vector<std::shared_ptr<ISetting>> settings = {levelNameSetting, difficultySetting, tiersSetting, enjoymentsSetting, exactNameSetting, removeUnratedSetting, removeRatedSetting};
 
 public:
     SearchObject() = default;
 
     void loadSettings();
     void saveSettings();
+    void resetToDefaults();
+    std::string createSearchQuery();
 
     std::shared_ptr<TextSearchSetting> getLevelNameSetting();
     std::shared_ptr<EnumSearchSetting> getDifficultySetting();

@@ -1,22 +1,24 @@
 #include "SearchObject.h"
 void SearchObject::loadSettings() {
-    levelNameSetting->loadSetting();
-    difficultySetting->loadSetting();
-    tiersSetting->loadSetting();
-    enjoymentsSetting->loadSetting();
-    exactNameSetting->loadSetting();
-    removeUnratedSetting->loadSetting();
-    removeRatedSetting->loadSetting();
+    for (const auto& setting: settings) {
+        setting->loadSetting();
+    }
 }
 
 void SearchObject::saveSettings() {
-    levelNameSetting->saveSetting();
-    difficultySetting->saveSetting();
-    tiersSetting->saveSetting();
-    enjoymentsSetting->saveSetting();
-    exactNameSetting->saveSetting();
-    removeUnratedSetting->saveSetting();
-    removeRatedSetting->saveSetting();
+    for (const auto& setting: settings) {
+        setting->saveSetting();
+    }
+}
+
+void SearchObject::resetToDefaults() {
+    for (const auto& setting: settings) {
+        setting->resetToDefault();
+    }
+}
+
+std::string SearchObject::createSearchQuery() {
+    return "";
 }
 
 std::shared_ptr<TextSearchSetting> SearchObject::getLevelNameSetting() {
