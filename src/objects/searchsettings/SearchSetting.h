@@ -3,11 +3,12 @@
 
 #include <string>
 #include <Geode/loader/Mod.hpp>
+#include "ISetting.h"
 
 using namespace geode::prelude;
 
 template<typename T>
-class SearchSetting {
+class SearchSetting : public ISetting {
 protected:
     T value;
 	T defaultValue;
@@ -19,7 +20,7 @@ public:
     	this->value = defaultValue;
     }
 
-	virtual ~SearchSetting() = default;
+	~SearchSetting() override = default;
 
 	virtual T getSettingValue() {
 		return value;
@@ -29,12 +30,20 @@ public:
 		this->value = value;
 	}
 
-	virtual void loadSetting() {
+	void loadSetting() override {
 		value = Mod::get()->getSavedValue<T>(settingKey, defaultValue);
 	}
 
-	virtual void saveSetting() {
+	void saveSetting() override {
 		Mod::get()->setSavedValue(settingKey, value);
+	}
+
+    void resetToDefault() override {
+		this->value = defaultValue;
+	}
+
+    std::string getSearchQueryFragment() override {
+		return "";
 	}
 };
 
