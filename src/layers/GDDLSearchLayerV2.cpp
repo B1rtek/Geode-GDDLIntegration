@@ -102,7 +102,9 @@ void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
 }
 
 void GDDLSearchLayerV2::onResetClicked(CCObject* sender) {
-
+    searchObject.resetToDefaults();
+    levelNameTextInput->setString(searchObject.getLevelNameSetting()->getSettingValue());
+    currentPage->reloadSettings();
 }
 
 void GDDLSearchLayerV2::onPageLeftClicked(CCObject* sender) {
