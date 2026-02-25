@@ -15,6 +15,8 @@ class EnumInputControl : public SearchInputControl {
     void onEnumValueRight(CCObject *sender);
 public:
     static EnumInputControl *create(const std::string& labelText, std::shared_ptr<EnumSearchSetting> relatedSetting);
+
+    void loadSetting() override;
 };
 
 

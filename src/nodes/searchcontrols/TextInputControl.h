@@ -15,6 +15,7 @@ public:
     static TextInputControl *create(const std::string& labelText, const std::shared_ptr<SearchSetting<std::string>>& relatedSetting);
 
     void saveSetting() override;
+    void loadSetting() override;
 };
 
 

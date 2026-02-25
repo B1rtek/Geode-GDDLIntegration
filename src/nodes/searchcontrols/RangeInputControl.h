@@ -33,7 +33,7 @@ class RangeInputControl : public SearchInputControl {
         Utils::createLeftRightButtonsAround(minTextInput, {13.0f, 19.0f}, this, menu_selector(RangeInputControl::onMinValueLeft), menu_selector(RangeInputControl::onMinValueRight));
         Utils::createLeftRightButtonsAround(maxTextInput, {13.0f, 19.0f}, this, menu_selector(RangeInputControl::onMaxValueLeft), menu_selector(RangeInputControl::onMaxValueRight));
         // display current parameters
-        setSettingAndUpdateFields(this->relatedSetting->getSettingValue());
+        this->loadSetting();
 
         return true;
     }
@@ -133,6 +133,10 @@ public:
 
     void saveSetting() override {
         this->relatedSetting->setSettingValue(getCurrentValues());
+    }
+
+    void loadSetting() override {
+        this->setSettingAndUpdateFields(this->relatedSetting->getSettingValue());
     }
 };
 

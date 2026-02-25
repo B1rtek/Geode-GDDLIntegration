@@ -10,7 +10,7 @@ bool TextInputControl::init(const std::string& labelText, const std::shared_ptr<
     Utils::createGeodeTextInput(controlMenu, textInputNode, "bigFont.fnt", "", 32, {standardComponentWidth, standardComponentHeight}, {controlSize.x/2, 15.0f});
     // associate with setting and load the value
     this->relatedSetting = relatedSetting;
-    this->textInputNode->setString(this->relatedSetting->getSettingValue());
+    this->loadSetting();
     return true;
 }
 
@@ -26,4 +26,8 @@ TextInputControl* TextInputControl::create(const std::string& labelText, const s
 
 void TextInputControl::saveSetting() {
     this->relatedSetting->setSettingValue(this->textInputNode->getString());
+}
+
+void TextInputControl::loadSetting() {
+    this->textInputNode->setString(this->relatedSetting->getSettingValue());
 }

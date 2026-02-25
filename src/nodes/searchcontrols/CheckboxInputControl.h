@@ -28,6 +28,7 @@ public:
                                         bool mutuallyExclusive = false);
 
     void saveSetting() override;
+    void loadSetting() override;
 };
 
 

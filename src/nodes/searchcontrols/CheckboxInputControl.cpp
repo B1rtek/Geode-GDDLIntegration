@@ -23,10 +23,7 @@ bool CheckboxInputControl::init(const std::string& labelText1,
     this->relatedSetting1 = relatedSetting1;
     this->relatedSetting2 = relatedSetting2;
     this->mutuallyExclusive = mutuallyExclusive;
-    this->settingToggle1->toggle(this->relatedSetting1->getSettingValue());
-    if (this->relatedSetting2 != nullptr) {
-        this->settingToggle2->toggle(this->relatedSetting2->getSettingValue());
-    }
+    this->loadSetting();
     return true;
 }
 
@@ -79,5 +76,12 @@ void CheckboxInputControl::saveSetting() {
     relatedSetting1->setSettingValue(settingToggle1->isToggled());
     if (settingToggle2 != nullptr) {
         relatedSetting2->setSettingValue(settingToggle2->isToggled());
+    }
+}
+
+void CheckboxInputControl::loadSetting() {
+    this->settingToggle1->toggle(this->relatedSetting1->getSettingValue());
+    if (this->relatedSetting2 != nullptr) {
+        this->settingToggle2->toggle(this->relatedSetting2->getSettingValue());
     }
 }

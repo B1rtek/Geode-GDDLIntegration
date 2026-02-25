@@ -12,23 +12,20 @@ bool EnumInputControl::init(const std::string& labelText, const std::shared_ptr<
                                      menu_selector(EnumInputControl::onEnumValueRight), 10);
     // association with setting
     this->relatedSetting = relatedSetting;
-    this->enumLabel->setString(this->relatedSetting->getEnumValue().c_str());
-    Utils::scaleLabelToWidth(this->enumLabel, standardComponentWidth);
+    this->loadSetting();
     return true;
 }
 
 void EnumInputControl::onEnumValueLeft(CCObject* sender) {
     const int newValue = this->relatedSetting->getSettingValue() - 1;
     this->relatedSetting->setSettingValue(newValue);
-    this->enumLabel->setString(this->relatedSetting->getEnumValue().c_str());
-    Utils::scaleLabelToWidth(this->enumLabel, standardComponentWidth);
+    this->loadSetting();
 }
 
 void EnumInputControl::onEnumValueRight(CCObject* sender) {
     const int newValue = this->relatedSetting->getSettingValue() + 1;
     this->relatedSetting->setSettingValue(newValue);
-    this->enumLabel->setString(this->relatedSetting->getEnumValue().c_str());
-    Utils::scaleLabelToWidth(this->enumLabel, standardComponentWidth);
+    this->loadSetting();
 }
 
 EnumInputControl* EnumInputControl::create(const std::string& labelText,
@@ -40,4 +37,9 @@ EnumInputControl* EnumInputControl::create(const std::string& labelText,
         delete newNode;
         return nullptr;
     }
+}
+
+void EnumInputControl::loadSetting() {
+    this->enumLabel->setString(this->relatedSetting->getEnumValue().c_str());
+    Utils::scaleLabelToWidth(this->enumLabel, standardComponentWidth);
 }

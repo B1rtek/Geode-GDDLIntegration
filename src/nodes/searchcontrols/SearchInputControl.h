@@ -19,6 +19,7 @@ public:
     void relocateToGlobalMenu(CCMenu* popupMainMenu);
     
     virtual void saveSetting() {};
+    virtual void loadSetting() {};
 };
 
 
