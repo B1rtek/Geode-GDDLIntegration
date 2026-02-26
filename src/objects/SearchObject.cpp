@@ -27,6 +27,10 @@ std::string SearchObject::createSearchQuery() {
     return request;
 }
 
+std::shared_ptr<EnumSearchSetting> SearchObject::getSortSearchSetting() {
+    return this->sortSearchSetting;
+}
+
 std::shared_ptr<TextSearchSetting> SearchObject::getLevelNameSetting() {
     return this->levelNameSetting;
 }
