@@ -82,7 +82,7 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         // simplified search page
     } else if (pageNumber == 1) {
         // first page
-        currentPage->addControl(TextInputControl::create("Level name", searchObject.getLevelNameSetting()), nullptr);
+        currentPage->addControl(EnumInputControl::create("Sort by", searchObject.getSortSearchSetting()), m_buttonMenu);
         currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
         currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getTiersSetting(), true), m_buttonMenu);
         currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()), m_buttonMenu);
