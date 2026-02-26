@@ -12,10 +12,11 @@ class SearchSetting : public ISetting {
 protected:
     T value;
 	T defaultValue;
-    std::string settingKey;
+    std::string settingKey, searchQueryParameterName;
 public:
-    explicit SearchSetting(const std::string& settingKey, T defaultValue = T{}) {
-        this->settingKey = settingKey;
+    explicit SearchSetting(const std::string& settingKeyBase, T defaultValue = T{}) {
+        this->settingKey = "search-" + settingKeyBase;
+    	this->searchQueryParameterName = settingKeyBase;
     	this->defaultValue = defaultValue;
     	this->value = defaultValue;
     }

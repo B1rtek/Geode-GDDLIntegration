@@ -9,11 +9,17 @@ class RangeSearchSetting : public SearchSetting<std::vector<T>> {
 protected:
     T minValue, maxValue;
     bool allowOverlap, wrapAround;
-
+    std::string searchQueryParameterMin, searchQueryParameterMax;
 public:
-    RangeSearchSetting(const std::string& settingKey, T minValue, T maxValue, const bool allowOverlap = true, const bool wrapAround = true) :
-        SearchSetting<std::vector<T>>(settingKey, std::vector<T>{minValue, maxValue}), minValue(minValue),
-        maxValue(maxValue), allowOverlap(allowOverlap), wrapAround(wrapAround) {}
+    RangeSearchSetting(const std::string& settingKey, T minValue, T maxValue, const std::string& searchQueryParameterNameMin,
+        const std::string& searchQueryParameterNameMax, std::vector<T> defaultValue = {}, const bool allowOverlap = true,
+        const bool wrapAround = true) : SearchSetting<std::vector<T>>(settingKey, std::vector<T>{minValue, maxValue}),
+        minValue(minValue), maxValue(maxValue), searchQueryParameterMin(searchQueryParameterNameMin),
+        searchQueryParameterMax(searchQueryParameterNameMax), allowOverlap(allowOverlap), wrapAround(wrapAround) {
+        if (defaultValue.size() > 0) {
+            this->defaultValue = defaultValue;
+        }
+    }
 
     void setSettingValue(std::vector<T> value) override {
         if (value.size() != 2) return;
@@ -39,6 +45,17 @@ public:
 
     std::vector<T> getMinMaxValues() {
         return {minValue, maxValue};
+    }
+
+    std::string getSearchQueryFragment() override {
+        std::string fragment = "";
+        if (this->value[0] != this->defaultValue[0]) {
+            fragment += "&" + this->searchQueryParameterMin + "=" + std::to_string(this->value[0]);
+        }
+        if (this->value[1] != this->defaultValue[1]) {
+            fragment += "&" + this->searchQueryParameterMax + "=" + std::to_string(this->value[1]);
+        }
+        return fragment;
     }
 };
 

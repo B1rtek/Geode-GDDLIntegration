@@ -12,3 +12,10 @@ void TextSearchSetting::loadSetting() {
     SearchSetting::loadSetting();
     setSettingValue(value);
 }
+
+std::string TextSearchSetting::getSearchQueryFragment() {
+    if (this->value != this->defaultValue) {
+        return "&" + this->searchQueryParameterName + "=" + this->value;
+    }
+    return "";
+}

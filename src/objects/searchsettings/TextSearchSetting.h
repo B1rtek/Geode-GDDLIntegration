@@ -11,6 +11,7 @@ public:
 
     void setSettingValue(std::string value) override;
     void loadSetting() override;
+    std::string getSearchQueryFragment() override;
 };
 
 
