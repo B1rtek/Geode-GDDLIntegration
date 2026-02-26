@@ -7,16 +7,21 @@
 #include "searchsettings/EnumSearchSetting.h"
 #include "searchsettings/RangeSearchSetting.h"
 #include "searchsettings/TextSearchSetting.h"
+#include "searchsettings/BoolSearchSetting.h"
 
 class SearchObject {
-    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("search-name", "", 32);
-    std::shared_ptr<EnumSearchSetting> difficultySetting = std::make_shared<EnumSearchSetting>("search-difficulty", std::vector<std::string>{"Easy Demon", "Medium Demon", "Hard Demon", "Insane Demon", "Extreme Demon", "Any"}, 5);
-    std::shared_ptr<RangeSearchSetting<int>> tiersSetting = std::make_shared<RangeSearchSetting<int>>("search-tiers", 0, Values::highestTier);
-    std::shared_ptr<RangeSearchSetting<float>> enjoymentsSetting = std::make_shared<RangeSearchSetting<float>>("search-enjoyments", 0.0f, 10.0f);
-    std::shared_ptr<SearchSetting<bool>> exactNameSetting = std::make_shared<SearchSetting<bool>>("search-exactName", false);
-    std::shared_ptr<SearchSetting<bool>> removeUnratedSetting = std::make_shared<SearchSetting<bool>>("search-removeUnrated", false);
-    std::shared_ptr<SearchSetting<bool>> removeRatedSetting = std::make_shared<SearchSetting<bool>>("search-removeRated", false);
+    const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
+    // settings
+    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("name", "", 32);
+    std::shared_ptr<EnumSearchSetting> difficultySetting = std::make_shared<EnumSearchSetting>("difficulty", std::vector<std::string>{"Easy Demon", "Medium Demon", "Hard Demon", "Insane Demon", "Extreme Demon", "Any"}, 5, 1);
+    std::shared_ptr<RangeSearchSetting<int>> tiersSetting = std::make_shared<RangeSearchSetting<int>>("tiers", 0, Values::highestTier, "minRating", "maxRating", std::vector{0, 0});
+    std::shared_ptr<RangeSearchSetting<float>> enjoymentsSetting = std::make_shared<RangeSearchSetting<float>>("enjoyments", 0.0f, 10.0f, "minEnjoyment", "maxEnjoyment", std::vector{0.0f, 0.0f});
+    std::shared_ptr<BoolSearchSetting> exactNameSetting = std::make_shared<BoolSearchSetting>("exactName", false);
+    std::shared_ptr<BoolSearchSetting> removeUnratedSetting = std::make_shared<BoolSearchSetting>("removeUnrated", false);
+    std::shared_ptr<BoolSearchSetting> removeRatedSetting = std::make_shared<BoolSearchSetting>("removeRated", false);
     std::vector<std::shared_ptr<ISetting>> settings = {levelNameSetting, difficultySetting, tiersSetting, enjoymentsSetting, exactNameSetting, removeUnratedSetting, removeRatedSetting};
+    // current search specific things
+    int apiPagesFetched = 0;
 
 public:
     SearchObject() = default;
@@ -30,9 +35,9 @@ public:
     std::shared_ptr<EnumSearchSetting> getDifficultySetting();
     std::shared_ptr<RangeSearchSetting<int>> getTiersSetting();
     std::shared_ptr<RangeSearchSetting<float>> getEnjoymentsSetting();
-    std::shared_ptr<SearchSetting<bool>> getExactNameSetting();
-    std::shared_ptr<SearchSetting<bool>> getRemoveUnratedSetting();
-    std::shared_ptr<SearchSetting<bool>> getRemoveRatedSetting();
+    std::shared_ptr<BoolSearchSetting> getExactNameSetting();
+    std::shared_ptr<BoolSearchSetting> getRemoveUnratedSetting();
+    std::shared_ptr<BoolSearchSetting> getRemoveRatedSetting();
 };
 
 
