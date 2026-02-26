@@ -98,7 +98,9 @@ void GDDLSearchLayerV2::updatePageNumberLabel() {
 }
 
 void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
-
+    currentPage->saveSettings();
+    searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
+    searchObject.createSearchQuery();
 }
 
 void GDDLSearchLayerV2::onResetClicked(CCObject* sender) {
