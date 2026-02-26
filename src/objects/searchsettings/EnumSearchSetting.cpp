@@ -1,7 +1,8 @@
 #include "EnumSearchSetting.h"
 
 EnumSearchSetting::EnumSearchSetting(const std::string& settingKey, const std::vector<std::string>& options,
-    int defaultValue, int queryEnumOffset): SearchSetting(settingKey, defaultValue), options(options), quertEnumOffset(queryEnumOffset) {}
+    int defaultValue, int queryEnumOffset, const std::vector<std::string>& queryStrings):
+    SearchSetting(settingKey, defaultValue), options(options), queryEnumOffset(queryEnumOffset), queryStrings(queryStrings) {}
 
 void EnumSearchSetting::setSettingValue(int value) {
     if (value < 0) {
@@ -22,7 +23,7 @@ std::string EnumSearchSetting::getEnumValue() const {
 
 std::string EnumSearchSetting::getSearchQueryFragment() {
     if (this->value != this->defaultValue) {
-        return "&" + this->searchQueryParameterName + "=" + std::to_string(this->value + this->quertEnumOffset);
+        return "&" + this->searchQueryParameterName + "=" + (queryStrings.empty() ? std::to_string(this->value + this->queryEnumOffset) : this->queryStrings[this->value]);
     }
     return "";
 }
