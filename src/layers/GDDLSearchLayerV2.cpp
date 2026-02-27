@@ -36,6 +36,20 @@ void GDDLSearchLayerV2::createBaseUI() {
     m_buttonMenu->setPosition({64.5f - aspectRatioFixX, 295.0f - aspectRatioFixY});
     m_buttonMenu->setID("gddl-demon-search-menu"_spr);
     m_mainLayer->addChild(m_buttonMenu, 0);
+
+    // due to touch prio, we have to recreate everything, I could also probably create a separate menu...
+    recreateMainButtonMenu();
+
+    // initialize page
+    currentPage = SearchLayerPage::create();
+    currentPage->setPosition({winSize.width / 2 - popupSize.x/2 + 2.5f, winSize.height / 2 - popupSize.y/2 + 40.0f});
+    m_mainLayer->addChild(currentPage);
+}
+
+void GDDLSearchLayerV2::recreateMainButtonMenu() {
+    // clear
+    m_buttonMenu->removeAllChildren();
+
     // close button
     const auto closeButtonSprite = Utils::getGrayPopupCloseButton();
     const auto closeButton =
@@ -69,11 +83,16 @@ void GDDLSearchLayerV2::createBaseUI() {
     pageNumberLabel->setPosition({popupSize.x/2, -255.0f});
     // buttons around the label
     Utils::createLeftRightButtonsAround(pageNumberLabel, {13.0f, 19.0f}, this, menu_selector(GDDLSearchLayerV2::onPageLeftClicked), menu_selector(GDDLSearchLayerV2::onPageRightClicked));
+}
 
-    // initialize page
-    currentPage = SearchLayerPage::create();
-    currentPage->setPosition({winSize.width / 2 - popupSize.x/2 + 2.5f, winSize.height / 2 - popupSize.y/2 + 40.0f});
-    m_mainLayer->addChild(currentPage);
+void GDDLSearchLayerV2::reloadAfterSwitchingPage() {
+    currentPage->saveSettings();
+    searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
+    searchObject.saveSettings();
+    recreateMainButtonMenu();
+    searchObject.loadSettings();
+    levelNameTextInput->setString(searchObject.getLevelNameSetting()->getSettingValue());
+    displayPage(currentPageNumber);
 }
 
 void GDDLSearchLayerV2::displayPage(int pageNumber) {
@@ -82,12 +101,8 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         // simplified search page
     } else if (pageNumber == 1) {
         // first page
-        currentPage->addControl(EnumInputControl::create("Sort by", searchObject.getSortSearchSetting()), m_buttonMenu);
         currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getTiersSetting(), true), m_buttonMenu);
         currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()), m_buttonMenu);
-        currentPage->addControl(CheckboxInputControl::create("No unrated", searchObject.getRemoveUnratedSetting(), "No rated", searchObject.getRemoveRatedSetting(), true), m_buttonMenu);
-        currentPage->addControl(CheckboxInputControl::create("Exact match", searchObject.getExactNameSetting()), m_buttonMenu);
     }
     updatePageNumberLabel();
 }
@@ -110,11 +125,19 @@ void GDDLSearchLayerV2::onResetClicked(CCObject* sender) {
 }
 
 void GDDLSearchLayerV2::onPageLeftClicked(CCObject* sender) {
-
+    --currentPageNumber;
+    if (currentPageNumber < 0) {
+        currentPageNumber = 3;
+    }
+    reloadAfterSwitchingPage();
 }
 
 void GDDLSearchLayerV2::onPageRightClicked(CCObject* sender) {
-
+    ++currentPageNumber;
+    if (currentPageNumber > 3) {
+        currentPageNumber = 0;
+    }
+    reloadAfterSwitchingPage();
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {

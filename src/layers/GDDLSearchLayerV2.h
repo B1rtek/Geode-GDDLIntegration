@@ -26,6 +26,8 @@ class GDDLSearchLayerV2 : public FLAlertLayer {
 
     // internal ui methods
     void createBaseUI();
+    void recreateMainButtonMenu();
+    void reloadAfterSwitchingPage();
     void displayPage(int pageNumber);
     void updatePageNumberLabel();
 
