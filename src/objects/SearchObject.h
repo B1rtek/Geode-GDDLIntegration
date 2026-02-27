@@ -31,11 +31,11 @@ class SearchObject {
     std::shared_ptr<RangeSearchSetting<int>> ratingsSetting = std::make_shared<RangeSearchSetting<int>>(
         "ratings", 0, Values::highestTier, "minRating", "maxRating", std::vector{0, 0});
     std::shared_ptr<RangeSearchSetting<float>> enjoymentsSetting = std::make_shared<RangeSearchSetting<float>>(
-        "enjoyments", 0.0f, 10.0f, "minEnjoyment", "maxEnjoyment", std::vector{0.0f, 0.0f});
+        "enjoyments", 0.0f, 10.0f, "minEnjoyment", "maxEnjoyment", std::vector{0.0f, 10.0f});
     std::shared_ptr<RangeSearchSetting<int>> enjoymentsCountSetting = std::make_shared<RangeSearchSetting<int>>(
         "enjoymentsCount", 0, 9999, "minEnjoymentCount", "maxEnjoymentCount", std::vector{0, 0});
     std::shared_ptr<RangeSearchSetting<float>> deviationsSetting = std::make_shared<RangeSearchSetting<float>>(
-        "deviations", 0.0f, 100.0f, "minDeviation", "maxDeviation", std::vector{0.0f, 0.0f});
+        "deviations", 0.0f, 100.0f, "minDeviation", "maxDeviation", std::vector{0.0f, 100.0f});
     std::shared_ptr<RangeSearchSetting<int>> ratingsCountSetting = std::make_shared<RangeSearchSetting<int>>(
         "ratingsCount", 0, 9999, "minSubmissionCount", "maxSubmissionCount", std::vector{0, 0});
     std::shared_ptr<EnumSearchSetting> difficultySetting = std::make_shared<EnumSearchSetting>(
