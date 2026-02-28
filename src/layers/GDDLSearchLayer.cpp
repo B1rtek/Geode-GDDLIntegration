@@ -8,7 +8,7 @@
 
 #include "RatingsManager.h"
 #include "Utils.h"
-#include "modified/LevelBrowserLayer.cpp"
+#include "modified/GDDLLevelBrowserLayer.h"
 
 bool GDDLSearchLayer::init() {
     if (!FLAlertLayer::init(150))
@@ -670,7 +670,7 @@ bool GDDLSearchLayer::hideAnyLoadingCircle() {
     return false;
 }
 
-void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer* callbackObject,
+void GDDLSearchLayer::handleSearchObject(GJSearchObject *searchObject, GDDLLevelBrowserLayer* callbackObject,
                                          const int resultsCount) {
     if(callbackObject != nullptr) { // search continues
         callbackObject->handleSearchObject(searchObject, resultsCount);
@@ -1131,7 +1131,7 @@ void GDDLSearchLayer::saveSettings() {
     Mod::get()->setSavedValue("search-simplified", simplified);
 }
 
-void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject) {
+void GDDLSearchLayer::requestSearchPage(int requestedPage, GDDLLevelBrowserLayer *callbackObject) {
     // check whether the cache already contains results for this query
     if (requestedPage < 0) {
         requestedPage = 0;

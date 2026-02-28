@@ -5,8 +5,8 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/utils/web.hpp>
 #include "GDDLDemonSplitLayer.h"
+#include "modified/GDDLLevelBrowserLayer.h"
 
-struct GDDLBrowserLayer;
 using namespace geode::prelude;
 
 enum LevelCompleteness { ANY, UNCOMPLETED, COMPLETED };
@@ -76,7 +76,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     inline static bool searching = false;
     inline static async::TaskHolder<web::WebResponse> searchListener;
     inline static int requestRequestedPage; // for the sole purpose of using it inside of the request lambda
-    inline static GDDLBrowserLayer* searchCallbackObject;
+    inline static GDDLLevelBrowserLayer* searchCallbackObject;
     inline static Ref<GDDLDemonSplitLayer> demonSplitLayer = nullptr;
     inline static GDDLSearchLayer* searchLayer = nullptr;
 
@@ -145,7 +145,7 @@ class GDDLSearchLayer final : public FLAlertLayer {
     static void appendFetchedResults(const std::string &response);
     static std::pair<int, int> getReadyRange(int requestedPage);
     static bool hideAnyLoadingCircle();
-    static void handleSearchObject(GJSearchObject *searchObject, GDDLBrowserLayer *callbackObject, int resultsCount);
+    static void handleSearchObject(GJSearchObject *searchObject, GDDLLevelBrowserLayer *callbackObject, int resultsCount);
     static std::function<void(web::WebResponse)> getSearchListenerLambda();
     // utility (that and Utils.h)
     static float calculateNewFloat(float currentValue, bool increase, float lowerbound, float upperbound);
@@ -205,7 +205,7 @@ public:
     void show() override;
     static void loadSettings(); // called on game startup
     static void saveSettings(); // called in menulayer after every modification of the search values
-    static void requestSearchPage(int requestedPage, GDDLBrowserLayer *callbackObject);
+    static void requestSearchPage(int requestedPage, GDDLLevelBrowserLayer *callbackObject);
     static void requestSearchFromDemonSplit(int tier, GDDLDemonSplitLayer* layer);
     static int getSearchResultsPageCount();
     static int getSearchResultsCount();
