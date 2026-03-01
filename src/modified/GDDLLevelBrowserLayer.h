@@ -5,6 +5,7 @@
 #include <objects/SearchObject.h>
 
 #include "Geode/modify/LevelBrowserLayer.hpp"
+#include "objects/SearchObject.h"
 
 struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, LevelBrowserLayer> {
     struct Fields {

@@ -10,6 +10,8 @@
 #include "searchsettings/TextSearchSetting.h"
 #include "searchsettings/BoolSearchSetting.h"
 
+struct GDDLLevelBrowserLayer; // circular import oops
+
 class SearchObject {
     const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
     static constexpr unsigned long long inGameResultsPageSize = 10;
@@ -92,11 +94,12 @@ class SearchObject {
     std::string createSearchParametersString();
     std::string createFullSearchQuery(const std::string& queryParameters);
     GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex) const;
-    Result<std::vector<int>> parseApiResponse(std::string response);
+    void getSearchResultsForPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer);
+    Result<std::vector<int>> parseApiResponse(const std::string& response);
     std::vector<int> filterApiResponse(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
     bool isPageReady(int pageNumber) const;
-    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage);
-    void openLevelBrowser(GJSearchObject* gjSearchObject);
+    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer);
+    void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer);
 
 public:
     SearchObject() = default;
@@ -108,6 +111,10 @@ public:
 
     // search handling
     void performInitialSearch();
+    void requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer);
+    void cancelSearch();
+
+    int getTotalApiResultsCount();
 
     std::shared_ptr<EnumSearchSetting> getSortSetting();
     std::shared_ptr<EnumSearchSetting> getSortDirectionSetting();

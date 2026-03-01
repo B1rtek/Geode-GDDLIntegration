@@ -31,22 +31,36 @@ GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long 
     return GJSearchObject::create(SearchType::Type19, requestString);
 }
 
-Result<std::vector<int>> SearchObject::parseApiResponse(std::string response) {
+void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
+    if (isPageReady(pageNumber)) {
+        // display what we have
+        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize);
+        forwardToLevelBrowser(gjSearchObject, callingLayer);
+    } else {
+        // fetch more
+        const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(pageNumber, callingLayer));
+    }
+}
+
+Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& response) {
     std::vector<int> listOfIds;
+    if (response.empty()) {
+        return Err("Server returned empty response");
+    }
     const auto maybeResponseJson = matjson::parse(response);
     if (maybeResponseJson.isErr()) {
-        // TODO well that's not good, add some logging
         return Err("Server returned invalid JSON");
     }
     const matjson::Value& responseJson = maybeResponseJson.unwrap();
     if (!responseJson.contains("levels") || !responseJson["levels"].isArray() || !responseJson.contains("total") || !responseJson["total"].isNumber()) {
-        // TODO well, it should, add some logging
         return Err("Server returned invalid response");
     }
     totalApiResultsCount = std::max(totalApiResultsCount, responseJson["total"].asInt().unwrap());
     for (auto level : responseJson["levels"].asArray().unwrap()) {
         if (!level.contains("ID") || !level["ID"].isNumber()) {
-            // TODO well, it should have it, add some logging
             return Err("Server returned invalid response: missing ID key in a level object");
         }
         const int levelID = level["ID"].asInt().unwrap();
@@ -82,29 +96,29 @@ std::vector<int> SearchObject::filterApiResponse(std::vector<int> parsedResponse
 }
 
 bool SearchObject::isPageReady(const int pageNumber) const {
-    if (totalApiResultsCount <= apiResultsProcessedCount) {
+    if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
         // already fetched everything there is to fetch
         return true;
     }
     return results.size() >= (pageNumber + 1) * inGameResultsPageSize;
 }
 
-std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage) {
-    return [this, requestedPage](web::WebResponse res) {
+std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer) {
+    return [this, requestedPage, callingLayer](web::WebResponse res) {
         if (res.code() != 200) {
-            // TODO error of some kind oops, add some logging
+            const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+            const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
+            log::error("SearchObject::getSearchLambda: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
             searching = false;
             return;
         }
-        const std::string response = res.string().unwrapOrDefault();
-        if (response.empty()) {
-            // TODO empty response? how??, add some logging
-            searching = false;
-            return;
-        }
-        Result<std::vector<int>> parsedResponse = parseApiResponse(response);
-        if (parsedResponse.err()) {
-            // TODO invalid response oops, add some logging
+        Result<std::vector<int>> parsedResponse = parseApiResponse(res.string().unwrapOrDefault());
+        if (parsedResponse.isErr()) {
+            const std::string errorMessage = "GDDL: Search failed - " + parsedResponse.unwrapErr();
+            Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            log::error("SearchObject::getSearchLambda: {}", parsedResponse.unwrapErr());
             searching = false;
             return;
         }
@@ -113,22 +127,17 @@ std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requeste
             results.push_back(id);
         }
         ++apiPagesFetched;
-        // check if we have enough
-        if (isPageReady(requestedPage)) {
-            GJSearchObject *searchObject = createGJSearchObjectFromIndex(requestedPage * inGameResultsPageSize);
-            openLevelBrowser(searchObject);
-        } else {
-            // recurse
-            const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
-            auto req = web::WebRequest();
-            req.header("User-Agent", Utils::getUserAgent());
-            searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(apiPagesFetched));
-        }
-        searching = false;
+        getSearchResultsForPage(requestedPage, callingLayer);
     };
 }
 
-void SearchObject::openLevelBrowser(GJSearchObject* gjSearchObject) {
+void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer) {
+    if (!searching) return; // search can be canceled externally by the browser layer which might no longer exist
+    searching = false;
+    if (callingLayer != nullptr) {
+        callingLayer->handleSearchObject(gjSearchObject, results.size());
+        return;
+    }
     const auto listLayer = static_cast<GDDLLevelBrowserLayer*>(GDDLLevelBrowserLayer::create(gjSearchObject));
     listLayer->assignSearchObject(this);
     const auto listLayerScene = CCScene::create();
@@ -163,18 +172,26 @@ void SearchObject::performInitialSearch() {
         // query has changed, we can clear the list of results
         results.clear();
         lastSearchParameters = searchParameters;
+        apiPagesFetched = 0;
+        totalApiResultsCount = 0;
+        apiResultsProcessedCount = 0;
     }
-    if (isPageReady(0)) {
-        // fetch more
-        const std::string apiSearchQuery = createFullSearchQuery(searchParameters);
-        auto req = web::WebRequest();
-        req.header("User-Agent", Utils::getUserAgent());
-        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(0));
-    } else {
-        // display what we have
-        GJSearchObject* gjSearcjObject = createGJSearchObjectFromIndex(0);
-        openLevelBrowser(gjSearcjObject);
-    }
+    getSearchResultsForPage(0, nullptr);
+}
+
+void SearchObject::requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
+    if (searching) return;
+    searching = true;
+    getSearchResultsForPage(pageNumber, nullptr);
+}
+
+void SearchObject::cancelSearch() {
+    searchTaskHolder.cancel();
+    searching = false;
+}
+
+int SearchObject::getTotalApiResultsCount() {
+    return this->totalApiResultsCount;
 }
 
 std::shared_ptr<EnumSearchSetting> SearchObject::getSortSetting() {
