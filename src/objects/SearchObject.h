@@ -12,6 +12,7 @@
 
 class SearchObject {
     const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
+    static constexpr unsigned long long inGameResultsPageSize = 10;
     // settings
     std::shared_ptr<EnumSearchSetting> sortSetting = std::make_shared<EnumSearchSetting>(
         "sort", std::vector<std::string>{
@@ -80,14 +81,28 @@ class SearchObject {
     };
     // current search specific things
     int apiPagesFetched = 0;
+    std::string lastSearchParameters;
+    std::vector<int> results = {68718751, 26681070, 26681070};
+    int totalApiResultsCount = 0;
+    int apiResultsProcessedCount = 0;
+    async::TaskHolder<web::WebResponse> searchTaskHolder;
+
+    std::string createSearchParametersString();
+    std::string createFullSearchQuery(const std::string& queryParameters);
+    GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex) const;
+    std::function<void(web::WebResponse)> getSearchLambda();
+    void openLevelBrowser(GJSearchObject* gjSearchObject);
 
 public:
     SearchObject() = default;
 
+    // settings handling
     void loadSettings();
     void saveSettings();
     void resetToDefaults();
-    std::string createSearchQuery();
+
+    // search handling
+    void performInitialSearch();
 
     std::shared_ptr<EnumSearchSetting> getSortSetting();
     std::shared_ptr<EnumSearchSetting> getSortDirectionSetting();

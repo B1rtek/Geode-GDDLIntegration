@@ -1,4 +1,51 @@
 #include "SearchObject.h"
+
+#include <Utils.h>
+#include <modified/GDDLLevelBrowserLayer.h>
+
+std::string SearchObject::createSearchParametersString() {
+    std::string request;
+    for (const auto& setting : searchableSettings) {
+        request += setting->getSearchQueryFragment();
+    }
+    return request;
+}
+
+std::string SearchObject::createFullSearchQuery(const std::string& queryParameters) {
+    std::string request = searchEndpoint + "?page=" + std::to_string(apiPagesFetched) + "&limit=25" + queryParameters;
+    log::info("Search request: {}", request);
+    return request;
+}
+
+GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex) const {
+    std::string requestString;
+    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, results.size());
+    for (unsigned i = firstIndex; i < lastIndex; i++) {
+        requestString += std::to_string(results[i]) + ',';
+    }
+    if (!requestString.empty()) {
+        requestString.pop_back();
+    }
+    requestString += "&gameVersion=22";
+    log::info("GJRequest: {}", requestString);
+    return GJSearchObject::create(SearchType::Type19, requestString);
+}
+
+std::function<void(web::WebResponse)> SearchObject::getSearchLambda() {
+    return [](web::WebResponse res) {
+
+    };
+}
+
+void SearchObject::openLevelBrowser(GJSearchObject* gjSearchObject) {
+    const auto listLayer = static_cast<GDDLLevelBrowserLayer*>(GDDLLevelBrowserLayer::create(gjSearchObject));
+    listLayer->assignSearchObject(this);
+    const auto listLayerScene = CCScene::create();
+    listLayerScene->addChild(listLayer);
+    const auto transition = CCTransitionFade::create(0.5, listLayerScene);
+    CCDirector::sharedDirector()->pushScene(transition);
+}
+
 void SearchObject::loadSettings() {
     for (const auto& setting : settings) {
         setting->loadSetting();
@@ -17,14 +64,24 @@ void SearchObject::resetToDefaults() {
     }
 }
 
-std::string SearchObject::createSearchQuery() {
-    std::string request = searchEndpoint;
-    request += "?page=" + std::to_string(apiPagesFetched) + "&limit=25";
-    for (const auto& setting : searchableSettings) {
-        request += setting->getSearchQueryFragment();
+void SearchObject::performInitialSearch() {
+    const std::string searchParameters = createSearchParametersString();
+    if (searchParameters != lastSearchParameters) {
+        // query has changed, we can clear the list of results
+        results.clear();
+        lastSearchParameters = searchParameters;
     }
-    log::info("Search request: {}", request);
-    return request;
+    if (results.size() < 10 && apiResultsProcessedCount < totalApiResultsCount) {
+        // fetch more
+        const std::string apiSearchQuery = createFullSearchQuery(searchParameters);
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda());
+    } else {
+        // display what we have
+        GJSearchObject* gjSearcjObject = createGJSearchObjectFromIndex(0);
+        openLevelBrowser(gjSearcjObject);
+    }
 }
 
 std::shared_ptr<EnumSearchSetting> SearchObject::getSortSetting() {

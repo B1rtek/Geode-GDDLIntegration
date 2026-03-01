@@ -68,3 +68,7 @@ void GDDLLevelBrowserLayer::handleSearchObject(GJSearchObject * searchObject, in
     loadPage(searchObject);
     setCorrectLabelsText();
 }
+
+void GDDLLevelBrowserLayer::assignSearchObject(SearchObject* searchObject) {
+    m_fields->searchObject = searchObject;
+}

@@ -2,11 +2,14 @@
 #define GDDLINTEGRATION_GDDLBROWSERLAYER_H
 
 #include <Geode/Bindings.hpp>
+#include <objects/SearchObject.h>
+
 #include "Geode/modify/LevelBrowserLayer.hpp"
 
 struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, LevelBrowserLayer> {
     struct Fields {
         int currentPage = 0;
+        SearchObject* searchObject = nullptr;
     };
 
     bool init(GJSearchObject * p0);
@@ -16,6 +19,7 @@ struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, Level
     // void onGoToPage(CCObject* sender);
     void setCorrectLabelsText();
     void handleSearchObject(GJSearchObject * searchObject, int resultsCount);
+    void assignSearchObject(SearchObject* searchObject);
 };
 
 #endif //GDDLINTEGRATION_GDDLBROWSERLAYER_H
