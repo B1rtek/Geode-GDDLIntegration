@@ -13,6 +13,7 @@
 class SearchObject {
     const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
     static constexpr unsigned long long inGameResultsPageSize = 10;
+    static constexpr unsigned long long apiResultsChunk = 25;
     // settings
     std::shared_ptr<EnumSearchSetting> sortSetting = std::make_shared<EnumSearchSetting>(
         "sort", std::vector<std::string>{
@@ -82,15 +83,19 @@ class SearchObject {
     // current search specific things
     int apiPagesFetched = 0;
     std::string lastSearchParameters;
-    std::vector<int> results = {68718751, 26681070, 26681070};
-    int totalApiResultsCount = 0;
+    std::vector<int> results;
+    long long totalApiResultsCount = 0;
     int apiResultsProcessedCount = 0;
     async::TaskHolder<web::WebResponse> searchTaskHolder;
+    bool searching = false;
 
     std::string createSearchParametersString();
     std::string createFullSearchQuery(const std::string& queryParameters);
     GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex) const;
-    std::function<void(web::WebResponse)> getSearchLambda();
+    Result<std::vector<int>> parseApiResponse(std::string response);
+    std::vector<int> filterApiResponse(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
+    bool isPageReady(int pageNumber) const;
+    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage);
     void openLevelBrowser(GJSearchObject* gjSearchObject);
 
 public:

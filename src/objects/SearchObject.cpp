@@ -31,9 +31,100 @@ GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long 
     return GJSearchObject::create(SearchType::Type19, requestString);
 }
 
-std::function<void(web::WebResponse)> SearchObject::getSearchLambda() {
-    return [](web::WebResponse res) {
+Result<std::vector<int>> SearchObject::parseApiResponse(std::string response) {
+    std::vector<int> listOfIds;
+    const auto maybeResponseJson = matjson::parse(response);
+    if (maybeResponseJson.isErr()) {
+        // TODO well that's not good, add some logging
+        return Err("Server returned invalid JSON");
+    }
+    const matjson::Value& responseJson = maybeResponseJson.unwrap();
+    if (!responseJson.contains("levels") || !responseJson["levels"].isArray() || !responseJson.contains("total") || !responseJson["total"].isNumber()) {
+        // TODO well, it should, add some logging
+        return Err("Server returned invalid response");
+    }
+    totalApiResultsCount = std::max(totalApiResultsCount, responseJson["total"].asInt().unwrap());
+    for (auto level : responseJson["levels"].asArray().unwrap()) {
+        if (!level.contains("ID") || !level["ID"].isNumber()) {
+            // TODO well, it should have it, add some logging
+            return Err("Server returned invalid response: missing ID key in a level object");
+        }
+        const int levelID = level["ID"].asInt().unwrap();
+        // levels with ID lower than that are official demons and therefore cannot be displayed
+        if (levelID > 3) {
+            results.push_back(levelID);
+        }
+        // optional step: if rating is present, update cache
+        if (level.contains("Rating") && level["Rating"].isExactlyDouble()) {
+            const float rating = level["Rating"].asDouble().unwrap();
+            RatingsManager::updateCacheFromSearch(levelID, rating);
+        }
+        ++apiResultsProcessedCount;
+    }
+    return Ok(results);
+}
 
+std::vector<int> SearchObject::filterApiResponse(std::vector<int> parsedResponse, const bool includeCompleted,
+    const bool includeUncompleted) {
+    if (includeCompleted == includeUncompleted) {
+        // just return everything
+        return parsedResponse;
+    }
+    GameLevelManager *levelManager = GameLevelManager::sharedState();
+    CCArray *completedLevels = levelManager->getCompletedLevels(false);
+    for (const auto level : CCArrayExt<GJGameLevel*>(completedLevels)) {
+        const bool levelCompleted = level->m_normalPercent == 100;
+        if ((includeCompleted && !levelCompleted) || (includeUncompleted && levelCompleted)) {
+            std::erase(parsedResponse, static_cast<int>(level->m_levelID));
+        }
+    }
+    return parsedResponse;
+}
+
+bool SearchObject::isPageReady(const int pageNumber) const {
+    if (totalApiResultsCount <= apiResultsProcessedCount) {
+        // already fetched everything there is to fetch
+        return true;
+    }
+    return results.size() >= (pageNumber + 1) * inGameResultsPageSize;
+}
+
+std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage) {
+    return [this, requestedPage](web::WebResponse res) {
+        if (res.code() != 200) {
+            // TODO error of some kind oops, add some logging
+            searching = false;
+            return;
+        }
+        const std::string response = res.string().unwrapOrDefault();
+        if (response.empty()) {
+            // TODO empty response? how??, add some logging
+            searching = false;
+            return;
+        }
+        Result<std::vector<int>> parsedResponse = parseApiResponse(response);
+        if (parsedResponse.err()) {
+            // TODO invalid response oops, add some logging
+            searching = false;
+            return;
+        }
+        const std::vector<int> filteredResults = filterApiResponse(parsedResponse.unwrap(), completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
+        for (const auto id : filteredResults) {
+            results.push_back(id);
+        }
+        ++apiPagesFetched;
+        // check if we have enough
+        if (isPageReady(requestedPage)) {
+            GJSearchObject *searchObject = createGJSearchObjectFromIndex(requestedPage * inGameResultsPageSize);
+            openLevelBrowser(searchObject);
+        } else {
+            // recurse
+            const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
+            auto req = web::WebRequest();
+            req.header("User-Agent", Utils::getUserAgent());
+            searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(apiPagesFetched));
+        }
+        searching = false;
     };
 }
 
@@ -65,18 +156,20 @@ void SearchObject::resetToDefaults() {
 }
 
 void SearchObject::performInitialSearch() {
+    if (searching) return;
+    searching = true;
     const std::string searchParameters = createSearchParametersString();
     if (searchParameters != lastSearchParameters) {
         // query has changed, we can clear the list of results
         results.clear();
         lastSearchParameters = searchParameters;
     }
-    if (results.size() < 10 && apiResultsProcessedCount < totalApiResultsCount) {
+    if (isPageReady(0)) {
         // fetch more
         const std::string apiSearchQuery = createFullSearchQuery(searchParameters);
         auto req = web::WebRequest();
         req.header("User-Agent", Utils::getUserAgent());
-        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda());
+        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(0));
     } else {
         // display what we have
         GJSearchObject* gjSearcjObject = createGJSearchObjectFromIndex(0);
