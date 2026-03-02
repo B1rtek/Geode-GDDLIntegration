@@ -1,3 +1,7 @@
+# 1.3.0-beta.2
+- Search menu overhaul and optimization, big rewrite
+- TODO: move the gddl demon split button to the robtop demon split
+
 # 1.2.11
 - Compatibility with Geode 5.0.0/Geometry Dash 2.2081
 - Added the missing [sorting by deviation and popularity](https://github.com/B1rtek/Geode-GDDLIntegration/issues/102) options to the GDDL search menu
