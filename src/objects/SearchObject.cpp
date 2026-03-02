@@ -17,11 +17,11 @@ std::string SearchObject::createFullSearchQuery(const std::string& queryParamete
     return request;
 }
 
-GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex) const {
+GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> filteredResults) const {
     std::string requestString;
-    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, results.size());
+    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, filteredResults.size());
     for (unsigned i = firstIndex; i < lastIndex; i++) {
-        requestString += std::to_string(results[i]) + ',';
+        requestString += std::to_string(filteredResults[i]) + ',';
     }
     if (!requestString.empty()) {
         requestString.pop_back();
@@ -32,9 +32,10 @@ GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long 
 }
 
 void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
-    if (isPageReady(pageNumber)) {
+    const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
+    if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
-        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize);
+        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize, filteredResults);
         forwardToLevelBrowser(gjSearchObject, callingLayer);
     } else {
         // fetch more
@@ -66,7 +67,7 @@ Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& respo
         const int levelID = level["ID"].asInt().unwrap();
         // levels with ID lower than that are official demons and therefore cannot be displayed
         if (levelID > 3) {
-            results.push_back(levelID);
+            listOfIds.push_back(levelID);
         }
         // optional step: if rating is present, update cache
         if (level.contains("Rating") && level["Rating"].isExactlyDouble()) {
@@ -75,32 +76,47 @@ Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& respo
         }
         ++apiResultsProcessedCount;
     }
-    return Ok(results);
+    return Ok(listOfIds);
 }
 
-std::vector<int> SearchObject::filterApiResponse(std::vector<int> parsedResponse, const bool includeCompleted,
+std::vector<int> SearchObject::filterResults(std::vector<int> parsedResponse, const bool includeCompleted,
     const bool includeUncompleted) {
     if (includeCompleted == includeUncompleted) {
         // just return everything
         return parsedResponse;
     }
+    // get the list of completed in parsed response
+    std::vector<int> completedFromParsed;
     GameLevelManager *levelManager = GameLevelManager::sharedState();
     CCArray *completedLevels = levelManager->getCompletedLevels(false);
     for (const auto level : CCArrayExt<GJGameLevel*>(completedLevels)) {
         const bool levelCompleted = level->m_normalPercent == 100;
-        if ((includeCompleted && !levelCompleted) || (includeUncompleted && levelCompleted)) {
-            std::erase(parsedResponse, static_cast<int>(level->m_levelID));
+        if (levelCompleted && std::ranges::find(parsedResponse, static_cast<int>(level->m_levelID)) != parsedResponse.end()) {
+            completedFromParsed.push_back(level->m_levelID);
         }
+    }
+    // filter
+    if (includeCompleted) {
+        std::vector<int> orderedCompletedFromParsed;
+        for (const auto& id : parsedResponse) {
+            if (std::ranges::find(completedFromParsed, id) != completedFromParsed.end()) {
+                orderedCompletedFromParsed.push_back(id);
+            }
+        }
+        return orderedCompletedFromParsed;
+    }
+    for (const auto& id : completedFromParsed) {
+        std::erase(parsedResponse, id);
     }
     return parsedResponse;
 }
 
-bool SearchObject::isPageReady(const int pageNumber) const {
+bool SearchObject::isPageReady(const int pageNumber, const std::vector<int>& filteredResults) const {
     if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
         // already fetched everything there is to fetch
         return true;
     }
-    return results.size() >= (pageNumber + 1) * inGameResultsPageSize;
+    return filteredResults.size() >= (pageNumber + 1) * inGameResultsPageSize;
 }
 
 std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer) {
@@ -122,11 +138,11 @@ std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requeste
             searching = false;
             return;
         }
-        const std::vector<int> filteredResults = filterApiResponse(parsedResponse.unwrap(), completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
-        for (const auto id : filteredResults) {
+        for (const auto id : parsedResponse.unwrap()) {
             results.push_back(id);
         }
         ++apiPagesFetched;
+        // const std::vector<int> filteredResults = filterResults(parsedResponse.unwrap(), completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
         getSearchResultsForPage(requestedPage, callingLayer);
     };
 }
@@ -182,7 +198,7 @@ void SearchObject::performInitialSearch() {
 void SearchObject::requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
     if (searching) return;
     searching = true;
-    getSearchResultsForPage(pageNumber, nullptr);
+    getSearchResultsForPage(pageNumber, callingLayer);
 }
 
 void SearchObject::cancelSearch() {
@@ -192,6 +208,10 @@ void SearchObject::cancelSearch() {
 
 int SearchObject::getTotalApiResultsCount() {
     return this->totalApiResultsCount;
+}
+
+int SearchObject::getTotalApiResultsPageCount() {
+    return this->totalApiResultsCount % 10 ? this->totalApiResultsCount / 10 : this->totalApiResultsCount / 10 + 1;
 }
 
 std::shared_ptr<EnumSearchSetting> SearchObject::getSortSetting() {

@@ -93,11 +93,11 @@ class SearchObject {
 
     std::string createSearchParametersString();
     std::string createFullSearchQuery(const std::string& queryParameters);
-    GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex) const;
+    GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex, std::vector<int> filteredResults) const;
     void getSearchResultsForPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer);
     Result<std::vector<int>> parseApiResponse(const std::string& response);
-    std::vector<int> filterApiResponse(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
-    bool isPageReady(int pageNumber) const;
+    std::vector<int> filterResults(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
+    bool isPageReady(int pageNumber, const std::vector<int>& filteredResults) const;
     std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer);
     void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer);
 
@@ -115,6 +115,7 @@ public:
     void cancelSearch();
 
     int getTotalApiResultsCount();
+    int getTotalApiResultsPageCount();
 
     std::shared_ptr<EnumSearchSetting> getSortSetting();
     std::shared_ptr<EnumSearchSetting> getSortDirectionSetting();

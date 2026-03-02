@@ -13,7 +13,6 @@ struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, Level
         SearchObject* searchObject = nullptr;
     };
 
-    bool init(GJSearchObject * p0);
     void loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) override;
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
