@@ -19,7 +19,7 @@ std::string SearchObject::createFullSearchQuery(const std::string& queryParamete
 
 GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> filteredResults) const {
     std::string requestString;
-    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, filteredResults.size());
+    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, static_cast<unsigned long long>(filteredResults.size()));
     for (unsigned i = firstIndex; i < lastIndex; i++) {
         requestString += std::to_string(filteredResults[i]) + ',';
     }
@@ -59,7 +59,7 @@ Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& respo
     if (!responseJson.contains("levels") || !responseJson["levels"].isArray() || !responseJson.contains("total") || !responseJson["total"].isNumber()) {
         return Err("Server returned invalid response");
     }
-    totalApiResultsCount = std::max(totalApiResultsCount, responseJson["total"].asInt().unwrap());
+    totalApiResultsCount = std::max(totalApiResultsCount, static_cast<long long>(responseJson["total"].asInt().unwrap()));
     for (auto level : responseJson["levels"].asArray().unwrap()) {
         if (!level.contains("ID") || !level["ID"].isNumber()) {
             return Err("Server returned invalid response: missing ID key in a level object");
