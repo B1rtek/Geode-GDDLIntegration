@@ -49,12 +49,16 @@ void GDDLLevelBrowserLayer::onGoToLastPage(CCObject* sender) {
 }
 
 void GDDLLevelBrowserLayer::keyBackClicked() {
-    backActions();
+    if (m_fields->searchObject != nullptr) {
+        backActions();
+    }
     Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::keyBackClicked();
 }
 
 void GDDLLevelBrowserLayer::onBack(cocos2d::CCObject* sender) {
-    backActions();
+    if (m_fields->searchObject != nullptr) {
+        backActions();
+    }
     Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::onBack(sender);
 }
 
