@@ -7,7 +7,7 @@ bool EnumInputControl::init(const std::string& labelText, const std::shared_ptr<
 
     // UI
     Utils::createLabel(controlMenu, "bigFont.fnt", labelText, standardComponentWidth, {controlSize.x/2, 45.0f});
-    auto bg = Utils::createLabelForChoice(controlMenu, enumLabel, "bigFont.fnt", "", standardComponentWidth, {controlSize.x/2, 15.0f}, {standardComponentWidth, standardComponentHeight});
+    auto bg = Utils::createLabelForChoice(controlMenu, enumLabel, "bigFont.fnt", "", standardComponentWidth, {controlSize.x/2, 15.0f}, {standardComponentWidth, standardComponentHeight}, "square02b_001.png");
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(EnumInputControl::onEnumValueLeft),
                                      menu_selector(EnumInputControl::onEnumValueRight), 10);
     // association with setting
