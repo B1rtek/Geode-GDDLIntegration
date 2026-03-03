@@ -39,8 +39,8 @@ void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowse
         // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
         const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount());
         forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
-    } else {
-        // fetch more
+    } else if (searching) {
+        // fetch more (if search wasn't canceled)
         const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
         auto req = web::WebRequest();
         req.header("User-Agent", Utils::getUserAgent());

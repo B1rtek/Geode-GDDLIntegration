@@ -18,7 +18,10 @@ struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, Level
     void onPrevPage(CCObject* sender);
     void setIDPopupClosed(SetIDPopup* popup, int value) override;
     void onGoToLastPage(CCObject* sender);
+    void keyBackClicked() override;
+    void onBack(cocos2d::CCObject* sender) override;
 
+    void backActions();
     void setCorrectLabelsText();
     void handleSearchObject(GJSearchObject * searchObject, int resultsCount);
     void assignSearchObject(SearchObject* searchObject);

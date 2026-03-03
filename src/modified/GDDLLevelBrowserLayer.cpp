@@ -48,6 +48,20 @@ void GDDLLevelBrowserLayer::onGoToLastPage(CCObject* sender) {
     }
 }
 
+void GDDLLevelBrowserLayer::keyBackClicked() {
+    backActions();
+    Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::keyBackClicked();
+}
+
+void GDDLLevelBrowserLayer::onBack(cocos2d::CCObject* sender) {
+    backActions();
+    Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::onBack(sender);
+}
+
+void GDDLLevelBrowserLayer::backActions() {
+    m_fields->searchObject->cancelSearch();
+}
+
 void GDDLLevelBrowserLayer::setCorrectLabelsText() {
     // # of results text
     const int firstLevel = m_fields->currentPage * 10 + 1;
