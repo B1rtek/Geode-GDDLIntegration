@@ -40,13 +40,24 @@ void GDDLLevelBrowserLayer::setIDPopupClosed(SetIDPopup* popup, int value) {
     }
 }
 
+void GDDLLevelBrowserLayer::onGoToLastPage(CCObject* sender) {
+    if (m_fields->searchObject != nullptr) {
+        m_fields->searchObject->requestSearchPage(m_fields->searchObject->getTotalApiResultsPageCount() - 1, this);
+    } else {
+        LevelBrowserLayer::onGoToLastPage(sender);
+    }
+}
+
 void GDDLLevelBrowserLayer::setCorrectLabelsText() {
+    // # of results text
     const int firstLevel = m_fields->currentPage * 10 + 1;
     const int lastLevel = std::min(firstLevel + 9, m_fields->searchObject->getTotalApiResultsPageCount());
     m_countText->setString(
-            fmt::format("{} to {} of max. {}", firstLevel, lastLevel, m_fields->searchObject->getTotalApiResultsPageCount())
+            fmt::format("{} to {} of max. {}", firstLevel, lastLevel, m_fields->searchObject->getTotalApiResultsCount())
                     .c_str());
+    // page button
     m_pageBtn->setVisible(true);
+    m_pageText->setString(std::to_string(m_fields->currentPage + 1).c_str());
 }
 
 void GDDLLevelBrowserLayer::handleSearchObject(GJSearchObject * searchObject, int pageToLoad) {
