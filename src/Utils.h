@@ -49,11 +49,11 @@ public:
     static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue, std::string emptyPlaceholder = "");
     static void scaleLabelToWidth(CCLabelBMFont *&label, const float maxWidth);
-    static void createLabel(CCLayer *parent, const std::string &font, const std::string &text, float maxWidth,
-                            const CCPoint &position, int zOrder = 1);
+    static CCLabelBMFont* createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
+                                      const CCPoint& position, int zOrder = 1);
     static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
                                                 const std::string &placeholder, float maxWidth, const CCPoint &position,
-                                                const CCPoint &bgSize, int zOrder = 1);
+                                                const CCPoint &bgSize, const std::string &bgSprite = "square02_small.png", int zOrder = 1);
     static std::function<void(web::WebResponse)> getCacheDownloadLambda(bool notifySuccess = false);
     static CCSprite *getTierSpriteFromName(const char *name);
     static CCSprite *getSpriteFromTier(const int tier);

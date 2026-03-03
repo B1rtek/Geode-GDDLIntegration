@@ -124,21 +124,22 @@ void Utils::scaleLabelToWidth(CCLabelBMFont*& label, const float maxWidth) {
     label->setScale(scale);
 }
 
-void Utils::createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
-    const CCPoint& position, int zOrder) {
+CCLabelBMFont* Utils::createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
+                                  const CCPoint& position, int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
+    return label;
 }
 
 CCScale9Sprite* Utils::createLabelForChoice(CCLayer* parent, CCLabelBMFont*& label, const std::string& font,
-    const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, int zOrder) {
+    const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, const std::string &bgSprite, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
-    const auto bg = CCScale9Sprite::create("square02b_001.png");
+    const auto bg = CCScale9Sprite::create(bgSprite.c_str());
     parent->addChild(bg, zOrder + 1);
     bg->setContentSize(bgSize);
     bg->setScale(0.5f);
