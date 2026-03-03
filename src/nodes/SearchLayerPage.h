@@ -14,7 +14,7 @@ class SearchLayerPage : public cocos2d::CCNode {
 public:
     static SearchLayerPage *create();
 
-    void addControl(SearchInputControl* control, CCMenu* targetGlobalMenu = nullptr);
+    void addControl(SearchInputControl* control, CCMenu* targetGlobalMenu = nullptr, int controlIndex = -1);
     void clearContent();
     void clickOffTextfields();
     void saveSettings();

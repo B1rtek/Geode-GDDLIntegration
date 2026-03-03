@@ -18,9 +18,9 @@ SearchLayerPage* SearchLayerPage::create() {
     }
 }
 
-void SearchLayerPage::addControl(SearchInputControl* control, CCMenu* targetGlobalMenu) {
+void SearchLayerPage::addControl(SearchInputControl* control, CCMenu* targetGlobalMenu, int controlIndex) {
     if (controls.size() >= 9) return;
-    control->setPosition(getControlPosition(controls.size()));
+    control->setPosition(getControlPosition(controlIndex != -1 ? controlIndex : controls.size()));
     this->addChild(control);
     // FUCK TOUCH PRIO
     if (targetGlobalMenu != nullptr) {
