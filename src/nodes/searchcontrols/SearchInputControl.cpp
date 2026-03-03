@@ -9,7 +9,6 @@ bool SearchInputControl::init() {
     controlMenu->setPosition({0.0f, 0.0f});
     controlMenu->setZOrder(2);
     this->addChild(controlMenu);
-    // handleTouchPriority(this);
 
     return true;
 }

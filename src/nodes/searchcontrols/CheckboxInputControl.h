@@ -6,8 +6,11 @@
 
 
 class CheckboxInputControl : public SearchInputControl {
+protected:
     CCMenuItemToggler* settingToggle1 = nullptr;
     CCMenuItemToggler* settingToggle2 = nullptr;
+    CCLabelBMFont* settingLabel1 = nullptr;
+    CCLabelBMFont* settingLabel2 = nullptr;
     std::shared_ptr<SearchSetting<bool>> relatedSetting1 = nullptr;
     std::shared_ptr<SearchSetting<bool>> relatedSetting2 = nullptr;
     bool mutuallyExclusive = false;

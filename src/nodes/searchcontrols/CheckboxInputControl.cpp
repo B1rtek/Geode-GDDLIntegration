@@ -12,12 +12,12 @@ bool CheckboxInputControl::init(const std::string& labelText1,
     settingToggle1 = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(CheckboxInputControl::onToggler1Toggled), 0.8f);
     controlMenu->addChild(settingToggle1, 1);
     settingToggle1->setPosition({25.0f, 45.0f});
-    Utils::createLabel(controlMenu, "bigFont.fnt", labelText1, standardComponentWidth - 20.0f, {85.0f, 45.0f});
+    settingLabel1 = Utils::createLabel(controlMenu, "bigFont.fnt", labelText1, standardComponentWidth - 20.0f, {85.0f, 45.0f});
     if (relatedSetting2 != nullptr) {
         settingToggle2 = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(CheckboxInputControl::onToggler2Toggled), 0.8f);
         controlMenu->addChild(settingToggle2, 1);
         settingToggle2->setPosition({25.0f, 15.0f});
-        Utils::createLabel(controlMenu, "bigFont.fnt", labelText2, standardComponentWidth - 20.0f, {85.0f, 15.0f});
+        settingLabel2 = Utils::createLabel(controlMenu, "bigFont.fnt", labelText2, standardComponentWidth - 20.0f, {85.0f, 15.0f});
     }
     // associate with settings and update values
     this->relatedSetting1 = relatedSetting1;
