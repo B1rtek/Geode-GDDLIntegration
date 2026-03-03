@@ -131,6 +131,11 @@ public:
         }
     }
 
+    void clickOffTextfields() override {
+        this->minTextInput->getInputNode()->onClickTrackNode(false);
+        this->maxTextInput->getInputNode()->onClickTrackNode(false);
+    }
+
     void saveSetting() override {
         this->relatedSetting->setSettingValue(getCurrentValues());
     }

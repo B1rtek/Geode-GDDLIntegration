@@ -16,6 +16,7 @@ public:
 
     void addControl(SearchInputControl* control, CCMenu* targetGlobalMenu = nullptr);
     void clearContent();
+    void clickOffTextfields();
     void saveSettings();
     void reloadSettings();
 

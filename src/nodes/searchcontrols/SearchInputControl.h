@@ -17,6 +17,7 @@ protected:
 public:
     static SearchInputControl *create();
     void relocateToGlobalMenu(CCMenu* popupMainMenu);
+    virtual void clickOffTextfields() {};
     
     virtual void saveSetting() {};
     virtual void loadSetting() {};

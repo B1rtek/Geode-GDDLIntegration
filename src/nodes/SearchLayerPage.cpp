@@ -36,6 +36,12 @@ void SearchLayerPage::clearContent() {
     controls.clear();
 }
 
+void SearchLayerPage::clickOffTextfields() {
+    for (const auto control : controls) {
+        control->clickOffTextfields();
+    }
+}
+
 void SearchLayerPage::saveSettings() {
     for (const auto control : controls) {
         control->saveSetting();
