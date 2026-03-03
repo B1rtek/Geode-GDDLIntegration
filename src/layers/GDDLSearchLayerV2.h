@@ -31,6 +31,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer {
     void reloadAfterSwitchingPage();
     void displayPage(int pageNumber);
     void updatePageNumberLabel();
+    void setTopBarVisibility(bool visibility);
     void backActions();
     void clickOffTextfields();
 

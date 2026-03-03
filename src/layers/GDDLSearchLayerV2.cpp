@@ -6,6 +6,7 @@
 #include <nodes/searchcontrols/TextInputControl.h>
 #include <nodes/searchcontrols/RangeInputControl.h>
 #include <nodes/searchcontrols/CheckboxInputControl.h>
+#include <nodes/searchcontrols/SimplifiedSearchControl.h>
 
 bool GDDLSearchLayerV2::init() {
     if (!FLAlertLayer::init(150))
@@ -97,9 +98,11 @@ void GDDLSearchLayerV2::reloadAfterSwitchingPage() {
 
 void GDDLSearchLayerV2::displayPage(int pageNumber) {
     currentPage->clearContent();
+    setTopBarVisibility(true);
     if (pageNumber == 0) {
         // simplified search page
-
+        setTopBarVisibility(false);
+        currentPage->addControl(SimplifiedSearchControl::create(&searchObject), m_buttonMenu, 2);
     } else if (pageNumber == 1) {
         // first page
         currentPage->addControl(EnumInputControl::create("Top skillset", searchObject.getTopSkillsetSetting()), m_buttonMenu);
@@ -121,7 +124,6 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
         currentPage->addControl(TextInputControl::create("Creator", searchObject.getCreatorNameSetting()));
         currentPage->addControl(TextInputControl::create("Song", searchObject.getSongNameSetting()));
         currentPage->addControl(CheckboxInputControl::create("Is in pack", searchObject.getIsInPackSetting()), m_buttonMenu);
-
     } else if (pageNumber == 3) {
         currentPage->addControl(RangeInputControl<int>::create("Level ID", searchObject.getIdsRangeSetting(), true), m_buttonMenu);
     }
@@ -131,6 +133,12 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
 void GDDLSearchLayerV2::updatePageNumberLabel() {
     pageNumberLabel->setString(pageNames[currentPageNumber].c_str());
     Utils::scaleLabelToWidth(pageNumberLabel, 110.0f);
+}
+
+void GDDLSearchLayerV2::setTopBarVisibility(const bool visibility) {
+    levelNameTextInput->setVisible(visibility);
+    searchButton->setVisible(visibility);
+    resetButton->setVisible(visibility);
 }
 
 void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
@@ -186,7 +194,15 @@ void GDDLSearchLayerV2::backActions() {
 void GDDLSearchLayerV2::clickOffTextfields() {
     currentPage->clickOffTextfields();
     this->levelNameTextInput->getInputNode()->onClickTrackNode(false);
-    typeinfo_cast<CCTextInputNode*>(getParent()->getChildByIDRecursive("search-bar"))->onClickTrackNode(false);
+    // why are you dynamic casting without checking the result - Cvolton #39 #40
+    // I'm preserving this comment because it's funny
+    const auto parent = getParent();
+    if (parent == nullptr) return;
+    const auto searchBar = parent->getChildByIDRecursive("search-bar");
+    if (searchBar == nullptr) return;
+    const auto searchBarTextInputNode = dynamic_cast<CCTextInputNode*>(searchBar);
+    if (searchBarTextInputNode == nullptr) return;
+    searchBarTextInputNode->onClickTrackNode(false);
 }
 
 GDDLSearchLayerV2* GDDLSearchLayerV2::create() {
