@@ -15,26 +15,28 @@ void GDDLLevelBrowserLayer::loadLevelsFinished(cocos2d::CCArray * p0, char const
 }
 
 void GDDLLevelBrowserLayer::onNextPage(CCObject * sender) {
-    LevelBrowserLayer::onNextPage(sender);
     if (m_fields->searchObject != nullptr) {
         m_fields->currentPage = std::min(m_fields->currentPage + 1, m_fields->searchObject->getTotalApiResultsPageCount() - 1);
         m_fields->searchObject->requestSearchPage(m_fields->currentPage, this);
+    } else {
+        LevelBrowserLayer::onNextPage(sender);
     }
 }
 
 void GDDLLevelBrowserLayer::onPrevPage(CCObject * sender) {
-    LevelBrowserLayer::onPrevPage(sender);
     if (m_fields->searchObject != nullptr) {
         m_fields->currentPage = std::max(0, m_fields->currentPage - 1);
         m_fields->searchObject->requestSearchPage(m_fields->currentPage, this);
+    } else {
+        LevelBrowserLayer::onPrevPage(sender);
     }
 }
 
-void GDDLLevelBrowserLayer::onGoToPage(CCObject* sender) {// left here in case this is doable in the future
-    LevelBrowserLayer::onGoToPage(sender);
+void GDDLLevelBrowserLayer::setIDPopupClosed(SetIDPopup* popup, int value) {
     if (m_fields->searchObject != nullptr) {
-        const int pageTarget = std::stoi(m_pageText->getString());
-        m_fields->searchObject->requestSearchPage(pageTarget, this);
+        m_fields->searchObject->requestSearchPage(value - 1, this);
+    } else {
+        Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::setIDPopupClosed(popup, value);
     }
 }
 
@@ -44,6 +46,7 @@ void GDDLLevelBrowserLayer::setCorrectLabelsText() {
     m_countText->setString(
             fmt::format("{} to {} of max. {}", firstLevel, lastLevel, m_fields->searchObject->getTotalApiResultsPageCount())
                     .c_str());
+    m_pageBtn->setVisible(true);
 }
 
 void GDDLLevelBrowserLayer::handleSearchObject(GJSearchObject * searchObject, int pageToLoad) {
