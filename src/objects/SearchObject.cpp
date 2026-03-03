@@ -36,7 +36,9 @@ void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowse
     if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
         GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize, filteredResults);
-        forwardToLevelBrowser(gjSearchObject, callingLayer);
+        // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
+        const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount());
+        forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
     } else {
         // fetch more
         const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
@@ -147,11 +149,11 @@ std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requeste
     };
 }
 
-void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer) {
+void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber) {
     if (!searching) return; // search can be canceled externally by the browser layer which might no longer exist
     searching = false;
     if (callingLayer != nullptr) {
-        callingLayer->handleSearchObject(gjSearchObject, results.size());
+        callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
         return;
     }
     const auto listLayer = static_cast<GDDLLevelBrowserLayer*>(GDDLLevelBrowserLayer::create(gjSearchObject));
@@ -211,7 +213,7 @@ int SearchObject::getTotalApiResultsCount() {
 }
 
 int SearchObject::getTotalApiResultsPageCount() {
-    return this->totalApiResultsCount % 10 ? this->totalApiResultsCount / 10 : this->totalApiResultsCount / 10 + 1;
+    return this->totalApiResultsCount % inGameResultsPageSize ? this->totalApiResultsCount / inGameResultsPageSize : this->totalApiResultsCount / inGameResultsPageSize + 1;
 }
 
 std::shared_ptr<EnumSearchSetting> SearchObject::getSortSetting() {

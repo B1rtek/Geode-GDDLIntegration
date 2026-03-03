@@ -99,7 +99,7 @@ class SearchObject {
     std::vector<int> filterResults(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
     bool isPageReady(int pageNumber, const std::vector<int>& filteredResults) const;
     std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer);
-    void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer);
+    void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber);
 
 public:
     SearchObject() = default;
