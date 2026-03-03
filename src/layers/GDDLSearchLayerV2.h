@@ -23,6 +23,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer {
     // normal popup stuff
     bool init() override;
     void onClose(CCObject *sender);
+    void keyBackClicked() override;
 
     // internal ui methods
     void createBaseUI();
@@ -30,6 +31,8 @@ class GDDLSearchLayerV2 : public FLAlertLayer {
     void reloadAfterSwitchingPage();
     void displayPage(int pageNumber);
     void updatePageNumberLabel();
+    void backActions();
+    void clickOffTextfields();
 
     // callbacks
     void onSearchClicked(CCObject* sender);

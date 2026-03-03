@@ -136,6 +136,7 @@ void GDDLSearchLayerV2::updatePageNumberLabel() {
 void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
     currentPage->saveSettings();
     searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
+    clickOffTextfields();
     searchObject.performInitialSearch();
 }
 
@@ -162,11 +163,30 @@ void GDDLSearchLayerV2::onPageRightClicked(CCObject* sender) {
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
+    backActions();
+}
+
+void GDDLSearchLayerV2::keyBackClicked() {
+    FLAlertLayer::keyBackClicked();
+    backActions();
+}
+
+void GDDLSearchLayerV2::backActions() {
+    // save settings
     currentPage->saveSettings();
     searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
     searchObject.saveSettings();
+    // click off textfields
+    clickOffTextfields();
+    // the rest idk
     setKeypadEnabled(false);
     removeFromParentAndCleanup(true);
+}
+
+void GDDLSearchLayerV2::clickOffTextfields() {
+    currentPage->clickOffTextfields();
+    this->levelNameTextInput->getInputNode()->onClickTrackNode(false);
+    typeinfo_cast<CCTextInputNode*>(getParent()->getChildByIDRecursive("search-bar"))->onClickTrackNode(false);
 }
 
 GDDLSearchLayerV2* GDDLSearchLayerV2::create() {
