@@ -22,8 +22,10 @@ bool SimplifiedSearchControl::init(SearchObject* searchObject) {
             controlMenu->addChild(tierNode);
         }
     }
-    // associate with SearchObject and load value
-    this->searchObject = searchObject;
+    // Copy only the necessary values from searchObject
+    this->searchObject = SearchObject();
+    this->searchObject.getCompletedSetting()->setSettingValue(searchObject->getCompletedSetting()->getSettingValue());
+    this->searchObject.getUncompletedSetting()->setSettingValue(searchObject->getUncompletedSetting()->getSettingValue());
 
     return true;
 }
@@ -48,13 +50,14 @@ void SimplifiedSearchControl::onTierSearch(CCObject* sender) {
     const int end = tierStr.size();
     const std::string tierNumberStr = tierStr.substr(start, end - start);
     const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
-    if (!maybeTierNumber.isOk()) {
-        // TODO change this into Notification
-        FLAlertLayer::create("Error", "Invalid tier number", "OK")->show();
+    if (maybeTierNumber.isErr()) {
+        Notification::create("Invalid tier number", NotificationIcon::Error, 2)->show();
         return;
     }
     // search
-    log::info("Tier clicked: {}", maybeTierNumber.unwrap());
+    this->saveSetting();
+    searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
+    searchObject.performInitialSearch();
 }
 
 SimplifiedSearchControl* SimplifiedSearchControl::create(SearchObject* searchObject) {
