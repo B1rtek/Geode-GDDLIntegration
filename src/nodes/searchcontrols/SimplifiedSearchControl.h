@@ -5,7 +5,7 @@
 
 #include "CheckboxInputControl.h"
 
-class SimplifiedSearchControl : public CheckboxInputControl {
+class SimplifiedSearchControl : public CheckboxInputControl, public ILoadingCircleHaver {
     // abomination
     static constexpr float spacing = 35.0f;
     static constexpr int rows = 5;
@@ -18,6 +18,9 @@ class SimplifiedSearchControl : public CheckboxInputControl {
     void onTierSearch(CCObject* sender);
 public:
     static SimplifiedSearchControl* create(SearchObject* searchObject);
+
+    void showLoadingCircle() override;
+    void hideLoadingCircle() override;
 };
 
 

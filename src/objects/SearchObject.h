@@ -9,6 +9,7 @@
 #include "searchsettings/RangeSearchSetting.h"
 #include "searchsettings/TextSearchSetting.h"
 #include "searchsettings/BoolSearchSetting.h"
+#include "ILoadingCircleHaver.h"
 
 struct GDDLLevelBrowserLayer; // circular import oops
 
@@ -94,12 +95,14 @@ class SearchObject {
     std::string createSearchParametersString();
     std::string createFullSearchQuery(const std::string& queryParameters);
     GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex, std::vector<int> filteredResults) const;
-    void getSearchResultsForPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer);
+    void getSearchResultsForPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver);
     Result<std::vector<int>> parseApiResponse(const std::string& response);
     std::vector<int> filterResults(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
     bool isPageReady(int pageNumber, const std::vector<int>& filteredResults) const;
-    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer);
-    void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber);
+    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver);
+    void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber, ILoadingCircleHaver*
+                               loadingCircleHaver);
+    void endSearch(ILoadingCircleHaver* loadingCircleHaver);
 
 public:
     SearchObject() = default;
@@ -110,12 +113,13 @@ public:
     void resetToDefaults();
 
     // search handling
-    void performInitialSearch();
+    void performInitialSearch(ILoadingCircleHaver* loadingCircleHaver);
     void requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer);
     void cancelSearch();
 
     int getTotalApiResultsCount();
     int getTotalApiResultsPageCount();
+    bool isSearching();
 
     std::shared_ptr<EnumSearchSetting> getSortSetting();
     std::shared_ptr<EnumSearchSetting> getSortDirectionSetting();

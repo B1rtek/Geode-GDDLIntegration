@@ -57,7 +57,7 @@ void SimplifiedSearchControl::onTierSearch(CCObject* sender) {
     // search
     this->saveSetting();
     searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
-    searchObject.performInitialSearch();
+    searchObject.performInitialSearch(this);
 }
 
 SimplifiedSearchControl* SimplifiedSearchControl::create(SearchObject* searchObject) {
@@ -68,4 +68,12 @@ SimplifiedSearchControl* SimplifiedSearchControl::create(SearchObject* searchObj
         delete newNode;
         return nullptr;
     }
+}
+
+void SimplifiedSearchControl::showLoadingCircle() {
+
+}
+
+void SimplifiedSearchControl::hideLoadingCircle() {
+
 }

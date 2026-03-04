@@ -119,9 +119,12 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     const std::string tierNumberStr = tierStr.substr(start, end - start);
     const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
     if (maybeTierNumber.isOk()) {
-        searchObject.getCompletedSetting()->setSettingValue(true);
-        searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
-        searchObject.performInitialSearch();
+        if (!searchObject.isSearching()) {
+            showLoadingCircle();
+            searchObject.getCompletedSetting()->setSettingValue(true);
+            searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
+            searchObject.performInitialSearch(this);
+        }
     } else {
         Notification::create("Invalid tier number", NotificationIcon::Warning, 2)->show();
     }
@@ -162,6 +165,22 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {
     return tierNode;
 }
 
+GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {
+    // ReSharper disable once CppDFAConstantConditions
+    if (const auto newLayer = new GDDLDemonSplitLayer(); newLayer != nullptr && newLayer->init()) {
+        newLayer->autorelease();
+        return newLayer;
+    } else {
+        delete newLayer;
+        return nullptr;
+    }
+}
+
+void GDDLDemonSplitLayer::show() {
+    FLAlertLayer::show();
+    cocos::handleTouchPriority(this);
+}
+
 void GDDLDemonSplitLayer::showLoadingCircle() {
     // ugh the layout I made for this is so god awful
     const auto loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
@@ -183,20 +202,3 @@ void GDDLDemonSplitLayer::hideLoadingCircle() {
         m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
     }
 }
-
-GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {
-    // ReSharper disable once CppDFAConstantConditions
-    if (const auto newLayer = new GDDLDemonSplitLayer(); newLayer != nullptr && newLayer->init()) {
-        newLayer->autorelease();
-        return newLayer;
-    } else {
-        delete newLayer;
-        return nullptr;
-    }
-}
-
-void GDDLDemonSplitLayer::show() {
-    FLAlertLayer::show();
-    cocos::handleTouchPriority(this);
-}
-

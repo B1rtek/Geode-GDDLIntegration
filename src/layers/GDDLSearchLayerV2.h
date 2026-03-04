@@ -8,7 +8,7 @@
 
 using namespace geode::prelude;
 
-class GDDLSearchLayerV2 : public FLAlertLayer {
+class GDDLSearchLayerV2 : public FLAlertLayer, public ILoadingCircleHaver {
     constexpr static CCPoint popupSize = {440.0f, 290.0f};
     const inline static std::vector<std::string> pageNames = {"Simplified search", "Page 1", "Page 2", "Page 3"};
 
@@ -44,6 +44,9 @@ public:
     // normal popup stuff
     static GDDLSearchLayerV2* create();
     void show() override;
+
+    void showLoadingCircle() override;
+    void hideLoadingCircle() override;
 };
 
 

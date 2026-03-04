@@ -7,7 +7,7 @@
 
 using namespace geode::prelude;
 
-class GDDLDemonSplitLayer final : public FLAlertLayer {
+class GDDLDemonSplitLayer final : public FLAlertLayer, public ILoadingCircleHaver {
     static constexpr int rows = 5;
     static constexpr int columns = Values::highestTier % rows == 0 ? Values::highestTier / rows : Values::highestTier / rows + 1;
     CCMenuItemSpriteExtra* m_closeBtn{};
@@ -22,14 +22,14 @@ class GDDLDemonSplitLayer final : public FLAlertLayer {
     void onEnter() override;
 
     CCNode* createTierNode(int tier, int count);
-    void showLoadingCircle();
 public:
     bool wasClosed = false;
 
     static GDDLDemonSplitLayer* create();
     void show() override;
 
-    void hideLoadingCircle();
+    void showLoadingCircle() override;
+    void hideLoadingCircle() override;
 };
 
 

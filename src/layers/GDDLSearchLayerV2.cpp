@@ -145,7 +145,7 @@ void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
     currentPage->saveSettings();
     searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
     clickOffTextfields();
-    searchObject.performInitialSearch();
+    searchObject.performInitialSearch(this);
 }
 
 void GDDLSearchLayerV2::onResetClicked(CCObject* sender) {
@@ -220,4 +220,12 @@ GDDLSearchLayerV2* GDDLSearchLayerV2::create() {
 void GDDLSearchLayerV2::show() {
     FLAlertLayer::show();
     cocos::handleTouchPriority(this);
+}
+
+void GDDLSearchLayerV2::showLoadingCircle() {
+
+}
+
+void GDDLSearchLayerV2::hideLoadingCircle() {
+
 }

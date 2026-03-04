@@ -31,20 +31,20 @@ GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long 
     return GJSearchObject::create(SearchType::Type19, requestString);
 }
 
-void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
+void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
     const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
     if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
         GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize, filteredResults);
         // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
         const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount());
-        forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
+        forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber, loadingCircleHaver);
     } else if (searching) {
         // fetch more (if search wasn't canceled)
         const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
         auto req = web::WebRequest();
         req.header("User-Agent", Utils::getUserAgent());
-        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(pageNumber, callingLayer));
+        searchTaskHolder.spawn(req.get(apiSearchQuery), getSearchLambda(pageNumber, callingLayer, loadingCircleHaver));
     }
 }
 
@@ -121,15 +121,15 @@ bool SearchObject::isPageReady(const int pageNumber, const std::vector<int>& fil
     return filteredResults.size() >= (pageNumber + 1) * inGameResultsPageSize;
 }
 
-std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer) {
-    return [this, requestedPage, callingLayer](web::WebResponse res) {
+std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
+    return [this, requestedPage, callingLayer, loadingCircleHaver](web::WebResponse res) {
         if (res.code() != 200) {
             const auto jsonResponse = res.json().unwrapOr(matjson::Value());
             const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
             log::error("SearchObject::getSearchLambda: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
-            searching = false;
+            endSearch(loadingCircleHaver);
             return;
         }
         Result<std::vector<int>> parsedResponse = parseApiResponse(res.string().unwrapOrDefault());
@@ -137,7 +137,7 @@ std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requeste
             const std::string errorMessage = "GDDL: Search failed - " + parsedResponse.unwrapErr();
             Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
             log::error("SearchObject::getSearchLambda: {}", parsedResponse.unwrapErr());
-            searching = false;
+            endSearch(loadingCircleHaver);
             return;
         }
         for (const auto id : parsedResponse.unwrap()) {
@@ -145,13 +145,14 @@ std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requeste
         }
         ++apiPagesFetched;
         // const std::vector<int> filteredResults = filterResults(parsedResponse.unwrap(), completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
-        getSearchResultsForPage(requestedPage, callingLayer);
+        getSearchResultsForPage(requestedPage, callingLayer, loadingCircleHaver);
     };
 }
 
-void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber) {
+void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber, ILoadingCircleHaver*
+                                         loadingCircleHaver) {
     if (!searching) return; // search can be canceled externally by the browser layer which might no longer exist
-    searching = false;
+    endSearch(loadingCircleHaver);
     if (callingLayer != nullptr) {
         callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
         return;
@@ -162,6 +163,13 @@ void SearchObject::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLev
     listLayerScene->addChild(listLayer);
     const auto transition = CCTransitionFade::create(0.5, listLayerScene);
     CCDirector::sharedDirector()->pushScene(transition);
+}
+
+void SearchObject::endSearch(ILoadingCircleHaver* loadingCircleHaver) {
+    if (loadingCircleHaver != nullptr) {
+        loadingCircleHaver->hideLoadingCircle();
+    }
+    searching = false;
 }
 
 void SearchObject::loadSettings() {
@@ -182,7 +190,7 @@ void SearchObject::resetToDefaults() {
     }
 }
 
-void SearchObject::performInitialSearch() {
+void SearchObject::performInitialSearch(ILoadingCircleHaver* loadingCircleHaver) {
     if (searching) return;
     searching = true;
     const std::string searchParameters = createSearchParametersString();
@@ -194,13 +202,13 @@ void SearchObject::performInitialSearch() {
         totalApiResultsCount = 0;
         apiResultsProcessedCount = 0;
     }
-    getSearchResultsForPage(0, nullptr);
+    getSearchResultsForPage(0, nullptr, loadingCircleHaver);
 }
 
 void SearchObject::requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
     if (searching) return;
     searching = true;
-    getSearchResultsForPage(pageNumber, callingLayer);
+    getSearchResultsForPage(pageNumber, callingLayer, nullptr);
 }
 
 void SearchObject::cancelSearch() {
@@ -214,6 +222,10 @@ int SearchObject::getTotalApiResultsCount() {
 
 int SearchObject::getTotalApiResultsPageCount() {
     return this->totalApiResultsCount % inGameResultsPageSize ? this->totalApiResultsCount / inGameResultsPageSize : this->totalApiResultsCount / inGameResultsPageSize + 1;
+}
+
+bool SearchObject::isSearching() {
+    return this->searching;
 }
 
 std::shared_ptr<EnumSearchSetting> SearchObject::getSortSetting() {
