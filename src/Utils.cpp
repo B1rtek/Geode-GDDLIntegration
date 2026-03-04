@@ -377,3 +377,22 @@ Result<std::string_view> Utils::getSpriteNodeFrameName(CCSprite* sprite) {
 
     return Ok(frameName);
 }
+
+char Utils::toHex(int number) {
+    if (number < 10) return static_cast<char>(48 + number);
+    return static_cast<char>(55 + number);
+}
+
+std::string Utils::urlEncode(const std::string& input) {
+    std::string result;
+    for (const char c : input) {
+        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            result += c;
+        } else {
+            result += '%';
+            result += toHex(c/16);
+            result += toHex(c%16);
+        }
+    }
+    return result;
+}

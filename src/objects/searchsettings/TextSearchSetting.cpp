@@ -1,5 +1,7 @@
 #include "TextSearchSetting.h"
 
+#include <Utils.h>
+
 TextSearchSetting::TextSearchSetting(const std::string& settingKey, const std::string& defaultValue, const unsigned maxLength): SearchSetting(settingKey, defaultValue), maxLength(maxLength) {}
 
 void TextSearchSetting::setSettingValue(const std::string value) {
@@ -15,7 +17,7 @@ void TextSearchSetting::loadSetting() {
 
 std::string TextSearchSetting::getSearchQueryFragment() {
     if (this->value != this->defaultValue) {
-        return "&" + this->searchQueryParameterName + "=" + this->value;
+        return "&" + this->searchQueryParameterName + "=" + Utils::urlEncode(this->value);
     }
     return "";
 }

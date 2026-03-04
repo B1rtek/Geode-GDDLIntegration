@@ -71,6 +71,8 @@ public:
     static std::string getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse& res);
     static void addAuthHeader(web::WebRequest &req);
     static Result<std::string_view> getSpriteNodeFrameName(CCSprite* sprite);
+    static char toHex(int number);
+    static std::string urlEncode(const std::string& input);
 };
 
 template <typename T>
