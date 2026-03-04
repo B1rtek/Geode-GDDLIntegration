@@ -7,6 +7,10 @@ bool SimplifiedSearchControl::init(SearchObject* searchObject) {
     this->setContentSize(controlSize * 3);
     controlMenu->setContentSize(controlSize * 3);
     this->updateLayout();
+    loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setPosition({290.0f, 228.0f});
+    loadingSpinner->setVisible(false);
+    controlMenu->addChild(loadingSpinner);
     // checkboxes and labels are handled by CheckboxInputControl, we can move them around however
     settingToggle1->setPosition({90.0f, 15.0f});
     settingLabel1->setPosition({150.0f, 15.0f});
@@ -43,6 +47,7 @@ CCMenuItemSpriteExtra* SimplifiedSearchControl::createTierNode(const int tier) {
 }
 
 void SimplifiedSearchControl::onTierSearch(CCObject* sender) {
+    if (searchObject.isSearching()) return;
     // get the tier number
     auto *senderNode = typeinfo_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
@@ -55,6 +60,7 @@ void SimplifiedSearchControl::onTierSearch(CCObject* sender) {
         return;
     }
     // search
+    showLoadingCircle();
     this->saveSetting();
     searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
     searchObject.performInitialSearch(this);
@@ -71,9 +77,9 @@ SimplifiedSearchControl* SimplifiedSearchControl::create(SearchObject* searchObj
 }
 
 void SimplifiedSearchControl::showLoadingCircle() {
-
+    loadingSpinner->setVisible(true);
 }
 
 void SimplifiedSearchControl::hideLoadingCircle() {
-
+    loadingSpinner->setVisible(false);
 }

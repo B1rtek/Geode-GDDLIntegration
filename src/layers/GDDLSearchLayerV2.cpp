@@ -63,6 +63,11 @@ void GDDLSearchLayerV2::recreateMainButtonMenu() {
     title->setPosition({220.0f, -10.0f});
     title->setScale(0.7f);
     title->setID("gddl-demon-search-title"_spr);
+    // loading circle
+    loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setPosition({295.0f, -12.0f});
+    loadingSpinner->setVisible(false);
+    m_buttonMenu->addChild(loadingSpinner);
 
     // base controls - level name input field, search and clear buttons, page switching buttons, page number label
     // level name input field
@@ -142,6 +147,8 @@ void GDDLSearchLayerV2::setTopBarVisibility(const bool visibility) {
 }
 
 void GDDLSearchLayerV2::onSearchClicked(CCObject* sender) {
+    if (searchObject.isSearching()) return;
+    showLoadingCircle();
     currentPage->saveSettings();
     searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
     clickOffTextfields();
@@ -223,9 +230,9 @@ void GDDLSearchLayerV2::show() {
 }
 
 void GDDLSearchLayerV2::showLoadingCircle() {
-
+    loadingSpinner->setVisible(true);
 }
 
 void GDDLSearchLayerV2::hideLoadingCircle() {
-
+    loadingSpinner->setVisible(false);
 }

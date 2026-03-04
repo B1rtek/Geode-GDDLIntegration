@@ -12,6 +12,7 @@ class SimplifiedSearchControl : public CheckboxInputControl, public ILoadingCirc
     static constexpr int columns = Values::highestTier % rows == 0 ? Values::highestTier / rows : Values::highestTier / rows + 1;
     static constexpr CCPoint tiersGridPosition = {95.0f, 190.0f};
     SearchObject searchObject;
+    LoadingSpinner* loadingSpinner = nullptr;
 
     bool init(SearchObject* searchObject);
     CCMenuItemSpriteExtra* createTierNode(const int tier);

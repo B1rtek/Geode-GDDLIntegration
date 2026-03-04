@@ -17,6 +17,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer, public ILoadingCircleHaver {
     CCMenuItemSpriteExtra* searchButton = nullptr;
     CCMenuItemSpriteExtra* resetButton = nullptr;
     CCLabelBMFont* pageNumberLabel = nullptr;
+    LoadingSpinner* loadingSpinner = nullptr;
     SearchLayerPage* currentPage = nullptr;
     SearchObject searchObject = SearchObject();
 
