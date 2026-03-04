@@ -42,11 +42,11 @@ bool GDDLDemonSplitLayer::init() {
 
     // this is where the tiers go
     std::map<int, int> tierStats = RatingsManager::getTierStats();
-    for (int row = 0; row < 5; row++) {
+    for (int row = 0; row < rows; row++) {
         const auto rowNode = CCNode::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
         rowNode->setContentSize({390.0f, 20.0f});
-        for (int column = 0; column < 8; column++) {
+        for (int column = 0; column < columns; column++) {
             const int targetTier = row+1+column*5;
             if (targetTier <= Values::highestTier) {
                 const auto tierNode = createTierNode(targetTier, tierStats[targetTier]);
@@ -72,6 +72,10 @@ bool GDDLDemonSplitLayer::init() {
     m_mainLayer->updateLayout();
     // fix the iButton :tm: placement (is it clear already that I never did frontend)
     iButton->setPosition({iButton->getPositionX(), 15.0f});
+
+    // better search wohoo
+    searchObject = SearchObject();
+
     return true;
 }
 
@@ -115,13 +119,9 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     const std::string tierNumberStr = tierStr.substr(start, end - start);
     const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
     if (maybeTierNumber.isOk()) {
-        if (!GDDLSearchLayer::isSearching()) {
-            GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
-            // the list should display itself hopefully
-            showLoadingCircle();
-        } else {
-            Notification::create("Already searching...", NotificationIcon::Info, 1)->show();
-        }
+        searchObject.getCompletedSetting()->setSettingValue(true);
+        searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
+        searchObject.performInitialSearch();
     } else {
         Notification::create("Invalid tier number", NotificationIcon::Warning, 2)->show();
     }
