@@ -15,7 +15,7 @@ void GDDLLevelBrowserLayer::loadLevelsFinished(cocos2d::CCArray * p0, char const
 
 void GDDLLevelBrowserLayer::onNextPage(CCObject * sender) {
     if (m_fields->searchObject != nullptr) {
-        m_fields->currentPage = std::min(m_fields->currentPage + 1, m_fields->searchObject->getTotalApiResultsPageCount() - 1);
+        m_fields->currentPage = std::min(m_fields->currentPage + 1, m_fields->searchObject->getTotalApiResultsPageCount());
         m_fields->searchObject->requestSearchPage(m_fields->currentPage, this);
     } else {
         LevelBrowserLayer::onNextPage(sender);
@@ -36,14 +36,6 @@ void GDDLLevelBrowserLayer::setIDPopupClosed(SetIDPopup* popup, int value) {
         m_fields->searchObject->requestSearchPage(value - 1, this);
     } else {
         Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::setIDPopupClosed(popup, value);
-    }
-}
-
-void GDDLLevelBrowserLayer::onGoToLastPage(CCObject* sender) {
-    if (m_fields->searchObject != nullptr) {
-        m_fields->searchObject->requestSearchPage(m_fields->searchObject->getTotalApiResultsPageCount() - 1, this);
-    } else {
-        LevelBrowserLayer::onGoToLastPage(sender);
     }
 }
 
@@ -68,7 +60,7 @@ void GDDLLevelBrowserLayer::backActions() {
 void GDDLLevelBrowserLayer::setCorrectLabelsText() {
     // # of results text
     const int firstLevel = m_fields->currentPage * 10 + 1;
-    const int lastLevel = std::min(firstLevel + 9, m_fields->searchObject->getTotalApiResultsPageCount());
+    const int lastLevel = std::min(firstLevel + 9, m_fields->searchObject->getTotalApiResultsCount());
     m_countText->setString(
             fmt::format("{} to {} of max. {}", firstLevel, lastLevel, m_fields->searchObject->getTotalApiResultsCount())
                     .c_str());
@@ -90,6 +82,6 @@ void GDDLLevelBrowserLayer::assignSearchObject(SearchObject* searchObject) {
 
 void GDDLLevelBrowserLayer::updateAfterInitialLoad() {
     m_leftArrow->setVisible(m_fields->currentPage > 0);
-    m_rightArrow->setVisible(m_fields->currentPage < m_fields->searchObject->getTotalApiResultsPageCount() - 1);
+    m_rightArrow->setVisible(m_fields->currentPage < m_fields->searchObject->getTotalApiResultsPageCount());
     setCorrectLabelsText();
 }

@@ -35,9 +35,9 @@ void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowse
     const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
     if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
-        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(pageNumber * inGameResultsPageSize, filteredResults);
+        const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount() - 1);
+        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(actualPageNumber * inGameResultsPageSize, filteredResults);
         // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
-        const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount());
         forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber, loadingCircleHaver);
     } else if (searching) {
         // fetch more (if search wasn't canceled)
