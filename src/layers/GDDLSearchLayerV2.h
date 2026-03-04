@@ -12,7 +12,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer, public ILoadingCircleHaver {
     constexpr static CCPoint popupSize = {440.0f, 290.0f};
     const inline static std::vector<std::string> pageNames = {"Simplified search", "Page 1", "Page 2", "Page 3"};
 
-    int currentPageNumber = 1;
+    int currentPageNumber = Mod::get()->getSavedValue<int>("search-pageNumber", 1);
     TextInput* levelNameTextInput = nullptr;
     CCMenuItemSpriteExtra* searchButton = nullptr;
     CCMenuItemSpriteExtra* resetButton = nullptr;

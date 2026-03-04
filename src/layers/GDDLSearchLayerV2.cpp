@@ -191,6 +191,7 @@ void GDDLSearchLayerV2::backActions() {
     currentPage->saveSettings();
     searchObject.getLevelNameSetting()->setSettingValue(this->levelNameTextInput->getString());
     searchObject.saveSettings();
+    Mod::get()->setSavedValue("search-pageNumber", currentPageNumber);
     // click off textfields
     clickOffTextfields();
     // the rest idk
