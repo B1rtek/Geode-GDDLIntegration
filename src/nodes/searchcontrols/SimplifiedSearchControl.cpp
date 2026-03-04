@@ -26,10 +26,8 @@ bool SimplifiedSearchControl::init(SearchObject* searchObject) {
             controlMenu->addChild(tierNode);
         }
     }
-    // Copy only the necessary values from searchObject
+    // Create local SearchObject
     this->searchObject = SearchObject();
-    this->searchObject.getCompletedSetting()->setSettingValue(searchObject->getCompletedSetting()->getSettingValue());
-    this->searchObject.getUncompletedSetting()->setSettingValue(searchObject->getUncompletedSetting()->getSettingValue());
 
     return true;
 }
@@ -62,6 +60,8 @@ void SimplifiedSearchControl::onTierSearch(CCObject* sender) {
     // search
     showLoadingCircle();
     this->saveSetting();
+    searchObject.getCompletedSetting()->setSettingValue(relatedSetting1->getSettingValue());
+    searchObject.getUncompletedSetting()->setSettingValue(relatedSetting2->getSettingValue());
     searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
     searchObject.performInitialSearch(this);
 }
