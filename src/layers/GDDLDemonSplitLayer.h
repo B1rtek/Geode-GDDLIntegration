@@ -11,6 +11,8 @@ class GDDLDemonSplitLayer final : public FLAlertLayer, public ILoadingCircleHave
     static constexpr int rows = 5;
     static constexpr int columns = Values::highestTier % rows == 0 ? Values::highestTier / rows : Values::highestTier / rows + 1;
     CCMenuItemSpriteExtra* m_closeBtn{};
+    CCLabelBMFont* loadingLabel = nullptr;
+    LoadingSpinner* loadingSpinner = nullptr;
     SearchObject searchObject;
 
     bool init() override;

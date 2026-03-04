@@ -73,6 +73,22 @@ bool GDDLDemonSplitLayer::init() {
     // fix the iButton :tm: placement (is it clear already that I never did frontend)
     iButton->setPosition({iButton->getPositionX(), 15.0f});
 
+    // loading label and circle
+    // ugh the layout I made for this is so god awful
+    loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
+    loadingLabel->setScale(0.7f);
+    loadingLabel->setAnchorPoint({1.0f, 0.5f});
+    loadingLabel->setPosition({m_buttonMenu->getContentWidth() - 30.0f, dynamic_cast<CCMenuItemSpriteExtra*>(m_buttonMenu->getChildByIDRecursive("gddl-demon-split-ok"_spr))->getPositionY()});
+    loadingLabel->setID("gddl-demon-split-loading-label"_spr);
+    loadingLabel->setVisible(false);
+    m_buttonMenu->addChild(loadingLabel);
+    loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
+    loadingSpinner->setPosition({loadingLabel->getPositionX() + 5.0f, loadingLabel->getPositionY()});
+    loadingSpinner->setID("gddl-demon-split-loading-spinner"_spr);
+    loadingSpinner->setVisible(false);
+    m_buttonMenu->addChild(loadingSpinner);
+
     // better search wohoo
     searchObject = SearchObject();
 
@@ -182,23 +198,11 @@ void GDDLDemonSplitLayer::show() {
 }
 
 void GDDLDemonSplitLayer::showLoadingCircle() {
-    // ugh the layout I made for this is so god awful
-    const auto loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
-    loadingLabel->setScale(0.7f);
-    loadingLabel->setAnchorPoint({1.0f, 0.5f});
-    loadingLabel->setPosition({m_buttonMenu->getContentWidth() - 30.0f, dynamic_cast<CCMenuItemSpriteExtra*>(m_buttonMenu->getChildByIDRecursive("gddl-demon-split-ok"_spr))->getPositionY()});
-    loadingLabel->setID("gddl-demon-split-loading-label"_spr);
-    m_buttonMenu->addChild(loadingLabel);
-    const auto loadingSpinner = LoadingSpinner::create(15.0f);
-    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
-    loadingSpinner->setPosition({loadingLabel->getPositionX() + 5.0f, loadingLabel->getPositionY()});
-    loadingSpinner->setID("gddl-demon-split-loading-spinner"_spr);
-    m_buttonMenu->addChild(loadingSpinner);
+    loadingLabel->setVisible(true);
+    loadingSpinner->setVisible(true);
 }
 
 void GDDLDemonSplitLayer::hideLoadingCircle() {
-    if (m_buttonMenu != nullptr) {
-        m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
-        m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
-    }
+    loadingLabel->setVisible(false);
+    loadingSpinner->setVisible(false);
 }
