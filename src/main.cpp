@@ -9,7 +9,6 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
 
-#include "layers/GDDLSearchLayer.h"
 #include "RatingsManager.h"
 #include "Utils.h"
 #include "modified/GDDLRobtopLevelsLayer.h"
@@ -46,10 +45,6 @@ class $modify(MenuLayer) {
     bool init() override {
         if (!MenuLayer::init()) return false;
 
-        GDDLSearchLayer::loadSettings(); // will only work if this is the first time the MenuLayer was loaded
-        GDDLSearchLayer::stopSearch();
-        GDDLSearchLayer::restoreValuesAfterSplit();
-        GDDLSearchLayer::saveSettings();
         if (!RatingsManager::readCache) {
             // populate from save
             RatingsManager::readCache = true;

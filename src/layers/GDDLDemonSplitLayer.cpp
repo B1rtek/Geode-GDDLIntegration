@@ -4,7 +4,6 @@
 #include <Geode/ui/LoadingSpinner.hpp>
 
 #include "RatingsManager.h"
-#include "GDDLSearchLayer.h"
 
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
@@ -149,8 +148,6 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
 void GDDLDemonSplitLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
-    GDDLSearchLayer::restoreValuesAfterSplit();
-    GDDLSearchLayer::stopSearch();
 }
 
 CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {

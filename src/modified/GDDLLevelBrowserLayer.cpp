@@ -5,7 +5,6 @@
 #include <Geode/Bindings.hpp>
 #include "Geode/modify/LevelBrowserLayer.hpp"
 
-#include "layers/GDDLSearchLayer.h"
 
 void GDDLLevelBrowserLayer::loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) {
     LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
