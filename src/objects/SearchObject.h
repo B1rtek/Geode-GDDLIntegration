@@ -119,6 +119,8 @@ public:
 
     int getTotalApiResultsCount();
     int getTotalApiResultsPageCount();
+    int getPageCountOf(const std::vector<int>& vec);
+    std::string getPageCountText(int pageNumber);
     bool isSearching();
 
     std::shared_ptr<EnumSearchSetting> getSortSetting();

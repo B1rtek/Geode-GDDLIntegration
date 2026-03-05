@@ -18,6 +18,7 @@ std::string SearchObject::createFullSearchQuery(const std::string& queryParamete
 }
 
 GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> filteredResults) const {
+    log::info("createGJSearchObjectFromIndex: total {}, starting from {}", filteredResults.size(), firstIndex);
     std::string requestString;
     const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, static_cast<unsigned long long>(filteredResults.size()));
     for (unsigned i = firstIndex; i < lastIndex; i++) {
@@ -33,14 +34,18 @@ GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long 
 
 void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
     const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
+    log::info("getSearchResultsForPage: filteredResults count: {}", filteredResults.size());
     if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
-        const int actualPageNumber = std::min(pageNumber, getTotalApiResultsPageCount() - 1);
+        log::info("getSearchResultsForPage: We have enough");
+        const int actualPageNumber = std::min(pageNumber, getPageCountOf(filteredResults) - 1);
+        log::info("getSearchResultsForPage: actually loading page {}", actualPageNumber);
         GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(actualPageNumber * inGameResultsPageSize, filteredResults);
         // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
         forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber, loadingCircleHaver);
     } else if (searching) {
         // fetch more (if search wasn't canceled)
+        log::info("getSearchResultsForPage: fetch more");
         const std::string apiSearchQuery = createFullSearchQuery(lastSearchParameters);
         auto req = web::WebRequest();
         req.header("User-Agent", Utils::getUserAgent());
@@ -208,6 +213,7 @@ void SearchObject::performInitialSearch(ILoadingCircleHaver* loadingCircleHaver)
 void SearchObject::requestSearchPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer) {
     if (searching) return;
     searching = true;
+    log::info("requestSearchPage requesting {}", pageNumber);
     getSearchResultsForPage(pageNumber, callingLayer, nullptr);
 }
 
@@ -221,7 +227,23 @@ int SearchObject::getTotalApiResultsCount() {
 }
 
 int SearchObject::getTotalApiResultsPageCount() {
-    return this->totalApiResultsCount % inGameResultsPageSize ? this->totalApiResultsCount / inGameResultsPageSize : this->totalApiResultsCount / inGameResultsPageSize + 1;
+    return this->totalApiResultsCount % inGameResultsPageSize == 0 ? this->totalApiResultsCount / inGameResultsPageSize : this->totalApiResultsCount / inGameResultsPageSize + 1;
+}
+
+int SearchObject::getPageCountOf(const std::vector<int>& vec) {
+    return vec.size() % inGameResultsPageSize == 0 ? vec.size() / inGameResultsPageSize : vec.size() / inGameResultsPageSize + 1;
+}
+
+std::string SearchObject::getPageCountText(int pageNumber) {
+    const int firstLevel = pageNumber * 10 + 1;
+    if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
+        // we have everything already, we can answer
+        const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
+        const int lastLevel = std::min(firstLevel + 9, static_cast<int>(filteredResults.size()));
+        return fmt::format("{} to {} of {}", firstLevel, lastLevel, filteredResults.size());
+    }
+    const int lastLevel = std::min(firstLevel + 9, static_cast<int>(totalApiResultsCount));
+    return fmt::format("{} to {} of max. {}", firstLevel, lastLevel, totalApiResultsCount);
 }
 
 bool SearchObject::isSearching() {

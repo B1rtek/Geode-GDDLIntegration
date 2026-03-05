@@ -16,6 +16,7 @@ void GDDLLevelBrowserLayer::loadLevelsFinished(cocos2d::CCArray * p0, char const
 void GDDLLevelBrowserLayer::onNextPage(CCObject * sender) {
     if (m_fields->searchObject != nullptr) {
         m_fields->currentPage = std::min(m_fields->currentPage + 1, m_fields->searchObject->getTotalApiResultsPageCount());
+        log::info("onNextPage Requesting page {}", m_fields->currentPage);
         m_fields->searchObject->requestSearchPage(m_fields->currentPage, this);
     } else {
         LevelBrowserLayer::onNextPage(sender);
@@ -25,6 +26,7 @@ void GDDLLevelBrowserLayer::onNextPage(CCObject * sender) {
 void GDDLLevelBrowserLayer::onPrevPage(CCObject * sender) {
     if (m_fields->searchObject != nullptr) {
         m_fields->currentPage = std::max(0, m_fields->currentPage - 1);
+        log::info("onPrevPage Requesting page {}", m_fields->currentPage);
         m_fields->searchObject->requestSearchPage(m_fields->currentPage, this);
     } else {
         LevelBrowserLayer::onPrevPage(sender);
@@ -34,6 +36,7 @@ void GDDLLevelBrowserLayer::onPrevPage(CCObject * sender) {
 void GDDLLevelBrowserLayer::setIDPopupClosed(SetIDPopup* popup, int value) {
     if (m_fields->searchObject != nullptr) {
         m_fields->searchObject->requestSearchPage(value - 1, this);
+        log::info("setIDPopupClosed Requesting page {}", value - 1);
     } else {
         Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::setIDPopupClosed(popup, value);
     }
@@ -59,11 +62,7 @@ void GDDLLevelBrowserLayer::backActions() {
 
 void GDDLLevelBrowserLayer::setCorrectLabelsText() {
     // # of results text
-    const int firstLevel = m_fields->currentPage * 10 + 1;
-    const int lastLevel = std::min(firstLevel + 9, m_fields->searchObject->getTotalApiResultsCount());
-    m_countText->setString(
-            fmt::format("{} to {} of max. {}", firstLevel, lastLevel, m_fields->searchObject->getTotalApiResultsCount())
-                    .c_str());
+    m_countText->setString(m_fields->searchObject->getPageCountText(m_fields->currentPage).c_str());
     // page button
     m_pageBtn->setVisible(true);
     m_pageText->setString(std::to_string(m_fields->currentPage + 1).c_str());
@@ -71,6 +70,7 @@ void GDDLLevelBrowserLayer::setCorrectLabelsText() {
 
 void GDDLLevelBrowserLayer::handleSearchObject(GJSearchObject * searchObject, int pageToLoad) {
     m_fields->currentPage = pageToLoad;
+    log::info("handleSearchObject Loaded page: {}", pageToLoad);
     loadPage(searchObject);
     setCorrectLabelsText();
 }
