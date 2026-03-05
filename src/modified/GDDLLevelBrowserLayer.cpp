@@ -78,6 +78,6 @@ void GDDLLevelBrowserLayer::assignSearchObject(SearchObject* searchObject) {
 
 void GDDLLevelBrowserLayer::updateAfterInitialLoad() {
     m_leftArrow->setVisible(m_fields->currentPage > 0);
-    m_rightArrow->setVisible(m_fields->currentPage < m_fields->searchObject->getTotalApiResultsPageCount());
+    m_rightArrow->setVisible(m_fields->searchObject->shouldShowRightArrow(m_fields->currentPage));
     setCorrectLabelsText();
 }

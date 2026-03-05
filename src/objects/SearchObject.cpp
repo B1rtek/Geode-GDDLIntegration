@@ -227,7 +227,7 @@ int SearchObject::getPageCountOf(const std::vector<int>& vec) {
     return vec.size() % inGameResultsPageSize == 0 ? vec.size() / inGameResultsPageSize : vec.size() / inGameResultsPageSize + 1;
 }
 
-std::string SearchObject::getPageCountText(int pageNumber) {
+std::string SearchObject::getPageCountText(const int pageNumber) {
     const int firstLevel = pageNumber * 10 + 1;
     if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
         // we have everything already, we can answer
@@ -235,8 +235,21 @@ std::string SearchObject::getPageCountText(int pageNumber) {
         const int lastLevel = std::min(firstLevel + 9, static_cast<int>(filteredResults.size()));
         return fmt::format("{} to {} of {}", firstLevel, lastLevel, filteredResults.size());
     }
+    // we can only answer based on the max estimate
     const int lastLevel = std::min(firstLevel + 9, static_cast<int>(totalApiResultsCount));
     return fmt::format("{} to {} of max. {}", firstLevel, lastLevel, totalApiResultsCount);
+}
+
+bool SearchObject::shouldShowRightArrow(const int pageNumber) {
+    if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
+        // we have everything already, we can answer based on filtered
+        const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
+        const int pageCount = getPageCountOf(filteredResults);
+        return pageNumber < pageCount - 1;
+    }
+    // we can only answer based on the max estimate
+    const int pageCount = getTotalApiResultsPageCount();
+    return pageNumber < pageCount - 1;
 }
 
 bool SearchObject::isSearching() {
