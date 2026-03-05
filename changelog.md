@@ -1,9 +1,10 @@
-# 1.3.0-beta.3
+# 1.3.0-beta.4
 - Complete search menu overhaul
   - Old messy menu has been replaced by a brand new one
   - New menu has a lot more filters, available on a few pages
   - Reordered the filters according to feedback
   - You can use the "go to page" button on the search results screen now
+  - It should no longer be possible to land on an empty/invalid page of results
   - The new search menu respects the theme set in the mod settings
 - TODO: move the gddl demon split button to the robtop demon split
 

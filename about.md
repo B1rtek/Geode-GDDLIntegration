@@ -16,9 +16,7 @@ GDDL Discord server: https://discord.gg/gddl
 
 ## Known issues
 If you encounter an <cy>issue</c> with the mod, [open an issue in the mod's GitHub repo](https://github.com/B1rtek/Geode-GDDLIntegration/issues/new/choose) or contact me on Discord (<cb>@b1rtek</c>)
-- <cy>Usernames</c> sometimes turn into <cy>`-`</c> after a <cr>failed</c> request, this is just cosmetic though ([apparently Rob's fault](https://github.com/geode-sdk/indexer/issues/557#issuecomment-1913375319))
 - Opening the *GDDL Demon Split* popup <co>might</c> cause a lag, don't worry about that :)
-- The level browser <co>might</c> display a button which should allow you to go to the next page of results even though there might be no more pages
 
 ## Special thanks
 
