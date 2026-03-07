@@ -35,6 +35,9 @@ public:
     static void createTextInputNode(CCNode *parent, CCTextInputNode *&textfield, const std::string &font,
                                     const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
                                     const CCPoint &position, int zOrder = 1);
+    static void createGeodeTextInput(CCNode *parent, geode::TextInput *&textfield, const std::string &font,
+                                    const std::string &placeholder, int maxCharacters, const CCPoint &bgSize,
+                                    const CCPoint &position, int zOrder = 1);
     static void createLeftRightButtonsAround(CCNode *object, const CCPoint &size, CCObject *callbackObject,
                                              SEL_MenuHandler leftCallback,
                                              SEL_MenuHandler rightCallback, int zOrder = 1);
@@ -46,11 +49,11 @@ public:
     static void setNumberWithDefZeroTextfield(int value, CCTextInputNode *&textfield);
     static void setNumberWithGivenDefaultValueTextfield(int value, CCTextInputNode *&textfield, int defaultValue, std::string emptyPlaceholder = "");
     static void scaleLabelToWidth(CCLabelBMFont *&label, const float maxWidth);
-    static void createLabel(CCLayer *parent, const std::string &font, const std::string &text, float maxWidth,
-                            const CCPoint &position, int zOrder = 1);
+    static CCLabelBMFont* createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
+                                      const CCPoint& position, int zOrder = 1);
     static CCScale9Sprite *createLabelForChoice(CCLayer *parent, CCLabelBMFont *&label, const std::string &font,
                                                 const std::string &placeholder, float maxWidth, const CCPoint &position,
-                                                const CCPoint &bgSize, int zOrder = 1);
+                                                const CCPoint &bgSize, const std::string &bgSprite = "square02_small.png", int zOrder = 1);
     static std::function<void(web::WebResponse)> getCacheDownloadLambda(bool notifySuccess = false);
     static CCSprite *getTierSpriteFromName(const char *name);
     static CCSprite *getSpriteFromTier(const int tier);
@@ -68,6 +71,8 @@ public:
     static std::string getErrorFromMessageAndResponse(matjson::Value jsonResponse, web::WebResponse& res);
     static void addAuthHeader(web::WebRequest &req);
     static Result<std::string_view> getSpriteNodeFrameName(CCSprite* sprite);
+    static char toHex(int number);
+    static std::string urlEncode(const std::string& input);
 };
 
 template <typename T>

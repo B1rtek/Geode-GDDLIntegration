@@ -1,3 +1,12 @@
+# 1.3.0
+- Complete search menu overhaul
+  - <cr>Old</c> messy menu has been replaced by a <cg>brand new one</c>
+  - New menu has a lot more <co>filters</c>, available on a few pages
+  - <cb>Reordered</c> the filters according to feedback
+  - You can use the <cj>go to page</c> button on the search results screen now
+  - It should no longer be possible to land on an <cl>empty/invalid</c> page of results
+  - The new search menu respects the theme set in the mod settings (you can make it <cp>purple</c> or sth)
+
 # 1.2.11
 - Compatibility with Geode 5.0.0/Geometry Dash 2.2081
 - Added the missing [sorting by deviation and popularity](https://github.com/B1rtek/Geode-GDDLIntegration/issues/102) options to the GDDL search menu

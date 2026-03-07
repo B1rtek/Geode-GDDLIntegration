@@ -4,7 +4,6 @@
 #include <Geode/ui/LoadingSpinner.hpp>
 
 #include "RatingsManager.h"
-#include "GDDLSearchLayer.h"
 
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw
@@ -42,11 +41,11 @@ bool GDDLDemonSplitLayer::init() {
 
     // this is where the tiers go
     std::map<int, int> tierStats = RatingsManager::getTierStats();
-    for (int row = 0; row < 5; row++) {
+    for (int row = 0; row < rows; row++) {
         const auto rowNode = CCNode::create();
         rowNode->setLayout(RowLayout::create()->setGap(5.0f));
         rowNode->setContentSize({390.0f, 20.0f});
-        for (int column = 0; column < 8; column++) {
+        for (int column = 0; column < columns; column++) {
             const int targetTier = row+1+column*5;
             if (targetTier <= Values::highestTier) {
                 const auto tierNode = createTierNode(targetTier, tierStats[targetTier]);
@@ -72,6 +71,26 @@ bool GDDLDemonSplitLayer::init() {
     m_mainLayer->updateLayout();
     // fix the iButton :tm: placement (is it clear already that I never did frontend)
     iButton->setPosition({iButton->getPositionX(), 15.0f});
+
+    // loading label and circle
+    // ugh the layout I made for this is so god awful
+    loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
+    loadingLabel->setScale(0.7f);
+    loadingLabel->setAnchorPoint({1.0f, 0.5f});
+    loadingLabel->setPosition({m_buttonMenu->getContentWidth() - 30.0f, dynamic_cast<CCMenuItemSpriteExtra*>(m_buttonMenu->getChildByIDRecursive("gddl-demon-split-ok"_spr))->getPositionY()});
+    loadingLabel->setID("gddl-demon-split-loading-label"_spr);
+    loadingLabel->setVisible(false);
+    m_buttonMenu->addChild(loadingLabel);
+    loadingSpinner = LoadingSpinner::create(15.0f);
+    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
+    loadingSpinner->setPosition({loadingLabel->getPositionX() + 5.0f, loadingLabel->getPositionY()});
+    loadingSpinner->setID("gddl-demon-split-loading-spinner"_spr);
+    loadingSpinner->setVisible(false);
+    m_buttonMenu->addChild(loadingSpinner);
+
+    // better search wohoo
+    searchObject = SearchObject();
+
     return true;
 }
 
@@ -115,12 +134,11 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
     const std::string tierNumberStr = tierStr.substr(start, end - start);
     const Result<int> maybeTierNumber = numFromString<int>(tierNumberStr);
     if (maybeTierNumber.isOk()) {
-        if (!GDDLSearchLayer::isSearching()) {
-            GDDLSearchLayer::requestSearchFromDemonSplit(maybeTierNumber.unwrap(), this);
-            // the list should display itself hopefully
+        if (!searchObject.isSearching()) {
             showLoadingCircle();
-        } else {
-            Notification::create("Already searching...", NotificationIcon::Info, 1)->show();
+            searchObject.getCompletedSetting()->setSettingValue(true);
+            searchObject.getRatingsSetting()->setSettingValue({maybeTierNumber.unwrap(), maybeTierNumber.unwrap()});
+            searchObject.performInitialSearch(this);
         }
     } else {
         Notification::create("Invalid tier number", NotificationIcon::Warning, 2)->show();
@@ -130,8 +148,6 @@ void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-
 void GDDLDemonSplitLayer::onEnter() {
     FLAlertLayer::onEnter();
     cocos::handleTouchPriority(this);
-    GDDLSearchLayer::restoreValuesAfterSplit();
-    GDDLSearchLayer::stopSearch();
 }
 
 CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {
@@ -162,28 +178,6 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {
     return tierNode;
 }
 
-void GDDLDemonSplitLayer::showLoadingCircle() {
-    // ugh the layout I made for this is so god awful
-    const auto loadingLabel = CCLabelBMFont::create("Loading...", "chatFont.fnt");
-    loadingLabel->setScale(0.7f);
-    loadingLabel->setAnchorPoint({1.0f, 0.5f});
-    loadingLabel->setPosition({m_buttonMenu->getContentWidth() - 30.0f, dynamic_cast<CCMenuItemSpriteExtra*>(m_buttonMenu->getChildByIDRecursive("gddl-demon-split-ok"_spr))->getPositionY()});
-    loadingLabel->setID("gddl-demon-split-loading-label"_spr);
-    m_buttonMenu->addChild(loadingLabel);
-    const auto loadingSpinner = LoadingSpinner::create(15.0f);
-    loadingSpinner->setAnchorPoint({0.0f, 0.5f});
-    loadingSpinner->setPosition({loadingLabel->getPositionX() + 5.0f, loadingLabel->getPositionY()});
-    loadingSpinner->setID("gddl-demon-split-loading-spinner"_spr);
-    m_buttonMenu->addChild(loadingSpinner);
-}
-
-void GDDLDemonSplitLayer::hideLoadingCircle() {
-    if (m_buttonMenu != nullptr) {
-        m_buttonMenu->removeChildByID("gddl-demon-split-loading-label"_spr);
-        m_buttonMenu->removeChildByID("gddl-demon-split-loading-spinner"_spr);
-    }
-}
-
 GDDLDemonSplitLayer *GDDLDemonSplitLayer::create() {
     // ReSharper disable once CppDFAConstantConditions
     if (const auto newLayer = new GDDLDemonSplitLayer(); newLayer != nullptr && newLayer->init()) {
@@ -200,3 +194,12 @@ void GDDLDemonSplitLayer::show() {
     cocos::handleTouchPriority(this);
 }
 
+void GDDLDemonSplitLayer::showLoadingCircle() {
+    loadingLabel->setVisible(true);
+    loadingSpinner->setVisible(true);
+}
+
+void GDDLDemonSplitLayer::hideLoadingCircle() {
+    loadingLabel->setVisible(false);
+    loadingSpinner->setVisible(false);
+}
