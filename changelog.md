@@ -1,12 +1,11 @@
-# 1.3.0-beta.4
+# 1.3.0
 - Complete search menu overhaul
-  - Old messy menu has been replaced by a brand new one
-  - New menu has a lot more filters, available on a few pages
-  - Reordered the filters according to feedback
-  - You can use the "go to page" button on the search results screen now
-  - It should no longer be possible to land on an empty/invalid page of results
-  - The new search menu respects the theme set in the mod settings
-- TODO: move the gddl demon split button to the robtop demon split
+  - <cr>Old</c> messy menu has been replaced by a <cg>brand new one</c>
+  - New menu has a lot more <co>filters</c>, available on a few pages
+  - <cb>Reordered</c> the filters according to feedback
+  - You can use the <cj>go to page</c> button on the search results screen now
+  - It should no longer be possible to land on an <cl>empty/invalid</c> page of results
+  - The new search menu respects the theme set in the mod settings (you can make it <cp>purple</c> or sth)
 
 # 1.2.11
 - Compatibility with Geode 5.0.0/Geometry Dash 2.2081
