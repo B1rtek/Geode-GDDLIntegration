@@ -17,7 +17,7 @@
 		"community": "https://discord.gg/gddl"
 	},
 	"dependencies": {
-		"geode.node-ids": ">=1.22.0"
+		"geode.node-ids": ">=1.23.2"
 	},
 	"tags": [
 		"utility",
