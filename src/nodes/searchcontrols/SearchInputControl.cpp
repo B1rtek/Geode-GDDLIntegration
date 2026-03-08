@@ -4,7 +4,7 @@ bool SearchInputControl::init() {
     if (!CCNode::init()) return false;
 
     this->setContentSize(controlSize);
-    controlMenu = new CCMenu();
+    controlMenu = CCMenu::create();
     controlMenu->setContentSize(controlSize);
     controlMenu->setPosition({0.0f, 0.0f});
     controlMenu->setZOrder(2);
