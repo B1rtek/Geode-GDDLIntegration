@@ -1,6 +1,9 @@
 #include "GDDLPacksLayer.h"
 
 #include <Geode/ui/Layout.hpp>
+#include <Geode/ui/ScrollLayer.hpp>
+#include <nodes/searchcontrols/CheckboxInputControl.h>
+#include <objects/searchsettings/BoolSearchSetting.h>
 
 bool GDDLPacksLayer::init() {
     if (!CCLayer::init()) return false;
@@ -17,6 +20,18 @@ bool GDDLPacksLayer::init() {
     backBtn->setID("back-button");
     backMenu->addChild(backBtn);
     this->addChildAtPosition(backMenu, Anchor::TopLeft, ccp(8, -23), false);
+
+    // test scrolllayer
+
+    const auto scrollList = ScrollLayer::create({200.0f, 200.0f});
+    scrollList->setTouchEnabled(true);
+    scrollList->setPosition({100.0f, 200.0f});
+    for (int i = 0; i < 5; i++) {
+        scrollList->m_contentLayer->addChild(CheckboxInputControl::create("Test item " + std::to_string(i), std::make_shared<BoolSearchSetting>("test-setting-bool", false)));
+    }
+    scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    scrollList->scrollToTop();
+    this->addChild(scrollList);
 
     return true;
 }
