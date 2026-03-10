@@ -1,3 +1,6 @@
+# 1.4.0
+- Packs support!!!
+
 # 1.3.0
 - Complete search menu overhaul
   - <cr>Old</c> messy menu has been replaced by a <cg>brand new one</c>
