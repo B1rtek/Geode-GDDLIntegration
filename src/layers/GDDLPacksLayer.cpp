@@ -2,6 +2,7 @@
 
 #include <Geode/ui/Layout.hpp>
 #include <Geode/ui/ScrollLayer.hpp>
+#include <nodes/PackListItem.h>
 #include <nodes/searchcontrols/CheckboxInputControl.h>
 #include <objects/searchsettings/BoolSearchSetting.h>
 
@@ -40,7 +41,7 @@ bool GDDLPacksLayer::init() {
     packsList->setPosition({winSize.width / 2 - listSize.x / 2, winSize.height / 2 - listSize.y / 2});
     for (int i = 0; i < 5; i++) {
         // TODO a bunch of placeholders, replace with actual content later
-        packsList->m_contentLayer->addChild(CheckboxInputControl::create("Test item " + std::to_string(i), std::make_shared<BoolSearchSetting>("test-setting-bool", false)));
+        packsList->m_contentLayer->addChild(PackListItem::create(356.0f, PackInfo({}, "Pack " + std::to_string(i+1), "tier_unrated.png")));
     }
     packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     packsList->scrollToTop();
