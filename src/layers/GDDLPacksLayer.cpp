@@ -1,5 +1,6 @@
 #include "GDDLPacksLayer.h"
 
+#include <Utils.h>
 #include <Geode/ui/Layout.hpp>
 #include <Geode/ui/ScrollLayer.hpp>
 #include <nodes/PackListItem.h>
@@ -39,16 +40,41 @@ bool GDDLPacksLayer::init() {
     // list
     packsList = ScrollLayer::create({356.0f, 220.0f});
     packsList->setPosition({winSize.width / 2 - listSize.x / 2, winSize.height / 2 - listSize.y / 2});
-    for (int i = 0; i < 5; i++) {
-        // TODO a bunch of placeholders, replace with actual content later
-        packsList->m_contentLayer->addChild(PackListItem::create(356.0f, PackInfo({}, "Pack " + std::to_string(i+1), "tier_unrated.png")));
-    }
+    // for (int i = 0; i < 5; i++) {
+    //     // TODO a bunch of placeholders, replace with actual content later
+    //     packsList->m_contentLayer->addChild(PackListItem::create(356.0f, PackInfo({}, "Pack " + std::to_string(i+1), "tier_unrated.png")));
+    // }
     packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     packsList->scrollToTop();
-    packsList->m_contentLayer->setColor(ccc3(255, 0, 0)); // super evil list
-    packsList->m_contentLayer->setOpacity(100);
     this->addChild(packsList);
     createListFrame();
+
+    // next/prev page arrows
+    const auto nextPageMenu = CCMenu::create();
+    nextPageMenu->setContentSize({50.0f, 50.0f});
+    nextPageMenu->setPosition({winSize.width / 2 + listSize.x / 2 + 50.0f, winSize.height / 2});
+    this->addChild(nextPageMenu);
+    const auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
+    nextButtonSprite->setFlipX(true);
+    const auto nextPageButton = CCMenuItemSpriteExtra::create(nextButtonSprite, this, menu_selector(GDDLPacksLayer::onNextPage));
+    nextPageButton->setPosition({25.0f, 25.0f});
+    nextPageMenu->addChild(nextPageButton);
+
+    const auto prevPageMenu = CCMenu::create();
+    prevPageMenu->setContentSize({50.0f, 50.0f});
+    prevPageMenu->setPosition({winSize.width / 2 - listSize.x / 2 - 50.0f, winSize.height / 2});
+    this->addChild(prevPageMenu);
+    const auto prevButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
+    const auto prevPageButton = CCMenuItemSpriteExtra::create(prevButtonSprite, this, menu_selector(GDDLPacksLayer::onPrevPage));
+    prevPageButton->setPosition({25.0f, 25.0f});
+    prevPageMenu->addChild(prevPageButton);
+
+    // TODO rest of the UI
+
+    // request packs
+    auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
+    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda());
 
     return true;
 }
@@ -79,6 +105,58 @@ void GDDLPacksLayer::createListFrame() {
         cornerSprite->setRotation(i * 90.0f);
         this->addChild(cornerSprite);
     }
+}
+
+void GDDLPacksLayer::updateList() {
+    packsList->m_contentLayer->removeAllChildren();
+    for (const auto& packInfo : packInfos[page]) {
+        packsList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo));
+    }
+    packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    packsList->scrollToTop();
+}
+
+std::function<void(web::WebResponse)> GDDLPacksLayer::getPacksDownloadLambda() {
+    return [this](web::WebResponse res) {
+        if (res.code() != 200) {
+            // const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+            // const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+            // Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            // const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
+            // log::error("SearchObject::getSearchLambda: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
+            return;
+        }
+        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+        if (!jsonResponse.contains("packs") || !jsonResponse["packs"].isArray()) {
+            // TODO error
+            log::info("invalid outer json");
+            return;
+        }
+        for (auto packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
+            const Result<PackInfo> maybePackInfo = PackInfo::createFromJson(packInfoObject);
+            if (maybePackInfo.isErr()) {
+                // TODO error
+                log::info("invalid inner json: {}", packInfoObject.dump());
+                return;
+            }
+            const PackInfo& packInfo = maybePackInfo.unwrap();
+            highestPage = std::max(highestPage, packInfo.getCategoryId());
+            packInfos[packInfo.getCategoryId()].push_back(packInfo);
+        }
+        updateList();
+    };
+}
+
+void GDDLPacksLayer::onNextPage(CCObject* sender) {
+    ++page;
+    if (page > highestPage) page = 1;
+    updateList();
+}
+
+void GDDLPacksLayer::onPrevPage(CCObject* sender) {
+    --page;
+    if (page < 1) page = highestPage;
+    updateList();
 }
 
 void GDDLPacksLayer::onBack(CCObject* sender) {
