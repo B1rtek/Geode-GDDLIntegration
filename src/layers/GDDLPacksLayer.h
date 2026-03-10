@@ -4,6 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/ui/ScrollLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <objects/PackCategoryInfo.h>
 #include <objects/PackInfo.h>
 
 using namespace geode::prelude;
@@ -16,6 +17,7 @@ class GDDLPacksLayer : public CCLayer {
     CCLabelBMFont* titleLabel = nullptr;
     int page = 1, highestPage = 1;
     std::map<int, std::vector<PackInfo>> packInfos;
+    std::map<int, PackCategoryInfo> packCategoryInfos;
     TaskHolder<web::WebResponse> packsTaskHolder;
 
     bool init() override;

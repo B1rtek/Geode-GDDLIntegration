@@ -69,6 +69,11 @@ bool GDDLPacksLayer::init() {
     prevPageButton->setPosition({25.0f, 25.0f});
     prevPageMenu->addChild(prevPageButton);
 
+    // title label
+    titleLabel = CCLabelBMFont::create("Packs", "bigFont.fnt");
+    titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 40.0f});
+    this->addChild(titleLabel);
+
     // TODO rest of the UI
 
     // request packs
@@ -114,6 +119,7 @@ void GDDLPacksLayer::updateList() {
     }
     packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     packsList->scrollToTop();
+    titleLabel->setString(packCategoryInfos[page].getName().c_str());
 }
 
 std::function<void(web::WebResponse)> GDDLPacksLayer::getPacksDownloadLambda() {
@@ -127,21 +133,32 @@ std::function<void(web::WebResponse)> GDDLPacksLayer::getPacksDownloadLambda() {
             return;
         }
         const auto jsonResponse = res.json().unwrapOr(matjson::Value());
-        if (!jsonResponse.contains("packs") || !jsonResponse["packs"].isArray()) {
+        if (!jsonResponse.contains("packs") || !jsonResponse["packs"].isArray() ||
+            !jsonResponse.contains("categories") || !jsonResponse["categories"].isArray()) {
             // TODO error
             log::info("invalid outer json");
             return;
         }
-        for (auto packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
+        for (const auto packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
             const Result<PackInfo> maybePackInfo = PackInfo::createFromJson(packInfoObject);
             if (maybePackInfo.isErr()) {
                 // TODO error
-                log::info("invalid inner json: {}", packInfoObject.dump());
+                log::info("invalid inner pack json: {}", packInfoObject.dump());
                 return;
             }
-            const PackInfo& packInfo = maybePackInfo.unwrap();
-            highestPage = std::max(highestPage, packInfo.getCategoryId());
+            const PackInfo packInfo = maybePackInfo.unwrap();
             packInfos[packInfo.getCategoryId()].push_back(packInfo);
+        }
+        for (const auto packCategoryInfoObject : jsonResponse["categories"].asArray().unwrap()) {
+            const Result<PackCategoryInfo> maybePackCategoryInfo = PackCategoryInfo::createFromJson(packCategoryInfoObject);
+            if (maybePackCategoryInfo.isErr()) {
+                // TODO error
+                log::info("invalid inner category json: {}", packCategoryInfoObject.dump());
+                return;
+            }
+            const PackCategoryInfo& packCategoryInfo = maybePackCategoryInfo.unwrap();
+            highestPage = std::max(highestPage, packCategoryInfo.getId());
+            packCategoryInfos[packCategoryInfo.getId()] = packCategoryInfo;
         }
         updateList();
     };
