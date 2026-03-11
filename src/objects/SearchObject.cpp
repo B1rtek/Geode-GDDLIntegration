@@ -17,25 +17,12 @@ std::string SearchObject::createFullSearchQuery(const std::string& queryParamete
     return request;
 }
 
-GJSearchObject* SearchObject::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> filteredResults) const {
-    std::string requestString;
-    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, static_cast<unsigned long long>(filteredResults.size()));
-    for (unsigned i = firstIndex; i < lastIndex; i++) {
-        requestString += std::to_string(filteredResults[i]) + ',';
-    }
-    if (!requestString.empty()) {
-        requestString.pop_back();
-    }
-    requestString += "&gameVersion=22";
-    return GJSearchObject::create(SearchType::Type19, requestString);
-}
-
 void SearchObject::getSearchResultsForPage(const int pageNumber, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
     const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
     if (isPageReady(pageNumber, filteredResults)) {
         // display what we have
-        const int actualPageNumber = std::min(pageNumber, getPageCountOf(filteredResults) - 1);
-        GJSearchObject* gjSearchObject = createGJSearchObjectFromIndex(actualPageNumber * inGameResultsPageSize, filteredResults);
+        const int actualPageNumber = std::min(pageNumber, Utils::getPageCountOf(filteredResults) - 1);
+        GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(actualPageNumber * inGameResultsPageSize, filteredResults);
         // the "ready" page might not necessarily be the one requested as there might be less than the requested amount of pages
         forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber, loadingCircleHaver);
     } else if (searching) {
@@ -223,10 +210,6 @@ int SearchObject::getTotalApiResultsPageCount() {
     return this->totalApiResultsCount % inGameResultsPageSize == 0 ? this->totalApiResultsCount / inGameResultsPageSize : this->totalApiResultsCount / inGameResultsPageSize + 1;
 }
 
-int SearchObject::getPageCountOf(const std::vector<int>& vec) {
-    return vec.size() % inGameResultsPageSize == 0 ? vec.size() / inGameResultsPageSize : vec.size() / inGameResultsPageSize + 1;
-}
-
 std::string SearchObject::getPageCountText(const int pageNumber) {
     const int firstLevel = pageNumber * 10 + 1;
     if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
@@ -244,7 +227,7 @@ bool SearchObject::shouldShowRightArrow(const int pageNumber) {
     if (totalApiResultsCount <= apiResultsProcessedCount && apiPagesFetched > 0) {
         // we have everything already, we can answer based on filtered
         const std::vector<int> filteredResults = filterResults(results, completedSetting->getSettingValue(), uncompletedSetting->getSettingValue());
-        const int pageCount = getPageCountOf(filteredResults);
+        const int pageCount = Utils::getPageCountOf(filteredResults);
         return pageNumber < pageCount - 1;
     }
     // we can only answer based on the max estimate

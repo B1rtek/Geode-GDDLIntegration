@@ -94,7 +94,6 @@ class SearchObject {
 
     std::string createSearchParametersString();
     std::string createFullSearchQuery(const std::string& queryParameters);
-    GJSearchObject* createGJSearchObjectFromIndex(unsigned long long firstIndex, std::vector<int> filteredResults) const;
     void getSearchResultsForPage(int pageNumber, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver);
     Result<std::vector<int>> parseApiResponse(const std::string& response);
     std::vector<int> filterResults(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
@@ -119,7 +118,6 @@ public:
 
     int getTotalApiResultsCount();
     int getTotalApiResultsPageCount();
-    int getPageCountOf(const std::vector<int>& vec);
     std::string getPageCountText(int pageNumber);
     bool shouldShowRightArrow(int pageNumber);
     bool isSearching();

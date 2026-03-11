@@ -409,3 +409,7 @@ GJSearchObject* Utils::createGJSearchObjectFromIndex(const unsigned long long fi
     requestString += "&gameVersion=22";
     return GJSearchObject::create(SearchType::Type19, requestString);
 }
+
+int Utils::getPageCountOf(const std::vector<int>& vec, const int pageSize) {
+    return vec.size() % pageSize == 0 ? vec.size() / pageSize : vec.size() / pageSize + 1;
+}
