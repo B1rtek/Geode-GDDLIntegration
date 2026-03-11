@@ -399,7 +399,7 @@ std::string Utils::urlEncode(const std::string& input) {
 
 GJSearchObject* Utils::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> ids) {
     std::string requestString;
-    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, ids.size());
+    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, static_cast<unsigned long long>(ids.size())); // static_cast for android
     for (unsigned i = firstIndex; i < lastIndex; i++) {
         requestString += std::to_string(ids[i]) + ',';
     }
