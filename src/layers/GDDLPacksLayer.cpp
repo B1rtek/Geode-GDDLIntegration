@@ -140,14 +140,14 @@ std::function<void(web::WebResponse)> GDDLPacksLayer::getPacksDownloadLambda() {
             return;
         }
         for (const auto packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
-            const Result<PackInfo> maybePackInfo = PackInfo::createFromJson(packInfoObject);
+            const Result<std::shared_ptr<PackInfo>> maybePackInfo = PackInfo::createFromJson(packInfoObject);
             if (maybePackInfo.isErr()) {
                 // TODO error
                 log::info("invalid inner pack json: {}", packInfoObject.dump());
                 return;
             }
-            const PackInfo packInfo = maybePackInfo.unwrap();
-            packInfos[packInfo.getCategoryId()].push_back(packInfo);
+            const std::shared_ptr<PackInfo> packInfo = maybePackInfo.unwrap();
+            packInfos[packInfo->getCategoryId()].push_back(packInfo);
         }
         for (const auto packCategoryInfoObject : jsonResponse["categories"].asArray().unwrap()) {
             const Result<PackCategoryInfo> maybePackCategoryInfo = PackCategoryInfo::createFromJson(packCategoryInfoObject);

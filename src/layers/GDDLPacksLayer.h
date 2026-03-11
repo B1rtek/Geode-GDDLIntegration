@@ -16,7 +16,7 @@ class GDDLPacksLayer : public CCLayer {
     ScrollLayer* packsList = nullptr;
     CCLabelBMFont* titleLabel = nullptr;
     int page = 1, highestPage = 1;
-    std::map<int, std::vector<PackInfo>> packInfos;
+    std::map<int, std::vector<std::shared_ptr<PackInfo>>> packInfos;
     std::map<int, PackCategoryInfo> packCategoryInfos;
     TaskHolder<web::WebResponse> packsTaskHolder;
 

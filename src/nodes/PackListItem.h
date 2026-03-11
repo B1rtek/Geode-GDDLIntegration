@@ -10,11 +10,13 @@ class PackListItem : public CCNode {
     static constexpr float itemHeight = 50.0f;
     const inline static std::string packIconsBaseUrl = "https://gdladder.com/packIcons/";
 
-    bool init(const float width, const PackInfo& packInfo);
+    std::shared_ptr<PackInfo> packInfo;
+
+    bool init(const float width, const std::shared_ptr<PackInfo>& packInfo);
 
     void onView(CCObject* sender);
 public:
-    static PackListItem* create(const float width, const PackInfo& packInfo);
+    static PackListItem* create(const float width, const std::shared_ptr<PackInfo>& packInfo);
 };
 
 

@@ -3,10 +3,11 @@
 #include <Geode/loader/Mod.hpp>
 #include <Geode/ui/LazySprite.hpp>
 
-bool PackListItem::init(const float width, const PackInfo& packInfo) {
+bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& packInfo) {
     if (!CCNode::init()) return false;
 
     this->setContentSize({width, itemHeight});
+    this->packInfo = packInfo;
 
     // icon
     const auto icon = LazySprite::create({20.0f, 20.0f});
@@ -16,12 +17,12 @@ bool PackListItem::init(const float width, const PackInfo& packInfo) {
             icon->setScale(0.275f);
         }
     });
-    icon->loadFromUrl(packIconsBaseUrl + packInfo.getIconPath());
+    icon->loadFromUrl(packIconsBaseUrl + packInfo->getIconPath());
     icon->setPosition({20.0f, itemHeight / 2});
     this->addChild(icon);
 
     // title
-    const auto title = CCLabelBMFont::create(packInfo.getName().c_str(), "bigFont.fnt");
+    const auto title = CCLabelBMFont::create(packInfo->getName().c_str(), "bigFont.fnt");
     title->setAnchorPoint({0.0f, 0.5f});
     title->setScale(0.6f);
     title->setPosition({50.0f, itemHeight / 2});
@@ -47,7 +48,7 @@ void PackListItem::onView(CCObject* sender) {
     FLAlertLayer::create("view", "you clicked view", "OK")->show();
 }
 
-PackListItem* PackListItem::create(const float width, const PackInfo& packInfo) {
+PackListItem* PackListItem::create(const float width, const std::shared_ptr<PackInfo>& packInfo) {
     const auto ret = new PackListItem();
     if (ret->init(width, packInfo)) {
         ret->autorelease();
