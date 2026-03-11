@@ -45,7 +45,7 @@ bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& pack
 }
 
 void PackListItem::onView(CCObject* sender) {
-    FLAlertLayer::create("view", "you clicked view", "OK")->show();
+    packInfo->downloadAndOpenPack();
 }
 
 PackListItem* PackListItem::create(const float width, const std::shared_ptr<PackInfo>& packInfo) {
