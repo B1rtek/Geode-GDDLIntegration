@@ -18,6 +18,7 @@ class Utils {
     };
 public:
     const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
+    const inline static unsigned long long inGameResultsPageSize = 10;
 
     static std::string floatToString(float number, int precision);
     static unsigned int getCurrentTimestamp();
@@ -73,6 +74,7 @@ public:
     static Result<std::string_view> getSpriteNodeFrameName(CCSprite* sprite);
     static char toHex(int number);
     static std::string urlEncode(const std::string& input);
+    static GJSearchObject* createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> ids);
 };
 
 template <typename T>

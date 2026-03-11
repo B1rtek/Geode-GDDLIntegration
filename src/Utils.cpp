@@ -396,3 +396,16 @@ std::string Utils::urlEncode(const std::string& input) {
     }
     return result;
 }
+
+GJSearchObject* Utils::createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> ids) {
+    std::string requestString;
+    const unsigned lastIndex = std::min(firstIndex + inGameResultsPageSize, ids.size());
+    for (unsigned i = firstIndex; i < lastIndex; i++) {
+        requestString += std::to_string(ids[i]) + ',';
+    }
+    if (!requestString.empty()) {
+        requestString.pop_back();
+    }
+    requestString += "&gameVersion=22";
+    return GJSearchObject::create(SearchType::Type19, requestString);
+}
