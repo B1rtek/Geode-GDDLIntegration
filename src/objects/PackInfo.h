@@ -7,14 +7,16 @@
 using namespace geode::prelude;
 
 class PackInfo {
-    const int id;
-    const int categoryId;
-    const std::string name;
-    const std::string iconPath;
-    const int medianTier;
+    int id{};
+    int categoryId{};
+    std::string name;
+    std::string iconPath;
+    int medianTier{};
     std::vector<int> levels;
     
 public:
+    PackInfo() = default;
+
     PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath, const int medianTier);
 
     static Result<PackInfo> createFromJson(const matjson::Value& json);
