@@ -8,7 +8,6 @@ using namespace geode::prelude;
 
 class PackListItem : public CCNode {
     static constexpr float itemHeight = 50.0f;
-    const inline static std::string packIconsBaseUrl = "https://gdladder.com/packIcons/";
 
     std::shared_ptr<PackInfo> packInfo;
 

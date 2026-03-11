@@ -13,6 +13,8 @@ public:
     // https://gdladder.com/about#guidelines
     static constexpr int proofTier = 25;
     static constexpr int clicksTier = 31;
+    // api endpoints used more than in one class
+    const inline static std::string packIconsBaseUrl = "https://gdladder.com/packIcons/";
 };
 
 #endif //GDDLINTEGRATION_VALUES_H

@@ -1,5 +1,6 @@
 #include "PackListItem.h"
 
+#include <Values.h>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/ui/LazySprite.hpp>
 
@@ -17,7 +18,7 @@ bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& pack
             icon->setScale(0.275f);
         }
     });
-    icon->loadFromUrl(packIconsBaseUrl + packInfo->getIconPath());
+    icon->loadFromUrl(Values::packIconsBaseUrl + packInfo->getIconPath());
     icon->setPosition({20.0f, itemHeight / 2});
     this->addChild(icon);
 
