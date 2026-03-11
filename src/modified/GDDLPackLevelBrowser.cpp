@@ -1,5 +1,6 @@
 #include "GDDLPackLevelBrowser.h"
 
+#include <Utils.h>
 #include <Geode/binding/GJListLayer.hpp>
 
 gd::string GDDLPackLevelBrowser::getSearchTitle() {
@@ -53,8 +54,10 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
         // cursed things (fortunately they only happen once)
         const auto listChildren = m_list->getChildren();
         for (const auto child : CCArrayExt<CCNode*>(listChildren)) {
-            if (const auto maybeLabel = typeinfo_cast<CCLabelBMFont*>(child)) {
+            if (auto maybeLabel = typeinfo_cast<CCLabelBMFont*>(child)) {
                 maybeLabel->setString(m_fields->packInfo->getName().c_str());
+                // scale down so it doesn't take up the whole screen because it only scales after the whole thing loads for some reason
+                maybeLabel->limitLabelWidth(280.0f, 0.8f, 0.2f);
             }
         }
         // ok things
