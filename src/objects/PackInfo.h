@@ -30,8 +30,11 @@ public:
     PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath, const int medianTier);
 
     static Result<std::shared_ptr<PackInfo>> createFromJson(const matjson::Value& json);
+    // these should probably be an interface or sth
     void downloadAndOpenPack();
     void requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer);
+    std::string getPageCountText(const int pageNumber);
+    bool shouldShowRightArrow(const int pageNumber);
 
     int getId() const;
     int getCategoryId() const;

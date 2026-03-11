@@ -23,6 +23,8 @@ std::function<void(web::WebResponse)> PackInfo::getPackDownloadLambda() {
             levels.push_back(levelObject["LevelID"].asInt().unwrap());
         }
         // everything went well, forward to level browser
+        GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, levels);
+        forwardToLevelBrowser(gjSearchObject, nullptr, 0);
     };
 }
 
@@ -80,6 +82,17 @@ void PackInfo::requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer) {
     const int actualPageNumber = std::min(pageNumber, static_cast<int>(levels.size() % 10 == 0 ? levels.size() / 10 : levels.size() / 10 + 1));
     GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(actualPageNumber * 10, levels);
     forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
+}
+
+std::string PackInfo::getPageCountText(const int pageNumber) {
+    const int firstLevel = pageNumber * 10 + 1;
+    const int lastLevel = std::min(firstLevel + 9, static_cast<int>(levels.size()));
+    return fmt::format("{} to {} of {}", firstLevel, lastLevel, levels.size());
+}
+
+bool PackInfo::shouldShowRightArrow(const int pageNumber) {
+    const int pageCount = Utils::getPageCountOf(levels);
+    return pageNumber < pageCount - 1;
 }
 
 int PackInfo::getId() const {
