@@ -1,14 +1,54 @@
 #include "PackInfo.h"
 
-#include "PackInfo.h"
-
+#include <Utils.h>
 #include <Geode/ui/Notification.hpp>
+#include <modified/GDDLPackLevelBrowser.h>
+
+std::function<void(web::WebResponse)> PackInfo::getPackDownloadLambda() {
+    return [this](web::WebResponse res) {
+        if (res.code() != 200) {
+            // TODO error
+            return;
+        }
+        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+        if (!jsonResponse.isArray()) {
+            // TODO error
+            return;
+        }
+        for (const auto levelObject : jsonResponse.asArray().unwrap()) {
+            if (!levelObject.isObject() || !levelObject.contains("LevelID") || !levelObject["LevelID"].isNumber()) {
+                // TODO error
+                return;
+            }
+            levels.push_back(levelObject["LevelID"].asInt().unwrap());
+        }
+        // everything went well, forward to level browser
+    };
+}
+
+std::string PackInfo::getPackDownloadUrl(int packId) {
+    return packDownloadApiUrlBase + std::to_string(packId) + "/levels";
+}
+
+void PackInfo::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer,
+    const int actualPageNumber) {
+    if (callingLayer != nullptr) {
+        callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
+        return;
+    }
+    const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
+    levelBrowserLayer->assignPackInfo(this);
+    const auto listLayerScene = CCScene::create();
+    listLayerScene->addChild(levelBrowserLayer);
+    const auto transition = CCTransitionFade::create(0.5, listLayerScene);
+    CCDirector::sharedDirector()->pushScene(transition);
+}
 
 PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath,
                    const int medianTier): id(id), categoryId(categoryId), name(name), iconPath(iconPath), medianTier(medianTier) {
 }
 
-Result<PackInfo> PackInfo::createFromJson(const matjson::Value& json) {
+Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value& json) {
     if (!json.isObject() ||
         !json.contains("ID") || !json["ID"].isNumber() ||
         !json.contains("CategoryID") || !json["CategoryID"].isNumber() ||
@@ -23,7 +63,23 @@ Result<PackInfo> PackInfo::createFromJson(const matjson::Value& json) {
     if (json.contains("Meta") && json["Meta"].isObject() && json["Meta"].contains("MedianTier") && json["Meta"]["MedianTier"].isNumber()) {
         medianTier = json["Meta"]["MedianTier"].asInt().unwrap();
     }
-    return Ok(PackInfo(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), iconName, medianTier));
+    return Ok(std::make_shared<PackInfo>(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), iconName, medianTier));
+}
+
+void PackInfo::downloadAndOpenPack() {
+    if (levels.empty()) {
+        auto req = web::WebRequest();
+        req.header("User-Agent", Utils::getUserAgent());
+        packDownloadTaskHolder.spawn(req.get(getPackDownloadUrl(id)), getPackDownloadLambda());
+    } else {
+        requestPage(0, nullptr);
+    }
+}
+
+void PackInfo::requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer) {
+    const int actualPageNumber = std::min(pageNumber, static_cast<int>(levels.size() % 10 == 0 ? levels.size() / 10 : levels.size() / 10 + 1));
+    GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(actualPageNumber * 10, levels);
+    forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
 }
 
 int PackInfo::getId() const {
