@@ -64,7 +64,36 @@ void GDDLPackLevelBrowser::keyBackClicked() {
 
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onEnterTransitionDidFinish();
-    if (m_fields->packInfo != nullptr && m_fields->firstOpen) {
+    if (m_fields->packInfo != nullptr) {
+        createPackUI();
+        updateAfterLoadLevelsFinished();
+    }
+}
+
+void GDDLPackLevelBrowser::onBack(cocos2d::CCObject* sender) {
+    if (m_fields->packInfo != nullptr) {
+        backActions();
+    }
+    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onBack(sender);
+}
+
+void GDDLPackLevelBrowser::backActions() {
+    // empty for now
+}
+
+void GDDLPackLevelBrowser::handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber) {
+    m_fields->currentPage = actualPageNumber;
+    loadPage(gjSearchObject);
+    setCorrectLabelsText();
+}
+
+void GDDLPackLevelBrowser::assignPackInfo(PackInfo* packInfo) {
+    this->m_fields->packInfo = packInfo;
+    updateAfterLoadLevelsFinished();
+}
+
+void GDDLPackLevelBrowser::createPackUI() {
+    if (m_fields->firstOpen) {
         m_fields->firstOpen = false;
         // cursed things (fortunately they only happen once)
         const auto listChildren = m_list->getChildren();
@@ -91,48 +120,29 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
             this->addChild(packIcon);
         }
         // progress bar
+        m_fields->progressBar = ProgressBar::create(ProgressBarStyle::Solid);
+        m_fields->progressBar->showProgressLabel(true);
+        m_fields->progressBar->setScale(0.9f);
+        m_fields->progressBar->setPrecision(2);
+        m_fields->progressBar->setPosition({m_list->getPositionX() + m_list->getContentWidth() / 2 - m_fields->progressBar->getScaledContentWidth() / 2, m_list->getPositionY() - 15.0f});
+        m_fields->progressBar->setZOrder(11);
+        this->addChild(m_fields->progressBar);
+    }
+}
+
+void GDDLPackLevelBrowser::updatePackUI() {
+    if (m_fields->progressBar != nullptr) {
         const auto [progress, baseCompleted] = m_fields->packInfo->getCompletionStatus();
-        const auto progressBar = ProgressBar::create(ProgressBarStyle::Solid);
-        progressBar->updateProgress(progress);
-        progressBar->showProgressLabel(true);
-        progressBar->setScale(0.9f);
-        progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
-        progressBar->setPrecision(2);
-        progressBar->setPosition({m_list->getPositionX() + m_list->getContentWidth() / 2 - progressBar->getScaledContentWidth() / 2, m_list->getPositionY() - 15.0f});
-        progressBar->setZOrder(11);
-        this->addChild(progressBar);
-        // ok things
-        updateAfterLoadLevelsFinished();
+        m_fields->progressBar->updateProgress(progress);
+        m_fields->progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
     }
-
-}
-
-void GDDLPackLevelBrowser::onBack(cocos2d::CCObject* sender) {
-    if (m_fields->packInfo != nullptr) {
-        backActions();
-    }
-    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onBack(sender);
-}
-
-void GDDLPackLevelBrowser::backActions() {
-    // empty for now
-}
-
-void GDDLPackLevelBrowser::handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber) {
-    m_fields->currentPage = actualPageNumber;
-    loadPage(gjSearchObject);
-    setCorrectLabelsText();
-}
-
-void GDDLPackLevelBrowser::assignPackInfo(PackInfo* packInfo) {
-    this->m_fields->packInfo = packInfo;
-    updateAfterLoadLevelsFinished();
 }
 
 void GDDLPackLevelBrowser::updateAfterLoadLevelsFinished() {
     m_leftArrow->setVisible(m_fields->currentPage > 0);
     m_rightArrow->setVisible(m_fields->packInfo->shouldShowRightArrow(m_fields->currentPage));
     setCorrectLabelsText();
+    updatePackUI();
 }
 
 void GDDLPackLevelBrowser::setCorrectLabelsText() {

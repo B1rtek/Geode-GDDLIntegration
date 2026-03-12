@@ -3,6 +3,7 @@
 
 #include "objects/PackInfo.h"
 #include <Geode/modify/LevelBrowserLayer.hpp>
+#include <Geode/ui/ProgressBar.hpp>
 
 using namespace geode::prelude;
 
@@ -11,6 +12,7 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
         int currentPage = 0;
         PackInfo* packInfo = nullptr;
         bool firstOpen = true;
+        ProgressBar* progressBar = nullptr;
     };
 
     gd::string getSearchTitle();
@@ -25,6 +27,8 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     void backActions();
     void handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber);
     void assignPackInfo(PackInfo* packInfo);
+    void createPackUI();
+    void updatePackUI();
     void updateAfterLoadLevelsFinished();
     void setCorrectLabelsText();
 };
