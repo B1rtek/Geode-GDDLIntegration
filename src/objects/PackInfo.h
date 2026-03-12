@@ -18,6 +18,7 @@ class PackInfo {
     std::string iconPath;
     int medianTier{};
     std::vector<int> levels;
+    std::set<int> extraLevels;
     TaskHolder<web::WebResponse> packDownloadTaskHolder;
 
     std::function<void(web::WebResponse)> getPackDownloadLambda();
@@ -36,6 +37,7 @@ public:
     std::string getPageCountText(const int pageNumber);
     bool shouldShowRightArrow(const int pageNumber);
 
+    std::pair<float, bool> getCompletionStatus() const;
     int getId() const;
     int getCategoryId() const;
     std::string getName() const;

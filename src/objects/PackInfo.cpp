@@ -20,7 +20,12 @@ std::function<void(web::WebResponse)> PackInfo::getPackDownloadLambda() {
                 // TODO error
                 return;
             }
-            levels.push_back(levelObject["LevelID"].asInt().unwrap());
+            const int levelId = levelObject["LevelID"].asInt().unwrap();
+            levels.push_back(levelId);
+            // extra levels
+            if (levelObject.contains("EX") && levelObject["EX"].isBool() && levelObject["EX"].asBool().unwrap()) {
+                extraLevels.insert(levelId);
+            }
         }
         // everything went well, forward to level browser
         GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, levels);
@@ -93,6 +98,25 @@ std::string PackInfo::getPageCountText(const int pageNumber) {
 bool PackInfo::shouldShowRightArrow(const int pageNumber) {
     const int pageCount = Utils::getPageCountOf(levels);
     return pageNumber < pageCount - 1;
+}
+
+std::pair<float, bool> PackInfo::getCompletionStatus() const {
+    int completedBase = 0, completedTotal = 0;
+    GameLevelManager *levelManager = GameLevelManager::sharedState();
+    CCArray *completedLevels = levelManager->getCompletedLevels(false);
+    for (const auto level : CCArrayExt<GJGameLevel*>(completedLevels)) {
+        const bool levelCompleted = level->m_normalPercent == 100;
+        if (levelCompleted && std::ranges::find(levels, static_cast<int>(level->m_levelID)) != levels.end()) {
+            ++completedTotal;
+            if (!extraLevels.contains(static_cast<int>(level->m_levelID))) {
+                ++completedBase;
+            }
+        }
+    }
+    if (completedBase == levels.size() - extraLevels.size()) {
+        return {100.0f * static_cast<float>(completedTotal) / static_cast<float>(levels.size()), true};
+    }
+    return {100.0f * static_cast<float>(completedBase) / static_cast<float>(levels.size() - extraLevels.size()), false};
 }
 
 int PackInfo::getId() const {
