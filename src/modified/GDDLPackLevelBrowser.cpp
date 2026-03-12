@@ -60,6 +60,21 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
                 maybeLabel->limitLabelWidth(280.0f, 0.8f, 0.2f);
             }
         }
+        // sprite adding things
+        for (int i = 0; i < 2; i++) {
+            const auto packIcon = LazySprite::create({20.0f, 20.0f});
+            packIcon->setLoadCallback([packIcon](Result<> res) {
+                if (!res) {
+                    packIcon->initWithFile(Mod::get()->expandSpriteName("tier_unrated.png").data());
+                    packIcon->setScale(0.275f);
+                }
+            });
+            packIcon->loadFromUrl(Values::packIconsBaseUrl + m_fields->packInfo->getIconPath());
+            packIcon->setPosition({m_list->getPositionX() - 4.0f + i * (m_list->getContentWidth() + 8.0f), m_list->getPositionY() + m_list->getContentHeight() + 17.0f});
+            packIcon->setScale(1.25f);
+            packIcon->setZOrder(3);
+            this->addChild(packIcon);
+        }
         // ok things
         updateAfterLoadLevelsFinished();
     }
