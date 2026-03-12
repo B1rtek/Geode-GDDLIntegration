@@ -10,6 +10,7 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     struct Fields {
         int currentPage = 0;
         PackInfo* packInfo = nullptr;
+        bool firstOpen = true;
     };
 
     gd::string getSearchTitle();

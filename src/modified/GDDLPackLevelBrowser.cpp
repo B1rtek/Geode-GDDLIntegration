@@ -14,6 +14,7 @@ void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* 
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::loadLevelsFinished(p0, p1, p2);
     if (m_fields->packInfo != nullptr) {
         updateAfterLoadLevelsFinished();
+        // TODO mark levels as extra
     }
 }
 
@@ -50,7 +51,8 @@ void GDDLPackLevelBrowser::keyBackClicked() {
 
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onEnterTransitionDidFinish();
-    if (m_fields->packInfo != nullptr) {
+    if (m_fields->packInfo != nullptr && m_fields->firstOpen) {
+        m_fields->firstOpen = false;
         // cursed things (fortunately they only happen once)
         const auto listChildren = m_list->getChildren();
         for (const auto child : CCArrayExt<CCNode*>(listChildren)) {
@@ -72,9 +74,20 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
             packIcon->loadFromUrl(Values::packIconsBaseUrl + m_fields->packInfo->getIconPath());
             packIcon->setPosition({m_list->getPositionX() - 4.0f + i * (m_list->getContentWidth() + 8.0f), m_list->getPositionY() + m_list->getContentHeight() + 17.0f});
             packIcon->setScale(1.25f);
-            packIcon->setZOrder(3);
+            packIcon->setZOrder(11);
             this->addChild(packIcon);
         }
+        // progress bar
+        const auto [progress, baseCompleted] = m_fields->packInfo->getCompletionStatus();
+        const auto progressBar = ProgressBar::create(ProgressBarStyle::Solid);
+        progressBar->updateProgress(progress);
+        progressBar->showProgressLabel(true);
+        progressBar->setScale(0.9f);
+        progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
+        progressBar->setPrecision(2);
+        progressBar->setPosition({m_list->getPositionX() + m_list->getContentWidth() / 2 - progressBar->getScaledContentWidth() / 2, m_list->getPositionY() - 15.0f});
+        progressBar->setZOrder(11);
+        this->addChild(progressBar);
         // ok things
         updateAfterLoadLevelsFinished();
     }
