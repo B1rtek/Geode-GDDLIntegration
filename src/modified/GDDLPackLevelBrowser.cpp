@@ -14,7 +14,20 @@ void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* 
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::loadLevelsFinished(p0, p1, p2);
     if (m_fields->packInfo != nullptr) {
         updateAfterLoadLevelsFinished();
-        // TODO mark levels as extra
+        log::info("running loadLevelsFinished");
+        // mark levels as extra
+        for (const auto levelCell : CCArrayExt<LevelCell*>(m_list->m_listView->m_tableView->m_cellArray)) {
+            log::info("entered level cell for {}", levelCell->m_level->m_levelID);
+            if (m_fields->packInfo->isExtra(levelCell->m_level->m_levelID)) {
+                // mark as extra by setting the name to red I guess? idk
+                const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
+                const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
+                if (levelNameLabel) {
+                    log::info("found level name label, setting to red");
+                    levelNameLabel->setColor(ccc3(255, 0, 0));
+                }
+            }
+        }
     }
 }
 

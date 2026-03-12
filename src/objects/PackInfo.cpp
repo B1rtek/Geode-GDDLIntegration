@@ -142,3 +142,7 @@ int PackInfo::getMedianTier() const {
 std::vector<int> PackInfo::getLevels() const {
     return levels;
 }
+
+bool PackInfo::isExtra(const int levelId) const {
+    return extraLevels.contains(levelId);
+}

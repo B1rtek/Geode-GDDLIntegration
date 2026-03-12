@@ -44,6 +44,7 @@ public:
     std::string getIconPath() const;
     int getMedianTier() const;
     std::vector<int> getLevels() const;
+    bool isExtra(const int levelId) const;
 };
 
 
