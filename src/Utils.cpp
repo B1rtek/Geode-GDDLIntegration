@@ -32,11 +32,22 @@ void Utils::createTextInputNode(CCNode* parent, CCTextInputNode*& textfield, con
     textfield = CCTextInputNode::create(bgSize.x, bgSize.y, placeholder.c_str(), font.c_str());
     parent->addChild(textfield, zOrder + 1);
     textfield->setPosition(position);
-#ifdef GEODE_IS_ANDROID
+#ifdef GEODE_IS_MOBILE
         ++maxCharacters; // robert :)
 #endif
     textfield->setMaxLabelLength(maxCharacters);
     textfield->setMaxLabelScale(0.7f);
+}
+
+void Utils::createGeodeTextInput(CCNode* parent, geode::TextInput*& textfield, const std::string& font,
+    const std::string& placeholder, int maxCharacters, const CCPoint& bgSize, const CCPoint& position, int zOrder) {
+    textfield = geode::TextInput::create(bgSize.x, placeholder.c_str(), font.c_str());
+    parent->addChild(textfield, zOrder + 1);
+    textfield->setPosition(position);
+#ifdef GEODE_IS_MOBILE
+    ++maxCharacters; // robert :)
+#endif
+    textfield->setMaxCharCount(maxCharacters);
 }
 
 void Utils::createLeftRightButtonsAround(CCNode* object, const CCPoint& size, CCObject* callbackObject,
@@ -113,27 +124,29 @@ void Utils::scaleLabelToWidth(CCLabelBMFont*& label, const float maxWidth) {
     label->setScale(scale);
 }
 
-void Utils::createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
-    const CCPoint& position, int zOrder) {
+CCLabelBMFont* Utils::createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
+                                  const CCPoint& position, int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
+    return label;
 }
 
 CCScale9Sprite* Utils::createLabelForChoice(CCLayer* parent, CCLabelBMFont*& label, const std::string& font,
-    const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, int zOrder) {
+    const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, const std::string &bgSprite, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);
     scaleLabelToWidth(label, maxWidth);
-    const auto bg = CCScale9Sprite::create("square02_small.png");
+    const auto bg = CCScale9Sprite::create(bgSprite.c_str());
     parent->addChild(bg, zOrder + 1);
     bg->setContentSize(bgSize);
     bg->setScale(0.5f);
     bg->setContentSize(bg->getContentSize() / 0.5f);
     bg->setPosition(position);
-    bg->setOpacity(100);
+    bg->setOpacity(90);
+    bg->setColor({0, 0, 0});
     return bg;
 }
 
@@ -242,7 +255,7 @@ int Utils::getCorrectedFPS() {
 }
 
 bool Utils::isMobile() {
-#ifdef GEODE_IS_ANDROID
+#ifdef GEODE_IS_MOBILE
         return true;
 #else
     return false;
@@ -363,4 +376,23 @@ Result<std::string_view> Utils::getSpriteNodeFrameName(CCSprite* sprite) {
     }
 
     return Ok(frameName);
+}
+
+char Utils::toHex(int number) {
+    if (number < 10) return static_cast<char>(48 + number);
+    return static_cast<char>(55 + number);
+}
+
+std::string Utils::urlEncode(const std::string& input) {
+    std::string result;
+    for (const char c : input) {
+        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            result += c;
+        } else {
+            result += '%';
+            result += toHex(c/16);
+            result += toHex(c%16);
+        }
+    }
+    return result;
 }

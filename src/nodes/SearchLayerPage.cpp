@@ -1,0 +1,61 @@
+#include "SearchLayerPage.h"
+
+bool SearchLayerPage::init() {
+    if (!CCNode::init()) return false;
+
+    this->setContentSize(pageSize);
+
+    return true;
+}
+
+SearchLayerPage* SearchLayerPage::create() {
+    if (const auto newNode = new SearchLayerPage(); newNode != nullptr && newNode->init()) {
+        newNode->autorelease();
+        return newNode;
+    } else {
+        delete newNode;
+        return nullptr;
+    }
+}
+
+void SearchLayerPage::addControl(SearchInputControl* control, CCMenu* targetGlobalMenu, int controlIndex) {
+    if (controls.size() >= 9) return;
+    control->setPosition(getControlPosition(controlIndex != -1 ? controlIndex : controls.size()));
+    this->addChild(control);
+    // FUCK TOUCH PRIO
+    if (targetGlobalMenu != nullptr) {
+        control->relocateToGlobalMenu(targetGlobalMenu);
+    }
+    controls.push_back(control);
+}
+
+void SearchLayerPage::clearContent() {
+    for (const auto control : controls) {
+        this->removeChild(control);
+    }
+    controls.clear();
+}
+
+void SearchLayerPage::clickOffTextfields() {
+    for (const auto control : controls) {
+        control->clickOffTextfields();
+    }
+}
+
+void SearchLayerPage::saveSettings() {
+    for (const auto control : controls) {
+        control->saveSetting();
+    }
+}
+
+void SearchLayerPage::reloadSettings() {
+    for (const auto control : controls) {
+        control->loadSetting();
+    }
+}
+
+CCPoint SearchLayerPage::getControlPosition(const unsigned index) {
+    const float xPos = pageSize.x/3 * static_cast<float>(index/3);
+    const float yPos = 2*pageSize.y/3 - pageSize.y/3 * static_cast<float>(index%3);
+    return {xPos, yPos};
+}

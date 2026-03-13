@@ -2,15 +2,14 @@
 #include <Geode/Bindings.hpp>
 #include "Geode/modify/LevelSearchLayer.hpp"
 
+#include <layers/GDDLSearchLayerV2.h>
+
 #include "RatingsManager.h"
-#include "layers/GDDLSearchLayer.h"
 
 class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     // ReSharper disable once CppHidingFunction
     bool init(int p0) {
         if(!LevelSearchLayer::init(p0)) return false;
-        GDDLSearchLayer::stopSearch();
-        GDDLSearchLayer::restoreValuesAfterSplit();
         addGDDLButton();
         return true;
     }
@@ -27,6 +26,6 @@ class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     }
 
     void onGDDLSearch(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
-        GDDLSearchLayer::create()->show();
+        GDDLSearchLayerV2::create()->show();
     }
 };
