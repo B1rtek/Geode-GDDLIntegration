@@ -178,6 +178,11 @@ void GDDLSearchLayerV2::onPageRightClicked(CCObject* sender) {
     reloadAfterSwitchingPage();
 }
 
+void GDDLSearchLayerV2::onEnter() {
+    FLAlertLayer::onEnter();
+    searchObject.cancelSearch();
+}
+
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
     backActions();
 }
