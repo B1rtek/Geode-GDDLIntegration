@@ -1,4 +1,4 @@
-name: Build Geode Mod (v4)
+name: Build Geode Mod (debug)
 
 on:
   workflow_dispatch:
@@ -14,17 +14,6 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
-
-        - name: macOS
-          os: macos-latest
-
-        - name: iOS
-          os: macos-latest
-          target: iOS
-
-        - name: Android32
-          os: ubuntu-latest
-          target: Android32
 
         - name: Android64
           os: ubuntu-latest
@@ -43,13 +32,10 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          sdk: "v4.10.0"
           configure-args: "-DSKIP_BUILDING_CODEGEN=OFF"
           build-config: RelWithDebInfo
           export-symbols: true
           export-pdb: true
-          bindings: geode-sdk/bindings
-          bindings-ref: 23d6ae03307e612430623a7ea693819d6fa963fa
           combine: true
           target: ${{ matrix.config.target }}
 
