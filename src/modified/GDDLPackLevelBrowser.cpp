@@ -11,19 +11,17 @@ gd::string GDDLPackLevelBrowser::getSearchTitle() {
 }
 
 void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* p1, int p2) {
+    log::info("loadLevelsFinished() called");
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::loadLevelsFinished(p0, p1, p2);
     if (m_fields->packInfo != nullptr) {
         updateAfterLoadLevelsFinished();
-        log::info("running loadLevelsFinished");
         // mark levels as extra
         for (const auto levelCell : CCArrayExt<LevelCell*>(m_list->m_listView->m_tableView->m_cellArray)) {
-            log::info("entered level cell for {}", levelCell->m_level->m_levelID);
             if (m_fields->packInfo->isExtra(levelCell->m_level->m_levelID)) {
                 // mark as extra by setting the name to red I guess? idk
                 const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
                 const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
                 if (levelNameLabel) {
-                    log::info("found level name label, setting to red");
                     levelNameLabel->setColor(ccc3(255, 0, 0));
                 }
             }
@@ -55,30 +53,13 @@ void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
     }
 }
 
-void GDDLPackLevelBrowser::keyBackClicked() {
-    if (m_fields->packInfo != nullptr) {
-        backActions();
-    }
-    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::keyBackClicked();
-}
-
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
+    log::info("onEnterTransitionDidFinish() called");
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onEnterTransitionDidFinish();
     if (m_fields->packInfo != nullptr) {
         createPackUI();
         updateAfterLoadLevelsFinished();
     }
-}
-
-void GDDLPackLevelBrowser::onBack(cocos2d::CCObject* sender) {
-    if (m_fields->packInfo != nullptr) {
-        backActions();
-    }
-    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onBack(sender);
-}
-
-void GDDLPackLevelBrowser::backActions() {
-    // empty for now
 }
 
 void GDDLPackLevelBrowser::handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber) {
@@ -131,6 +112,7 @@ void GDDLPackLevelBrowser::createPackUI() {
 }
 
 void GDDLPackLevelBrowser::updatePackUI() {
+    // progressbar
     if (m_fields->progressBar != nullptr) {
         const auto [progress, baseCompleted] = m_fields->packInfo->getCompletionStatus();
         m_fields->progressBar->updateProgress(progress);

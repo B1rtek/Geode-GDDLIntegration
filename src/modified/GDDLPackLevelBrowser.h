@@ -20,11 +20,8 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
     void setIDPopupClosed(SetIDPopup* popup, int value) override;
-    void keyBackClicked() override;
-    void onBack(cocos2d::CCObject* sender) override;
     void onEnterTransitionDidFinish() override;
 
-    void backActions();
     void handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber);
     void assignPackInfo(PackInfo* packInfo);
     void createPackUI();
