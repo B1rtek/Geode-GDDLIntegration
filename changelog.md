@@ -1,5 +1,7 @@
-# 1.4.0
-- Packs support!!!
+# 1.3.1
+- Fixed a bug that caused memory leaks on the new search menu screen
+- Fixed a bug that caused the game to crash on Android while attempting to add levels to lists (thanks starfruitgamer123!)
+- Fixed a bug that made the old tier label display over user coins in weekly/event levels (thanks percival254!)
 
 # 1.3.0
 - Complete search menu overhaul

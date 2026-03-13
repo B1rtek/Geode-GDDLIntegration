@@ -23,6 +23,7 @@ class GDDLSearchLayerV2 : public FLAlertLayer, public ILoadingCircleHaver {
 
     // normal popup stuff
     bool init() override;
+    void onEnter() override;
     void onClose(CCObject *sender);
     void keyBackClicked() override;
 

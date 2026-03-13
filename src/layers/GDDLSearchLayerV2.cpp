@@ -99,6 +99,7 @@ void GDDLSearchLayerV2::reloadAfterSwitchingPage() {
     searchObject.loadSettings();
     levelNameTextInput->setString(searchObject.getLevelNameSetting()->getSettingValue());
     displayPage(currentPageNumber);
+    handleTouchPriority(this);
 }
 
 void GDDLSearchLayerV2::displayPage(int pageNumber) {
@@ -107,30 +108,30 @@ void GDDLSearchLayerV2::displayPage(int pageNumber) {
     if (pageNumber == 0) {
         // simplified search page
         setTopBarVisibility(false);
-        currentPage->addControl(SimplifiedSearchControl::create(&searchObject), m_buttonMenu, 2);
+        currentPage->addControl(SimplifiedSearchControl::create(&searchObject), nullptr, 2);
     } else if (pageNumber == 1) {
         // first page
-        currentPage->addControl(EnumInputControl::create("Top skillset", searchObject.getTopSkillsetSetting()), m_buttonMenu);
-        currentPage->addControl(EnumInputControl::create("Has skillset", searchObject.getHasSkillsetSetting()), m_buttonMenu);
-        currentPage->addControl(EnumInputControl::create("Sort by", searchObject.getSortSetting()), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getRatingsSetting(), true), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()), m_buttonMenu);
-        currentPage->addControl(EnumInputControl::create("Sort direction", searchObject.getSortDirectionSetting()), m_buttonMenu);
-        currentPage->addControl(CheckboxInputControl::create("No rated", searchObject.getExcludeRatedSetting(), "No unrated", searchObject.getExcludeUnratedSetting(), true), m_buttonMenu);
-        currentPage->addControl(CheckboxInputControl::create("No rated enj.", searchObject.getExcludeRatedEnjoymentSetting(), "No unrated enj.", searchObject.getExcludeUnratedEnjoymentSetting(), true), m_buttonMenu);
-        currentPage->addControl(CheckboxInputControl::create("Completed", searchObject.getCompletedSetting(), "Uncompleted", searchObject.getUncompletedSetting(), true), m_buttonMenu);
+        currentPage->addControl(EnumInputControl::create("Top skillset", searchObject.getTopSkillsetSetting()));
+        currentPage->addControl(EnumInputControl::create("Has skillset", searchObject.getHasSkillsetSetting()));
+        currentPage->addControl(EnumInputControl::create("Sort by", searchObject.getSortSetting()));
+        currentPage->addControl(RangeInputControl<int>::create("Tiers", searchObject.getRatingsSetting(), true));
+        currentPage->addControl(RangeInputControl<float>::create("Enjoyment rating", searchObject.getEnjoymentsSetting()));
+        currentPage->addControl(EnumInputControl::create("Sort direction", searchObject.getSortDirectionSetting()));
+        currentPage->addControl(CheckboxInputControl::create("No rated", searchObject.getExcludeRatedSetting(), "No unrated", searchObject.getExcludeUnratedSetting(), true));
+        currentPage->addControl(CheckboxInputControl::create("No rated enj.", searchObject.getExcludeRatedEnjoymentSetting(), "No unrated enj.", searchObject.getExcludeUnratedEnjoymentSetting(), true));
+        currentPage->addControl(CheckboxInputControl::create("Completed", searchObject.getCompletedSetting(), "Uncompleted", searchObject.getUncompletedSetting(), true));
     } else if (pageNumber == 2) {
-        currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()), m_buttonMenu);
-        currentPage->addControl(EnumInputControl::create("Length", searchObject.getLengthSetting()), m_buttonMenu);
-        currentPage->addControl(EnumInputControl::create("Two player type", searchObject.getTwoPlayerSetting()), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<int>::create("Submissions count", searchObject.getRatingsCountSetting(), true), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<int>::create("Enj. submissions count", searchObject.getEnjoymentsCountSetting(), true), m_buttonMenu);
-        currentPage->addControl(RangeInputControl<float>::create("Rating deviation", searchObject.getDeviationsSetting()), m_buttonMenu);
+        currentPage->addControl(EnumInputControl::create("Difficulty", searchObject.getDifficultySetting()));
+        currentPage->addControl(EnumInputControl::create("Length", searchObject.getLengthSetting()));
+        currentPage->addControl(EnumInputControl::create("Two player type", searchObject.getTwoPlayerSetting()));
+        currentPage->addControl(RangeInputControl<int>::create("Submissions count", searchObject.getRatingsCountSetting(), true));
+        currentPage->addControl(RangeInputControl<int>::create("Enj. submissions count", searchObject.getEnjoymentsCountSetting(), true));
+        currentPage->addControl(RangeInputControl<float>::create("Rating deviation", searchObject.getDeviationsSetting()));
         currentPage->addControl(TextInputControl::create("Creator", searchObject.getCreatorNameSetting()));
         currentPage->addControl(TextInputControl::create("Song", searchObject.getSongNameSetting()));
-        currentPage->addControl(CheckboxInputControl::create("Is in pack", searchObject.getIsInPackSetting()), m_buttonMenu);
+        currentPage->addControl(CheckboxInputControl::create("Is in pack", searchObject.getIsInPackSetting()));
     } else if (pageNumber == 3) {
-        currentPage->addControl(RangeInputControl<int>::create("Level ID", searchObject.getIdsRangeSetting(), true), m_buttonMenu);
+        currentPage->addControl(RangeInputControl<int>::create("Level ID", searchObject.getIdsRangeSetting(), true));
     }
     updatePageNumberLabel();
 }
@@ -175,6 +176,11 @@ void GDDLSearchLayerV2::onPageRightClicked(CCObject* sender) {
         currentPageNumber = 0;
     }
     reloadAfterSwitchingPage();
+}
+
+void GDDLSearchLayerV2::onEnter() {
+    FLAlertLayer::onEnter();
+    searchObject.cancelSearch();
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {
