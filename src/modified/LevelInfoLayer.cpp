@@ -92,7 +92,10 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
                 tierLabelSprite->setID("gddl-rating_label"_spr);
                 float labelShiftRows = 1.0f;
                 if (m_level->m_coins > 0) {
-                    labelShiftRows += 1.0f;
+                    labelShiftRows += 0.8f;
+                }
+                if (m_level->m_dailyID > 100000) {
+                    labelShiftRows += 0.8f; // quick fix for 5 people who use this thing for some reason
                 }
                 const auto moveRowsSetting = static_pointer_cast<UseOldTierLabelSettingV3>(Mod::get()->getSetting("use-old-tier-label"))->getPositionOffset();
                 if (moveRowsSetting == -1) {

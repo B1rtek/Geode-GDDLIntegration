@@ -17,10 +17,12 @@ struct GDDLLevelBrowserLayer : public geode::Modify<GDDLLevelBrowserLayer, Level
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
     void setIDPopupClosed(SetIDPopup* popup, int value) override;
-    void keyBackClicked() override;
-    void onBack(cocos2d::CCObject* sender) override;
+    // hooking onBack() on Android crashes the game, implemented a workaround
+    // by calling things from backActions() in GDDLSearchLayerV2 onEnter() because that works
+    // void keyBackClicked() override;
+    // void onBack(cocos2d::CCObject* sender) override;
 
-    void backActions();
+    // void backActions();
     void setCorrectLabelsText();
     void handleSearchObject(GJSearchObject * searchObject, int resultsCount);
     void assignSearchObject(SearchObject* searchObject);

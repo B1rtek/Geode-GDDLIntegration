@@ -35,27 +35,28 @@ void GDDLLevelBrowserLayer::setIDPopupClosed(SetIDPopup* popup, int value) {
     if (m_fields->searchObject != nullptr) {
         m_fields->searchObject->requestSearchPage(value - 1, this);
     } else {
-        Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::setIDPopupClosed(popup, value);
+        LevelBrowserLayer::setIDPopupClosed(popup, value);
     }
 }
 
-void GDDLLevelBrowserLayer::keyBackClicked() {
-    if (m_fields->searchObject != nullptr) {
-        backActions();
-    }
-    Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::keyBackClicked();
-}
-
-void GDDLLevelBrowserLayer::onBack(cocos2d::CCObject* sender) {
-    if (m_fields->searchObject != nullptr) {
-        backActions();
-    }
-    Modify<GDDLLevelBrowserLayer, LevelBrowserLayer>::onBack(sender);
-}
-
-void GDDLLevelBrowserLayer::backActions() {
-    m_fields->searchObject->cancelSearch();
-}
+// crash workaround, code moved to GDDLSearchLayerV2::onEnter()
+// void GDDLLevelBrowserLayer::keyBackClicked() {
+//     if (m_fields->searchObject != nullptr) {
+//         backActions();
+//     }
+//     LevelBrowserLayer::keyBackClicked();
+// }
+//
+// void GDDLLevelBrowserLayer::onBack(cocos2d::CCObject* sender) {
+//     if (m_fields->searchObject != nullptr) {
+//         backActions();
+//     }
+//     LevelBrowserLayer::onBack(sender);
+// }
+//
+// void GDDLLevelBrowserLayer::backActions() {
+//     m_fields->searchObject->cancelSearch();
+// }
 
 void GDDLLevelBrowserLayer::setCorrectLabelsText() {
     // # of results text
