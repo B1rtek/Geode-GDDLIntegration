@@ -11,21 +11,9 @@ gd::string GDDLPackLevelBrowser::getSearchTitle() {
 }
 
 void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* p1, int p2) {
-    log::info("loadLevelsFinished() called");
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::loadLevelsFinished(p0, p1, p2);
     if (m_fields->packInfo != nullptr) {
         updateAfterLoadLevelsFinished();
-        // mark levels as extra
-        for (const auto levelCell : CCArrayExt<LevelCell*>(m_list->m_listView->m_tableView->m_cellArray)) {
-            if (m_fields->packInfo->isExtra(levelCell->m_level->m_levelID)) {
-                // mark as extra by setting the name to red I guess? idk
-                const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
-                const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
-                if (levelNameLabel) {
-                    levelNameLabel->setColor(ccc3(255, 0, 0));
-                }
-            }
-        }
     }
 }
 
@@ -54,10 +42,10 @@ void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
 }
 
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
-    log::info("onEnterTransitionDidFinish() called");
     Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onEnterTransitionDidFinish();
     if (m_fields->packInfo != nullptr) {
         createPackUI();
+        log::info("onEnterTransitionDidFinish");
         updateAfterLoadLevelsFinished();
     }
 }
@@ -117,6 +105,23 @@ void GDDLPackLevelBrowser::updatePackUI() {
         const auto [progress, baseCompleted] = m_fields->packInfo->getCompletionStatus();
         m_fields->progressBar->updateProgress(progress);
         m_fields->progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
+    }
+    // mark levels as extra, not crashing here would be nice
+    const auto boomListView = typeinfo_cast<BoomListView*>(m_list->m_listView);
+    if (boomListView) {
+        const auto tableView = typeinfo_cast<TableView*>(boomListView->m_tableView);
+        if (tableView) {
+            for (const auto levelCell : CCArrayExt<LevelCell*>(m_list->m_listView->m_tableView->m_cellArray)) {
+                if (m_fields->packInfo->isExtra(levelCell->m_level->m_levelID)) {
+                    // mark as extra by setting the name to red I guess? idk
+                    const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
+                    const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
+                    if (levelNameLabel) {
+                        levelNameLabel->setColor(ccc3(255, 0, 0));
+                    }
+                }
+            }
+        }
     }
 }
 
