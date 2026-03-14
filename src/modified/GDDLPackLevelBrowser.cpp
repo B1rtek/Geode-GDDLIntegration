@@ -101,9 +101,12 @@ void GDDLPackLevelBrowser::createPackUI() {
 void GDDLPackLevelBrowser::updatePackUI() {
     // progressbar
     if (m_fields->progressBar != nullptr) {
-        const auto [progress, baseCompleted] = m_fields->packInfo->getCompletionStatus();
+        const auto [completedFraction, baseCompleted] = m_fields->packInfo->getCompletedFraction();
+        const float progress = 100.0f * static_cast<float>(completedFraction.first) / static_cast<float>(completedFraction.second);
         m_fields->progressBar->updateProgress(progress);
         m_fields->progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
+        const std::string progressString = std::to_string(completedFraction.first) + "/" + std::to_string(completedFraction.second);
+        m_fields->progressBar->getProgressLabel()->setString(progressString.c_str());
     }
     // mark levels as extra, not crashing here would be nice
     const auto boomListView = typeinfo_cast<BoomListView*>(m_list->m_listView);
@@ -116,7 +119,7 @@ void GDDLPackLevelBrowser::updatePackUI() {
                     const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
                     if (levelNameLabel) {
-                        levelNameLabel->setColor(ccc3(255, 0, 0));
+                        levelNameLabel->setColor(ccc3(255, 100, 100));
                     }
                 }
             }
