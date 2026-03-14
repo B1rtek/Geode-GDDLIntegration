@@ -11,7 +11,7 @@ gd::string GDDLPackLevelBrowser::getSearchTitle() {
 }
 
 void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* p1, int p2) {
-    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::loadLevelsFinished(p0, p1, p2);
+    LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
     if (m_fields->packInfo != nullptr) {
         updateAfterLoadLevelsFinished();
     }
@@ -37,15 +37,14 @@ void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
     if (m_fields->packInfo != nullptr) {
         m_fields->packInfo->requestPage(value - 1, this);
     } else {
-        Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::setIDPopupClosed(popup, value);
+        LevelBrowserLayer::setIDPopupClosed(popup, value);
     }
 }
 
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
-    Modify<GDDLPackLevelBrowser, LevelBrowserLayer>::onEnterTransitionDidFinish();
+    LevelBrowserLayer::onEnterTransitionDidFinish();
     if (m_fields->packInfo != nullptr) {
         createPackUI();
-        log::info("onEnterTransitionDidFinish");
         updateAfterLoadLevelsFinished();
     }
 }
