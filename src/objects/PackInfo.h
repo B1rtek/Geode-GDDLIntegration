@@ -24,6 +24,7 @@ class PackInfo {
     std::function<void(web::WebResponse)> getPackDownloadLambda();
     static std::string getPackDownloadUrl(int packId);
     void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer, const int actualPageNumber);
+    std::pair<int, int> calculateCompletionStats() const;
 
 public:
     PackInfo() = default;
@@ -38,6 +39,7 @@ public:
     bool shouldShowRightArrow(const int pageNumber);
 
     std::pair<float, bool> getCompletionStatus() const;
+    std::pair<std::pair<int, int>, bool> getCompletedFraction() const;
     int getId() const;
     int getCategoryId() const;
     std::string getName() const;

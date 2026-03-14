@@ -51,6 +51,22 @@ void PackInfo::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLev
     CCDirector::sharedDirector()->pushScene(transition);
 }
 
+std::pair<int, int> PackInfo::calculateCompletionStats() const {
+    int completedBase = 0, completedTotal = 0;
+    GameLevelManager *levelManager = GameLevelManager::sharedState();
+    CCArray *completedLevels = levelManager->getCompletedLevels(false);
+    for (const auto level : CCArrayExt<GJGameLevel*>(completedLevels)) {
+        const bool levelCompleted = level->m_normalPercent == 100;
+        if (levelCompleted && std::ranges::find(levels, static_cast<int>(level->m_levelID)) != levels.end()) {
+            ++completedTotal;
+            if (!extraLevels.contains(static_cast<int>(level->m_levelID))) {
+                ++completedBase;
+            }
+        }
+    }
+    return {completedBase, completedTotal};
+}
+
 PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath,
                    const int medianTier): id(id), categoryId(categoryId), name(name), iconPath(iconPath), medianTier(medianTier) {
 }
@@ -101,22 +117,19 @@ bool PackInfo::shouldShowRightArrow(const int pageNumber) {
 }
 
 std::pair<float, bool> PackInfo::getCompletionStatus() const {
-    int completedBase = 0, completedTotal = 0;
-    GameLevelManager *levelManager = GameLevelManager::sharedState();
-    CCArray *completedLevels = levelManager->getCompletedLevels(false);
-    for (const auto level : CCArrayExt<GJGameLevel*>(completedLevels)) {
-        const bool levelCompleted = level->m_normalPercent == 100;
-        if (levelCompleted && std::ranges::find(levels, static_cast<int>(level->m_levelID)) != levels.end()) {
-            ++completedTotal;
-            if (!extraLevels.contains(static_cast<int>(level->m_levelID))) {
-                ++completedBase;
-            }
-        }
-    }
+    const auto [completedBase, completedTotal] = calculateCompletionStats();
     if (completedBase == levels.size() - extraLevels.size()) {
         return {100.0f * static_cast<float>(completedTotal) / static_cast<float>(levels.size()), true};
     }
     return {100.0f * static_cast<float>(completedBase) / static_cast<float>(levels.size() - extraLevels.size()), false};
+}
+
+std::pair<std::pair<int, int>, bool> PackInfo::getCompletedFraction() const {
+    const auto [completedBase, completedTotal] = calculateCompletionStats();
+    if (completedBase == levels.size() - extraLevels.size()) {
+        return {{completedTotal, levels.size()}, true};
+    }
+    return {{completedBase, levels.size() - extraLevels.size()}, false};
 }
 
 int PackInfo::getId() const {
