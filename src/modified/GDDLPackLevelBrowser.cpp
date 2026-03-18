@@ -49,6 +49,15 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
     }
 }
 
+void GDDLPackLevelBrowser::onInfo(CCObject* sender) {
+    if (m_fields->packInfo != nullptr) {
+        const std::string description = "<cb>" + m_fields->packInfo->getDescription() + "</c>\n\n<cp>Demons</c> which are <cy>not required</c> for pack completion are marked in <cr>red</c>. The progress bar counts only <co>progress towards required completions</c> until you <cg>complete the pack</c>, afterwards the progress bar will <cj>turn blue</c> and count <co>progress of the whole pack</c>.";
+        FLAlertLayer::create(m_fields->packInfo->getName().c_str(), description, "OK")->show();
+    } else {
+        LevelBrowserLayer::onInfo(sender);
+    }
+}
+
 void GDDLPackLevelBrowser::handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber) {
     m_fields->currentPage = actualPageNumber;
     loadPage(gjSearchObject);
