@@ -76,6 +76,7 @@ public:
     static std::string urlEncode(const std::string& input);
     static GJSearchObject* createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> ids);
     static int getPageCountOf(const std::vector<int>& vec, const int pageSize = inGameResultsPageSize);
+    static std::string generateRainbowText(const std::string& text);
 };
 
 template <typename T>

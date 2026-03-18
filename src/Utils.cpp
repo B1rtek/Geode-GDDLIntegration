@@ -413,3 +413,19 @@ GJSearchObject* Utils::createGJSearchObjectFromIndex(const unsigned long long fi
 int Utils::getPageCountOf(const std::vector<int>& vec, const int pageSize) {
     return vec.size() % pageSize == 0 ? vec.size() / pageSize : vec.size() / pageSize + 1;
 }
+
+std::string Utils::generateRainbowText(const std::string& text) {
+    const std::string rainbowOrder = "abjlfgcysorpd";
+    const int rainbowLength = rainbowOrder.size();
+    int rainbowIndex = 0;
+    std::string result;
+    for (const auto letter : text) {
+        result += "<c";
+        result += rainbowOrder[rainbowIndex++];
+        result += ">";
+        result += letter;
+        result += "</c>";
+        if (rainbowIndex >= rainbowLength) rainbowIndex = 0;
+    }
+    return result;
+}
