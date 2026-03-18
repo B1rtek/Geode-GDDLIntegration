@@ -67,15 +67,16 @@ std::pair<int, int> PackInfo::calculateCompletionStats() const {
     return {completedBase, completedTotal};
 }
 
-PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath,
-                   const int medianTier): id(id), categoryId(categoryId), name(name), iconPath(iconPath), medianTier(medianTier) {
+PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath,
+                   const int medianTier): id(id), categoryId(categoryId), name(name), description(description), iconPath(iconPath), medianTier(medianTier) {
 }
 
 Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value& json) {
     if (!json.isObject() ||
         !json.contains("ID") || !json["ID"].isNumber() ||
         !json.contains("CategoryID") || !json["CategoryID"].isNumber() ||
-        !json.contains("Name") || !json["Name"].isString()) {
+        !json.contains("Name") || !json["Name"].isString() ||
+        !json.contains("Description") || !json["Description"].isString()) {
         return Err("Invalid PackInfo JSON");
     }
     std::string iconName = "tier_unrated.png";
@@ -86,7 +87,7 @@ Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value&
     if (json.contains("Meta") && json["Meta"].isObject() && json["Meta"].contains("MedianTier") && json["Meta"]["MedianTier"].isNumber()) {
         medianTier = json["Meta"]["MedianTier"].asInt().unwrap();
     }
-    return Ok(std::make_shared<PackInfo>(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), iconName, medianTier));
+    return Ok(std::make_shared<PackInfo>(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), json["Description"].asString().unwrap(), iconName, medianTier));
 }
 
 void PackInfo::downloadAndOpenPack() {
@@ -142,6 +143,10 @@ int PackInfo::getCategoryId() const {
 
 std::string PackInfo::getName() const {
     return name;
+}
+
+std::string PackInfo::getDescription() const {
+    return description;
 }
 
 std::string PackInfo::getIconPath() const {

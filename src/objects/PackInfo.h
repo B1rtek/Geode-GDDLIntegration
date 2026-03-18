@@ -15,6 +15,7 @@ class PackInfo {
     int id{};
     int categoryId{};
     std::string name;
+    std::string description;
     std::string iconPath;
     int medianTier{};
     std::vector<int> levels;
@@ -29,7 +30,7 @@ class PackInfo {
 public:
     PackInfo() = default;
 
-    PackInfo(const int id, const int categoryId, const std::string& name, const std::string& iconPath, const int medianTier);
+    PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath, const int medianTier);
 
     static Result<std::shared_ptr<PackInfo>> createFromJson(const matjson::Value& json);
     // these should probably be an interface or sth
@@ -43,6 +44,7 @@ public:
     int getId() const;
     int getCategoryId() const;
     std::string getName() const;
+    std::string getDescription() const;
     std::string getIconPath() const;
     int getMedianTier() const;
     std::vector<int> getLevels() const;
