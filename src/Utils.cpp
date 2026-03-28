@@ -195,7 +195,15 @@ CCSprite* Utils::getSpriteFromTier(const int tier) {
     if (tier == -1) {
         return getTierSpriteFromName("tier_unrated.png");
     }
-    return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
+    const auto sprite = CCSprite::create(Mod::get()->expandSpriteName("tier_base.png").data());
+    sprite->setScale(0.275f);
+    sprite->setAnchorPoint({0, 0});
+    sprite->setColor(hexColorTo3B(Values::tierColors[tier]));
+    const auto label = CCLabelBMFont::create(std::to_string(tier).c_str(), "bigFont.fnt");
+    label->setScale(2.0f);
+    label->setPosition(sprite->getContentWidth() / 2.0f, sprite->getContentHeight() / 2.0f + 4.0f);
+    sprite->addChild(label);
+    return sprite;
 }
 
 bool Utils::notExcluded(int levelID) {
