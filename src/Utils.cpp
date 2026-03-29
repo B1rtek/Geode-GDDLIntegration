@@ -411,3 +411,63 @@ std::string Utils::urlEncode(const std::string& input) {
     }
     return result;
 }
+
+Utils::HSV Utils::rgbToHsv(const ccColor3B& rgb) {
+    const float r = static_cast<float>(rgb.r) / 255.0f, g = static_cast<float>(rgb.g) / 255.0f, b = static_cast<float>(rgb.b) / 255.0f;
+    HSV hsv{};
+    const float xMax = std::max(r, std::max(g, b));
+    hsv.v = xMax;
+    const float xMin = std::min(r, std::min(g, b));
+    const float c = xMax - xMin;
+    if (c == 0) {
+        hsv.h = 0;
+    } else if (hsv.v == r) {
+        hsv.h = 60.0f * std::fmod((g-b)/c, 6);
+    } else if (hsv.v == g) {
+        hsv.h = 60.0f * ((b-r)/c+2);
+    } else {
+        hsv.h = 60.0f * ((r-g)/c+4);
+    }
+    while (hsv.h < 0.0f) {
+        hsv.h += 360.0f;
+    }
+    hsv.s = hsv.v == 0 ? 0 : c/hsv.v;
+    return hsv;
+}
+
+ccColor3B Utils::hsvToRgb(const HSV& hsv) {
+    const float c = hsv.v * hsv.s;
+    float r = 0, g = 0, b = 0;
+    const float h2 = hsv.h / 60.0f;
+    const float x = c * (1 - std::abs(std::fmod(h2, 2) - 1.0f));
+    if (h2 < 1) {
+        r = c;
+        g = x;
+        b = 0;
+    } else if (h2 < 2) {
+        r = x;
+        g = c;
+        b = 0;
+    } else if (h2 < 3) {
+        r = 0;
+        g = c;
+        b = x;
+    } else if (h2 < 4) {
+        r = 0;
+        g = x;
+        b = c;
+    } else if (h2 < 5) {
+        r = x;
+        g = 0;
+        b = c;
+    } else {
+        r = c;
+        g = 0;
+        b = x;
+    }
+    const float m = hsv.v - c;
+    r += m;
+    g += m;
+    b += m;
+    return ccc3(static_cast<int>(r * 255.0f), static_cast<int>(g * 255.0f), static_cast<int>(b * 255.0f));
+}
