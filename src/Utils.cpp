@@ -199,9 +199,16 @@ CCSprite* Utils::getSpriteFromTier(const int tier) {
     sprite->setScale(0.275f);
     sprite->setAnchorPoint({0, 0});
     sprite->setColor(hexColorTo3B(Values::tierColors[tier]));
+    const auto overlaySprite = CCSprite::create(Mod::get()->expandSpriteName("tier_base_overlay.png").data());
+    overlaySprite->setAnchorPoint({0, 0});
+    overlaySprite->setColor(hexColorTo3B(Values::tierColors[tier]));
+    overlaySprite->setOpacity(128);
+    overlaySprite->setZOrder(sprite->getZOrder() + 1);
+    sprite->addChild(overlaySprite);
     const auto label = CCLabelBMFont::create(std::to_string(tier).c_str(), "bigFont.fnt");
     label->setScale(2.0f);
     label->setPosition(sprite->getContentWidth() / 2.0f, sprite->getContentHeight() / 2.0f + 4.0f);
+    label->setZOrder(sprite->getZOrder() + 2);
     sprite->addChild(label);
     return sprite;
 }
