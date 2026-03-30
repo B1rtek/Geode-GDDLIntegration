@@ -182,20 +182,41 @@ std::function<void(web::WebResponse)> Utils::getCacheDownloadLambda(bool notifyS
     };
 }
 
-CCSprite* Utils::getTierSpriteFromName(const char* name) {
-    const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
-
-    sprite->setScale(0.275f);
-    sprite->setAnchorPoint({0, 0});
-
-    return sprite;
-}
-
 CCSprite* Utils::getSpriteFromTier(const int tier) {
     if (tier == -1) {
-        return getTierSpriteFromName("tier_unrated.png");
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName("tier_unrated.png").data());
+        sprite->setScale(0.275f);
+        sprite->setAnchorPoint({0, 0});
+        return sprite;
     }
-    return getTierSpriteFromName(("tier_" + std::to_string(tier) + ".png").c_str());
+    const auto sprite = CCSprite::create(Mod::get()->expandSpriteName("tier_base.png").data());
+    sprite->setScale(0.275f);
+    sprite->setAnchorPoint({0, 0});
+    sprite->setColor(hexColorTo3B(Values::tierColors[tier]));
+    const auto overlaySprite1 = CCSprite::create(Mod::get()->expandSpriteName("tier_top.png").data());
+    Utils::HSV topColorHSV = Utils::rgbToHsv(hexColorTo3B(Values::tierColors[tier]));
+    topColorHSV.v += 0.1;
+    if (topColorHSV.v > 1.0f) topColorHSV.v = 1.0f;
+    const auto topColor = Utils::hsvToRgb(topColorHSV);
+    overlaySprite1->setAnchorPoint({0, 0});
+    overlaySprite1->setColor(topColor);
+    overlaySprite1->setZOrder(sprite->getZOrder() + 1);
+    sprite->addChild(overlaySprite1);
+    const auto overlaySprite2 = CCSprite::create(Mod::get()->expandSpriteName("tier_bottom.png").data());
+    Utils::HSV bottomColorHSV = Utils::rgbToHsv(hexColorTo3B(Values::tierColors[tier]));
+    bottomColorHSV.v -= 0.1;
+    if (bottomColorHSV.v < 0.0f) bottomColorHSV.v = 0.0f;
+    const auto bottomColor = Utils::hsvToRgb(bottomColorHSV);
+    overlaySprite2->setAnchorPoint({0, 0});
+    overlaySprite2->setColor(bottomColor);
+    overlaySprite2->setZOrder(sprite->getZOrder() + 1);
+    sprite->addChild(overlaySprite2);
+    const auto label = CCLabelBMFont::create(std::to_string(tier).c_str(), "bigFont.fnt");
+    label->setScale(2.0f);
+    label->setPosition(sprite->getContentWidth() / 2.0f, sprite->getContentHeight() / 2.0f + 4.0f);
+    label->setZOrder(sprite->getZOrder() + 2);
+    sprite->addChild(label);
+    return sprite;
 }
 
 bool Utils::notExcluded(int levelID) {
@@ -412,4 +433,64 @@ GJSearchObject* Utils::createGJSearchObjectFromIndex(const unsigned long long fi
 
 int Utils::getPageCountOf(const std::vector<int>& vec, const int pageSize) {
     return vec.size() % pageSize == 0 ? vec.size() / pageSize : vec.size() / pageSize + 1;
+}
+
+Utils::HSV Utils::rgbToHsv(const ccColor3B& rgb) {
+    const float r = static_cast<float>(rgb.r) / 255.0f, g = static_cast<float>(rgb.g) / 255.0f, b = static_cast<float>(rgb.b) / 255.0f;
+    HSV hsv{};
+    const float xMax = std::max(r, std::max(g, b));
+    hsv.v = xMax;
+    const float xMin = std::min(r, std::min(g, b));
+    const float c = xMax - xMin;
+    if (c == 0) {
+        hsv.h = 0;
+    } else if (hsv.v == r) {
+        hsv.h = 60.0f * std::fmod((g-b)/c, 6);
+    } else if (hsv.v == g) {
+        hsv.h = 60.0f * ((b-r)/c+2);
+    } else {
+        hsv.h = 60.0f * ((r-g)/c+4);
+    }
+    while (hsv.h < 0.0f) {
+        hsv.h += 360.0f;
+    }
+    hsv.s = hsv.v == 0 ? 0 : c/hsv.v;
+    return hsv;
+}
+
+ccColor3B Utils::hsvToRgb(const HSV& hsv) {
+    const float c = hsv.v * hsv.s;
+    float r = 0, g = 0, b = 0;
+    const float h2 = hsv.h / 60.0f;
+    const float x = c * (1 - std::abs(std::fmod(h2, 2) - 1.0f));
+    if (h2 < 1) {
+        r = c;
+        g = x;
+        b = 0;
+    } else if (h2 < 2) {
+        r = x;
+        g = c;
+        b = 0;
+    } else if (h2 < 3) {
+        r = 0;
+        g = c;
+        b = x;
+    } else if (h2 < 4) {
+        r = 0;
+        g = x;
+        b = c;
+    } else if (h2 < 5) {
+        r = x;
+        g = 0;
+        b = c;
+    } else {
+        r = c;
+        g = 0;
+        b = x;
+    }
+    const float m = hsv.v - c;
+    r += m;
+    g += m;
+    b += m;
+    return ccc3(static_cast<int>(r * 255.0f), static_cast<int>(g * 255.0f), static_cast<int>(b * 255.0f));
 }

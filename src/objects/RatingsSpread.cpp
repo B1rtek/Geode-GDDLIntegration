@@ -34,7 +34,7 @@ std::vector<BarChartData> RatingsSpread::getDiffSpreadData() {
     std::vector<BarChartData> chartData{};
     for (int i = minRating; i <= maxRating; i++) {
         const int count = diffRatings.contains(i) ? diffRatings[i] : 0;
-        chartData.push_back(BarChartData(Utils::hexColorTo4F(RatingsManager::tierColors[i]), "Tier " + std::to_string(i), count));
+        chartData.push_back(BarChartData(Utils::hexColorTo4F(Values::tierColors[i]), "Tier " + std::to_string(i), count));
     }
     return chartData;
 }

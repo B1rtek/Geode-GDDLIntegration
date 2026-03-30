@@ -17,6 +17,14 @@ class Utils {
         "Brown", "Blue", "Green", "Purple", "Gray", "White", "Transparent???"
     };
 public:
+    struct HSV {
+        float h, s, v;
+
+        HSV(const float h, const float s, const float v) : h(h), s(s), v(v) {}
+
+        HSV() = default;
+    };
+
     const inline static std::string hopefullyAllCharactersAnyoneWillEverNeed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+`~[]{}/?.>,<\\|;:'\" ";
     const inline static unsigned long long inGameResultsPageSize = 10;
 
@@ -56,7 +64,6 @@ public:
                                                 const std::string &placeholder, float maxWidth, const CCPoint &position,
                                                 const CCPoint &bgSize, const std::string &bgSprite = "square02_small.png", int zOrder = 1);
     static std::function<void(web::WebResponse)> getCacheDownloadLambda(bool notifySuccess = false);
-    static CCSprite *getTierSpriteFromName(const char *name);
     static CCSprite *getSpriteFromTier(const int tier);
     static bool notExcluded(int levelID);
     static ccColor4F hexColorTo4F(int hexColor);
@@ -76,6 +83,8 @@ public:
     static std::string urlEncode(const std::string& input);
     static GJSearchObject* createGJSearchObjectFromIndex(const unsigned long long firstIndex, std::vector<int> ids);
     static int getPageCountOf(const std::vector<int>& vec, const int pageSize = inGameResultsPageSize);
+    static HSV rgbToHsv(const ccColor3B& rgb);
+    static ccColor3B hsvToRgb(const HSV& hsv);
 };
 
 template <typename T>

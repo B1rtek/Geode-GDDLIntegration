@@ -98,7 +98,7 @@ class SearchObject {
     Result<std::vector<int>> parseApiResponse(const std::string& response);
     std::vector<int> filterResults(std::vector<int> parsedResponse, bool includeCompleted, bool includeUncompleted);
     bool isPageReady(int pageNumber, const std::vector<int>& filteredResults) const;
-    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver);
+    std::function<void(web::WebResponse)> getSearchLambda(int requestedPage, const Ref<GDDLLevelBrowserLayer>& callingLayer, ILoadingCircleHaver* loadingCircleHaver);
     void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLLevelBrowserLayer* callingLayer, int actualPageNumber, ILoadingCircleHaver*
                                loadingCircleHaver);
     void endSearch(ILoadingCircleHaver* loadingCircleHaver);

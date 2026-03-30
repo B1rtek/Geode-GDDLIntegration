@@ -107,7 +107,7 @@ bool SearchObject::isPageReady(const int pageNumber, const std::vector<int>& fil
     return filteredResults.size() >= (pageNumber + 1) * inGameResultsPageSize;
 }
 
-std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, GDDLLevelBrowserLayer* callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
+std::function<void(web::WebResponse)> SearchObject::getSearchLambda(int requestedPage, const Ref<GDDLLevelBrowserLayer>& callingLayer, ILoadingCircleHaver* loadingCircleHaver) {
     return [this, requestedPage, callingLayer, loadingCircleHaver](web::WebResponse res) {
         if (res.code() != 200) {
             const auto jsonResponse = res.json().unwrapOr(matjson::Value());
