@@ -182,18 +182,12 @@ std::function<void(web::WebResponse)> Utils::getCacheDownloadLambda(bool notifyS
     };
 }
 
-CCSprite* Utils::getTierSpriteFromName(const char* name) {
-    const auto sprite = CCSprite::create(Mod::get()->expandSpriteName(name).data());
-
-    sprite->setScale(0.275f);
-    sprite->setAnchorPoint({0, 0});
-
-    return sprite;
-}
-
 CCSprite* Utils::getSpriteFromTier(const int tier) {
     if (tier == -1) {
-        return getTierSpriteFromName("tier_unrated.png");
+        const auto sprite = CCSprite::create(Mod::get()->expandSpriteName("tier_unrated.png").data());
+        sprite->setScale(0.275f);
+        sprite->setAnchorPoint({0, 0});
+        return sprite;
     }
     const auto sprite = CCSprite::create(Mod::get()->expandSpriteName("tier_base.png").data());
     sprite->setScale(0.275f);

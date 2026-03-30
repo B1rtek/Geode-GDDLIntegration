@@ -63,7 +63,6 @@ public:
                                                 const std::string &placeholder, float maxWidth, const CCPoint &position,
                                                 const CCPoint &bgSize, const std::string &bgSprite = "square02_small.png", int zOrder = 1);
     static std::function<void(web::WebResponse)> getCacheDownloadLambda(bool notifySuccess = false);
-    static CCSprite *getTierSpriteFromName(const char *name);
     static CCSprite *getSpriteFromTier(const int tier);
     static bool notExcluded(int levelID);
     static ccColor4F hexColorTo4F(int hexColor);
