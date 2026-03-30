@@ -1,3 +1,9 @@
+# 1.3.2
+- The tier images are now being assembled from template textures instead, improving texture pack support ([thanks Aktimoose!](https://github.com/B1rtek/Geode-GDDLIntegration/issues/108))
+- Opening the GDDL Demon Split and the simplified search page doesn't lag the game anymore
+- Fixed (most likely) a bug that could cause a crash during search in certain conditions (thanks amendoim_zinho and Alphalaneous!)
+- Fixed a small touch prio issue in the new search menu that made all controls unresponsive after coming back from a search
+
 # 1.3.1
 - Fixed a bug that caused memory leaks on the new search menu screen
 - Fixed a bug that caused the game to crash on Android while attempting to add levels to lists (thanks starfruitgamer123!)
