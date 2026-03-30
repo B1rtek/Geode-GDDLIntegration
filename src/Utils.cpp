@@ -494,3 +494,19 @@ ccColor3B Utils::hsvToRgb(const HSV& hsv) {
     b += m;
     return ccc3(static_cast<int>(r * 255.0f), static_cast<int>(g * 255.0f), static_cast<int>(b * 255.0f));
 }
+
+std::string Utils::generateRainbowText(const std::string& text) {
+    const std::string rainbowOrder = "abjlfgcysorpd";
+    const int rainbowLength = rainbowOrder.size();
+    int rainbowIndex = 0;
+    std::string result;
+    for (const auto letter : text) {
+        result += "<c";
+        result += rainbowOrder[rainbowIndex++];
+        result += ">";
+        result += letter;
+        result += "</c>";
+        if (rainbowIndex >= rainbowLength) rainbowIndex = 0;
+    }
+    return result;
+}

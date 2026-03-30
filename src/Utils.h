@@ -85,6 +85,7 @@ public:
     static int getPageCountOf(const std::vector<int>& vec, const int pageSize = inGameResultsPageSize);
     static HSV rgbToHsv(const ccColor3B& rgb);
     static ccColor3B hsvToRgb(const HSV& hsv);
+    static std::string generateRainbowText(const std::string& text);
 };
 
 template <typename T>
