@@ -181,6 +181,7 @@ void GDDLSearchLayerV2::onPageRightClicked(CCObject* sender) {
 void GDDLSearchLayerV2::onEnter() {
     FLAlertLayer::onEnter();
     searchObject.cancelSearch();
+    cocos::handleTouchPriority(this);
 }
 
 void GDDLSearchLayerV2::onClose(CCObject* sender) {

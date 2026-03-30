@@ -1,5 +1,6 @@
 #include "GDDLDemonSplitLayer.h"
 
+#include <Utils.h>
 #include <Geode/Geode.hpp>
 #include <Geode/ui/LoadingSpinner.hpp>
 
@@ -155,9 +156,7 @@ CCNode *GDDLDemonSplitLayer::createTierNode(const int tier, const int count) {
     tierNode->setLayout(RowLayout::create()->setGap(3.0f)->setAutoScale(true));
     tierNode->setContentSize({50.0f, 20.0f});
     // tier sprite
-    std::string tierStrName = tier != -1 ? std::to_string(tier) : "unrated";
-    const std::string tierSpriteName = "tier_" + tierStrName + ".png";
-    const auto tierSprite = CCSprite::create(Mod::get()->expandSpriteName(tierSpriteName.c_str()).data());
+    const auto tierSprite = Utils::getSpriteFromTier(tier);
     tierSprite->setScale(0.05f);
     tierSprite->setContentSize({20.0f, 20.0f});
     const auto tierButton = CCMenuItemSpriteExtra::create(tierSprite, this, menu_selector(GDDLDemonSplitLayer::onTierSearch));
