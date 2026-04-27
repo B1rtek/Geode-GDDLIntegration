@@ -1,3 +1,8 @@
+**![Mod Version](https://api.geode-sdk.org/v1/mods/b1rtek.gddlintegration/status_badge?stat=version)
+![Downloads](https://api.geode-sdk.org/v1/mods/b1rtek.gddlintegration/status_badge?stat=downloads)
+![GD Version](https://api.geode-sdk.org/v1/mods/b1rtek.gddlintegration/status_badge?stat=gd_version)
+![Geode Version](https://api.geode-sdk.org/v1/mods/b1rtek.gddlintegration/status_badge?stat=geode_version)**
+
 # <cr> GDDL Integration </c>
 Integration with [Geometry Dash Demon Ladder](https://gdladder.com/)  
 GDDL Discord server: https://discord.gg/gddl
