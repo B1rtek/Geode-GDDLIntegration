@@ -9,7 +9,7 @@
 class RatingsSpread {
     std::map<int, int> diffRatings{};
     std::map<int, int> enjRatings{};
-    int minRating = Values::highestTier+1, maxRating = -1, minEnj = 11, maxEnj = -1;
+    int minRating = Values::highestTier+1, maxRating = -1; // no minEnj maxEnj, we always show the full 0-10 range
 
 public:
     const inline static int enjColors[] = {
