@@ -1,4 +1,6 @@
 #include "ButtonPositionSettingV3.h"
+
+#include <Geode/Geode.hpp>
 #include "ButtonPositionSettingNodeV3.h"
 
 Result<std::shared_ptr<SettingV3>> ButtonPositionSettingV3::parse(std::string const& key,

@@ -1,5 +1,6 @@
 #include "UseOldTierLabelSettingV3.h"
 
+#include <Geode/Geode.hpp>
 #include "UseOldTierLabelSettingNodeV3.h"
 
 Result<std::shared_ptr<SettingV3>>

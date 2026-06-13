@@ -1,4 +1,6 @@
 #include "DummySettingLoginV3.h"
+
+#include <Geode/Geode.hpp>
 #include "LoginSettingNodeV3.h"
 
 Result<std::shared_ptr<SettingV3>>

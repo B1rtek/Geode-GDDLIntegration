@@ -1,4 +1,6 @@
 #include "DummySettingV3.h"
+
+#include <Geode/Geode.hpp>
 #include "CacheResetSettingNodeV3.h"
 
 Result<std::shared_ptr<SettingV3>>
