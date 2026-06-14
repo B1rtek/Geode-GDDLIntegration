@@ -21,12 +21,14 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     void onPrevPage(CCObject* sender);
     void setIDPopupClosed(SetIDPopup* popup, int value) override;
     void onEnterTransitionDidFinish() override;
+    void onEnter() override;
     void onInfo(CCObject* sender);
 
     void handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber);
     void assignPackInfo(PackInfo* packInfo);
     void createPackUI();
     void updatePackUI();
+    void hideOriginalTextures();
     void updateAfterLoadLevelsFinished();
     void setCorrectLabelsText();
 };

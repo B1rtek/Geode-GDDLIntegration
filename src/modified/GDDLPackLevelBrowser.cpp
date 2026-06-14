@@ -2,6 +2,7 @@
 
 #include <Utils.h>
 #include <Geode/binding/GJListLayer.hpp>
+#include <layers/GDDLThemeBaseLayer.h>
 
 gd::string GDDLPackLevelBrowser::getSearchTitle() {
     if (m_fields->packInfo != nullptr) {
@@ -43,6 +44,14 @@ void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
 
 void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
     LevelBrowserLayer::onEnterTransitionDidFinish();
+    // if (m_fields->packInfo != nullptr) {
+    //     createPackUI();
+    //     updateAfterLoadLevelsFinished();
+    // }
+}
+
+void GDDLPackLevelBrowser::onEnter() {
+    LevelBrowserLayer::onEnter();
     if (m_fields->packInfo != nullptr) {
         createPackUI();
         updateAfterLoadLevelsFinished();
@@ -77,6 +86,7 @@ void GDDLPackLevelBrowser::createPackUI() {
         for (const auto child : CCArrayExt<CCNode*>(listChildren)) {
             if (auto maybeLabel = typeinfo_cast<CCLabelBMFont*>(child)) {
                 maybeLabel->setString(m_fields->packInfo->getName().c_str());
+                maybeLabel->setZOrder(11);
                 // scale down so it doesn't take up the whole screen because it only scales after the whole thing loads for some reason
                 maybeLabel->limitLabelWidth(280.0f, 0.8f, 0.2f);
             }
@@ -104,6 +114,36 @@ void GDDLPackLevelBrowser::createPackUI() {
         m_fields->progressBar->setPosition({m_list->getPositionX() + m_list->getContentWidth() / 2 - m_fields->progressBar->getScaledContentWidth() / 2, m_list->getPositionY() - 15.0f});
         m_fields->progressBar->setZOrder(11);
         this->addChild(m_fields->progressBar);
+
+        // now the really cursed stuff happens
+        // hiding the original frame and bg
+        hideOriginalTextures();
+        // placing the better frame
+        // sides
+        const std::vector<CCPoint> sidePositions = {
+            {m_list->getPositionX() - 7.5f, m_list->getContentHeight() / 2 + m_list->getPositionY()}, // left
+            {m_list->getContentWidth() + m_list->getPositionX() + 7.5f, m_list->getContentHeight() / 2 + m_list->getPositionY()}, // right
+        };
+        for (int i = 0; i < sidePositions.size(); i++) {
+            const auto sideSprite = CCSprite::create(Mod::get()->expandSpriteName("border_thin.png").data());
+            sideSprite->setPosition(sidePositions[i]);
+            sideSprite->setRotation((i - 1) * 180.0f + 90.0f);
+            sideSprite->setScaleX(m_list->getContentHeight() / sideSprite->getContentWidth());
+            sideSprite->setZOrder(10);
+            this->addChild(sideSprite);
+        }
+        // top and bottom
+        const auto topSprite = CCSprite::create(Mod::get()->expandSpriteName("border_upper_thick.png").data());
+        topSprite->setPosition({m_list->getContentWidth() / 2 + m_list->getPositionX(), m_list->getContentHeight() + m_list->getPositionY() + topSprite->getContentHeight() / 2 - 10.0f});
+        topSprite->setZOrder(-1);
+        this->addChild(topSprite);
+        const auto bottomSprite = CCSprite::create(Mod::get()->expandSpriteName("border_bottom_thick.png").data());
+        bottomSprite->setPosition({m_list->getContentWidth() / 2 + m_list->getPositionX(), m_list->getPositionY() - bottomSprite->getContentHeight() / 2 + 20.0f});
+        bottomSprite->setZOrder(10);
+        this->addChild(bottomSprite);
+
+        // gddl theme :tm: background
+        GDDLThemeBaseLayer::createBackground(this);
     }
 }
 
@@ -132,6 +172,25 @@ void GDDLPackLevelBrowser::updatePackUI() {
                     }
                 }
             }
+        }
+    }
+    // hide the original frame because it keeps reappearing
+    hideOriginalTextures();
+}
+
+void GDDLPackLevelBrowser::hideOriginalTextures() {
+    const std::vector<std::string> borderIDs = {"left-border", "right-border", "bottom-border", "top-border"};
+    for (const auto id : borderIDs) {
+        const auto node = m_list->getChildByIDRecursive(id);
+        if (node != nullptr) {
+            node->setVisible(false);
+        }
+    }
+    const std::vector<std::string> bgIDs = {"background", "left-corner", "right-corner"};
+    for (const auto id : bgIDs) {
+        const auto node = this->getChildByIDRecursive(id);
+        if (node != nullptr) {
+            node->setVisible(false);
         }
     }
 }
