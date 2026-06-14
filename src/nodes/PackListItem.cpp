@@ -36,7 +36,7 @@ bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& pack
     buttonMenu->setContentSize({itemHeight * 2, itemHeight});
     buttonMenu->setPosition({width - itemHeight * 2, 0});
     this->addChild(buttonMenu);
-    const auto viewButtonSprite = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png");
+    const auto viewButtonSprite = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_06.png");
     viewButtonSprite->setScale(0.6f);
     const auto viewButton = CCMenuItemSpriteExtra::create(viewButtonSprite, this, menu_selector(PackListItem::onView));
     viewButton->setPosition({itemHeight, itemHeight / 2});
