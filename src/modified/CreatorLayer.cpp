@@ -3,6 +3,7 @@
 #include <Geode/modify/CreatorLayer.hpp>
 #include <layers/GDDLHomeLayer.h>
 #include <layers/GDDLSearchLayerV2.h>
+#include <layers/GDDLThemeListLayer.h>
 
 class $modify(GDDLCreatorLayer, CreatorLayer) {
 
@@ -24,6 +25,6 @@ class $modify(GDDLCreatorLayer, CreatorLayer) {
     }
 
     void onGDDLHome(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
-        GDDLHomeLayer::scene();
+        GDDLThemeListLayer::scene(false);
     }
 };
