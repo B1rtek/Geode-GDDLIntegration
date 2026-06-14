@@ -1,5 +1,7 @@
 #include "GDDLRating.h"
 
+#include <cmath>
+
 GDDLRating::GDDLRating(matjson::Value levelData) {
     this->rating = levelData.contains("Rating") && !levelData["Rating"].isNull() ? levelData["Rating"].asDouble().unwrap() : -1.0f;
     this->defaultRating = levelData.contains("DefaultRating") && !levelData["DefaultRating"].isNull() ? levelData["DefaultRating"].asInt().unwrap() : -1;
@@ -10,7 +12,7 @@ GDDLRating::GDDLRating(matjson::Value levelData) {
     this->submissionCount = levelData.contains("SubmissionCount") && !levelData["SubmissionCount"].isNull() ? levelData["SubmissionCount"].asInt().unwrap() : 0;
     this->showcaseVideoID = levelData.contains("Showcase") && !levelData["Showcase"].isNull() ? levelData["Showcase"].asString().unwrap() : "";
 
-    this->roundedRating = static_cast<int>(round(this->rating));
+    this->roundedRating = static_cast<int>(std::round(this->rating));
 
 }
 
