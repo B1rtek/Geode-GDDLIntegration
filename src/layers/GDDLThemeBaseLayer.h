@@ -17,6 +17,7 @@ protected:
 public:
     static GDDLThemeBaseLayer* create();
     static GDDLThemeBaseLayer* scene();
+    static void createBackground(CCLayer* target);
 };
 
 

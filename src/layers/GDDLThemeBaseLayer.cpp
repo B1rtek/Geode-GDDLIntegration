@@ -4,28 +4,7 @@ bool GDDLThemeBaseLayer::init() {
     if (!CCLayer::init()) return false;
 
     // bg
-    const auto winSize = CCDirector::sharedDirector()->getWinSize();
-    const auto bg = CCSprite::create(Mod::get()->expandSpriteName("bg.png").data());
-    bg->setAnchorPoint({0.0f, 0.0f});
-    bg->setPosition({-5.0f, -5.0f});
-    bg->setZOrder(-3);
-    bg->setScaleX((winSize.width + 10.0f) / bg->getContentWidth());
-    bg->setScaleY((winSize.height + 10.0f) / bg->getContentHeight());
-    this->addChild(bg);
-
-    // cornerpieces - texture name, position, anchor point
-    const std::vector<std::tuple<std::string, CCPoint, CCPoint>> cornerpiecePlacements = {
-        {"spike_ll.png", {0.0f, 0.0f}, {0.0f, 0.0f}},
-        {"spike_lr.png", {winSize.width, 0.0f}, {1.0f, 0.0f}},
-        {"spike_ur.png", {winSize.width, winSize.height}, {1.0f, 1.0f}},
-        {"spike_ul.png", {0.0f, winSize.height}, {0.0f, 1.0f}}
-    };
-    for (const auto placement: cornerpiecePlacements) {
-        const auto spikeTexture = CCSprite::create(Mod::get()->expandSpriteName(std::get<0>(placement)).data());
-        spikeTexture->setAnchorPoint(std::get<2>(placement));
-        spikeTexture->setPosition(std::get<1>(placement));
-        this->addChild(spikeTexture);
-    }
+    createBackground(this);
 
     // definitely not taken from Geode's ModsLayer
     const auto backMenu = CCMenu::create();
@@ -73,4 +52,31 @@ GDDLThemeBaseLayer* GDDLThemeBaseLayer::scene() {
     scene->addChild(layer);
     CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, scene));
     return layer;
+}
+
+void GDDLThemeBaseLayer::createBackground(CCLayer* target) {
+    // bg
+    const auto winSize = CCDirector::sharedDirector()->getWinSize();
+    const auto bg = CCSprite::create(Mod::get()->expandSpriteName("bg.png").data());
+    bg->setAnchorPoint({0.0f, 0.0f});
+    bg->setPosition({-5.0f, -5.0f});
+    bg->setZOrder(-3);
+    bg->setScaleX((winSize.width + 10.0f) / bg->getContentWidth());
+    bg->setScaleY((winSize.height + 10.0f) / bg->getContentHeight());
+    target->addChild(bg);
+
+    // cornerpieces - texture name, position, anchor point
+    const std::vector<std::tuple<std::string, CCPoint, CCPoint>> cornerpiecePlacements = {
+        {"spike_ll.png", {0.0f, 0.0f}, {0.0f, 0.0f}},
+        {"spike_lr.png", {winSize.width, 0.0f}, {1.0f, 0.0f}},
+        {"spike_ur.png", {winSize.width, winSize.height}, {1.0f, 1.0f}},
+        {"spike_ul.png", {0.0f, winSize.height}, {0.0f, 1.0f}}
+    };
+    for (const auto placement: cornerpiecePlacements) {
+        const auto spikeTexture = CCSprite::create(Mod::get()->expandSpriteName(std::get<0>(placement)).data());
+        spikeTexture->setAnchorPoint(std::get<2>(placement));
+        spikeTexture->setPosition(std::get<1>(placement));
+        spikeTexture->setZOrder(-2);
+        target->addChild(spikeTexture);
+    }
 }
