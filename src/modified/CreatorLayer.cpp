@@ -2,6 +2,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/modify/CreatorLayer.hpp>
 #include <layers/GDDLHomeLayer.h>
+#include <layers/GDDLPacksLayer.h>
 #include <layers/GDDLSearchLayerV2.h>
 #include <layers/GDDLThemeListLayer.h>
 
@@ -25,6 +26,6 @@ class $modify(GDDLCreatorLayer, CreatorLayer) {
     }
 
     void onGDDLHome(CCObject* sender) { // NOLINT(*-convert-member-functions-to-static)
-        GDDLThemeListLayer::scene(false);
+        GDDLPacksLayer::scene();
     }
 };
