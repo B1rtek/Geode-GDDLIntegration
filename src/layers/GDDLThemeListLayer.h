@@ -12,7 +12,7 @@ using namespace geode::prelude;
 class GDDLThemeListLayer : public GDDLThemeBaseLayer {
 protected:
     static constexpr CCPoint listSize = {356.0f, 220.0f};
-    ScrollLayer* packsList = nullptr;
+    ScrollLayer* scrollList = nullptr;
 
     bool init(bool thickFrame = true);
 

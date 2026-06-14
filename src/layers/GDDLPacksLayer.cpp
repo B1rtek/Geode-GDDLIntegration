@@ -8,51 +8,15 @@
 #include <objects/searchsettings/BoolSearchSetting.h>
 
 bool GDDLPacksLayer::init() {
-    if (!CCLayer::init()) return false;
+    if (!GDDLThemeListLayer::init(false)) return false;
 
-    // bg
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
-    const auto bg = CCSprite::create("GJ_gradientBG.png");
-    bg->setAnchorPoint({0.0f, 0.0f});
-    bg->setPosition({-5.0f, -5.0f});
-    bg->setZOrder(-3);
-    bg->setScaleX((winSize.width + 10.0f) / bg->getContentWidth());
-    bg->setScaleY((winSize.height + 10.0f) / bg->getContentHeight());
-    this->addChild(bg);
+    // base UI already created by GDDLThemeListLayer
 
-    // TODO cornerpieces
-
-    // definitely not taken from Geode's ModsLayer
-    const auto backMenu = CCMenu::create();
-    backMenu->setID("back-menu");
-    backMenu->setContentSize({100.f, 40.f});
-    backMenu->setAnchorPoint({ .0f, .5f });
-
-    const auto backSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
-    const auto backBtn = CCMenuItemSpriteExtra::create(
-        backSpr, this, menu_selector(GDDLPacksLayer::onBack)
-    );
-    backBtn->setID("back-button");
-    backMenu->addChild(backBtn);
-    backMenu->setLayout(SimpleRowLayout::create()->setMainAxisAlignment(MainAxisAlignment::Start)->setGap(5.f));
-    this->addChildAtPosition(backMenu, Anchor::TopLeft, ccp(8, -23), false);
-
-    // list
-    packsList = ScrollLayer::create({356.0f, 220.0f});
-    packsList->setPosition({winSize.width / 2 - listSize.x / 2, winSize.height / 2 - listSize.y / 2});
-    // for (int i = 0; i < 5; i++) {
-    //     // TODO a bunch of placeholders, replace with actual content later
-    //     packsList->m_contentLayer->addChild(PackListItem::create(356.0f, PackInfo({}, "Pack " + std::to_string(i+1), "tier_unrated.png")));
-    // }
-    packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
-    packsList->scrollToTop();
-    this->addChild(packsList);
-    createListFrame();
-
-    // next/prev page arrows
+    // next/prev page arrows, positions are really weird because math doesn't work for some reason here
     const auto nextPageMenu = CCMenu::create();
     nextPageMenu->setContentSize({50.0f, 50.0f});
-    nextPageMenu->setPosition({winSize.width / 2 + listSize.x / 2 + 50.0f, winSize.height / 2});
+    nextPageMenu->setPosition({120.0f + listSize.x, winSize.height / 2 - 25.0f});
     this->addChild(nextPageMenu);
     const auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
     nextButtonSprite->setFlipX(true);
@@ -62,7 +26,7 @@ bool GDDLPacksLayer::init() {
 
     const auto prevPageMenu = CCMenu::create();
     prevPageMenu->setContentSize({50.0f, 50.0f});
-    prevPageMenu->setPosition({winSize.width / 2 - listSize.x / 2 - 50.0f, winSize.height / 2});
+    prevPageMenu->setPosition({44.0f, winSize.height / 2 - 25.0f});
     this->addChild(prevPageMenu);
     const auto prevButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
     const auto prevPageButton = CCMenuItemSpriteExtra::create(prevButtonSprite, this, menu_selector(GDDLPacksLayer::onPrevPage));
@@ -71,10 +35,8 @@ bool GDDLPacksLayer::init() {
 
     // title label
     titleLabel = CCLabelBMFont::create("Packs", "bigFont.fnt");
-    titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 40.0f});
+    titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 30.0f});
     this->addChild(titleLabel);
-
-    // TODO rest of the UI
 
     // request packs
     auto req = web::WebRequest();
@@ -84,41 +46,13 @@ bool GDDLPacksLayer::init() {
     return true;
 }
 
-void GDDLPacksLayer::createListFrame() {
-    const std::vector<CCPoint> sidePositions = {
-        {packsList->getPositionX() - 8.0f, packsList->getContentHeight() / 2 + packsList->getPositionY()}, // left
-        {packsList->getContentWidth() / 2  + packsList->getPositionX(), packsList->getContentHeight() + packsList->getPositionY() + 7.5f}, // top
-        {packsList->getContentWidth() + packsList->getPositionX() + 8.0f, packsList->getContentHeight() / 2 + packsList->getPositionY()}, // right
-        {packsList->getContentWidth() / 2  + packsList->getPositionX(), packsList->getPositionY() - 7.5f} // bottom
-    };
-    for (int i = 0; i < sidePositions.size(); i++) {
-        const auto sideSprite = CCSprite::createWithSpriteFrameName("GJ_table_side_001.png");
-        sideSprite->setPosition(sidePositions[i]);
-        sideSprite->setRotation(i * 90.0f);
-        sideSprite->setScaleY(((i % 2 == 0 ? packsList->getContentHeight() : packsList->getContentWidth()) + 2.0f) / sideSprite->getContentHeight());
-        this->addChild(sideSprite);
-    }
-    const std::vector<CCPoint> cornerPositions = {
-        {packsList->getPositionX() - 8.0f, packsList->getContentHeight() + packsList->getPositionY() + 7.5f}, // top left
-        {packsList->getContentWidth() + packsList->getPositionX() + 8.0f, packsList->getContentHeight() + packsList->getPositionY() + 7.5f}, // top right
-        {packsList->getContentWidth() + packsList->getPositionX() + 8.0f, packsList->getPositionY() - 7.5f}, // bottom right
-        {packsList->getPositionX() - 8.0f, packsList->getPositionY() - 7.5f} // bottom left
-    };
-    for (int i = 0; i < cornerPositions.size(); i++) {
-        const auto cornerSprite = CCSprite::createWithSpriteFrameName("GJ_table_corner_001.png");
-        cornerSprite->setPosition(cornerPositions[i]);
-        cornerSprite->setRotation(i * 90.0f);
-        this->addChild(cornerSprite);
-    }
-}
-
 void GDDLPacksLayer::updateList() {
-    packsList->m_contentLayer->removeAllChildren();
+    scrollList->m_contentLayer->removeAllChildren();
     for (const auto& packInfo : packInfos[page]) {
-        packsList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo));
+        scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo));
     }
-    packsList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
-    packsList->scrollToTop();
+    scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    scrollList->scrollToTop();
     titleLabel->setString(packCategoryInfos[page].getName().c_str());
 }
 

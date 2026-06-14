@@ -7,13 +7,13 @@
 #include <objects/PackCategoryInfo.h>
 #include <objects/PackInfo.h>
 
+#include "GDDLThemeListLayer.h"
+
 using namespace geode::prelude;
 
-class GDDLPacksLayer : public CCLayer {
-    static constexpr CCPoint listSize = {356.0f, 220.0f};
+class GDDLPacksLayer : public GDDLThemeListLayer {
     static inline const std::string packsRequestApiUrl = "https://gdladder.com/api/packs";
 
-    ScrollLayer* packsList = nullptr;
     CCLabelBMFont* titleLabel = nullptr;
     int page = 1, highestPage = 1;
     std::map<int, std::vector<std::shared_ptr<PackInfo>>> packInfos;
@@ -30,7 +30,7 @@ class GDDLPacksLayer : public CCLayer {
     void onPrevPage(CCObject* sender);
     void onBack(CCObject* sender);
     void keyBackClicked() override;
-    void backActions();
+    void backActions() override;
 public:
 
     static GDDLPacksLayer* create();
