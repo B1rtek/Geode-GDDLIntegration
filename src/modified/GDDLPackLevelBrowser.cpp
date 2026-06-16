@@ -21,6 +21,7 @@ void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* 
 void GDDLPackLevelBrowser::onNextPage(CCObject* sender) {
     if (m_fields->packInfo != nullptr) {
         m_fields->packInfo->requestPage(m_fields->currentPage + 1, this);
+        hideOriginalTextures();
     } else {
         LevelBrowserLayer::onNextPage(sender);
     }
@@ -29,14 +30,24 @@ void GDDLPackLevelBrowser::onNextPage(CCObject* sender) {
 void GDDLPackLevelBrowser::onPrevPage(CCObject* sender) {
     if (m_fields->packInfo != nullptr) {
         m_fields->packInfo->requestPage(m_fields->currentPage - 1, this);
+        hideOriginalTextures();
     } else {
         LevelBrowserLayer::onPrevPage(sender);
+    }
+}
+
+void GDDLPackLevelBrowser::onRefresh(CCObject* sender) {
+    // TODO pack refresh logic here instead of this later
+    LevelBrowserLayer::onRefresh(sender);
+    if (m_fields->packInfo != nullptr) {
+        hideOriginalTextures();
     }
 }
 
 void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
     if (m_fields->packInfo != nullptr) {
         m_fields->packInfo->requestPage(value - 1, this);
+        hideOriginalTextures();
     } else {
         LevelBrowserLayer::setIDPopupClosed(popup, value);
     }
@@ -188,6 +199,13 @@ void GDDLPackLevelBrowser::hideOriginalTextures() {
     }
     const std::vector<std::string> bgIDs = {"background", "left-corner", "right-corner"};
     for (const auto id : bgIDs) {
+        const auto node = this->getChildByIDRecursive(id);
+        if (node != nullptr) {
+            node->setVisible(false);
+        }
+    }
+    const std::vector<std::string> otherModIDs = {"cvolton.betterinfo/last-button", "cvolton.betterinfo/star-button", "cvolton.betterinfo/filter-button"};
+    for (const auto id : otherModIDs) {
         const auto node = this->getChildByIDRecursive(id);
         if (node != nullptr) {
             node->setVisible(false);

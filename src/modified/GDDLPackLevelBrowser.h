@@ -19,6 +19,7 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     void loadLevelsFinished(cocos2d::CCArray * p0, char const *p1, int p2) override;
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
+    void onRefresh(CCObject* sender);
     void setIDPopupClosed(SetIDPopup* popup, int value) override;
     void onEnterTransitionDidFinish() override;
     void onEnter() override;
