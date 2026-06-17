@@ -4,7 +4,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/ui/LoadingSpinner.hpp>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 
 bool GDDLDemonSplitLayer::init() {
     if(!FLAlertLayer::init(75)) return false; // that magic number is actualy bg opacity btw

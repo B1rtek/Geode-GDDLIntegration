@@ -9,7 +9,7 @@
 #include <Geode/utils/web.hpp>
 #include <sys/stat.h>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "settings/ExcludeRangeSettingV3.h"
 
 class Utils {

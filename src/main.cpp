@@ -9,7 +9,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/utils/web.hpp>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 #include "modified/GDDLRobtopLevelsLayer.h"
 

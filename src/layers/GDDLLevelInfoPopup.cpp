@@ -2,7 +2,7 @@
 
 #include <Geode/utils/web.hpp>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 
 bool GDDLLevelInfoPopup::init()

@@ -1,6 +1,6 @@
 #include "CacheResetSettingNodeV3.h"
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 
 bool CacheResetSettingNodeV3::init(std::shared_ptr<DummySettingV3> setting, float width) {

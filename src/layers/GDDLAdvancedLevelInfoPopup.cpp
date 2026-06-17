@@ -3,7 +3,7 @@
 #include <Geode/ui/LoadingSpinner.hpp>
 #include <objects/Skillsets.h>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "objects/RatingsSpread.h"
 #include "Utils.h"
 #include "GDDLRatingSubmissionLayer.h"

@@ -3,7 +3,7 @@
 
 #include <Geode/Bindings.hpp>
 #include "Geode/modify/LevelSelectLayer.hpp"
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 #include "objects/IRatingObserver.h"
 

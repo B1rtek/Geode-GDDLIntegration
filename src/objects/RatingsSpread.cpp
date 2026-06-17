@@ -1,5 +1,5 @@
 #include "RatingsSpread.h"
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 
 RatingsSpread::RatingsSpread(const matjson::Value &spreadJson) {

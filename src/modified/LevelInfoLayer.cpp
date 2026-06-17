@@ -5,7 +5,7 @@
 #include "Geode/modify/LevelInfoLayer.hpp"
 #include <Geode/utils/web.hpp>
 
-#include "RatingsManager.h"
+#include "managers/RatingsManager.h"
 #include "Utils.h"
 #include "layers/GDDLLevelInfoPopup.h"
 #include "settings/ButtonPositionSettingV3.h"

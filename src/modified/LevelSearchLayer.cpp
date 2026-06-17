@@ -2,10 +2,8 @@
 #include <Geode/Bindings.hpp>
 #include "Geode/modify/LevelSearchLayer.hpp"
 
-#include <layers/GDDLPacksLayer.h>
 #include <layers/GDDLSearchLayerV2.h>
 
-#include "RatingsManager.h"
 
 class $modify(GDDLLevelSearchLayer, LevelSearchLayer) {
     // ReSharper disable once CppHidingFunction
