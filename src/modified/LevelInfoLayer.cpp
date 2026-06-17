@@ -16,7 +16,7 @@
 using namespace geode::prelude;
 
 class $modify(GDDLInfoLayer, LevelInfoLayer) {
-    struct Fields : public IRatingObserver {
+    struct Fields : public IApiResponseObserver {
         bool gddlTierUpdated = false;
         GDDLAdvancedLevelInfoPopup* advancedLevelInfoPopup = nullptr;
         GDDLInfoLayer* m_this;
@@ -25,7 +25,7 @@ class $modify(GDDLInfoLayer, LevelInfoLayer) {
             RatingsManager::subscribeToObservers(this);
         }
 
-        void updateRating() override {
+        void updateData() override {
             m_this->updateButton(RatingsManager::getDemonTier(m_this->m_level->m_levelID));
         }
 

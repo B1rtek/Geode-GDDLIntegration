@@ -3,7 +3,7 @@
 
 #include <map>
 #include <Geode/Geode.hpp>
-#include <objects/IRatingObserver.h>
+#include <objects/IApiResponseObserver.h>
 #include <objects/RatingsSpread.h>
 #include <objects/Skillsets.h>
 
@@ -20,7 +20,7 @@ class RatingsManager {
     inline static std::map<int, Submission> submissionsCache{};
     inline static int cacheTimestamp = 0;
     inline static std::string cachedListPath = Mod::get()->getSaveDir().string() + "/gddlcache.json";
-    inline static std::set<IRatingObserver*> ratingObservers{};
+    inline static std::set<IApiResponseObserver*> ratingObservers{};
 
     static GDDLRating parseJson(const std::string& response);
 public:
@@ -74,9 +74,9 @@ public:
 
     static void clearSubmissionCache();
 
-    static void subscribeToObservers(IRatingObserver* newSubscriber);
+    static void subscribeToObservers(IApiResponseObserver* newSubscriber);
 
-    static void unsubscribeFromObservers(IRatingObserver* unsubscribing);
+    static void unsubscribeFromObservers(IApiResponseObserver* unsubscribing);
 };
 
 

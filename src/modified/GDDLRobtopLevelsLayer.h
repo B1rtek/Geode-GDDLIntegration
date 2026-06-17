@@ -5,7 +5,7 @@
 #include "Geode/modify/LevelSelectLayer.hpp"
 #include "managers/RatingsManager.h"
 #include "Utils.h"
-#include "objects/IRatingObserver.h"
+#include "objects/IApiResponseObserver.h"
 
 struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, LevelSelectLayer> {
     enum Level {
@@ -22,7 +22,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
         DASH = 21,
     };
 
-    struct Fields : public IRatingObserver {
+    struct Fields : public IApiResponseObserver {
         int currentPage = 0;
         static constexpr int pageCount = 24;
         static inline bool beingBrowsed = false;
@@ -35,7 +35,7 @@ struct GDDLRobtopLevelsLayer : public geode::Modify<GDDLRobtopLevelsLayer, Level
             RatingsManager::subscribeToObservers(this);
         }
 
-        void updateRating() override {
+        void updateData() override {
             m_this->updateButton();
         }
 
