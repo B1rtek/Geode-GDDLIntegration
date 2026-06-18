@@ -4,6 +4,7 @@
 #include <Geode/Bindings.hpp>
 #include <Geode/ui/ScrollLayer.hpp>
 #include <Geode/utils/web.hpp>
+#include <objects/IApiResponseObserver.h>
 #include <objects/PackCategoryInfo.h>
 #include <objects/PackInfo.h>
 
@@ -11,30 +12,25 @@
 
 using namespace geode::prelude;
 
-class GDDLPacksLayer : public GDDLThemeListLayer {
-    static inline const std::string packsRequestApiUrl = "https://gdladder.com/api/packs";
-
+class GDDLPacksLayer : public GDDLThemeListLayer, public IApiResponseObserver {
     CCLabelBMFont* titleLabel = nullptr;
-    int page = 1, highestPage = 1;
-    std::map<int, std::vector<std::shared_ptr<PackInfo>>> packInfos;
-    std::map<int, PackCategoryInfo> packCategoryInfos;
+    int page = 1;
     TaskHolder<web::WebResponse> packsTaskHolder;
 
     bool init() override;
 
     void createListFrame();
-    void updateList();
-    std::function<void(web::WebResponse)> getPacksDownloadLambda();
-
+    void updateDisplay();
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
     void onBack(CCObject* sender);
     void keyBackClicked() override;
     void backActions() override;
 public:
-
     static GDDLPacksLayer* create();
     static GDDLPacksLayer* scene();
+    
+    void updateData() override;
 };
 
 

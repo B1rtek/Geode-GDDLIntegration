@@ -3,6 +3,7 @@
 #include <Utils.h>
 #include <Geode/ui/Layout.hpp>
 #include <Geode/ui/ScrollLayer.hpp>
+#include <managers/PacksManager.h>
 #include <nodes/PackListItem.h>
 #include <nodes/searchcontrols/CheckboxInputControl.h>
 #include <objects/searchsettings/BoolSearchSetting.h>
@@ -38,76 +39,39 @@ bool GDDLPacksLayer::init() {
     titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 30.0f});
     this->addChild(titleLabel);
 
-    // request packs
-    auto req = web::WebRequest();
-    req.header("User-Agent", Utils::getUserAgent());
-    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda());
+    // get packs
+    PacksManager::subscribeToObservers(this);
+    const auto maybePackCategoryInfo = PacksManager::getOrRequestPackCategoryInfo(page);
+    if (maybePackCategoryInfo.isOk()) {
+        updateDisplay();
+        PacksManager::unsubscribeFromObservers(this);
+        // from now on all data is loaded
+    }
 
     return true;
 }
 
-void GDDLPacksLayer::updateList() {
+void GDDLPacksLayer::updateDisplay() {
     scrollList->m_contentLayer->removeAllChildren();
-    for (const auto& packInfo : packInfos[page]) {
+    const std::vector<std::shared_ptr<PackInfo>> packInfos = PacksManager::getPacksFromCategory(page);
+    for (const auto& packInfo : packInfos) {
         scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo));
     }
     scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     scrollList->scrollToTop();
-    titleLabel->setString(packCategoryInfos[page].getName().c_str());
-}
-
-std::function<void(web::WebResponse)> GDDLPacksLayer::getPacksDownloadLambda() {
-    return [this](web::WebResponse res) {
-        if (res.code() != 200) {
-            // const auto jsonResponse = res.json().unwrapOr(matjson::Value());
-            // const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
-            // Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
-            // const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
-            // log::error("SearchObject::getSearchLambda: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
-            return;
-        }
-        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
-        if (!jsonResponse.contains("packs") || !jsonResponse["packs"].isArray() ||
-            !jsonResponse.contains("categories") || !jsonResponse["categories"].isArray()) {
-            // TODO error
-            log::info("invalid outer json");
-            return;
-        }
-        for (const auto packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
-            const Result<std::shared_ptr<PackInfo>> maybePackInfo = PackInfo::createFromJson(packInfoObject);
-            if (maybePackInfo.isErr()) {
-                // TODO error
-                log::info("invalid inner pack json: {}", packInfoObject.dump());
-                return;
-            }
-            const std::shared_ptr<PackInfo> packInfo = maybePackInfo.unwrap();
-            packInfos[packInfo->getCategoryId()].push_back(packInfo);
-        }
-        for (const auto packCategoryInfoObject : jsonResponse["categories"].asArray().unwrap()) {
-            const Result<PackCategoryInfo> maybePackCategoryInfo = PackCategoryInfo::createFromJson(packCategoryInfoObject);
-            if (maybePackCategoryInfo.isErr()) {
-                // TODO error
-                log::info("invalid inner category json: {}", packCategoryInfoObject.dump());
-                return;
-            }
-            const PackCategoryInfo& packCategoryInfo = maybePackCategoryInfo.unwrap();
-            highestPage = std::max(highestPage, packCategoryInfo.getId());
-            packCategoryInfos[packCategoryInfo.getId()] = packCategoryInfo;
-        }
-        updateList();
-    };
+    titleLabel->setString(PacksManager::getOrRequestPackCategoryInfo(page).unwrap().getName().c_str());
 }
 
 void GDDLPacksLayer::onNextPage(CCObject* sender) {
     ++page;
-    if (page > highestPage) page = 1;
-    updateList();
+    if (page > PacksManager::getCategoryCount()) page = 1;
+    updateDisplay();
 }
 
 void GDDLPacksLayer::onPrevPage(CCObject* sender) {
     --page;
-    if (page < 1) page = highestPage;
-    updateList();
+    if (page < 1) page = PacksManager::getCategoryCount();
+    updateDisplay();
 }
 
 void GDDLPacksLayer::onBack(CCObject* sender) {
@@ -138,4 +102,9 @@ GDDLPacksLayer* GDDLPacksLayer::scene() {
     scene->addChild(layer);
     CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, scene));
     return layer;
+}
+
+void GDDLPacksLayer::updateData() {
+    PacksManager::unsubscribeFromObservers(this);
+    updateDisplay();
 }
