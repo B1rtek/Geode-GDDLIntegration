@@ -134,18 +134,69 @@ void PacksManager::dumpToSave() {
     packsCacheFile.close();
 }
 
-Result<std::shared_ptr<PackInfo>> PacksManager::getPackInfo(int packID) {
+Result<std::shared_ptr<PackInfo>> PacksManager::getOrRequestPackInfo(int packID) {
     if (packsMap.contains(packID)) {
         return Ok(packsMap[packID]);
     }
+    // we don't have it, prepare and send the request
     return Err("Pack not saved");
 }
 
-Result<PackCategoryInfo> PacksManager::getPackCategoryInfo(int categoryID) {
+Result<PackCategoryInfo> PacksManager::getOrRequestPackCategoryInfo(int categoryID) {
+    if (!readCache) {
+        populateFromSave();
+        readCache = true;
+    }
     if (packCategoryMap.contains(categoryID)) {
         return Ok(packCategoryMap[categoryID]);
     }
+    // we don't have it, prepare and send the request
+    auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
+    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda());
     return Err("Category not saved");
+}
+
+std::function<void(web::WebResponse)> PacksManager::getPacksDownloadLambda() {
+    return [](web::WebResponse res) {
+        if (res.code() != 200) {
+            // const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+            // const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
+            // Notification::create(errorMessage, NotificationIcon::Error, 2)->show();
+            // const std::string rawResponse = jsonResponse.contains("message") ? jsonResponse.dump(0) : res.string().unwrapOr("Response was not a valid string");
+            // log::error("SearchObject::getSearchLambda: [{}] {}, raw response: {}", res.code(), errorMessage, rawResponse);
+            return;
+        }
+        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+        if (!jsonResponse.contains("packs") || !jsonResponse["packs"].isArray() ||
+            !jsonResponse.contains("categories") || !jsonResponse["categories"].isArray()) {
+            // TODO error
+            log::info("invalid outer json");
+            return;
+        }
+        for (const auto& packCategoryInfoObject : jsonResponse["categories"].asArray().unwrap()) {
+            const Result<PackCategoryInfo> maybePackCategoryInfo = getPackCategoryInfoFromJson(packCategoryInfoObject);
+            if (maybePackCategoryInfo.isErr()) {
+                // TODO error
+                log::info("invalid inner category json: {}", packCategoryInfoObject.dump());
+                return;
+            }
+            const PackCategoryInfo& packCategoryInfo = maybePackCategoryInfo.unwrap();
+            packCategoryMap[packCategoryInfo.getId()] = packCategoryInfo;
+        }
+        for (const auto& packInfoObject : jsonResponse["packs"].asArray().unwrap()) {
+            const Result<std::shared_ptr<PackInfo>> maybePackInfo = getPackInfoFromJson(packInfoObject);
+            if (maybePackInfo.isErr()) {
+                // TODO error
+                log::info("invalid inner pack json: {}", packInfoObject.dump());
+                return;
+            }
+            const std::shared_ptr<PackInfo> packInfo = maybePackInfo.unwrap();
+            packsMap[packInfo->getId()] = packInfo;
+        }
+        lastRefreshTimestamp = Utils::getCurrentTimestamp();
+        notifyObservers();
+    };
 }
 
 // for both reading cache and parsing api response
@@ -182,10 +233,30 @@ Result<PackCategoryInfo> PacksManager::getPackCategoryInfoFromJson(const matjson
     return Ok(PackCategoryInfo(json["ID"].asInt().unwrap(), json["Name"].asString().unwrap(), json["Description"].asString().unwrap()));
 }
 
+int PacksManager::getCategoryCount() {
+    return packCategoryMap.size();
+}
+
+std::vector<std::shared_ptr<PackInfo>> PacksManager::getPacksFromCategory(const int categoryID) {
+    std::vector<std::shared_ptr<PackInfo>> packsToReturn;
+    for (const auto [id, packInfo] : packsMap) {
+        if (packInfo->getCategoryId() == categoryID) {
+            packsToReturn.push_back(packInfo);
+        }
+    }
+    return packsToReturn;
+}
+
 void PacksManager::subscribeToObservers(IApiResponseObserver* newSubscriber) {
     packUpdateObservers.insert(newSubscriber);
 }
 
 void PacksManager::unsubscribeFromObservers(IApiResponseObserver* unsubscribing) {
     packUpdateObservers.erase(unsubscribing);
+}
+
+void PacksManager::notifyObservers() {
+    for (const auto observer: packUpdateObservers) {
+        observer->updateData();
+    }
 }

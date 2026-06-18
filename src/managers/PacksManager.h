@@ -14,6 +14,7 @@ class PacksManager {
     inline static int lastRefreshTimestamp = 0;
     inline static std::string packsCachePath = Mod::get()->getSaveDir().string() + "/packscache.json";
     inline static std::set<IApiResponseObserver*> packUpdateObservers{};
+    inline static TaskHolder<web::WebResponse> packsTaskHolder;
 public:
     const inline static std::string packDownloadApiUrlBase = "https://gdladder.com/api/packs/";
     static inline const std::string packsRequestApiUrl = "https://gdladder.com/api/packs";
@@ -21,14 +22,20 @@ public:
 
     static void populateFromSave();
     static void dumpToSave();
-    static Result<std::shared_ptr<PackInfo>> getPackInfo(int packID);
-    static Result<PackCategoryInfo> getPackCategoryInfo(int categoryID);
+    static Result<std::shared_ptr<PackInfo>> getOrRequestPackInfo(int packID);
+    static Result<PackCategoryInfo> getOrRequestPackCategoryInfo(int categoryID);
+    static int getCategoryCount();
+    static std::vector<std::shared_ptr<PackInfo>> getPacksFromCategory(int categoryID);
+    static std::function<void(web::WebResponse)> getPacksDownloadLambda();
+
 
     static Result<std::shared_ptr<PackInfo>> getPackInfoFromJson(const matjson::Value& json);
     static Result<PackCategoryInfo> getPackCategoryInfoFromJson(const matjson::Value& json);
 
+
     static void subscribeToObservers(IApiResponseObserver* newSubscriber);
     static void unsubscribeFromObservers(IApiResponseObserver* unsubscribing);
+    static void notifyObservers();
 };
 
 
