@@ -20,6 +20,7 @@ class PackInfo {
     int medianTier{};
     std::vector<int> levels;
     std::set<int> extraLevels;
+    int lastSaveTimestamp;
     TaskHolder<web::WebResponse> packDownloadTaskHolder;
 
     std::function<void(web::WebResponse)> getPackDownloadLambda();
@@ -30,7 +31,7 @@ class PackInfo {
 public:
     PackInfo() = default;
 
-    PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath, const int medianTier);
+    PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath, const int medianTier, const int lastSaveTimestamp);
 
     static Result<std::shared_ptr<PackInfo>> createFromJson(const matjson::Value& json);
     // these should probably be an interface or sth
@@ -49,6 +50,7 @@ public:
     int getMedianTier() const;
     std::vector<int> getLevels() const;
     bool isExtra(const int levelId) const;
+    int getLastSaveTimestamp() const;
 };
 
 

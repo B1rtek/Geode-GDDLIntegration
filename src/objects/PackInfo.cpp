@@ -68,7 +68,7 @@ std::pair<int, int> PackInfo::calculateCompletionStats() const {
 }
 
 PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath,
-                   const int medianTier): id(id), categoryId(categoryId), name(name), description(description), iconPath(iconPath), medianTier(medianTier) {
+                   const int medianTier, const int lastSaveTimestamp = 0): id(id), categoryId(categoryId), name(name), description(description), iconPath(iconPath), medianTier(medianTier), lastSaveTimestamp(lastSaveTimestamp) {
 }
 
 Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value& json) {
@@ -163,4 +163,8 @@ std::vector<int> PackInfo::getLevels() const {
 
 bool PackInfo::isExtra(const int levelId) const {
     return extraLevels.contains(levelId);
+}
+
+int PackInfo::getLastSaveTimestamp() const {
+    return lastSaveTimestamp;
 }
