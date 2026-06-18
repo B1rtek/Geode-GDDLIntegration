@@ -10,6 +10,7 @@
 #include <Geode/utils/web.hpp>
 
 #include "managers/RatingsManager.h"
+#include "managers/PacksManager.h"
 #include "Utils.h"
 #include "modified/GDDLRobtopLevelsLayer.h"
 
@@ -66,5 +67,6 @@ class $modify(MenuLayer) {
     void onQuit(cocos2d::CCObject* sender) {
         MenuLayer::onQuit(sender);
         RatingsManager::cacheList(true); // cache modified list on every exit
+        PacksManager::dumpToSave();
     }
 };
