@@ -83,6 +83,7 @@ void GDDLPacksLayer::keyBackClicked() {
 }
 
 void GDDLPacksLayer::backActions() {
+    PacksManager::unsubscribeFromObservers(this);
     CCDirector::get()->popScene();
 }
 

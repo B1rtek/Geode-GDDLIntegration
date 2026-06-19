@@ -91,6 +91,10 @@ void PacksManager::populateFromSave() {
 
 // called only on game quit
 void PacksManager::dumpToSave() {
+    if (packCategoryMap.empty()) {
+        // if we have nothing to save, do not save anything, do not overwrite potentially correct data
+        return;
+    }
     matjson::Value packsCache;
     packsCache["last-packlist-refresh"] = lastRefreshTimestamp;
     // categories
