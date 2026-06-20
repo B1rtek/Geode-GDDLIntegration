@@ -1,5 +1,5 @@
-# 1.4.0-beta.4
-- Packs support with new fancy textures, still wip
+# 1.4.0-beta.5
+- Packs support with new fancy textures, still wip (functions as intended, although not fully tested, ui still wip)
 
 # 1.3.2
 - The tier images are now being assembled from template textures instead, improving texture pack support ([thanks Aktimoose!](https://github.com/B1rtek/Geode-GDDLIntegration/issues/108))
