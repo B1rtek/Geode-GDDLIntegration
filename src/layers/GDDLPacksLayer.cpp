@@ -55,7 +55,7 @@ void GDDLPacksLayer::updateDisplay() {
     scrollList->m_contentLayer->removeAllChildren();
     const std::vector<std::shared_ptr<PackInfo>> packInfos = PacksManager::getPacksFromCategory(page);
     for (const auto& packInfo : packInfos) {
-        scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo));
+        scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo->getId()));
     }
     scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     scrollList->scrollToTop();

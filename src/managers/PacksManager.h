@@ -16,22 +16,24 @@ class PacksManager {
     inline static std::set<IApiResponseObserver*> packUpdateObservers{};
     inline static TaskHolder<web::WebResponse> packsTaskHolder;
 public:
-    const inline static std::string packDownloadApiUrlBase = "https://gdladder.com/api/packs/";
+    const inline static std::string packLevelsDownloadApiUrlBase = "https://gdladder.com/api/packs/";
     static inline const std::string packsRequestApiUrl = "https://gdladder.com/api/packs";
     inline static bool readCache = false;
 
     static void populateFromSave();
     static void dumpToSave();
-    static Result<std::shared_ptr<PackInfo>> getOrRequestPackInfo(int packID);
+    static Result<std::shared_ptr<PackInfo>> getOrRequestPackInfo(int packID, bool withLevels);
     static Result<PackCategoryInfo> getOrRequestPackCategoryInfo(int categoryID);
     static int getCategoryCount();
     static std::vector<std::shared_ptr<PackInfo>> getPacksFromCategory(int categoryID);
     static std::function<void(web::WebResponse)> getPacksDownloadLambda();
+    static std::function<void(web::WebResponse)> getPackLevelsDownloadLambda(int packID);
+    static std::string getPackLevelsDownloadUrl(int packID);
 
 
     static Result<std::shared_ptr<PackInfo>> getPackInfoFromJson(const matjson::Value& json);
     static Result<PackCategoryInfo> getPackCategoryInfoFromJson(const matjson::Value& json);
-
+    static Result<std::shared_ptr<PackInfo>> getPackLevelsFromJson(const matjson::Value& json, int packID);
 
     static void subscribeToObservers(IApiResponseObserver* newSubscriber);
     static void unsubscribeFromObservers(IApiResponseObserver* unsubscribing);

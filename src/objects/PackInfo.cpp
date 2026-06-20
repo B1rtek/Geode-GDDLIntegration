@@ -117,6 +117,22 @@ bool PackInfo::shouldShowRightArrow(const int pageNumber) {
     return pageNumber < pageCount - 1;
 }
 
+void PackInfo::clearLevelList() {
+    levels.clear();
+    extraLevels.clear();
+}
+
+void PackInfo::addLevel(const int levelID, const bool isExtra) {
+    levels.push_back(levelID);
+    if (isExtra) {
+        extraLevels.insert(levelID);
+    }
+}
+
+void PackInfo::updateLastSaveTimestamp() {
+    lastSaveTimestamp = Utils::getCurrentTimestamp();
+}
+
 std::pair<float, bool> PackInfo::getCompletionStatus() const {
     const auto [completedBase, completedTotal] = calculateCompletionStats();
     if (completedBase == levels.size() - extraLevels.size()) {

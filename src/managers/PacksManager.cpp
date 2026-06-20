@@ -138,11 +138,16 @@ void PacksManager::dumpToSave() {
     packsCacheFile.close();
 }
 
-Result<std::shared_ptr<PackInfo>> PacksManager::getOrRequestPackInfo(int packID) {
+Result<std::shared_ptr<PackInfo>> PacksManager::getOrRequestPackInfo(int packID, bool withLevels) {
     if (packsMap.contains(packID)) {
+        if (!withLevels || !packsMap[packID]->getLevels().empty())
         return Ok(packsMap[packID]);
     }
     // we don't have it, prepare and send the request
+    // TODO for now only handles downloading levels, not updating pack definition if it's outdated
+    auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
+    packsTaskHolder.spawn(req.get(getPackLevelsDownloadUrl(packID)), getPackLevelsDownloadLambda(packID));
     return Err("Pack not saved");
 }
 
@@ -203,6 +208,33 @@ std::function<void(web::WebResponse)> PacksManager::getPacksDownloadLambda() {
     };
 }
 
+std::function<void(web::WebResponse)> PacksManager::getPackLevelsDownloadLambda(const int packID) {
+    return [packID](web::WebResponse res) {
+        if (res.code() != 200) {
+            // TODO error
+            return;
+        }
+        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
+        if (!jsonResponse.isArray()) {
+            // TODO error
+            return;
+        }
+        const auto maybeUpdatedPack = getPackLevelsFromJson(jsonResponse, packID);
+        if (maybeUpdatedPack.isErr()) {
+            // TODO error
+            return;
+        }
+        const std::shared_ptr<PackInfo> packInfo = maybeUpdatedPack.unwrap();
+        packInfo->updateLastSaveTimestamp();
+        packsMap[packID] = packInfo;
+        notifyObservers();
+    };
+}
+
+std::string PacksManager::getPackLevelsDownloadUrl(const int packID) {
+    return packLevelsDownloadApiUrlBase + std::to_string(packID) + "/levels";
+}
+
 // for both reading cache and parsing api response
 Result<std::shared_ptr<PackInfo>> PacksManager::getPackInfoFromJson(const matjson::Value& json) {
     if (!json.isObject() ||
@@ -235,6 +267,22 @@ Result<PackCategoryInfo> PacksManager::getPackCategoryInfoFromJson(const matjson
         return Err("Invalid category JSON");
     }
     return Ok(PackCategoryInfo(json["ID"].asInt().unwrap(), json["Name"].asString().unwrap(), json["Description"].asString().unwrap()));
+}
+
+Result<std::shared_ptr<PackInfo>> PacksManager::getPackLevelsFromJson(const matjson::Value& json, int packID) {
+    if (!json.isArray()) return Err("JSON is not an array");
+    const std::shared_ptr<PackInfo> updatedPackInfo = packsMap[packID];
+    updatedPackInfo->clearLevelList();
+    for (const auto levelObject : json.asArray().unwrap()) {
+        if (levelObject.isObject() && levelObject.contains("LevelID") && levelObject["LevelID"].isNumber() &&
+            levelObject.contains("EX") && levelObject["EX"].isBool()) {
+            updatedPackInfo->addLevel(levelObject["LevelID"].asInt().unwrap(), levelObject["EX"].asBool().unwrap());
+        } else {
+            // invalid json
+            return Err("Invalid level JSON object");
+        }
+    }
+    return Ok(updatedPackInfo);
 }
 
 int PacksManager::getCategoryCount() {

@@ -39,6 +39,9 @@ public:
     void requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer);
     std::string getPageCountText(const int pageNumber);
     bool shouldShowRightArrow(const int pageNumber);
+    void clearLevelList();
+    void addLevel(int levelID, bool isExtra);
+    void updateLastSaveTimestamp();
 
     std::pair<float, bool> getCompletionStatus() const;
     std::pair<std::pair<int, int>, bool> getCompletedFraction() const;

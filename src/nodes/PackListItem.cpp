@@ -1,14 +1,17 @@
 #include "PackListItem.h"
 
+#include <Utils.h>
 #include <Values.h>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/ui/LazySprite.hpp>
+#include <managers/PacksManager.h>
+#include <modified/GDDLPackLevelBrowser.h>
 
-bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& packInfo) {
+bool PackListItem::init(const float width, const int packID) {
     if (!CCNode::init()) return false;
 
     this->setContentSize({width, itemHeight});
-    this->packInfo = packInfo;
+    const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(packID, false).unwrap(); // should never be Err
 
     // icon
     const auto icon = LazySprite::create({20.0f, 20.0f});
@@ -46,15 +49,43 @@ bool PackListItem::init(const float width, const std::shared_ptr<PackInfo>& pack
 }
 
 void PackListItem::onView(CCObject* sender) {
-    packInfo->downloadAndOpenPack();
+    PacksManager::subscribeToObservers(this);
+    const auto maybePackInfo = PacksManager::getOrRequestPackInfo(packID, true);
+    if (maybePackInfo.isOk()) {
+        PacksManager::unsubscribeFromObservers(this);
+        GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, maybePackInfo.unwrap()->getLevels());
+        forwardToLevelBrowser(gjSearchObject, nullptr, 0);
+    }
+    // well now we wait I guess
+    // TODO some kind of a loading circle I guess
 }
 
-PackListItem* PackListItem::create(const float width, const std::shared_ptr<PackInfo>& packInfo) {
+void PackListItem::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer,
+    int actualPageNumber) {
+    if (callingLayer != nullptr) {
+        callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
+        return;
+    }
+    const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
+    levelBrowserLayer->assignPackInfo(PacksManager::getOrRequestPackInfo(packID, true).unwrap().get());
+    const auto listLayerScene = CCScene::create();
+    listLayerScene->addChild(levelBrowserLayer);
+    const auto transition = CCTransitionFade::create(0.5, listLayerScene);
+    CCDirector::sharedDirector()->pushScene(transition);
+}
+
+PackListItem* PackListItem::create(const float width, const int packID) {
     const auto ret = new PackListItem();
-    if (ret->init(width, packInfo)) {
+    if (ret->init(width, packID)) {
         ret->autorelease();
         return ret;
     }
     delete ret;
     return nullptr;
+}
+
+void PackListItem::updateData() {
+    PacksManager::unsubscribeFromObservers(this);
+    GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, PacksManager::getOrRequestPackInfo(packID, true).unwrap()->getLevels());
+    forwardToLevelBrowser(gjSearchObject, nullptr, 0);
 }
