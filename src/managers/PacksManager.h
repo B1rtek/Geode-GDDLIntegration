@@ -15,6 +15,7 @@ class PacksManager {
     inline static std::string packsCachePath = Mod::get()->getSaveDir().string() + "/packscache.json";
     inline static std::set<IApiResponseObserver*> packUpdateObservers{};
     inline static TaskHolder<web::WebResponse> packsTaskHolder;
+    inline static TaskHolder<web::WebResponse> packLevelsTaskHolder;
 public:
     const inline static std::string packLevelsDownloadApiUrlBase = "https://gdladder.com/api/packs/";
     static inline const std::string packsRequestApiUrl = "https://gdladder.com/api/packs";

@@ -6,16 +6,21 @@
 
 void PackInfo::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer,
     const int actualPageNumber) {
+    log::info("[({})PackInfo::forwardToLevelBrowser] Called with callingLayer={}, actualPageNumber={}", fmt::ptr(this), fmt::ptr(callingLayer), actualPageNumber);
     if (callingLayer != nullptr) {
+        log::info("[({})PackInfo::forwardToLevelBrowser] Calling layer exists, forwarding searchObject", fmt::ptr(this));
         callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
         return;
     }
+    log::info("[({})PackInfo::forwardToLevelBrowser] Creating new GDDLPackLevelBrowser", fmt::ptr(this));
     const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
+    log::info("[({})PackInfo::forwardToLevelBrowser] Assigning pack ID {}", fmt::ptr(this), id);
     levelBrowserLayer->assignPackID(id);
     const auto listLayerScene = CCScene::create();
     listLayerScene->addChild(levelBrowserLayer);
     const auto transition = CCTransitionFade::create(0.5, listLayerScene);
     CCDirector::sharedDirector()->pushScene(transition);
+    log::info("[({})PackInfo::forwardToLevelBrowser] Pushed scene", fmt::ptr(this));
 }
 
 std::pair<int, int> PackInfo::calculateCompletionStats() const {
@@ -39,8 +44,10 @@ PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, 
 }
 
 void PackInfo::requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer) {
+    log::info("[({})PackInfo::requestPage] Called with pageNumber={}, callingLayer={}", fmt::ptr(this), pageNumber, fmt::ptr(callingLayer));
     const int actualPageNumber = std::min(pageNumber, static_cast<int>(levels.size() % 10 == 0 ? levels.size() / 10 : levels.size() / 10 + 1));
     GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(actualPageNumber * 10, levels);
+    log::info("[({})PackInfo::requestPage] Forwarding to level browser", fmt::ptr(this));
     forwardToLevelBrowser(gjSearchObject, callingLayer, actualPageNumber);
 }
 
@@ -56,6 +63,7 @@ bool PackInfo::shouldShowRightArrow(const int pageNumber) {
 }
 
 void PackInfo::clearLevelList() {
+    log::info("[({})PackInfo::clearLevelList] Called", fmt::ptr(this));
     levels.clear();
     extraLevels.clear();
 }
@@ -68,6 +76,7 @@ void PackInfo::addLevel(const int levelID, const bool isExtra) {
 }
 
 void PackInfo::replaceLevels(std::vector<int> levels, std::set<int> extraLevels) {
+    log::info("[({})PackInfo::replaceLevels] Called", fmt::ptr(this));
     this->levels = levels;
     this->extraLevels = extraLevels;
 }

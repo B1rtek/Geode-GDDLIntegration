@@ -10,6 +10,7 @@
 
 bool GDDLPacksLayer::init() {
     if (!GDDLThemeListLayer::init(false)) return false;
+    log::info("[({})GDDLPacksLayer::init] Called", fmt::ptr(this));
 
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
     // base UI already created by GDDLThemeListLayer
@@ -49,12 +50,17 @@ bool GDDLPacksLayer::init() {
     titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 30.0f});
     this->addChild(titleLabel);
 
+    log::info("[({})GDDLPacksLayer::init] Created, getting packs", fmt::ptr(this));
+
     // get packs
     PacksManager::subscribeToObservers(this);
+    log::info("[({})GDDLPacksLayer::init] Subscribed to PacksManager", fmt::ptr(this));
     const auto maybePackCategoryInfo = PacksManager::getOrRequestPackCategoryInfo(page);
     if (maybePackCategoryInfo.isOk()) {
-        updateDisplay();
+        log::info("[({})GDDLPacksLayer::init] Received PackCategoryInfo from cache for category {}", fmt::ptr(this), maybePackCategoryInfo.unwrap().getId());
         PacksManager::unsubscribeFromObservers(this);
+        log::info("[({})GDDLPacksLayer::init] Unsubscribed from PacksManager", fmt::ptr(this));
+        updateDisplay();
         // from now on all data is loaded
     }
 
@@ -62,36 +68,45 @@ bool GDDLPacksLayer::init() {
 }
 
 void GDDLPacksLayer::updateDisplay() {
+    log::info("[({})GDDLPacksLayer::updateDisplay] Called", fmt::ptr(this));
     scrollList->m_contentLayer->removeAllChildren();
     const std::vector<std::shared_ptr<PackInfo>> packInfos = PacksManager::getPacksFromCategory(page);
+    log::info("[({})GDDLPacksLayer::updateDisplay] Adding PackListItems", fmt::ptr(this));
     for (const auto& packInfo : packInfos) {
         scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo->getId()));
     }
     scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
     scrollList->scrollToTop();
+    log::info("[({})GDDLPacksLayer::updateDisplay] Updating title", fmt::ptr(this));
     titleLabel->setString(PacksManager::getOrRequestPackCategoryInfo(page).unwrap().getName().c_str());
 }
 
 void GDDLPacksLayer::onNextPage(CCObject* sender) {
+    log::info("[({})GDDLPacksLayer::onNextPage] Called", fmt::ptr(this));
     ++page;
     if (page > PacksManager::getCategoryCount()) page = 1;
     updateDisplay();
 }
 
 void GDDLPacksLayer::onPrevPage(CCObject* sender) {
+    log::info("[({})GDDLPacksLayer::onPrevPage] Called", fmt::ptr(this));
     --page;
     if (page < 1) page = PacksManager::getCategoryCount();
     updateDisplay();
 }
 
 void GDDLPacksLayer::onBack(CCObject* sender) {
+    log::info("[({})GDDLPacksLayer::onBack] Called", fmt::ptr(this));
     backActions();
 }
 
 void GDDLPacksLayer::onRefresh(CCObject* sender) {
+    log::info("[({})GDDLPacksLayer::onRefresh] Called", fmt::ptr(this));
     // TODO some kind of a loading circle
     PacksManager::subscribeToObservers(this);
+    log::info("[({})GDDLPacksLayer::onRefresh] Subscribed to PacksManager", fmt::ptr(this));
     PacksManager::requestPackListRefresh();
+    log::info("[({})GDDLPacksLayer::onRefresh] Requested pack list refresh", fmt::ptr(this));
 }
 
 void GDDLPacksLayer::keyBackClicked() {
@@ -99,7 +114,9 @@ void GDDLPacksLayer::keyBackClicked() {
 }
 
 void GDDLPacksLayer::backActions() {
+    log::info("[({})GDDLPacksLayer::backActions] Called", fmt::ptr(this));
     PacksManager::unsubscribeFromObservers(this);
+    log::info("[({})GDDLPacksLayer::backActions] Unsubscribed from PacksManager", fmt::ptr(this));
     CCDirector::get()->popScene();
 }
 
@@ -122,6 +139,8 @@ GDDLPacksLayer* GDDLPacksLayer::scene() {
 }
 
 void GDDLPacksLayer::updateData() {
+    log::info("[({})GDDLPacksLayer::updateData] Called", fmt::ptr(this));
     PacksManager::unsubscribeFromObservers(this);
+    log::info("[({})GDDLPacksLayer::updateData] Unsubscribed from PacksManager", fmt::ptr(this));
     updateDisplay();
 }
