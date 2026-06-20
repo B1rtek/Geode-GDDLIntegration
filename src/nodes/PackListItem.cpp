@@ -11,6 +11,7 @@ bool PackListItem::init(const float width, const int packID) {
     if (!CCNode::init()) return false;
 
     this->setContentSize({width, itemHeight});
+    this->packID = packID;
     const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(packID, false).unwrap(); // should never be Err
 
     // icon

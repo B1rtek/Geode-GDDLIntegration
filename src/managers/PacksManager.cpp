@@ -273,7 +273,7 @@ Result<std::shared_ptr<PackInfo>> PacksManager::getPackLevelsFromJson(const matj
     if (!json.isArray()) return Err("JSON is not an array");
     const std::shared_ptr<PackInfo> updatedPackInfo = packsMap[packID];
     updatedPackInfo->clearLevelList();
-    for (const auto levelObject : json.asArray().unwrap()) {
+    for (const auto& levelObject : json.asArray().unwrap()) {
         if (levelObject.isObject() && levelObject.contains("LevelID") && levelObject["LevelID"].isNumber() &&
             levelObject.contains("EX") && levelObject["EX"].isBool()) {
             updatedPackInfo->addLevel(levelObject["LevelID"].asInt().unwrap(), levelObject["EX"].asBool().unwrap());
