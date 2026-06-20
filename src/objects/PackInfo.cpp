@@ -4,39 +4,6 @@
 #include <Geode/ui/Notification.hpp>
 #include <modified/GDDLPackLevelBrowser.h>
 
-std::function<void(web::WebResponse)> PackInfo::getPackDownloadLambda() {
-    return [this](web::WebResponse res) {
-        if (res.code() != 200) {
-            // TODO error
-            return;
-        }
-        const auto jsonResponse = res.json().unwrapOr(matjson::Value());
-        if (!jsonResponse.isArray()) {
-            // TODO error
-            return;
-        }
-        for (const auto levelObject : jsonResponse.asArray().unwrap()) {
-            if (!levelObject.isObject() || !levelObject.contains("LevelID") || !levelObject["LevelID"].isNumber()) {
-                // TODO error
-                return;
-            }
-            const int levelId = levelObject["LevelID"].asInt().unwrap();
-            levels.push_back(levelId);
-            // extra levels
-            if (levelObject.contains("EX") && levelObject["EX"].isBool() && levelObject["EX"].asBool().unwrap()) {
-                extraLevels.insert(levelId);
-            }
-        }
-        // everything went well, forward to level browser
-        GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, levels);
-        forwardToLevelBrowser(gjSearchObject, nullptr, 0);
-    };
-}
-
-std::string PackInfo::getPackDownloadUrl(int packId) {
-    return packDownloadApiUrlBase + std::to_string(packId) + "/levels";
-}
-
 void PackInfo::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer,
     const int actualPageNumber) {
     if (callingLayer != nullptr) {
@@ -88,16 +55,6 @@ Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value&
         medianTier = json["Meta"]["MedianTier"].asInt().unwrap();
     }
     return Ok(std::make_shared<PackInfo>(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), json["Description"].asString().unwrap(), iconName, medianTier));
-}
-
-void PackInfo::downloadAndOpenPack() {
-    if (levels.empty()) {
-        auto req = web::WebRequest();
-        req.header("User-Agent", Utils::getUserAgent());
-        packDownloadTaskHolder.spawn(req.get(getPackDownloadUrl(id)), getPackDownloadLambda());
-    } else {
-        requestPage(0, nullptr);
-    }
 }
 
 void PackInfo::requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer) {

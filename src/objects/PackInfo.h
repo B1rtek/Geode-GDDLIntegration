@@ -10,8 +10,6 @@ using namespace geode::prelude;
 struct GDDLPackLevelBrowser; // circular import oops
 
 class PackInfo {
-    const inline static std::string packDownloadApiUrlBase = "https://gdladder.com/api/packs/";
-
     int id{};
     int categoryId{};
     std::string name;
@@ -23,8 +21,6 @@ class PackInfo {
     int lastSaveTimestamp;
     TaskHolder<web::WebResponse> packDownloadTaskHolder;
 
-    std::function<void(web::WebResponse)> getPackDownloadLambda();
-    static std::string getPackDownloadUrl(int packId);
     void forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer, const int actualPageNumber);
     std::pair<int, int> calculateCompletionStats() const;
 
@@ -35,7 +31,6 @@ public:
 
     static Result<std::shared_ptr<PackInfo>> createFromJson(const matjson::Value& json);
     // these should probably be an interface or sth
-    void downloadAndOpenPack();
     void requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer);
     std::string getPageCountText(const int pageNumber);
     bool shouldShowRightArrow(const int pageNumber);

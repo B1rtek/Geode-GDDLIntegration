@@ -55,18 +55,13 @@ void PackListItem::onView(CCObject* sender) {
     if (maybePackInfo.isOk()) {
         PacksManager::unsubscribeFromObservers(this);
         GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, maybePackInfo.unwrap()->getLevels());
-        forwardToLevelBrowser(gjSearchObject, nullptr, 0);
+        forwardToLevelBrowser(gjSearchObject);
     }
     // well now we wait I guess
     // TODO some kind of a loading circle I guess
 }
 
-void PackListItem::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLevelBrowser* callingLayer,
-    int actualPageNumber) {
-    if (callingLayer != nullptr) {
-        callingLayer->handleSearchObject(gjSearchObject, actualPageNumber);
-        return;
-    }
+void PackListItem::forwardToLevelBrowser(GJSearchObject* gjSearchObject) {
     const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
     levelBrowserLayer->assignPackInfo(PacksManager::getOrRequestPackInfo(packID, true).unwrap().get());
     const auto listLayerScene = CCScene::create();
@@ -88,5 +83,5 @@ PackListItem* PackListItem::create(const float width, const int packID) {
 void PackListItem::updateData() {
     PacksManager::unsubscribeFromObservers(this);
     GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(0, PacksManager::getOrRequestPackInfo(packID, true).unwrap()->getLevels());
-    forwardToLevelBrowser(gjSearchObject, nullptr, 0);
+    forwardToLevelBrowser(gjSearchObject);
 }
