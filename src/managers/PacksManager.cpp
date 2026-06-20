@@ -84,6 +84,12 @@ void PacksManager::populateFromSave() {
             } else {
                 const std::shared_ptr<PackInfo> packInfo = maybePackInfo.unwrap();
                 packsMap[packInfo->getId()] = packInfo;
+                if (entry.contains("levels") && entry["levels"].isArray()) {
+                    const auto maybeWithLevels = getPackLevelsFromJson(entry["levels"].asArray().unwrap(), packInfo->getId());
+                    if (maybeWithLevels.isOk()) {
+                        packsMap[packInfo->getId()] = maybeWithLevels.unwrap();
+                    }
+                }
             }
         }
     }
