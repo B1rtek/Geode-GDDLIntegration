@@ -11,7 +11,7 @@ void PackInfo::forwardToLevelBrowser(GJSearchObject* gjSearchObject, GDDLPackLev
         return;
     }
     const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
-    levelBrowserLayer->assignPackInfo(this);
+    levelBrowserLayer->assignPackID(id);
     const auto listLayerScene = CCScene::create();
     listLayerScene->addChild(levelBrowserLayer);
     const auto transition = CCTransitionFade::create(0.5, listLayerScene);

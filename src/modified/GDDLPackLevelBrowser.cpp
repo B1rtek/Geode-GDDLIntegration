@@ -3,24 +3,27 @@
 #include <Utils.h>
 #include <Geode/binding/GJListLayer.hpp>
 #include <layers/GDDLThemeBaseLayer.h>
+#include <managers/PacksManager.h>
 
 gd::string GDDLPackLevelBrowser::getSearchTitle() {
-    if (m_fields->packInfo != nullptr) {
-        return this->m_fields->packInfo->getName();
+    if (m_fields->packID != 0) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        return packInfo->getName();
     }
     return LevelBrowserLayer::getSearchTitle();
 }
 
 void GDDLPackLevelBrowser::loadLevelsFinished(cocos2d::CCArray* p0, char const* p1, int p2) {
     LevelBrowserLayer::loadLevelsFinished(p0, p1, p2);
-    if (m_fields->packInfo != nullptr) {
+    if (m_fields->packID != 0) {
         updateAfterLoadLevelsFinished();
     }
 }
 
 void GDDLPackLevelBrowser::onNextPage(CCObject* sender) {
-    if (m_fields->packInfo != nullptr) {
-        m_fields->packInfo->requestPage(m_fields->currentPage + 1, this);
+    if (m_fields->packID != 0) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        packInfo->requestPage(m_fields->currentPage + 1, this);
         hideOriginalTextures();
     } else {
         LevelBrowserLayer::onNextPage(sender);
@@ -28,8 +31,9 @@ void GDDLPackLevelBrowser::onNextPage(CCObject* sender) {
 }
 
 void GDDLPackLevelBrowser::onPrevPage(CCObject* sender) {
-    if (m_fields->packInfo != nullptr) {
-        m_fields->packInfo->requestPage(m_fields->currentPage - 1, this);
+    if (m_fields->packID != 0) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        packInfo->requestPage(m_fields->currentPage - 1, this);
         hideOriginalTextures();
     } else {
         LevelBrowserLayer::onPrevPage(sender);
@@ -39,14 +43,15 @@ void GDDLPackLevelBrowser::onPrevPage(CCObject* sender) {
 void GDDLPackLevelBrowser::onRefresh(CCObject* sender) {
     // TODO pack refresh logic here instead of this later
     LevelBrowserLayer::onRefresh(sender);
-    if (m_fields->packInfo != nullptr) {
+    if (m_fields->packID != 0) {
         hideOriginalTextures();
     }
 }
 
 void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
-    if (m_fields->packInfo != nullptr) {
-        m_fields->packInfo->requestPage(value - 1, this);
+    if (m_fields->packID != 0) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        packInfo->requestPage(value - 1, this);
         hideOriginalTextures();
     } else {
         LevelBrowserLayer::setIDPopupClosed(popup, value);
@@ -63,16 +68,17 @@ void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
 
 void GDDLPackLevelBrowser::onEnter() {
     LevelBrowserLayer::onEnter();
-    if (m_fields->packInfo != nullptr) {
+    if (m_fields->packID != 0) {
         createPackUI();
         updateAfterLoadLevelsFinished();
     }
 }
 
 void GDDLPackLevelBrowser::onInfo(CCObject* sender) {
-    if (m_fields->packInfo != nullptr) {
-        const std::string description = "<cb>" + m_fields->packInfo->getDescription() + "</c>\n\n<cp>Demons</c> which are <cy>not required</c> for pack completion are marked in <cr>red</c>. The progress bar counts only <co>progress towards required completions</c> until you <cg>complete the pack</c>, afterwards the progress bar will <cj>turn blue</c> and count <co>progress of the whole pack</c>.";
-        FLAlertLayer::create(m_fields->packInfo->getName().c_str(), description, "OK")->show();
+    if (m_fields->packID != 0) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        const std::string description = "<cb>" + packInfo->getDescription() + "</c>\n\n<cp>Demons</c> which are <cy>not required</c> for pack completion are marked in <cr>red</c>. The progress bar counts only <co>progress towards required completions</c> until you <cg>complete the pack</c>, afterwards the progress bar will <cj>turn blue</c> and count <co>progress of the whole pack</c>.";
+        FLAlertLayer::create(packInfo->getName().c_str(), description, "OK")->show();
     } else {
         LevelBrowserLayer::onInfo(sender);
     }
@@ -84,19 +90,20 @@ void GDDLPackLevelBrowser::handleSearchObject(GJSearchObject* gjSearchObject, co
     setCorrectLabelsText();
 }
 
-void GDDLPackLevelBrowser::assignPackInfo(PackInfo* packInfo) {
-    this->m_fields->packInfo = packInfo;
+void GDDLPackLevelBrowser::assignPackID(const int packID) {
+    this->m_fields->packID = packID;
     updateAfterLoadLevelsFinished();
 }
 
 void GDDLPackLevelBrowser::createPackUI() {
     if (m_fields->firstOpen) {
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
         m_fields->firstOpen = false;
         // cursed things (fortunately they only happen once)
         const auto listChildren = m_list->getChildren();
         for (const auto child : CCArrayExt<CCNode*>(listChildren)) {
             if (auto maybeLabel = typeinfo_cast<CCLabelBMFont*>(child)) {
-                maybeLabel->setString(m_fields->packInfo->getName().c_str());
+                maybeLabel->setString(packInfo->getName().c_str());
                 maybeLabel->setZOrder(11);
                 // scale down so it doesn't take up the whole screen because it only scales after the whole thing loads for some reason
                 maybeLabel->limitLabelWidth(280.0f, 0.8f, 0.2f);
@@ -111,7 +118,7 @@ void GDDLPackLevelBrowser::createPackUI() {
                     packIcon->setScale(0.275f);
                 }
             });
-            packIcon->loadFromUrl(Values::packIconsBaseUrl + m_fields->packInfo->getIconPath());
+            packIcon->loadFromUrl(Values::packIconsBaseUrl + packInfo->getIconPath());
             packIcon->setPosition({m_list->getPositionX() - 4.0f + i * (m_list->getContentWidth() + 8.0f), m_list->getPositionY() + m_list->getContentHeight() + 17.0f});
             packIcon->setScale(1.25f);
             packIcon->setZOrder(11);
@@ -159,9 +166,10 @@ void GDDLPackLevelBrowser::createPackUI() {
 }
 
 void GDDLPackLevelBrowser::updatePackUI() {
+    const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
     // progressbar
     if (m_fields->progressBar != nullptr) {
-        const auto [completedFraction, baseCompleted] = m_fields->packInfo->getCompletedFraction();
+        const auto [completedFraction, baseCompleted] = packInfo->getCompletedFraction();
         const float progress = 100.0f * static_cast<float>(completedFraction.first) / static_cast<float>(completedFraction.second);
         m_fields->progressBar->updateProgress(progress);
         m_fields->progressBar->setFillColor(baseCompleted ? ccc3(0, 255, 255) : ccc3(0, 255, 0));
@@ -174,7 +182,7 @@ void GDDLPackLevelBrowser::updatePackUI() {
         const auto tableView = typeinfo_cast<TableView*>(boomListView->m_tableView);
         if (tableView) {
             for (const auto levelCell : CCArrayExt<LevelCell*>(m_list->m_listView->m_tableView->m_cellArray)) {
-                if (m_fields->packInfo->isExtra(levelCell->m_level->m_levelID)) {
+                if (packInfo->isExtra(levelCell->m_level->m_levelID)) {
                     // mark as extra by setting the name to red I guess? idk
                     const auto maybeLevelNameLabel = levelCell->getChildByIDRecursive("level-name");
                     const auto levelNameLabel = typeinfo_cast<CCLabelBMFont*>(maybeLevelNameLabel);
@@ -214,15 +222,17 @@ void GDDLPackLevelBrowser::hideOriginalTextures() {
 }
 
 void GDDLPackLevelBrowser::updateAfterLoadLevelsFinished() {
+    const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
     m_leftArrow->setVisible(m_fields->currentPage > 0);
-    m_rightArrow->setVisible(m_fields->packInfo->shouldShowRightArrow(m_fields->currentPage));
+    m_rightArrow->setVisible(packInfo->shouldShowRightArrow(m_fields->currentPage));
     setCorrectLabelsText();
     updatePackUI();
 }
 
 void GDDLPackLevelBrowser::setCorrectLabelsText() {
+    const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
     // # of results text
-    m_countText->setString(m_fields->packInfo->getPageCountText(m_fields->currentPage).c_str());
+    m_countText->setString(packInfo->getPageCountText(m_fields->currentPage).c_str());
     // page button
     m_pageBtn->setVisible(true);
     m_pageText->setString(std::to_string(m_fields->currentPage + 1).c_str());

@@ -10,7 +10,7 @@ using namespace geode::prelude;
 struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLayer> {
     struct Fields {
         int currentPage = 0;
-        PackInfo* packInfo = nullptr;
+        int packID = 0;
         bool firstOpen = true;
         ProgressBar* progressBar = nullptr;
     };
@@ -26,7 +26,7 @@ struct GDDLPackLevelBrowser : public Modify<GDDLPackLevelBrowser, LevelBrowserLa
     void onInfo(CCObject* sender);
 
     void handleSearchObject(GJSearchObject* gjSearchObject, const int actualPageNumber);
-    void assignPackInfo(PackInfo* packInfo);
+    void assignPackID(int packID);
     void createPackUI();
     void updatePackUI();
     void hideOriginalTextures();

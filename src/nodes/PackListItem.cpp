@@ -63,7 +63,7 @@ void PackListItem::onView(CCObject* sender) {
 
 void PackListItem::forwardToLevelBrowser(GJSearchObject* gjSearchObject) {
     const auto levelBrowserLayer = static_cast<GDDLPackLevelBrowser*>(GDDLPackLevelBrowser::create(gjSearchObject));
-    levelBrowserLayer->assignPackInfo(PacksManager::getOrRequestPackInfo(packID, true).unwrap().get());
+    levelBrowserLayer->assignPackID(packID);
     const auto listLayerScene = CCScene::create();
     listLayerScene->addChild(levelBrowserLayer);
     const auto transition = CCTransitionFade::create(0.5, listLayerScene);
