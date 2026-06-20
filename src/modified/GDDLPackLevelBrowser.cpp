@@ -5,6 +5,14 @@
 #include <layers/GDDLThemeBaseLayer.h>
 #include <managers/PacksManager.h>
 
+bool GDDLPackLevelBrowser::init(GJSearchObject* gjSearchObject) {
+    if (!LevelBrowserLayer::init(gjSearchObject)) {
+        return false;
+    }
+    m_fields->m_this = this;
+    return true;
+}
+
 gd::string GDDLPackLevelBrowser::getSearchTitle() {
     if (m_fields->packID != 0) {
         const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
@@ -41,10 +49,12 @@ void GDDLPackLevelBrowser::onPrevPage(CCObject* sender) {
 }
 
 void GDDLPackLevelBrowser::onRefresh(CCObject* sender) {
-    // TODO pack refresh logic here instead of this later
-    LevelBrowserLayer::onRefresh(sender);
     if (m_fields->packID != 0) {
-        hideOriginalTextures();
+        const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+        packInfo->clearLevelList();
+        // request again to trigger a web request
+        const auto err = PacksManager::getOrRequestPackInfo(m_fields->packID, true);
+        // and now we wait, m_fields is always subscribed to changes
     }
 }
 
@@ -56,14 +66,6 @@ void GDDLPackLevelBrowser::setIDPopupClosed(SetIDPopup* popup, int value) {
     } else {
         LevelBrowserLayer::setIDPopupClosed(popup, value);
     }
-}
-
-void GDDLPackLevelBrowser::onEnterTransitionDidFinish() {
-    LevelBrowserLayer::onEnterTransitionDidFinish();
-    // if (m_fields->packInfo != nullptr) {
-    //     createPackUI();
-    //     updateAfterLoadLevelsFinished();
-    // }
 }
 
 void GDDLPackLevelBrowser::onEnter() {
@@ -227,6 +229,12 @@ void GDDLPackLevelBrowser::updateAfterLoadLevelsFinished() {
     m_rightArrow->setVisible(packInfo->shouldShowRightArrow(m_fields->currentPage));
     setCorrectLabelsText();
     updatePackUI();
+}
+
+void GDDLPackLevelBrowser::updateAfterRefresh() {
+    const std::shared_ptr<PackInfo> packInfo = PacksManager::getOrRequestPackInfo(m_fields->packID, true).unwrap(); // should always be valid
+    packInfo->requestPage(0, this);
+    hideOriginalTextures();
 }
 
 void GDDLPackLevelBrowser::setCorrectLabelsText() {
