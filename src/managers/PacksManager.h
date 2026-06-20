@@ -24,9 +24,10 @@ public:
     static void dumpToSave();
     static Result<std::shared_ptr<PackInfo>> getOrRequestPackInfo(int packID, bool withLevels);
     static Result<PackCategoryInfo> getOrRequestPackCategoryInfo(int categoryID);
+    static void requestPackListRefresh();
     static int getCategoryCount();
     static std::vector<std::shared_ptr<PackInfo>> getPacksFromCategory(int categoryID);
-    static std::function<void(web::WebResponse)> getPacksDownloadLambda();
+    static std::function<void(web::WebResponse)> getPacksDownloadLambda(bool refresh);
     static std::function<void(web::WebResponse)> getPackLevelsDownloadLambda(int packID);
     static std::string getPackLevelsDownloadUrl(int packID);
 

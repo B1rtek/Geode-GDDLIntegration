@@ -168,12 +168,18 @@ Result<PackCategoryInfo> PacksManager::getOrRequestPackCategoryInfo(int category
     // we don't have it, prepare and send the request
     auto req = web::WebRequest();
     req.header("User-Agent", Utils::getUserAgent());
-    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda());
+    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda(false));
     return Err("Category not saved");
 }
 
-std::function<void(web::WebResponse)> PacksManager::getPacksDownloadLambda() {
-    return [](web::WebResponse res) {
+void PacksManager::requestPackListRefresh() {
+    auto req = web::WebRequest();
+    req.header("User-Agent", Utils::getUserAgent());
+    packsTaskHolder.spawn(req.get(packsRequestApiUrl), getPacksDownloadLambda(true));
+}
+
+std::function<void(web::WebResponse)> PacksManager::getPacksDownloadLambda(bool refresh) {
+    return [refresh](web::WebResponse res) {
         if (res.code() != 200) {
             // const auto jsonResponse = res.json().unwrapOr(matjson::Value());
             // const std::string errorMessage = "GDDL: Search failed - " + Utils::getErrorFromMessageAndResponse(jsonResponse, res);
@@ -207,6 +213,10 @@ std::function<void(web::WebResponse)> PacksManager::getPacksDownloadLambda() {
                 return;
             }
             const std::shared_ptr<PackInfo> packInfo = maybePackInfo.unwrap();
+            if (refresh && packsMap.contains(packInfo->getId())) {
+                const auto oldPackInfo = packsMap[packInfo->getId()];
+                packInfo->replaceLevels(oldPackInfo->getLevels(), oldPackInfo->getExtraMap());
+            }
             packsMap[packInfo->getId()] = packInfo;
         }
         lastRefreshTimestamp = Utils::getCurrentTimestamp();

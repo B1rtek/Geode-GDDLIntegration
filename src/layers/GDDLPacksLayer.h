@@ -24,6 +24,7 @@ class GDDLPacksLayer : public GDDLThemeListLayer, public IApiResponseObserver {
     void onNextPage(CCObject* sender);
     void onPrevPage(CCObject* sender);
     void onBack(CCObject* sender);
+    void onRefresh(CCObject* sender);
     void keyBackClicked() override;
     void backActions() override;
 public:

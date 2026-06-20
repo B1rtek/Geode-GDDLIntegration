@@ -34,6 +34,16 @@ bool GDDLPacksLayer::init() {
     prevPageButton->setPosition({25.0f, 25.0f});
     prevPageMenu->addChild(prevPageButton);
 
+    // refresh button
+    const auto refreshButtonMenu = CCMenu::create();
+    refreshButtonMenu->setContentSize({50.0f, 50.0f});
+    refreshButtonMenu->setPosition({winSize.width - 50.0f, 25.0f});
+    this->addChild(refreshButtonMenu);
+    const auto refreshButtonSprite = CCSprite::createWithSpriteFrameName("GJ_updateBtn_001.png");
+    const auto refreshButton = CCMenuItemSpriteExtra::create(refreshButtonSprite, this, menu_selector(GDDLPacksLayer::onRefresh));
+    refreshButton->setPosition({20.0f, 5.0f});
+    refreshButtonMenu->addChild(refreshButton);
+
     // title label
     titleLabel = CCLabelBMFont::create("Packs", "bigFont.fnt");
     titleLabel->setPosition({winSize.width / 2, winSize.height / 2 + listSize.y / 2 + 30.0f});
@@ -76,6 +86,12 @@ void GDDLPacksLayer::onPrevPage(CCObject* sender) {
 
 void GDDLPacksLayer::onBack(CCObject* sender) {
     backActions();
+}
+
+void GDDLPacksLayer::onRefresh(CCObject* sender) {
+    // TODO some kind of a loading circle
+    PacksManager::subscribeToObservers(this);
+    PacksManager::requestPackListRefresh();
 }
 
 void GDDLPacksLayer::keyBackClicked() {
