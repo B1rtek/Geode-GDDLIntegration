@@ -38,25 +38,6 @@ PackInfo::PackInfo(const int id, const int categoryId, const std::string& name, 
                    const int medianTier, const int lastSaveTimestamp = 0): id(id), categoryId(categoryId), name(name), description(description), iconPath(iconPath), medianTier(medianTier), lastSaveTimestamp(lastSaveTimestamp) {
 }
 
-Result<std::shared_ptr<PackInfo>> PackInfo::createFromJson(const matjson::Value& json) {
-    if (!json.isObject() ||
-        !json.contains("ID") || !json["ID"].isNumber() ||
-        !json.contains("CategoryID") || !json["CategoryID"].isNumber() ||
-        !json.contains("Name") || !json["Name"].isString() ||
-        !json.contains("Description") || !json["Description"].isString()) {
-        return Err("Invalid PackInfo JSON");
-    }
-    std::string iconName = "tier_unrated.png";
-    if (json.contains("IconName") && json["IconName"].isString()) {
-        iconName = json["IconName"].asString().unwrap();
-    }
-    int medianTier = -1;
-    if (json.contains("Meta") && json["Meta"].isObject() && json["Meta"].contains("MedianTier") && json["Meta"]["MedianTier"].isNumber()) {
-        medianTier = json["Meta"]["MedianTier"].asInt().unwrap();
-    }
-    return Ok(std::make_shared<PackInfo>(json["ID"].asInt().unwrap(), json["CategoryID"].asInt().unwrap(), json["Name"].asString().unwrap(), json["Description"].asString().unwrap(), iconName, medianTier));
-}
-
 void PackInfo::requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer) {
     const int actualPageNumber = std::min(pageNumber, static_cast<int>(levels.size() % 10 == 0 ? levels.size() / 10 : levels.size() / 10 + 1));
     GJSearchObject* gjSearchObject = Utils::createGJSearchObjectFromIndex(actualPageNumber * 10, levels);
@@ -84,6 +65,11 @@ void PackInfo::addLevel(const int levelID, const bool isExtra) {
     if (isExtra) {
         extraLevels.insert(levelID);
     }
+}
+
+void PackInfo::replaceLevels(std::vector<int> levels, std::set<int> extraLevels) {
+    this->levels = levels;
+    this->extraLevels = extraLevels;
 }
 
 void PackInfo::updateLastSaveTimestamp() {
@@ -132,6 +118,10 @@ int PackInfo::getMedianTier() const {
 
 std::vector<int> PackInfo::getLevels() const {
     return levels;
+}
+
+std::set<int> PackInfo::getExtraMap() const {
+    return extraLevels;
 }
 
 bool PackInfo::isExtra(const int levelId) const {

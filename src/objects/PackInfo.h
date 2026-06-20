@@ -29,13 +29,13 @@ public:
 
     PackInfo(const int id, const int categoryId, const std::string& name, const std::string& description, const std::string& iconPath, const int medianTier, const int lastSaveTimestamp);
 
-    static Result<std::shared_ptr<PackInfo>> createFromJson(const matjson::Value& json);
     // these should probably be an interface or sth
     void requestPage(int pageNumber, GDDLPackLevelBrowser* callingLayer);
     std::string getPageCountText(const int pageNumber);
     bool shouldShowRightArrow(const int pageNumber);
     void clearLevelList();
     void addLevel(int levelID, bool isExtra);
+    void replaceLevels(std::vector<int> levels, std::set<int> extraLevels);
     void updateLastSaveTimestamp();
 
     std::pair<float, bool> getCompletionStatus() const;
@@ -47,6 +47,7 @@ public:
     std::string getIconPath() const;
     int getMedianTier() const;
     std::vector<int> getLevels() const;
+    std::set<int> getExtraMap() const;
     bool isExtra(const int levelId) const;
     int getLastSaveTimestamp() const;
 };
