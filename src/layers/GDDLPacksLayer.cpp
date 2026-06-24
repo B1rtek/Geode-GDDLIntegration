@@ -72,10 +72,12 @@ void GDDLPacksLayer::updateDisplay() {
     scrollList->m_contentLayer->removeAllChildren();
     const std::vector<std::shared_ptr<PackInfo>> packInfos = PacksManager::getPacksFromCategory(page);
     log::info("[({})GDDLPacksLayer::updateDisplay] Adding PackListItems", fmt::ptr(this));
+    bool dark = true;
     for (const auto& packInfo : packInfos) {
-        scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo->getId()));
+        scrollList->m_contentLayer->addChild(PackListItem::create(356.0f, packInfo->getId(), dark));
+        dark = !dark;
     }
-    scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout());
+    scrollList->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout(0));
     scrollList->scrollToTop();
     log::info("[({})GDDLPacksLayer::updateDisplay] Updating title", fmt::ptr(this));
     titleLabel->setString(PacksManager::getOrRequestPackCategoryInfo(page).unwrap().getName().c_str());
