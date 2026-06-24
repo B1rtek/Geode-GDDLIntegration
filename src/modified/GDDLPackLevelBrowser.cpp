@@ -137,11 +137,13 @@ void GDDLPackLevelBrowser::createPackUI() {
                 if (!res) {
                     packIcon->initWithFile(Mod::get()->expandSpriteName("tier_unrated.png").data());
                     packIcon->setScale(0.275f);
+                } else {
+                    packIcon->setScale(40.0f / packIcon->getContentWidth());
                 }
             });
             packIcon->loadFromUrl(Values::packIconsBaseUrl + packInfo->getIconPath());
             packIcon->setPosition({m_list->getPositionX() - 4.0f + i * (m_list->getContentWidth() + 8.0f), m_list->getPositionY() + m_list->getContentHeight() + 17.0f});
-            packIcon->setScale(1.25f);
+            packIcon->setScale(40.0f / packIcon->getContentWidth());
             packIcon->setZOrder(11);
             this->addChild(packIcon);
         }

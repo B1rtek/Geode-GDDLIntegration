@@ -28,10 +28,13 @@ bool PackListItem::init(const float width, const int packID, bool dark) {
         if (!res) {
             icon->initWithFile(Mod::get()->expandSpriteName("tier_unrated.png").data());
             icon->setScale(0.275f);
+        } else {
+            icon->setScale(32.0f / icon->getContentWidth());
         }
     });
     icon->loadFromUrl(Values::packIconsBaseUrl + packInfo->getIconPath());
     icon->setPosition({20.0f, itemHeight / 2.0f});
+    icon->setScale(32.0f / icon->getContentWidth());
     this->addChild(icon);
 
     // title
