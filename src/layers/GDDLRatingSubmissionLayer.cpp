@@ -497,6 +497,8 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
         return "Progress can't be 0%";
     }
     submissionJson["progress"] = correctedProgress;
+    // TODO quick fix for submissions needs a proper update later
+    submissionJson["status"] = correctedProgress == 100 ? "beaten" : "beating";
     if (const int correctedAttempts = std::min(
         std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, -1)),
         999999999); correctedAttempts != -1) {
