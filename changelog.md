@@ -1,3 +1,6 @@
+# 1.3.3
+- Update to GDDL API v3 (some new features might not be temporarily fully supported)
+
 # 1.3.2
 - The tier images are now being assembled from template textures instead, improving texture pack support ([thanks Aktimoose!](https://github.com/B1rtek/Geode-GDDLIntegration/issues/108))
 - Opening the GDDL Demon Split and the simplified search page doesn't lag the game anymore

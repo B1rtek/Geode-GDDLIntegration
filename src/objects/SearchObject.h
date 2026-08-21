@@ -14,7 +14,7 @@
 struct GDDLLevelBrowserLayer; // circular import oops
 
 class SearchObject {
-    const inline static std::string searchEndpoint = "https://gdladder.com/api/level/search";
+    const inline static std::string searchEndpoint = "https://gdladder.com/api/levels";
     static constexpr unsigned long long inGameResultsPageSize = 10;
     static constexpr unsigned long long apiResultsChunk = 25;
     // settings
