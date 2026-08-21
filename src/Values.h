@@ -1,6 +1,8 @@
 #ifndef GDDLINTEGRATION_VALUES_H
 #define GDDLINTEGRATION_VALUES_H
 
+#include <vector>
+
 class Values {
 public:
     // https://gdladder.com/references

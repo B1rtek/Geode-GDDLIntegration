@@ -1,6 +1,7 @@
 #include "UseOldTierLabelSettingV3.h"
-
 #include "UseOldTierLabelSettingNodeV3.h"
+
+#include <Geode/Geode.hpp>
 
 Result<std::shared_ptr<SettingV3>>
 UseOldTierLabelSettingV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
