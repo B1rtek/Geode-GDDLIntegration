@@ -57,22 +57,22 @@ Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& respo
         return Err("Server returned invalid JSON");
     }
     const matjson::Value& responseJson = maybeResponseJson.unwrap();
-    if (!responseJson.contains("levels") || !responseJson["levels"].isArray() || !responseJson.contains("total") || !responseJson["total"].isNumber()) {
+    if (!responseJson.contains("data") || !responseJson["data"].isArray() || !responseJson.contains("total") || !responseJson["total"].isNumber()) {
         return Err("Server returned invalid response");
     }
     totalApiResultsCount = std::max(totalApiResultsCount, static_cast<long long>(responseJson["total"].asInt().unwrap()));
-    for (auto level : responseJson["levels"].asArray().unwrap()) {
-        if (!level.contains("ID") || !level["ID"].isNumber()) {
-            return Err("Server returned invalid response: missing ID key in a level object");
+    for (auto level : responseJson["data"].asArray().unwrap()) {
+        if (!level.contains("id") || !level["id"].isNumber()) {
+            return Err("Server returned invalid response: missing `id` key in a level object");
         }
-        const int levelID = level["ID"].asInt().unwrap();
+        const int levelID = level["id"].asInt().unwrap();
         // levels with ID lower than that are official demons and therefore cannot be displayed
         if (levelID > 3) {
             listOfIds.push_back(levelID);
         }
         // optional step: if rating is present, update cache
-        if (level.contains("Rating") && level["Rating"].isExactlyDouble()) {
-            const float rating = level["Rating"].asDouble().unwrap();
+        if (level.contains("rating") && level["rating"].isExactlyDouble()) {
+            const float rating = level["rating"].asDouble().unwrap();
             RatingsManager::updateCacheFromSearch(levelID, rating);
         }
         ++apiResultsProcessedCount;
