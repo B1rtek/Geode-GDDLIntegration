@@ -30,9 +30,9 @@ class SearchObject {
         }, 0, 0, std::vector<std::string>{
             "asc", "desc"
         });
-    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("name", "", 32);
-    std::shared_ptr<TextSearchSetting> creatorNameSetting = std::make_shared<TextSearchSetting>("creator", "", 32);
-    std::shared_ptr<TextSearchSetting> songNameSetting = std::make_shared<TextSearchSetting>("song", "", 64);
+    std::shared_ptr<TextSearchSetting> levelNameSetting = std::make_shared<TextSearchSetting>("name", "", 22);
+    std::shared_ptr<TextSearchSetting> creatorNameSetting = std::make_shared<TextSearchSetting>("creator", "", 15);
+    std::shared_ptr<TextSearchSetting> songNameSetting = std::make_shared<TextSearchSetting>("song", "", 100);
     std::shared_ptr<RangeSearchSetting<int>> ratingsSetting = std::make_shared<RangeSearchSetting<int>>(
         "ratings", 0, Values::highestTier, "minRating", "maxRating", std::vector{0, 0});
     std::shared_ptr<RangeSearchSetting<float>> enjoymentsSetting = std::make_shared<RangeSearchSetting<float>>(
@@ -46,7 +46,9 @@ class SearchObject {
     std::shared_ptr<EnumSearchSetting> difficultySetting = std::make_shared<EnumSearchSetting>(
         "difficulty", std::vector<std::string>{
             "Easy Demon", "Medium Demon", "Hard Demon", "Insane Demon", "Extreme Demon", "Any"
-        }, 5, 1);
+        }, 5, 1, std::vector<std::string>{
+            "Easy", "Medium", "Hard", "Insane", "Extreme", "Any"
+        });
     std::shared_ptr<RangeSearchSetting<int>> idsRangeSetting = std::make_shared<RangeSearchSetting<int>>(
         "idsRange", 0, 2000000000, "minID", "maxID", std::vector{0, 0});
     std::shared_ptr<EnumSearchSetting> lengthSetting = std::make_shared<EnumSearchSetting>(
@@ -60,7 +62,7 @@ class SearchObject {
             "any", "no", "only"
         });
     std::shared_ptr<BoolSearchSetting> isInPackSetting = std::make_shared<BoolSearchSetting>("isInPack", false);
-    std::shared_ptr<EnumSearchSetting> topSkillsetSetting = std::make_shared<EnumSearchSetting>("topSkillset", Skillsets::skillsetNames);
+    std::shared_ptr<EnumSearchSetting> topSkillsetSetting = std::make_shared<EnumSearchSetting>("topTagID", Skillsets::skillsetNames);
     std::shared_ptr<EnumSearchSetting> hasSkillsetSetting = std::make_shared<EnumSearchSetting>("hasSkillset", Skillsets::skillsetNames);
     // skipping notRatedBy, I don't really think anybody would use this apart from maybe checking theirs? and it would be trickier to implement so nope not now
     std::shared_ptr<BoolSearchSetting> completedSetting = std::make_shared<BoolSearchSetting>("excludeCompleted", false); // special, not included in searchableSettings vector

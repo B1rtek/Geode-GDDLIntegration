@@ -1,3 +1,8 @@
+# 1.3.4
+- Submission status setting is now supported
+- Fixed a bug that caused an error during search when the "Difficulty" option was used (thanks zpowers and xvigames0!)
+- Fixed a bug which made the top skillset search not work at all (thanks ziomekel!)
+
 # 1.3.3
 - Update to GDDL API v3 (some new features might not be temporarily fully supported)
 

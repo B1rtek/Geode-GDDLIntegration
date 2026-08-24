@@ -14,7 +14,8 @@
  *  "progress":100,
  *  "attempts":403,
  *  "isSolo":true - default for both 1p and 2p levels
- *  "secondPlayerID": int | null
+ *  "secondPlayerID": int | null,
+ *  "status": "beaten" | "beating" | "hold" | "dropped" | "ptb"
  *  }
  *
  *  response
@@ -29,6 +30,7 @@
  *   "SecondPlayerID: null,
  *   "Progress": 100,
  *   "Attempts": 69,
+ *   "status": "dropped"
  *  }
  */
 
@@ -57,6 +59,13 @@ Submission::Submission(matjson::Value json, bool request) {
         this->progress = json["Progress"].asInt().unwrapOr(-1);
         this->attempts = json["Attempts"].asInt().unwrapOr(-1);
     }
+    const std::string statusString = json["status"].asString().unwrapOr("beaten");
+    const auto pos = std::ranges::find(statusValue, statusString);
+    if (pos == statusValue.end()) {
+        this->status = 0; // assume beaten as fallback
+    } else {
+        this->status = pos - statusValue.begin();
+    }
 }
 
 bool Submission::isEmpty() const {
@@ -83,6 +92,9 @@ std::string Submission::describe() const {
         description += ", ";
     }
     description += "progress <co>" + std::to_string(this->progress) + "%</c>";
+    if (this->progress != 100) {
+        description += " (marked as <co>" + statusDisplay[this->status] + "</c>)";
+    }
     if (this->attempts != -1) {
         description += " in <cp>" + std::to_string(this->attempts) + "</c> attempts";
     }

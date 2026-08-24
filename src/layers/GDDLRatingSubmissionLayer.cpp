@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "settings/LoginSettingNodeV3.h"
 #include "GDDLLoginLayer.h"
+#include "nodes/searchcontrols/SearchInputControl.h"
 
 bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     if (!FLAlertLayer::init(75)) return false; // that magic number is actually bg opacity btw
@@ -16,7 +17,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     this->twoPlayer = level->m_twoPlayerMode;
     setInitialValues();
 
-    const CCPoint popupSize = {220.0f, this->twoPlayer ? 300.0f : 250.0f};
+    const CCPoint popupSize = {260.0f, this->twoPlayer ? 300.0f : 250.0f};
     const auto winSize = CCDirector::sharedDirector()->getWinSize();
 
     // background
@@ -49,38 +50,38 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     const auto infoButtonSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     infoButtonSprite->setScale(0.5f);
     // rating
-    const auto ratingLabel = addLabel("Tier", {popupSize.x / 4 + 7.5f, popupSize.y - 40.0f});
+    const auto ratingLabel = addLabel("Tier", {popupSize.x / 4 + 17.5f, popupSize.y - 40.0f});
     Utils::createTextInputNode(m_buttonMenu, ratingTextfield, "bigFont.fnt", "-", 2, {35.0f, 25.0f},
-                               {popupSize.x / 4 + 7.5f, popupSize.y - 60.0f});
+                               {popupSize.x / 4 + 17.5f, popupSize.y - 60.0f});
     ratingTextfield->setAllowedChars("-1234567890");
     Utils::createLeftRightButtonsAround(ratingTextfield, {13.0f, 19.0f}, this,
                                         menu_selector(GDDLRatingSubmissionLayer::onRatingLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onRatingRight));
-    addInfoButtonAndCenterLabel(ratingLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onRatingInfo), popupSize.x / 4 + 7.5f);
+    addInfoButtonAndCenterLabel(ratingLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onRatingInfo), popupSize.x / 4 + 17.5f);
     // enjoyment
-    const auto enjoymentLabel = addLabel("Enjoyment", {3 * popupSize.x / 4 - 7.5f, popupSize.y - 40.0f});
+    const auto enjoymentLabel = addLabel("Enjoyment", {3 * popupSize.x / 4 - 17.5f, popupSize.y - 40.0f});
     Utils::createTextInputNode(m_buttonMenu, enjoymentTextfield, "bigFont.fnt", "-", 2, {35.0f, 25.0f},
-                               {3 * popupSize.x / 4 - 7.5f, popupSize.y - 60.0f});
+                               {3 * popupSize.x / 4 - 17.5f, popupSize.y - 60.0f});
     enjoymentTextfield->setAllowedChars("-1234567890");
     Utils::createLeftRightButtonsAround(enjoymentTextfield, {13.0f, 19.0f}, this,
                                         menu_selector(GDDLRatingSubmissionLayer::onEnjoymentLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onEnjoymentRight));
     addInfoButtonAndCenterLabel(enjoymentLabel, infoButtonSprite,
-                                menu_selector(GDDLRatingSubmissionLayer::onEnjoymentInfo), 3 * popupSize.x / 4 - 7.5f);
+                                menu_selector(GDDLRatingSubmissionLayer::onEnjoymentInfo), 3 * popupSize.x / 4 - 17.5f);
     // fps value
-    const auto fpsLabel = addLabel("FPS", {popupSize.x / 4 + 7.5f, popupSize.y - 85.0f});
+    const auto fpsLabel = addLabel("FPS", {popupSize.x / 4 + 17.5f, popupSize.y - 85.0f});
     Utils::createTextInputNode(m_buttonMenu, fpsTextfield, "bigFont.fnt", "", 4, {35.0f, 25.0f},
-                               {popupSize.x / 4 + 7.5f, popupSize.y - 105.0f});
+                               {popupSize.x / 4 + 17.5f, popupSize.y - 105.0f});
     fpsTextfield->setAllowedChars("1234567890");
     Utils::createLeftRightButtonsAround(fpsTextfield, {13.0f, 19.0f}, this,
                                         menu_selector(GDDLRatingSubmissionLayer::onFPSLeft),
                                         menu_selector(GDDLRatingSubmissionLayer::onFPSRight));
-    addInfoButtonAndCenterLabel(fpsLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onFPSInfo), popupSize.x / 4 + 7.5f);
+    addInfoButtonAndCenterLabel(fpsLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onFPSInfo), popupSize.x / 4 + 17.5f);
     // device
-    addLabel("Device", {3 * popupSize.x / 4 - 7.5f, popupSize.y - 85.0f});
+    addLabel("Device", {3 * popupSize.x / 4 - 17.5f, popupSize.y - 85.0f});
     const auto choiceLabelBG = Utils::createLabelForChoice(m_buttonMenu, deviceLabel, "bigFont.fnt",
                                                            device[mobile ? 1 : 0].c_str(), 50.0f,
-                                                           {3 * popupSize.x / 4 - 7.5f, popupSize.y - 105.0f},
+                                                           {3 * popupSize.x / 4 - 17.5f, popupSize.y - 105.0f},
                                                            {50.0f, 25.0f});
     Utils::createLeftRightButtonsAround(choiceLabelBG, {13.0f, 19.0f}, this,
                                         menu_selector(GDDLRatingSubmissionLayer::onDeviceLeft),
@@ -88,20 +89,24 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     // percent
     const auto percentLabel = addLabel("Percent", {popupSize.x / 4 + 7.5f, popupSize.y - 130.0f});
     Utils::createTextInputNode(m_buttonMenu, percentTextfield, "bigFont.fnt", "", 3, {35.0f, 25.0f},
-                               {popupSize.x / 4 + 7.5f, popupSize.y - 150.0f});
+                               {popupSize.x / 4 - 27.5f, popupSize.y - 150.0f});
     percentTextfield->setAllowedChars("1234567890");
-    addLabel("%", {popupSize.x / 4 + 37.5f, popupSize.y - 150.0f}, 0.7f, "bigFont.fnt");
-    addInfoButtonAndCenterLabel(percentLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onPercentInfo), popupSize.x / 4 + 7.5f);
+    addLabel("%", {popupSize.x / 4 + 0.5f, popupSize.y - 150.0f}, 0.7f, "bigFont.fnt");
+    addInfoButtonAndCenterLabel(percentLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onPercentInfo), popupSize.x / 4 - 17.5f);
+    // status
+    addLabel("Status", {popupSize.x / 2, popupSize.y - 130.0f});
+    const auto statusLabelBG = Utils::createLabelForChoice(m_buttonMenu, statusLabel, "bigFont.fnt", Submission::statusDisplay[status], 80.0f, {popupSize.x / 2, popupSize.y - 150.0f}, {80.0f, 25.0f});
+    Utils::createLeftRightButtonsAround(statusLabelBG, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onStatusLeft), menu_selector(GDDLRatingSubmissionLayer::onStatusRight));
     // attempts
-    const auto attemptsLabel = addLabel("Attempts", {3 * popupSize.x / 4 - 7.5f, popupSize.y - 130.0f});
+    const auto attemptsLabel = addLabel("Attempts", {3 * popupSize.x / 4 + 19.5f, popupSize.y - 130.0f});
     Utils::createTextInputNode(m_buttonMenu, attemptsTextfield, "bigFont.fnt", "", 9, {50.0f, 25.0f},
-                               {3 * popupSize.x / 4 - 7.5f, popupSize.y - 150.0f});
+                               {3 * popupSize.x / 4 + 19.5f, popupSize.y - 150.0f});
     percentTextfield->setAllowedChars("1234567890");
     addInfoButtonAndCenterLabel(attemptsLabel, infoButtonSprite,
-                                menu_selector(GDDLRatingSubmissionLayer::onAttemptsInfo), 3 * popupSize.x / 4 - 7.5f);
+                                menu_selector(GDDLRatingSubmissionLayer::onAttemptsInfo), 3 * popupSize.x / 4 + 19.5f);
     // proof
     const auto proofLabel = addLabel("Proof", {popupSize.x / 2, popupSize.y - 175.0f});
-    Utils::createTextInputNode(m_buttonMenu, proofTextfield, "chatFont.fnt", "", 256, {200.0f, 25.0f},
+    Utils::createTextInputNode(m_buttonMenu, proofTextfield, "chatFont.fnt", "", 256, {220.0f, 25.0f},
                                {popupSize.x / 2, popupSize.y - 195.0f});
     proofTextfield->setAllowedChars(Utils::hopefullyAllCharactersAnyoneWillEverNeed);
     addInfoButtonAndCenterLabel(proofLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onProofInfo), popupSize.x / 2);
@@ -127,7 +132,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     const auto submitButton = CCMenuItemSpriteExtra::create(submitButtonSprite, this,
                                                             menu_selector(GDDLRatingSubmissionLayer::onSubmitClicked));
     submitButton->setID("gddl-rating-submit-submit-button"_spr);
-    submitButton->setPosition({popupSize.x - 53.0f, 22.0f});
+    submitButton->setPosition({popupSize.x - 73.0f, 22.0f});
     m_buttonMenu->addChild(submitButton);
     // guidelines button
     const auto guidelinesButtonSprite = ButtonSprite::create("Guidelines", "bigFont.fnt", "GJ_button_02.png");
@@ -135,7 +140,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     const auto guidelinesButton = CCMenuItemSpriteExtra::create(guidelinesButtonSprite, this,
                                                                 menu_selector(
                                                                     GDDLRatingSubmissionLayer::onGuidelinesClicked));
-    guidelinesButton->setPosition({69.0f, 22.0f});
+    guidelinesButton->setPosition({89.0f, 22.0f});
     m_buttonMenu->addChild(guidelinesButton);
 
     updateTextfields();
@@ -312,6 +317,20 @@ void GDDLRatingSubmissionLayer::onSecondPlayerInfo(CCObject* sender) {
                          "OK")->show();
 }
 
+void GDDLRatingSubmissionLayer::onStatusLeft(CCObject* sender) {
+    --status;
+    if (status < 0) status = Submission::statusValue.size() - 1;
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
+    Utils::scaleLabelToWidth(statusLabel, 80.0f);
+}
+
+void GDDLRatingSubmissionLayer::onStatusRight(CCObject* sender) {
+    ++status;
+    if (status >= Submission::statusValue.size()) status = 0;
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
+    Utils::scaleLabelToWidth(statusLabel, 80.0f);
+}
+
 CCLabelBMFont*
 GDDLRatingSubmissionLayer::addLabel(const std::string& text, const CCPoint& position, float scale, std::string font) {
     const auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
@@ -339,6 +358,7 @@ void GDDLRatingSubmissionLayer::setInitialValues() {
     rating = gddlRating && suggestRatings ? gddlRating.value().roundedRating : 0;
     enjoyment = gddlRating && suggestRatings ? static_cast<int>(std::round(gddlRating.value().enjoyment)) : -1;
     mobile = Utils::isMobile();
+    status = percent == 100 ? 0 : 1;
     const bool measureFps = !Mod::get()->getSettingValue<bool>("enable-set-default-fps");
     if (measureFps) {
         // measure fps using the new awesome method
@@ -363,6 +383,7 @@ void GDDLRatingSubmissionLayer::updateTextfields() {
     Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1, "-");
     percentTextfield->setString(std::to_string(this->percent));
     attemptsTextfield->setString(std::to_string(this->attempts));
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
 }
 
 std::function<void(web::WebResponse)> GDDLRatingSubmissionLayer::getSubmissionListenerLambda() {
@@ -497,8 +518,10 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
         return "Progress can't be 0%";
     }
     submissionJson["progress"] = correctedProgress;
-    // TODO quick fix for submissions needs a proper update later
-    submissionJson["status"] = correctedProgress == 100 ? "beaten" : "beating";
+    submissionJson["status"] = Submission::statusValue[status];
+    if ((correctedProgress == 100 && status != 0) || (correctedProgress != 100 && status == 0)) {
+        return "Invalid progress percent";
+    }
     if (const int correctedAttempts = std::min(
         std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, -1)),
         999999999); correctedAttempts != -1) {
