@@ -95,7 +95,7 @@ bool GDDLRatingSubmissionLayer::init(GJGameLevel* level, int gddlLevelID) {
     addInfoButtonAndCenterLabel(percentLabel, infoButtonSprite, menu_selector(GDDLRatingSubmissionLayer::onPercentInfo), popupSize.x / 4 - 17.5f);
     // status
     addLabel("Status", {popupSize.x / 2, popupSize.y - 130.0f});
-    const auto statusLabelBG = Utils::createLabelForChoice(m_buttonMenu, statusLabel, "bigFont.fnt", statusDisplay[status], 80.0f, {popupSize.x / 2, popupSize.y - 150.0f}, {80.0f, 25.0f});
+    const auto statusLabelBG = Utils::createLabelForChoice(m_buttonMenu, statusLabel, "bigFont.fnt", Submission::statusDisplay[status], 80.0f, {popupSize.x / 2, popupSize.y - 150.0f}, {80.0f, 25.0f});
     Utils::createLeftRightButtonsAround(statusLabelBG, {13.0f, 19.0f}, this, menu_selector(GDDLRatingSubmissionLayer::onStatusLeft), menu_selector(GDDLRatingSubmissionLayer::onStatusRight));
     // attempts
     const auto attemptsLabel = addLabel("Attempts", {3 * popupSize.x / 4 + 19.5f, popupSize.y - 130.0f});
@@ -319,15 +319,15 @@ void GDDLRatingSubmissionLayer::onSecondPlayerInfo(CCObject* sender) {
 
 void GDDLRatingSubmissionLayer::onStatusLeft(CCObject* sender) {
     --status;
-    if (status < 0) status = statusValue.size() - 1;
-    statusLabel->setString(statusDisplay[status].c_str());
+    if (status < 0) status = Submission::statusValue.size() - 1;
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
     Utils::scaleLabelToWidth(statusLabel, 80.0f);
 }
 
 void GDDLRatingSubmissionLayer::onStatusRight(CCObject* sender) {
     ++status;
-    if (status >= statusValue.size()) status = 0;
-    statusLabel->setString(statusDisplay[status].c_str());
+    if (status >= Submission::statusValue.size()) status = 0;
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
     Utils::scaleLabelToWidth(statusLabel, 80.0f);
 }
 
@@ -383,7 +383,7 @@ void GDDLRatingSubmissionLayer::updateTextfields() {
     Utils::setNumberWithGivenDefaultValueTextfield(fps, fpsTextfield, -1, "-");
     percentTextfield->setString(std::to_string(this->percent));
     attemptsTextfield->setString(std::to_string(this->attempts));
-    statusLabel->setString(statusDisplay[status].c_str());
+    statusLabel->setString(Submission::statusDisplay[status].c_str());
 }
 
 std::function<void(web::WebResponse)> GDDLRatingSubmissionLayer::getSubmissionListenerLambda() {
@@ -518,8 +518,10 @@ std::string GDDLRatingSubmissionLayer::fillOutSubmissionJson() {
         return "Progress can't be 0%";
     }
     submissionJson["progress"] = correctedProgress;
-    // TODO quick fix for submissions needs a proper update later
-    submissionJson["status"] = correctedProgress == 100 ? "beaten" : "beating";
+    submissionJson["status"] = Submission::statusValue[status];
+    if ((correctedProgress == 100 && status != 0) || (correctedProgress != 100 && status == 0)) {
+        return "Invalid progress percent";
+    }
     if (const int correctedAttempts = std::min(
         std::max(-1, Utils::getNumberWithGivenDefaultTextfieldValue(attemptsTextfield, -1)),
         999999999); correctedAttempts != -1) {

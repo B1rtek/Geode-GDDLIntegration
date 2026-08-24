@@ -28,8 +28,6 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     std::string requestedUsername;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
-    const inline static std::vector<std::string> statusValue = {"beaten", "beating", "hold", "dropped", "ptb"};
-    const inline static std::vector<std::string> statusDisplay = {"Completed", "In progress", "On hold", "Dropped", "Plan to beat"};
     int rating = -1, enjoyment = -1, fps = 0, gddlLevelID = 0, percent = 0, attempts = 0, status = 0;
     bool mobile = false, twoPlayer = false, soloCompletion = true;
     const inline static std::vector<std::string> validProofURLs = {
@@ -85,7 +83,6 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
 public:
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
-
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
 
