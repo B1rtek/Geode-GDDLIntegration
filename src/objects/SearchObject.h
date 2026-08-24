@@ -62,7 +62,7 @@ class SearchObject {
             "any", "no", "only"
         });
     std::shared_ptr<BoolSearchSetting> isInPackSetting = std::make_shared<BoolSearchSetting>("isInPack", false);
-    std::shared_ptr<EnumSearchSetting> topSkillsetSetting = std::make_shared<EnumSearchSetting>("topSkillset", Skillsets::skillsetNames);
+    std::shared_ptr<EnumSearchSetting> topSkillsetSetting = std::make_shared<EnumSearchSetting>("topTagID", Skillsets::skillsetNames);
     std::shared_ptr<EnumSearchSetting> hasSkillsetSetting = std::make_shared<EnumSearchSetting>("hasSkillset", Skillsets::skillsetNames);
     // skipping notRatedBy, I don't really think anybody would use this apart from maybe checking theirs? and it would be trickier to implement so nope not now
     std::shared_ptr<BoolSearchSetting> completedSetting = std::make_shared<BoolSearchSetting>("excludeCompleted", false); // special, not included in searchableSettings vector
