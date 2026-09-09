@@ -3,10 +3,10 @@
 #include "Utils.h"
 
 RatingsSpread::RatingsSpread(const matjson::Value &spreadJson) {
-    if (!spreadJson.contains("rating") || !spreadJson.contains("enjoyment") || !spreadJson["rating"].isObject() || !spreadJson["enjoyment"].isObject()) {
+    if (!spreadJson.contains("weightedRating") || !spreadJson.contains("enjoyment") || !spreadJson["weightedRating"].isObject() || !spreadJson["enjoyment"].isObject()) {
         return;
     }
-    const auto ratings = spreadJson["rating"];
+    const auto ratings = spreadJson["weightedRating"];
     const auto enjoyments = spreadJson["enjoyment"];
     for (const auto &[key, value]: ratings) {
         const Result<int> maybeRating = numFromString<int>(key);
