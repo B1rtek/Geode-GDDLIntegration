@@ -128,7 +128,7 @@ void GDDLDemonSplitLayer::onInfo(cocos2d::CCObject *sender) { // NOLINT(*-conver
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 void GDDLDemonSplitLayer::onTierSearch(cocos2d::CCObject *sender) { // NOLINT(*-convert-member-functions-to-static)
-    auto *senderNode = dynamic_cast<CCNode *>(sender);
+    auto *senderNode = typeinfo_cast<CCNode *>(sender);
     const std::string tierStr = senderNode->getID();
     const int start = tierStr.find("button-tier-") + 12;
     const int end = tierStr.size();

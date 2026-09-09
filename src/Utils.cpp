@@ -369,7 +369,8 @@ std::string Utils::getErrorFromMessageAndResponse(matjson::Value jsonResponse, w
     std::string errorMessage = getErrorMessageFromErrorCode(res.code()).value_or(res.string().unwrapOr(std::to_string(res.code())));
     if (jsonResponse.contains("message")) {
         if (jsonResponse["message"].isArray()) {
-            errorMessage = jsonResponse["message"].asArray().unwrap()[0].asString().unwrapOr("Response was not a valid string");
+            const auto errorsArray = jsonResponse["message"].asArray().unwrap();
+            errorMessage = errorsArray.empty() ? "Error not provided" : errorsArray[0].asString().unwrapOr("Response was not a valid string");
         } else if (jsonResponse["message"].isString()) {
             errorMessage = jsonResponse["message"].asString().unwrapOr("Response was not a valid string");
         }
