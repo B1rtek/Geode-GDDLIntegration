@@ -27,7 +27,7 @@ GDDLRating RatingsManager::parseJson(const std::string& response) {
  *
  * If the list is over a week old, don't load data from it
  */
-void RatingsManager::populateFromSave() {
+void RatingsManager::populateFromSave(bool forceLoad) {
     if (!Utils::fileExists(cachedListPath)) {
         return;
     }
@@ -42,7 +42,7 @@ void RatingsManager::populateFromSave() {
         cacheTimestamp = data["cached"].asInt().unwrapOr(0);
         // ReSharper disable once CppTooWideScopeInitStatement
         const unsigned int currentTimestamp = Utils::getCurrentTimestamp();
-        if (currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it
+        if (forceLoad || currentTimestamp - cacheTimestamp < 86400 * 7) { // list less than 7 days old, load it (or force load)
             if (data.contains("list") && data["list"].isArray()) {
                 for (auto idRatingPair: data["list"].asArray().unwrap()) {
                     const int id = idRatingPair["ID"].asInt().unwrapOr(-1);

@@ -28,7 +28,7 @@ public:
     inline static bool readCache = false;
     inline static bool triedToDownloadCache = false;
 
-    static void populateFromSave();
+    static void populateFromSave(bool forceLoad = false);
 
     static int getDemonTier(int id);
 
