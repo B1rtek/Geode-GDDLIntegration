@@ -2,6 +2,7 @@
 - Fixed a bug where the outdated cache wouldn't be loaded if a request to refresh it fails
 - Fixed a bug which would wipe the cache after an unsuccessful refresh if the user loaded a rating on any level after that
 - Fixed a crash that might occur when the rating, enjoyment or deviation returned by the API is set to "NaN" (thanks waffybun and ooven!)
+- Rating spread only displays weighted ratings now (thanks huggies___!)
 
 # 1.3.4
 - Submission status setting is now supported
