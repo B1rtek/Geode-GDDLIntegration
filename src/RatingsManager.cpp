@@ -124,6 +124,7 @@ bool RatingsManager::addRatingFromResponse(const int id, const std::string &resp
 }
 
 void RatingsManager::cacheRatings(const std::string &response) {
+    std::map<int, int> newCache;
     // epic csv parser by b1rtek v1.2 (now it doesn't crash the game!!) (i think)
     std::stringstream ss;
     std::string value, line;
@@ -157,12 +158,13 @@ void RatingsManager::cacheRatings(const std::string &response) {
                 std::string strRating = values[5].substr(1, values[5].size() - 2);
                 const float rating = numFromString<float>(strRating).unwrapOr(-1.0f);
                 const int roundedRating = static_cast<int>(round(rating));
-                ratingsCache[id] = roundedRating;
+                newCache[id] = roundedRating;
             }
         }
     }
-    if (!ratingsCache.empty()) {
+    if (!newCache.empty()) {
         // don't save the cache if it's empty, that could potentially overwrite an outdated but a potentially full cache
+        ratingsCache = newCache;
         cacheList(false);
     }
 }
@@ -198,11 +200,6 @@ void RatingsManager::updateCacheFromSearch(const int levelID, const float rating
 
 int RatingsManager::getCachedTier(const int levelID) {
     return !ratingsCache.contains(levelID) ? -1 : ratingsCache[levelID];
-}
-
-void RatingsManager::clearCache() {
-    // clears the cache in-memory, leaving the file intact in case the refresh fails for some reason
-    ratingsCache.clear();
 }
 
 void RatingsManager::cacheSpread(const int levelID, const RatingsSpread& spread) {

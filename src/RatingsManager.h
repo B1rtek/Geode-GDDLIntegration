@@ -52,8 +52,6 @@ public:
 
     static void cacheList(bool onQuit);
 
-    static void clearCache();
-
     static void cacheSpread(const int levelID, const RatingsSpread& spread);
 
     static bool hasSpread(const int levelID);
