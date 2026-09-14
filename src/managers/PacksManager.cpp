@@ -329,8 +329,8 @@ Result<std::shared_ptr<PackInfo>> PacksManager::getPackLevelsFromJson(const matj
     updatedPackInfo->clearLevelList();
     for (const auto& levelObject : json.asArray().unwrap()) {
         if (levelObject.isObject() && levelObject.contains("LevelID") && levelObject["LevelID"].isNumber() &&
-            levelObject.contains("EX") && levelObject["EX"].isBool()) {
-            updatedPackInfo->addLevel(levelObject["LevelID"].asInt().unwrap(), levelObject["EX"].asBool().unwrap());
+            levelObject.contains("EX") && levelObject["EX"].isNumber()) {
+            updatedPackInfo->addLevel(levelObject["LevelID"].asInt().unwrap(), levelObject["EX"].asInt().unwrap() == 1);
         } else {
             // invalid json
             log::info("[PacksManager::getPackLevelsFromJson] Invalid level JSON object");
