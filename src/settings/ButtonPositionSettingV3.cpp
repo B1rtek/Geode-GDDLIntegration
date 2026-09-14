@@ -3,6 +3,8 @@
 #include <Geode/Geode.hpp>
 #include "ButtonPositionSettingNodeV3.h"
 
+#include <Geode/Geode.hpp>
+
 Result<std::shared_ptr<SettingV3>> ButtonPositionSettingV3::parse(std::string const& key,
                                                                   std::string const& modID, matjson::Value const& json) {
     const auto res = std::make_shared<ButtonPositionSettingV3>();

@@ -292,11 +292,11 @@ void GDDLAdvancedLevelInfoPopup::addTierSprite(const int tier) {
 
 
 std::string GDDLAdvancedLevelInfoPopup::getSpreadEndpointUrl(const int levelID) {
-    return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/submissions/spread";
+    return "https://gdladder.com/api/levels/" + std::to_string(levelID) + "/submissions/spread";
 }
 
 std::string GDDLAdvancedLevelInfoPopup::getSkillsetsEndpointUrl(const int levelID) {
-    return "https://gdladder.com/api/level/" + std::to_string(levelID) + "/tags";
+    return "https://gdladder.com/api/levels/" + std::to_string(levelID) + "/tags";
 }
 
 GDDLAdvancedLevelInfoPopup *

@@ -18,6 +18,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     CCTextInputNode* attemptsTextfield = nullptr;
     CCTextInputNode* secondPlayerTextfield = nullptr;
     CCLabelBMFont* deviceLabel = nullptr;
+    CCLabelBMFont* statusLabel = nullptr;
     CCMenuItemToggler* soloCompletionToggler = nullptr;
 
     const inline static std::string submissionEndpoint = "https://gdladder.com/api/submissions";
@@ -27,7 +28,7 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     std::string requestedUsername;
 
     const inline static std::vector<std::string> device = {"PC", "Mobile"};
-    int rating = -1, enjoyment = -1, fps = 0, gddlLevelID = 0, percent = 0, attempts = 0;
+    int rating = -1, enjoyment = -1, fps = 0, gddlLevelID = 0, percent = 0, attempts = 0, status = 0;
     bool mobile = false, twoPlayer = false, soloCompletion = true;
     const inline static std::vector<std::string> validProofURLs = {
         "https://www.youtube.com/watch?v=",
@@ -64,6 +65,8 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
     void onAttemptsInfo(CCObject* sender);
     void onProofInfo(CCObject* sender);
     void onSecondPlayerInfo(CCObject* sender);
+    void onStatusLeft(CCObject* sender);
+    void onStatusRight(CCObject* sender);
 
     CCLabelBMFont* addLabel(const std::string& text, const CCPoint& position, float scale = 0.7f,
                             std::string font = "chatFont.fnt");
@@ -80,7 +83,6 @@ class GDDLRatingSubmissionLayer final : public FLAlertLayer {
 
 public:
     const inline static std::string userSearchEndpoint = "https://gdladder.com/api/user/search";
-
     static GDDLRatingSubmissionLayer* create(GJGameLevel* level, int gddlLevelID);
     void show() override;
 

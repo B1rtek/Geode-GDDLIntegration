@@ -1,6 +1,20 @@
 # 1.4.0-beta.5
 - Packs support with new fancy textures, still wip (functions as intended, although not fully tested, ui still wip)
 
+# 1.3.5
+- Fixed a bug where the outdated cache wouldn't be loaded if a request to refresh it fails
+- Fixed a bug which would wipe the cache after an unsuccessful refresh if the user loaded a rating on any level after that
+- Fixed a crash that might occur when the rating, enjoyment or deviation returned by the API is set to "NaN" (thanks waffybun and ooven!)
+- Rating spread only displays weighted ratings now (thanks huggies___!)
+
+# 1.3.4
+- Submission status setting is now supported
+- Fixed a bug that caused an error during search when the "Difficulty" option was used (thanks zpowers and xvigames0!)
+- Fixed a bug which made the top skillset search not work at all (thanks ziomekel!)
+
+# 1.3.3
+- Update to GDDL API v3 (some new features might not be temporarily fully supported)
+
 # 1.3.2
 - The tier images are now being assembled from template textures instead, improving texture pack support ([thanks Aktimoose!](https://github.com/B1rtek/Geode-GDDLIntegration/issues/108))
 - Opening the GDDL Demon Split and the simplified search page doesn't lag the game anymore

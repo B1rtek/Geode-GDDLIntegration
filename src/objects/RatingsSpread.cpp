@@ -3,10 +3,10 @@
 #include "Utils.h"
 
 RatingsSpread::RatingsSpread(const matjson::Value &spreadJson) {
-    if (!spreadJson.contains("rating") || !spreadJson.contains("enjoyment") || !spreadJson["rating"].isObject() || !spreadJson["enjoyment"].isObject()) {
+    if (!spreadJson.contains("weightedRating") || !spreadJson.contains("enjoyment") || !spreadJson["weightedRating"].isObject() || !spreadJson["enjoyment"].isObject()) {
         return;
     }
-    const auto ratings = spreadJson["rating"];
+    const auto ratings = spreadJson["weightedRating"];
     const auto enjoyments = spreadJson["enjoyment"];
     for (const auto &[key, value]: ratings) {
         const Result<int> maybeRating = numFromString<int>(key);
@@ -23,8 +23,6 @@ RatingsSpread::RatingsSpread(const matjson::Value &spreadJson) {
         if (maybeEnj.isOk()) {
             const int enjoyment = maybeEnj.unwrap();
             const int count = value.asInt().unwrapOr(0);
-            minEnj = std::min(minEnj, enjoyment);
-            maxEnj = std::max(maxEnj, enjoyment);
             enjRatings[enjoyment] = count;
         }
     }
@@ -41,7 +39,7 @@ std::vector<BarChartData> RatingsSpread::getDiffSpreadData() {
 
 std::vector<BarChartData> RatingsSpread::getEnjSpreadData() {
     std::vector<BarChartData> chartData{};
-    for (int i = minEnj; i <= maxEnj; i++) {
+    for (int i = 0; i <= 10; i++) {
         const int count = enjRatings.contains(i) ? enjRatings[i] : 0;
         chartData.push_back(BarChartData(Utils::hexColorTo4F(enjColors[i]), std::to_string(i) + "/10", count));
     }

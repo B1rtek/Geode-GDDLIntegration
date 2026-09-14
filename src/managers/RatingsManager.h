@@ -28,7 +28,7 @@ public:
     inline static bool readCache = false;
     inline static bool triedToDownloadCache = false;
 
-    static void populateFromSave();
+    static void populateFromSave(bool forceLoad = false);
 
     static int getDemonTier(int id);
 
@@ -51,8 +51,6 @@ public:
     static int getCachedTier(int levelID);
 
     static void cacheList(bool onQuit);
-
-    static void clearCache();
 
     static void cacheSpread(const int levelID, const RatingsSpread& spread);
 

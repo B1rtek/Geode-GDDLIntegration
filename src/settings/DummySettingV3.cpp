@@ -3,6 +3,8 @@
 #include <Geode/Geode.hpp>
 #include "CacheResetSettingNodeV3.h"
 
+#include <Geode/Geode.hpp>
+
 Result<std::shared_ptr<SettingV3>>
 DummySettingV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<DummySettingV3>();

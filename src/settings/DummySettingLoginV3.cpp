@@ -3,6 +3,8 @@
 #include <Geode/Geode.hpp>
 #include "LoginSettingNodeV3.h"
 
+#include <Geode/Geode.hpp>
+
 Result<std::shared_ptr<SettingV3>>
 DummySettingLoginV3::parse(const std::string& key, const std::string& modID, const matjson::Value& json) {
     const auto res = std::make_shared<DummySettingLoginV3>();
