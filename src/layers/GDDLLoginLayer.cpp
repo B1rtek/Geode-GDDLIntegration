@@ -73,7 +73,7 @@ bool GDDLLoginLayer::init() {
 
         // disclaimer about logging out
         const std::string disclaimerMessage = "<cr>Logging out</c> will <cy>only delete</c> the <cj>API key</c> from\n<co>this device</c>, to log out <cy>all devices</c> go to\ngdladder.com > <cg>Settings</c> > <cp>Developer</c>.";
-        const auto disclaimerTextArea = TextArea::create(disclaimerMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+        const auto disclaimerTextArea = TextArea::create(disclaimerMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false, 0);
         disclaimerTextArea->setID("gddl-login-disclaimer"_spr);
         disclaimerTextArea->setPosition({popupSize.x / 2 + 30.0f + mediumGraphics * 5.0f, popupSize.y - 115.0f}); // why does this thing not place itself in the middle ugh
         m_buttonMenu->addChild(disclaimerTextArea);
@@ -96,7 +96,7 @@ bool GDDLLoginLayer::init() {
 
         // instructions
         const std::string apiKeyInstructions = "To obtain your <cj>API key</c>, log into your\n<cr>GDDL account</c> in the browser and go\nto <cg>Settings</c> > <cp>Developer</c>.    "; // these spaces at the end are 100% intentional, screw you TextArea
-        const auto apiKeyTextArea = TextArea::create(apiKeyInstructions, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+        const auto apiKeyTextArea = TextArea::create(apiKeyInstructions, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false, 0);
         apiKeyTextArea->setID("gddl-login-api-key-instructions"_spr);
         apiKeyTextArea->setPosition({popupSize.x / 2 + 25.0f + mediumGraphics * 4.0f, popupSize.y - 115.0f}); // why does this thing not place itself in the middle ugh
         m_buttonMenu->addChild(apiKeyTextArea);
@@ -104,7 +104,7 @@ bool GDDLLoginLayer::init() {
 
     // never share this key with anyone label
     std::string neverShareMessage = "<cr>Never</c> share your <cj>API key</c> with anyone.\n<co>Anyone</c> in the possession of your <cj>API key</c>\nhas <cy>full access to your account</c>.";
-    const auto disclaimerTextArea = TextArea::create(neverShareMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false);
+    const auto disclaimerTextArea = TextArea::create(neverShareMessage, "chatFont.fnt", 0.8, popupSize.x, {0.5f, 0.5f}, lineHeight, false, 0);
     disclaimerTextArea->setID("gddl-login-never-share"_spr);
     disclaimerTextArea->setPosition({popupSize.x / 2 + 27.5f + mediumGraphics * 4.0f, popupSize.y - 155.0f}); // why does this thing not place itself in the middle ugh
     m_buttonMenu->addChild(disclaimerTextArea);

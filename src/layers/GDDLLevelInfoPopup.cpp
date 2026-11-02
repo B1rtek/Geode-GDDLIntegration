@@ -121,7 +121,7 @@ void GDDLLevelInfoPopup::addLevelInfo() {
         const std::string submissionCount = "<cy>Total submissions:</c> " + (info.submissionCount == -1 ? "N/A" : std::to_string(info.submissionCount)) + '\n';
         levelInfoText = " \n" + rating + enjoyment + submissionCount + " \n"; // uhhh this is a good workaround right?
     }
-    const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false);
+    const auto levelInfoLabels = TextArea::create(levelInfoText, "chatFont.fnt", 1, popupSize.x-30.0f, {0.5f,0.5f}, 20, false, 0);
     levelInfoLabels->setID("gddl-level-info-label"_spr);
     m_buttonMenu->addChild(levelInfoLabels, 2);
     levelInfoLabels->setPosition({0.0f, 5.0f});
