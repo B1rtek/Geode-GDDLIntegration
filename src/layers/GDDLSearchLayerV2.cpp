@@ -208,7 +208,7 @@ void GDDLSearchLayerV2::backActions() {
 
 void GDDLSearchLayerV2::clickOffTextfields() {
     currentPage->clickOffTextfields();
-    this->levelNameTextInput->getInputNode()->onClickTrackNode(false);
+    this->levelNameTextInput->unfocus();
     // why are you dynamic casting without checking the result - Cvolton #39 #40
     // I'm preserving this comment because it's funny
     const auto parent = getParent();
