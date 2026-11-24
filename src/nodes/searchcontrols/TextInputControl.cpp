@@ -25,7 +25,7 @@ TextInputControl* TextInputControl::create(const std::string& labelText, const s
 }
 
 void TextInputControl::clickOffTextfields() {
-    this->textInputNode->getInputNode()->onClickTrackNode(false);
+    this->textInputNode->unfocus();
 }
 
 void TextInputControl::saveSetting() {

@@ -71,7 +71,7 @@ Result<std::vector<int>> SearchObject::parseApiResponse(const std::string& respo
             listOfIds.push_back(levelID);
         }
         // optional step: if rating is present, update cache
-        if (level.contains("rating") && level["rating"].isExactlyDouble()) {
+        if (level.contains("rating") && level["rating"].isNumber()) {
             const float rating = level["rating"].asDouble().unwrap();
             RatingsManager::updateCacheFromSearch(levelID, rating);
         }

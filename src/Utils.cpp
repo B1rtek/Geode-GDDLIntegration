@@ -124,7 +124,7 @@ void Utils::scaleLabelToWidth(CCLabelBMFont*& label, const float maxWidth) {
     label->setScale(scale);
 }
 
-CCLabelBMFont* Utils::createLabel(CCLayer* parent, const std::string& font, const std::string& text, float maxWidth,
+CCLabelBMFont* Utils::createLabel(CCNode* parent, const std::string& font, const std::string& text, float maxWidth,
                                   const CCPoint& position, int zOrder) {
     auto label = CCLabelBMFont::create(text.c_str(), font.c_str());
     parent->addChild(label, zOrder);
@@ -133,8 +133,8 @@ CCLabelBMFont* Utils::createLabel(CCLayer* parent, const std::string& font, cons
     return label;
 }
 
-CCScale9Sprite* Utils::createLabelForChoice(CCLayer* parent, CCLabelBMFont*& label, const std::string& font,
-    const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, const std::string &bgSprite, int zOrder) {
+CCScale9Sprite* Utils::createLabelForChoice(CCNode* parent, CCLabelBMFont*& label, const std::string& font,
+                                            const std::string& placeholder, float maxWidth, const CCPoint& position, const CCPoint& bgSize, const std::string &bgSprite, int zOrder) {
     label = CCLabelBMFont::create(placeholder.c_str(), font.c_str());
     parent->addChild(label, zOrder);
     label->setPosition(position);

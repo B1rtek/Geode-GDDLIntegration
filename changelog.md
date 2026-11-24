@@ -1,3 +1,6 @@
+# 1.3.6
+- 2.2091 support
+
 # 1.3.5
 - Fixed a bug where the outdated cache wouldn't be loaded if a request to refresh it fails
 - Fixed a bug which would wipe the cache after an unsuccessful refresh if the user loaded a rating on any level after that
