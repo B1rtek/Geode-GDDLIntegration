@@ -14,7 +14,6 @@ protected:
     CCMenuItemSpriteExtra* loginLogoutButton = nullptr;
 
     bool init(std::shared_ptr<DummySettingLoginV3> setting, float width);
-    void updateState(CCNode* invoker) override;
 
     void onLoginLogoutButtonClicked(CCObject *sender);
     ButtonSprite* getLoginLogoutButtonSprite(bool login);
@@ -25,6 +24,7 @@ protected:
 public:
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    void updateState(CCNode* invoker) override;
 
     void updateFromOutside();
     static bool loggedIn();

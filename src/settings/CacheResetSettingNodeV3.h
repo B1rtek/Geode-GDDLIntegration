@@ -12,7 +12,6 @@ protected:
     async::TaskHolder<web::WebResponse> cacheEventListener;
 
     bool init(std::shared_ptr<DummySettingV3> setting, float width);
-    void updateState(CCNode* invoker) override;
 
     void onCacheResetButtonClicked(CCObject *sender);
 
@@ -22,6 +21,7 @@ protected:
 public:
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    void updateState(CCNode* invoker) override;
 
     static CacheResetSettingNodeV3* create(std::shared_ptr<DummySettingV3> setting, float width);
 };

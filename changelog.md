@@ -1,5 +1,6 @@
-# 1.3.6
-- 2.2091 support
+# 1.3.6-beta.5
+- 2.2091 support (Windows/Linux and Android only for now)
+- Fixed non-clickable settings ([thanks CatsAreCoolXD!](https://github.com/B1rtek/Geode-GDDLIntegration/issues/119))
 
 # 1.3.5
 - Fixed a bug where the outdated cache wouldn't be loaded if a request to refresh it fails
