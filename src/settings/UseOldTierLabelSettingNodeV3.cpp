@@ -7,18 +7,25 @@ bool UseOldTierLabelSettingNodeV3::init(std::shared_ptr<UseOldTierLabelSettingV3
         return false;
     }
 
+    const auto menu = CCMenu::create();
+    menu->setContentSize(this->getButtonMenu()->getContentSize());
+    menu->setAnchorPoint(this->getButtonMenu()->getAnchorPoint());
+    menu->setPosition(this->getButtonMenu()->getPosition());
+    this->addChild(menu);
+
     // setting UI
-    Utils::createCheckbox(this->getButtonMenu(), enabledToggler, "Enable", 15.0f, 0.6f, {36.0f, 20.0f}, this,
+    Utils::createCheckbox(menu, enabledToggler, "Enable", 15.0f, 0.6f, {36.0f, 20.0f}, this,
                           menu_selector(UseOldTierLabelSettingNodeV3::onToggleEnabled));
-    Utils::createTextInputNode(this->getButtonMenu(), positionOffsetTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f},
+    Utils::createTextInputNode(menu, positionOffsetTextfield, "bigFont.fnt", "", 2, {35.0f, 25.0f},
                                {121.0f, 15.0f});
     Utils::createLeftRightButtonsAround(positionOffsetTextfield, {13.0f, 19.0f}, this,
                                         menu_selector(UseOldTierLabelSettingNodeV3::onPositionOffsetLeft),
                                         menu_selector(UseOldTierLabelSettingNodeV3::onPositionOffsetRight));
-    Utils::createLabel(this->getButtonMenu(), "chatFont.fnt", "Offset:", 50.0f, {71.0f, 15.0f});
+    Utils::createLabel(menu, "chatFont.fnt", "Offset:", 50.0f, {71.0f, 15.0f});
 
-    this->getButtonMenu()->setContentWidth(170.0f);
-    this->getButtonMenu()->updateLayout();
+    menu->setContentWidth(170.0f);
+    menu->setPosition({this->getContentWidth() - menu->getScaledContentWidth(),0});
+    menu->updateLayout();
 
     // load values
     loadValues();

@@ -7,25 +7,32 @@ bool ExcludeRangeSettingNodeV3::init(std::shared_ptr<ExcludeRangeSettingV3> sett
         return false;
     }
 
+    const auto menu = CCMenu::create();
+    menu->setContentSize(this->getButtonMenu()->getContentSize());
+    menu->setAnchorPoint(this->getButtonMenu()->getAnchorPoint());
+    menu->setPosition(this->getButtonMenu()->getPosition());
+    this->addChild(menu);
+
     // range textboxes
-    Utils::createTextInputNode(this->getButtonMenu(), textfields[0], "bigFont.fnt", "", 2, {35.0f, 25.0f},
+    Utils::createTextInputNode(menu, textfields[0], "bigFont.fnt", "", 2, {35.0f, 25.0f},
                                {40.0f, 15.0f});
     Utils::createLeftRightButtonsAround(textfields[0], {13.0f, 19.0f}, this,
                                         menu_selector(ExcludeRangeSettingNodeV3::onRangeBeginLeft),
                                         menu_selector(ExcludeRangeSettingNodeV3::onRangeBeginRight));
-    Utils::createTextInputNode(this->getButtonMenu(), textfields[1], "bigFont.fnt", "", 2, {35.0f, 25.0f},
+    Utils::createTextInputNode(menu, textfields[1], "bigFont.fnt", "", 2, {35.0f, 25.0f},
                                {115.0f, 15.0f});
     Utils::createLeftRightButtonsAround(textfields[1], {13.0f, 19.0f}, this,
                                         menu_selector(ExcludeRangeSettingNodeV3::onRangeEndLeft),
                                         menu_selector(ExcludeRangeSettingNodeV3::onRangeEndRight));
-    Utils::createLabel(this->getButtonMenu(), "chatFont.fnt", "to", 30.0f, {77.5f, 15.0f});
+    Utils::createLabel(menu, "chatFont.fnt", "to", 30.0f, {77.5f, 15.0f});
 
     // include/exclude toggle
-    Utils::createCheckbox(this->getButtonMenu(), includeToggler, "Include", 15.0f, 0.6f, {170.0f, 20.0f}, this,
+    Utils::createCheckbox(menu, includeToggler, "Include", 15.0f, 0.6f, {170.0f, 20.0f}, this,
                           menu_selector(ExcludeRangeSettingNodeV3::onToggleInclude));
 
-    this->getButtonMenu()->setContentWidth(190.0f);
-    this->getButtonMenu()->updateLayout();
+    menu->setContentWidth(190.0f);
+    menu->setPosition({this->getContentWidth() - menu->getScaledContentWidth(),0});
+    menu->updateLayout();
 
     // load values
     loadValues();

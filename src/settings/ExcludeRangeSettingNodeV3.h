@@ -17,7 +17,6 @@ protected:
 
     bool init(std::shared_ptr<ExcludeRangeSettingV3> setting, float width);
     void loadValues();
-    void updateState(CCNode* invoker) override;
 
     void onRangeBeginLeft(CCObject *sender);
     void onRangeBeginRight(CCObject *sender);
@@ -31,6 +30,7 @@ protected:
 public:
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    void updateState(CCNode* invoker) override;
     std::shared_ptr<ExcludeRangeSettingV3> getSetting() const;
 
     static ExcludeRangeSettingNodeV3* create(std::shared_ptr<ExcludeRangeSettingV3> setting, float width);

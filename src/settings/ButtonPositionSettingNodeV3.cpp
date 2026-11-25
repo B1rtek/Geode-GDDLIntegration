@@ -6,13 +6,20 @@ bool ButtonPositionSettingNodeV3::init(std::shared_ptr<ButtonPositionSettingV3> 
         return false;
     }
 
+    const auto menu = CCMenu::create();
+    menu->setContentSize(this->getContentSize());
+    menu->setAnchorPoint({1,0});
+    menu->setPosition({this->getContentWidth(),0});
+    this->addChild(menu);
+
     // choice label
-    const auto bg = Utils::createLabelForChoice(this->getButtonMenu(), positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {100.0f, 15.0f},
+    const auto bg = Utils::createLabelForChoice(menu, positionSettingLabel, "bigFont.fnt", toDisplay[0], labelWidth, {100.0f, 15.0f},
                                    {labelWidth, 25.0f});
     Utils::createLeftRightButtonsAround(bg, {13.0f, 19.0f}, this, menu_selector(ButtonPositionSettingNodeV3::onPositionSettingLeft), menu_selector(ButtonPositionSettingNodeV3::onPositionSettingRight));
 
-    this->getButtonMenu()->setContentWidth(bg->getScaledContentWidth() * 1.3f);
-    this->getButtonMenu()->updateLayout();
+    menu->setContentWidth(bg->getScaledContentWidth() * 1.3f);
+    menu->setPosition({this->getContentWidth() - menu->getScaledContentWidth(),0});
+    menu->updateLayout();
 
     // load values
     loadValues();

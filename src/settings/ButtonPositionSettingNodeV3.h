@@ -15,7 +15,6 @@ protected:
 
     bool init(std::shared_ptr<ButtonPositionSettingV3> setting, float width);
     void loadValues();
-    void updateState(CCNode* invoker) override;
     void setPositionSettingLabel();
 
     void onPositionSettingLeft(CCObject *sender);
@@ -28,6 +27,7 @@ public:
 
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    void updateState(CCNode* invoker) override;
     std::shared_ptr<ButtonPositionSettingV3> getSetting() const;
 
     static ButtonPositionSettingNodeV3* create(std::shared_ptr<ButtonPositionSettingV3> setting, float width);

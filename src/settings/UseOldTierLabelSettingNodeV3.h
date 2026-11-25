@@ -16,7 +16,6 @@ protected:
 
     bool init(std::shared_ptr<UseOldTierLabelSettingV3> setting, float width);
     void loadValues();
-    void updateState(CCNode* invoker) override;
 
     void onPositionOffsetLeft(CCObject *sender);
     void onPositionOffsetRight(CCObject *sender);
@@ -28,6 +27,7 @@ protected:
 public:
     bool hasUncommittedChanges() const override;
     bool hasNonDefaultValue() const override;
+    void updateState(CCNode* invoker) override;
     std::shared_ptr<UseOldTierLabelSettingV3> getSetting() const;
 
     static UseOldTierLabelSettingNodeV3* create(std::shared_ptr<UseOldTierLabelSettingV3> setting, float width);

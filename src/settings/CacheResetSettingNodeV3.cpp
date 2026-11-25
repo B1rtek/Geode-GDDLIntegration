@@ -8,14 +8,19 @@ bool CacheResetSettingNodeV3::init(std::shared_ptr<DummySettingV3> setting, floa
         return false;
     }
 
+    const auto menu = CCMenu::create();
+    menu->setContentSize(this->getButtonMenu()->getContentSize());
+    menu->setAnchorPoint(this->getButtonMenu()->getAnchorPoint());
+    menu->setPosition(this->getButtonMenu()->getPosition());
+    this->addChild(menu);
+
     // reset button
     const auto resetButtonSprite = ButtonSprite::create("Reset", "bigFont.fnt", "GJ_button_04.png");
     resetButtonSprite->setScale(0.6f);
     const auto resetButton = CCMenuItemSpriteExtra::create(resetButtonSprite, this, menu_selector(CacheResetSettingNodeV3::onCacheResetButtonClicked));
 
-    this->getButtonMenu()->addChildAtPosition(resetButton, Anchor::Center);
-    this->getButtonMenu()->setContentWidth(150);
-    this->getButtonMenu()->updateLayout();
+    menu->addChildAtPosition(resetButton, Anchor::Center);
+    menu->updateLayout();
 
     return true;
 }

@@ -7,21 +7,28 @@ bool LoginSettingNodeV3::init(std::shared_ptr<DummySettingLoginV3> setting, floa
         return false;
     }
 
+    const auto menu = CCMenu::create();
+    menu->setContentSize(this->getButtonMenu()->getContentSize());
+    menu->setAnchorPoint(this->getButtonMenu()->getAnchorPoint());
+    menu->setPosition(this->getButtonMenu()->getPosition());
+    this->addChild(menu);
+
     // login status
     loginStatus = CCLabelBMFont::create("Not logged in", "chatFont.fnt");
     loginStatus->setScale(0.5f);
     loginStatus->setAnchorPoint({0.0f, 0.5f});
     loginStatus->setPosition({0.0f, 15.0f});
-    this->getButtonMenu()->addChild(loginStatus);
+    menu->addChild(loginStatus);
 
 
     // login/logout button
     loginLogoutButton = CCMenuItemSpriteExtra::create(getLoginLogoutButtonSprite(true), this, menu_selector(LoginSettingNodeV3::onLoginLogoutButtonClicked));
     loginLogoutButton->setPosition({150.0f, 15.0f});
-    this->getButtonMenu()->addChild(loginLogoutButton);
+    menu->addChild(loginLogoutButton);
 
-    this->getButtonMenu()->setContentWidth(200);
-    this->getButtonMenu()->updateLayout();
+    menu->setContentWidth(200);
+    menu->setPosition({this->getContentWidth() - menu->getScaledContentWidth(),0});
+    menu->updateLayout();
 
     updateState(nullptr);
 
