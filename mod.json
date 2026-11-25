@@ -1,6 +1,6 @@
 {
 	"geode": "6.0.0",
-	"version": "v1.3.6",
+	"version": "v1.3.6-beta.5",
 	"gd": {
 		"android": "2.2091",
 		"win": "2.2091",
@@ -105,7 +105,7 @@
 			"type": "title"
 		},
 		"exclude-range" : {
-			"name": "Include/Exclude range",
+			"name": "Incl./Excl. range",
 			"description": "<cr>Removes</c> the GDDL button from level pages of levels <cy>within</c> the specified range. If the <cb>include</c> toggle is toggled <cg>on</c>, the ratings will <cy>only</c> be displayed in the specified range. If both range ends are set to <cb>0</c>, this setting does <cy>nothing</c>, an empty value means 1 (range beginning) and 35 (range end) by default. Range is <cg>inclusive</c> on <cb>both</c> ends.",
 			"type": "custom:exclude-range-v3"
 		},
